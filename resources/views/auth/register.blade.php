@@ -105,71 +105,10 @@
                             <button class="btn btn-lg btn-primary btn-block">Register</button>
                         </div>
                     </form><!-- form -->
-                    <div class="form-note-s2 pt-4"> Already have an account ? <a
-                            href="html/pages/auths/auth-login.html"><strong>Sign in instead</strong></a>
+                    <div class="form-note-s2 pt-4"> 이미 계정이 있으신가요 ? <a
+                            href="html/pages/auths/auth-login.html"><strong>로그인하기</strong></a>
                     </div>
-                    <div class="text-center pt-4 pb-3">
-                        <h6 class="overline-title overline-title-sap"><span>OR</span></h6>
-                    </div>
-                    <ul class="nav justify-center gx-8">
-                        <li class="nav-item"><a class="nav-link" href="#">Facebook</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Google</a></li>
-                    </ul>
                 </div><!-- .nk-block -->
-                <div class="nk-block nk-auth-footer">
-                    <div class="nk-block-between">
-                        <ul class="nav nav-sm">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Terms & Condition</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Privacy Policy</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Help</a>
-                            </li>
-                            <li class="nav-item dropup">
-                                <a class="dropdown-toggle dropdown-indicator has-indicator nav-link"
-                                    data-bs-toggle="dropdown" data-offset="0,10"><small>English</small></a>
-                                <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
-                                    <ul class="language-list">
-                                        <li>
-                                            <a href="#" class="language-item">
-                                                <img src="./images/flags/english.png" alt=""
-                                                    class="language-flag">
-                                                <span class="language-name">English</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="language-item">
-                                                <img src="./images/flags/spanish.png" alt=""
-                                                    class="language-flag">
-                                                <span class="language-name">Español</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="language-item">
-                                                <img src="./images/flags/french.png" alt=""
-                                                    class="language-flag">
-                                                <span class="language-name">Français</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="language-item">
-                                                <img src="./images/flags/turkey.png" alt=""
-                                                    class="language-flag">
-                                                <span class="language-name">Türkçe</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul><!-- nav -->
-                    </div>
-                    <div class="mt-3">
-                        <p>&copy; 2022 DashLite. All Rights Reserved.</p>
-                    </div>
-                </div><!-- nk-block -->
             </div><!-- nk-split-content -->
             <div class="nk-split-content nk-split-stretch bg-lighter d-flex toggle-break-lg toggle-slide toggle-slide-right"
                 data-toggle-body="true" data-content="athPromo" data-toggle-screen="lg" data-toggle-overlay="true">
