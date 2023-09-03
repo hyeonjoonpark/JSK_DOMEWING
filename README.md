@@ -2,8 +2,6 @@
 
 Sellwing is a web-based e-commerce platform that allows businesses to easily create and manage their online stores. Whether you're a small boutique or a large retailer, Sellwing provides the tools you need to sell products online effectively.
 
-![Sellwing Demo](demo.gif)
-
 ## Features
 
 - **User-friendly Dashboard:** Manage your store, products, and orders through an intuitive dashboard.
