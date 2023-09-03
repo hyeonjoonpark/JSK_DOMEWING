@@ -2,8 +2,6 @@
 
 Sellwing은 비즈니스가 온라인 상점을 손쉽게 생성하고 관리할 수 있는 웹 기반 전자 상거래 플랫폼입니다. 작은 부티크 또는 대규모 소매업자라면 Sellwing은 온라인 제품을 효과적으로 판매하기 위한 필수 도구를 제공합니다.
 
-![Sellwing 데모](demo.gif)
-
 ## 주요 기능
 
 - **사용자 친화적인 대시보드:** 직관적인 대시보드를 통해 상점, 제품 및 주문을 관리합니다.
@@ -19,4 +17,4 @@ Sellwing은 비즈니스가 온라인 상점을 손쉽게 생성하고 관리할
 
 Sellwing을 서버에 설정하려면 다음 단계를 따르세요:
 
-1. **저장소 복제:** ```bash git clone <https://github.com/parkchef/sellwing.git> cd sellwing
+1. **저장소 복제:** ```bash git clone <https://github.com/parkchef/sellwing.git>
