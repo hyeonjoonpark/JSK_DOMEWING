@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -14,7 +13,6 @@ class WebhookController extends Controller
 
         return "Update successful";
     }
-
     protected function updateProject()
     {
         try {
@@ -28,14 +26,12 @@ class WebhookController extends Controller
             Log::error("Error updating project: " . $e->getMessage());
         }
     }
-
     protected function updateCaches()
     {
         Artisan::call('config:cache');
         Artisan::call('route:cache');
         Artisan::call('view:cache');
     }
-
     protected function updateCodeAndCache()
     {
         $output = shell_exec("cd " . base_path() . " && git pull origin master && php artisan config:cache"); // 또는 사용하는 브랜치 이름
