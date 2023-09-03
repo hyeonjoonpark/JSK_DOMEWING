@@ -105,8 +105,7 @@
                             <button class="btn btn-lg btn-primary btn-block">Register</button>
                         </div>
                     </form><!-- form -->
-                    <div class="form-note-s2 pt-4"> 이미 계정이 있으신가요 ? <a
-                            href="html/pages/auths/auth-login.html"><strong>로그인하기</strong></a>
+                    <div class="form-note-s2 pt-4"> 이미 계정이 있으신가요 ? <a href="/auth/login"><strong>로그인하기</strong></a>
                     </div>
                 </div><!-- .nk-block -->
             </div><!-- nk-split-content -->
