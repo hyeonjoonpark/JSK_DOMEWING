@@ -19,4 +19,4 @@ Sellwing is a web-based e-commerce platform that allows businesses to easily cre
 
 Follow these steps to set up Sellwing on your server:
 
-1. **Clone the Repository:** ```bash git clone <https://github.com/your-username/sellwing.git> cd sellwing
+1. **Clone the Repository:** ```bash git clone <https://github.com/parkchef/sellwing.git> cd sellwing
