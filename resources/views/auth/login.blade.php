@@ -44,18 +44,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <form action="html/index.html">
-                                    <div class="form-group">
-                                        <div class="form-label-group">
-                                            <label class="form-label" for="email">업체</label>
-                                            <select class="form-select js-select2" name="vendor"
-                                                id="vendor"></select>
-                                        </div>
-                                        <div class="form-control-wrap">
-                                            <input type="text" class="form-control form-control-lg" id="email"
-                                                placeholder="이메일을 기입해주세요">
-                                        </div>
-                                    </div>
+                                <form action="auth/login">
                                     <div class="form-group">
                                         <div class="form-label-group">
                                             <label class="form-label" for="email">이메일</label>

@@ -15,6 +15,7 @@ Route::middleware([Authenticate::class, 'redirectTo'])
 
 // 로그인 및 등록 라우트
 Route::group(['prefix' => 'auth'], function () {
+    Route::get('/', [LoginController::class, 'showLoginForm'])->name('auth.login');
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('auth.login');
     Route::get('register', [RegisterController::class, 'register']);
 });
