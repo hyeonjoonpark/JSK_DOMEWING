@@ -10,9 +10,6 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('vendors', function (Blueprint $table) {
-            $table->enum('is_active', ['ACTIVE', 'INACTIVE'])->default('ACTIVE'); // ENUM 타입의 is_active 컬럼을 추가하고 기본값을 'ACTIVE'로 설정합니다.
-        });
         Schema::table('users', function (Blueprint $table) {
             $table->enum('is_active', ['ACTIVE', 'INACTIVE'])->default('ACTIVE'); // ENUM 타입의 is_active 컬럼을 추가하고 기본값을 'ACTIVE'로 설정합니다.
         });
