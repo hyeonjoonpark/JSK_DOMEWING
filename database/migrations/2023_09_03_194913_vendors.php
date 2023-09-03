@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->timestamps();
-            $table->is_active();
+            $table->enum('is_active', ['ACTIVE', 'INACTIVE'])->default('ACTIVE'); // ENUM 타입의 is_active 컬럼을 추가하고 기본값을 'ACTIVE'로 설정합니다.
         });
     }
 
