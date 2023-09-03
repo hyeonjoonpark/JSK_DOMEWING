@@ -95,14 +95,12 @@
                         <div class="form-group">
                             <div class="custom-control custom-control-xs custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="checkbox">
-                                <label class="custom-control-label" for="checkbox">I agree to Dashlite <a
-                                        tabindex="-1" href="#">Privacy Policy</a> &amp; <a tabindex="-1"
-                                        href="#">
-                                        Terms.</a></label>
+                                <label class="custom-control-label" for="checkbox"><a tabindex="-1"
+                                        href="#">이용약관</a>에 동의합니다.</label>
                             </div>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-lg btn-primary btn-block">Register</button>
+                            <button class="btn btn-lg btn-primary btn-block">회원가입</button>
                         </div>
                     </form><!-- form -->
                     <div class="form-note-s2 pt-4"> 이미 계정이 있으신가요 ? <a href="/auth/login"><strong>로그인하기</strong></a>
