@@ -1,20 +1,22 @@
 # Sellwing
 
-Sellwing is a web-based e-commerce platform that allows businesses to easily create and manage their online stores. Whether you're a small boutique or a large retailer, Sellwing provides the tools you need to sell products online effectively.
+Sellwing은 비즈니스가 온라인 상점을 손쉽게 생성하고 관리할 수 있는 웹 기반 전자 상거래 플랫폼입니다. 작은 부티크 또는 대규모 소매업자라면 Sellwing은 온라인 제품을 효과적으로 판매하기 위한 필수 도구를 제공합니다.
 
-## Features
+![Sellwing 데모](demo.gif)
 
-- **User-friendly Dashboard:** Manage your store, products, and orders through an intuitive dashboard.
-- **Product Catalog:** Create and organize your product listings with images, descriptions, and pricing.
-- **Shopping Cart:** Seamless shopping cart experience for customers to add, edit, and finalize their purchases.
-- **Checkout and Payment:** Secure payment processing with support for various payment methods.
-- **Order Management:** Easily process and fulfill customer orders from your dashboard.
-- **Inventory Tracking:** Keep track of your product inventory and receive low stock alerts.
-- **Customer Reviews:** Collect and display customer reviews to build trust.
-- **Responsive Design:** Sellwing is responsive, ensuring a great shopping experience on all devices.
+## 주요 기능
 
-## Getting Started
+- **사용자 친화적인 대시보드:** 직관적인 대시보드를 통해 상점, 제품 및 주문을 관리합니다.
+- **제품 카탈로그:** 이미지, 설명 및 가격과 함께 제품 목록을 생성 및 구성합니다.
+- **장바구니:** 고객이 상품을 추가, 수정 및 구매하는 원활한 장바구니 경험을 제공합니다.
+- **결제 및 송장:** 다양한 결제 방법을 지원하는 안전한 결제 처리가 가능합니다.
+- **주문 관리:** 대시보드에서 고객 주문을 쉽게 처리하고 배송 상태를 실시간으로 추적할 수 있습니다.
+- **재고 관리:** 제품 재고를 실시간으로 관리하고 재고 부족 알림을 받습니다.
+- **고객 리뷰:** 고객 리뷰를 수집하고 신뢰성을 확립하기 위해 표시합니다.
+- **반응형 디자인:** Sellwing은 모든 디바이스에서 훌륭한 쇼핑 경험을 보장하기 위해 반응형 디자인을 적용하였습니다.
 
-Follow these steps to set up Sellwing on your server:
+## 시작하기
 
-1. **Clone the Repository:** ```bash git clone <https://github.com/parkchef/sellwing.git> cd sellwing
+Sellwing을 서버에 설정하려면 다음 단계를 따르세요:
+
+1. **저장소 복제:** ```bash git clone <https://github.com/parkchef/sellwing.git> cd sellwing
