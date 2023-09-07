@@ -28,7 +28,7 @@
                 </div>
                 <div class="nk-block nk-block-middle nk-auth-body">
                     <div class="brand-logo pb-5">
-                        <a href="html/index.html" class="logo-link">
+                        <a href="/" class="logo-link">
                             <img class="logo-light logo-img logo-img-lg" src="{{ asset('assets/images/logo.png') }}"
                                 srcset="{{ asset('assets/images/logo.png') }} 2x" alt="logo">
                             <img class="logo-dark logo-img logo-img-lg" src="{{ asset('assets/images/logo.png') }}"
@@ -43,30 +43,35 @@
                             </div>
                         </div>
                     </div><!-- .nk-block-head -->
-                    <form action="html/pages/auths/auth-success.html">
+                    <form action="{{ route('createUser') }}" method="POST">
+                        @csrf
                         <div class="form-group">
-                            <label class="form-label" for="name">업체</label>
+                            <label class="form-label" for="company">업체</label>
                             <div class="form-control-wrap">
-                                <select class="form-select js-select2" name="vendor" id="vendor" data-search="on">
-                                    @foreach ($vendors as $i)
-                                        <option value="{{ $i->remember_token }}">{{ $i->name }}</option>
-                                    @endforeach
-                                </select>
+                                <input type="text"
+                                    class="form-control form-control-lg @error('company') is-invalid @enderror"
+                                    id="company" name="company" value="{{ old('company') }}"
+                                    placeholder="소속 업체명을 기입해주세요">
                             </div>
+                            <p class="text-danger">{{ $errors->first('company') }}</p>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="name">이름</label>
                             <div class="form-control-wrap">
-                                <input type="text" class="form-control form-control-lg" id="name"
-                                    placeholder="이름을 기입해주세요">
+                                <input type="text"
+                                    class="form-control form-control-lg @error('name') is-invalid @enderror"
+                                    id="name" name="name" value="{{ old('name') }}" placeholder="이름을 기입해주세요">
                             </div>
+                            <p class="text-danger">{{ $errors->first('name') }}</p>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="email">이메일</label>
                             <div class="form-control-wrap">
-                                <input type="text" class="form-control form-control-lg" id="email"
-                                    placeholder="이메일을 기입해주세요">
+                                <input type="email"
+                                    class="form-control form-control-lg @error('email') is-invalid @enderror"
+                                    id="email" name="email" value="{{ old('email') }}" placeholder="이름을 기입해주세요">
                             </div>
+                            <p class="text-danger">{{ $errors->first('email') }}</p>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="password">비밀번호</label>
@@ -76,35 +81,43 @@
                                     <em class="passcode-icon icon-show icon ni ni-eye"></em>
                                     <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
                                 </a>
-                                <input type="password" class="form-control form-control-lg" id="password"
-                                    placeholder="비밀번호를 기입해주세요">
+                                <input type="password"
+                                    class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                    id="password" name="password" placeholder="비밀번호를 기입해주세요"
+                                    value="{{ old('password') }}">
                             </div>
+                            <p class="text-danger">{{ $errors->first('password') }}</p>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="confirm_password">비밀번호 확인</label>
+                            <label class="form-label" for="password_confirmation">비밀번호 확인</label>
                             <div class="form-control-wrap">
                                 <a tabindex="-1" href="#" class="form-icon form-icon-right passcode-switch lg"
-                                    data-target="confirm_password">
+                                    data-target="password_confirmation">
                                     <em class="passcode-icon icon-show icon ni ni-eye"></em>
                                     <em class="passcode-icon icon-hide icon ni ni-eye-off"></em>
                                 </a>
-                                <input type="confirm_password" class="form-control form-control-lg"
-                                    id="confirm_password" placeholder="비밀번호를 기입해주세요">
+                                <input type="password"
+                                    class="form-control form-control-lg @error('password') is-invalid @enderror"
+                                    id="password_confirmation" name="password_confirmation"
+                                    placeholder="비밀번호를 기입해주세요" value="{{ old('password_confirmation') }}">
                             </div>
+                            <p class="text-danger">{{ $errors->first('password') }}</p>
                         </div>
                         <div class="form-group">
                             <div class="custom-control custom-control-xs custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="checkbox">
-                                <label class="custom-control-label" for="checkbox"><a tabindex="-1"
+                                <input type="checkbox" class="custom-control-input" id="ppt" name="ppt">
+                                <label class="custom-control-label" for="ppt"><a tabindex="-1"
                                         href="#">이용약관</a>에 동의합니다.</label>
                             </div>
+                            <p class="text-danger">{{ $errors->first('ppt') }}</p>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-lg btn-primary btn-block">회원가입</button>
+                            <button type="submit" class="btn btn-lg btn-primary btn-block">회원가입</button>
                         </div>
-                    </form><!-- form -->
-                    <div class="form-note-s2 pt-4"> 이미 계정이 있으신가요 ? <a href="/auth/login"><strong>로그인하기</strong></a>
-                    </div>
+                        <div class="form-note-s2 pt-4"> 이미 계정이 있으신가요 ? <a
+                                href="/auth/login"><strong>로그인하기</strong></a>
+                        </div>
+                    </form>
                 </div><!-- .nk-block -->
             </div><!-- nk-split-content -->
             <div class="nk-split-content nk-split-stretch bg-lighter d-flex toggle-break-lg toggle-slide toggle-slide-right"

@@ -49,6 +49,7 @@
     <!-- app-root @e -->
     <!-- JavaScript -->
     @include('partials.scripts')
+    @yield('scripts')
 </body>
 
 </html>

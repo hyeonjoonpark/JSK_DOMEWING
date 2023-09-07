@@ -27,6 +27,13 @@
                                 <span class="nk-menu-text">대시보드</span>
                             </a>
                         </li>
+                        <li class="nk-menu-item">
+                            <a href="/auth/logout" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em
+                                        class="icon fa-solid fa-arrow-right-from-bracket"></em></span>
+                                <span class="nk-menu-text">로그아웃</span>
+                            </a>
+                        </li>
                     </ul><!-- .nk-footer-menu -->
                 </div><!-- .nk-sidebar-footer -->
             </div><!-- .nk-sidebar-content -->

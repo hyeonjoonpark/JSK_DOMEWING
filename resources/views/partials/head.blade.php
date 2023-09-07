@@ -8,7 +8,7 @@
 <!-- Fav Icon  -->
 <link rel="shortcut icon" href="./images/favicon.png">
 <!-- Page Title  -->
-<title>셀윙 | B2B 도매 통합 플랫폼</title>
+<title>도매윙 | B2B 도매 통합 플랫폼</title>
 <!-- StyleSheets  -->
 <link rel="stylesheet" href="./assets/css/dashlite.css?ver=3.1.1">
 <link id="skin-default" rel="stylesheet" href="./assets/css/theme.css?ver=3.1.1">

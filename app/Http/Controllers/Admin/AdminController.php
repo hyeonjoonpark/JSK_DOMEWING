@@ -1,12 +1,16 @@
 <?php
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\DashboardController;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function dashboard()
     {
-        return view('admin/index'); // 뷰 이름을 변경합니다.
+        $dashboardController = new DashboardController();
+        $posts = $dashboardController->loadPosts();
+        return view('admin/dashboard', ['posts' => $posts]);
     }
 }
