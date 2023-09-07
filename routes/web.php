@@ -11,6 +11,7 @@ Route::middleware('auth')
     ->prefix('admin')
     ->group(function () {
         Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        Route::get('/dashboard', [AdminController::class, 'dashboard']);
         Route::post('submit-post', [DashboardController::class, 'createPost']);
     });
 

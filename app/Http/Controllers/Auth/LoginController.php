@@ -34,7 +34,7 @@ class LoginController extends Controller
             ];
 
             if (Auth::attempt($credentials)) {
-                return redirect()->route('admin.dashboard');
+                return redirect()->to('/admin/dashboard');
             }
 
             throw ValidationException::withMessages([
@@ -49,6 +49,6 @@ class LoginController extends Controller
     public function logout()
     {
         Auth::logout(); // 현재 사용자 로그아웃
-        return redirect()->route('auth.login'); // 로그아웃 후 리디렉션할 경로
+        return redirect()->to('/auth/login'); // 로그아웃 후 리디렉션할 경로
     }
 }
