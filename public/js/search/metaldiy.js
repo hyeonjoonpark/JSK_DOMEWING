@@ -1,11 +1,19 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     try {
         const keyword = process.argv[2];
+        await page.goto('https://www.metaldiy.com/login/popupLogin.do?popupYn=Y');
+        await page.waitForSelector('#loginId');
+        await page.waitForSelector('#loginPw');
+        await page.type('#loginId', 'sungil2018');
+        await page.type('#loginPw', 'tjddlf88!@');
+        await page.waitForSelector('input[title="로그인"]');
+        await page.click('input[title="로그인"]');
+        await page.waitForNavigation();
         // 웹 페이지로 이동
         await page.goto('https://www.metaldiy.com/main/searchItemList.do?kw=' + keyword);
 

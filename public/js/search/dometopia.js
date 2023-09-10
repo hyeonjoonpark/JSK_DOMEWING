@@ -1,12 +1,20 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     try {
         const keyword = process.argv[2];
         // 웹 페이지로 이동
+        await page.goto('https://dometopia.com/member/login');
+        await page.waitForSelector('#userid');
+        await page.waitForSelector('#password');
+        await page.type('#userid', 'luminous2020');
+        await page.type('#password', 'Fnalshtm88!@');
+        await page.waitForSelector('input[type="submit"]');
+        await page.click('input[type="submit"]');
+        await page.waitForNavigation();
         await page.goto('https://dometopia.com/goods/search?search_text=' + keyword);
         async function wait(seconds) {
             return new Promise(resolve => setTimeout(resolve, seconds * 1000));
