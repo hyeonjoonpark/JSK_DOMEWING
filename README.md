@@ -17,4 +17,4 @@ Sellwing은 비즈니스가 온라인 상점을 손쉽게 생성하고 관리할
 
 Sellwing을 서버에 설정하려면 다음 단계를 따르세요:
 
-1. **저장소 복제:** ```bash git clone <https://github.com/parkchef/sellwing.git>
+1. **저장소 복제:** ```bash git clone <https://github.com/parkchef/sellwing.git> DREAMVIZUAL
