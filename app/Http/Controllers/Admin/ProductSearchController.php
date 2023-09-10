@@ -31,6 +31,7 @@ class ProductSearchController extends Controller
         $vendorIds = $request->vendorIds;
         $vendors = $this->getVendorList($vendorIds);
         $data['return'] = [];
+        set_time_limit(0); // 실행 시간 제한 해제
         foreach ($vendors as $vendor) {
             $nodeScriptPath = public_path('js/search/' . $vendor->name_eng . '.js');
             $command = "node $nodeScriptPath $keyword";

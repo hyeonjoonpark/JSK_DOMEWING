@@ -49,6 +49,7 @@
                 <div class="card-inner">
                     <h5 class="card-title">수집 결과</h5>
                     <h6 class="card-subtitle mb-2">해당 상품 정보에 대한 수집 결과입니다:</h6>
+                    <p class="card-text">총 <span class="fw-bold" id="numResult"></span>건이 검색되었습니다</p>
                     <div id="collectResult">
                         <table id="productTable" class="datatable-init-export nowrap table" data-export-title="Export"
                             data-order='[[2, "asc"]]'>
@@ -109,6 +110,7 @@
                             text: "데이터를 성공적으로 불러왔습니다."
                         });
                         updateDataTable(response.return);
+                        $('#numResult').html(response.return.length);
                     } else {
                         Swal.fire({
                             icon: 'error',
