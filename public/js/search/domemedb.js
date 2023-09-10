@@ -39,7 +39,7 @@ const puppeteer = require('puppeteer');
                 const imageText = productElement.querySelector('li > a > img');
                 const image = imageText.getAttribute('src');
                 const hrefSelector = productElement.querySelector('li > a').getAttribute('href');
-                const href = 'http://domeggook.com' + hrefSelector.match(/\d+/g).join('');
+                const href = 'http://domeggook.com/' + hrefSelector;
                 const platform = '도매매';
                 productsArr.push({ name, price, image, href, platform });
             }
