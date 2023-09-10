@@ -13,6 +13,7 @@ Route::middleware('auth')
         Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::get('/dashboard', [AdminController::class, 'dashboard']);
         Route::post('submit-post', [DashboardController::class, 'createPost']);
+        Route::get('product/search', [AdminController::class, 'productSearch']);
     });
 
 // 로그인 및 등록 라우트

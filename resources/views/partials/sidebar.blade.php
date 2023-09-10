@@ -22,9 +22,15 @@
                             <h6 class="overline-title text-primary-alt">메인 메뉴</h6>
                         </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item">
-                            <a href="/" class="nk-menu-link">
+                            <a href="/admin/dashboard" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-chart-line"></em></span>
                                 <span class="nk-menu-text">대시보드</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
+                            <a href="/admin/product/search" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-magnifying-glass"></em></span>
+                                <span class="nk-menu-text">상품 대량 검색</span>
                             </a>
                         </li>
                         <li class="nk-menu-item">
