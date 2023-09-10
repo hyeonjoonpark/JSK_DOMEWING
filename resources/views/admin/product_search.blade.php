@@ -73,9 +73,17 @@
 @endsection
 @section('scripts')
     <script>
+        const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}';
+        // 이미지를 미리 로딩
+        const image = new Image();
+        image.src = loadingGifSrc;
+
         function collectInit() {
+            const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}'
+            let html = '<img src="' + image.src + '" class="w-75" />'
+            html += '<h2 class="swal2-title">상품 데이터를 수집 중입니다</h2>'
             Swal.fire({
-                html: '<img src="{{ asset('assets/images/loading.gif') }}" />',
+                html: html,
                 allowOutsideClick: false,
                 showConfirmButton: false
             });
