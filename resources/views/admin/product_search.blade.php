@@ -81,7 +81,7 @@
         function collectInit() {
             const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}'
             let html = '<img src="' + image.src + '" class="w-75" />'
-            html += '<h2 class="swal2-title">상품 데이터를 수집 중입니다</h2>'
+            html += '<h2 class="swal2-title mt-5">상품 데이터를 수집 중입니다</h2>'
             Swal.fire({
                 html: html,
                 allowOutsideClick: false,
