@@ -109,6 +109,7 @@
                             title: "진행 성공",
                             text: "데이터를 성공적으로 불러왔습니다."
                         });
+                        console.log(response.return);
                         updateDataTable(response.return);
                         $('#numResult').html(response.return.length);
                     } else {

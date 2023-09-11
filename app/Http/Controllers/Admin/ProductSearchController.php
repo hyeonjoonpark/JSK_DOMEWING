@@ -39,8 +39,10 @@ class ProductSearchController extends Controller
             exec($command, $output, $returnCode);
             if ($returnCode === 0) {
                 $tmpOutputs = json_decode(implode('', $output), true);
-                foreach ($tmpOutputs as $tmpOutput) {
-                    $data['return'][] = $tmpOutput;
+                if (!empty($tmpOutputs)) {
+                    foreach ($tmpOutputs as $tmpOutput) {
+                        $data['return'][] = $tmpOutput;
+                    }
                 }
             }
         }
