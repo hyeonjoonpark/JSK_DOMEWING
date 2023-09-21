@@ -16,12 +16,13 @@
                         <label class="form-label">업체</label>
                         <div class="row">
                             @foreach ($vendors as $vendor)
-                                <div class="col-3">
+                                <div class="col-3 mb-3">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="vendor{{ $vendor->id }}"
-                                            name="vendors[]" value="{{ $vendor->id }}" checked>
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="vendor{{ $vendor->vendor_id }}" name="vendors[]"
+                                            value="{{ $vendor->vendor_id }}" checked>
                                         <label class="custom-control-label"
-                                            for="vendor{{ $vendor->id }}">{{ $vendor->name }}</label>
+                                            for="vendor{{ $vendor->vendor_id }}">{{ $vendor->name }}</label>
                                     </div>
                                 </div>
                             @endforeach

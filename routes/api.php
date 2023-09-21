@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ProductRegisterController;
 use App\Http\Controllers\Admin\ProductSearchController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Http\Request;
@@ -24,3 +25,5 @@ Route::post('/webhook', [WebhookController::class, 'webhook']);
 Route::post('/set-post-confirmed', [DashboardController::class, 'setPostConfirmed']);
 Route::post('/delete-post', [DashboardController::class, 'deletePost']);
 Route::post('/product/search', [ProductSearchController::class, 'productSearch']);
+Route::post('/product/category', [ProductRegisterController::class, 'categorySearch']);
+Route::post('/product/register', [ProductRegisterController::class, 'handle']);

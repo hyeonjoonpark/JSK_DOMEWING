@@ -11,6 +11,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "mysql2": "^3.6.1",
         "puppeteer": "^21.1.1"
     }
 }

@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'naver_shop' => [
+        'api_key' => env('NAVER_SHOP_API_KEY'),
+        'secret_key' => env('NAVER_SHOP_SECRET_KEY'),
+    ],
+
 ];

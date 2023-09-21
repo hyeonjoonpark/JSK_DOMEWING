@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NaverShopController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware('auth')
@@ -14,6 +15,7 @@ Route::middleware('auth')
         Route::get('/dashboard', [AdminController::class, 'dashboard']);
         Route::post('submit-post', [DashboardController::class, 'createPost']);
         Route::get('product/search', [AdminController::class, 'productSearch']);
+        Route::get('product/register', [AdminController::class, 'productRegister']);
     });
 
 // 로그인 및 등록 라우트
@@ -28,3 +30,4 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/naver-shop/categories', [NaverShopController::class, 'getCategories']);

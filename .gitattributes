@@ -9,3 +9,5 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+# Windows에서 CRLF를 유지하도록 설정
+* text eol=crlf
