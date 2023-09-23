@@ -361,7 +361,7 @@
             // formData.append('productDesc', productDesc);
             formData.append('itemName', $("#productName").val());
             formData.append('invoiceName', $("#invoiceName").val());
-            formData.append('category', $('#categoryResult option:selected').text());
+            formData.append('category', $('#categoryResult option:selected').val());
             formData.append('keywords', $('#keywords').val());
 
             const taxability = $("input[name='taxability']:checked").next().text().trim();

@@ -8,8 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
+use App\Http\Controllers\Admin\FormController;
 
 class ProductRegisterController extends Controller
 {
@@ -69,7 +68,7 @@ class ProductRegisterController extends Controller
             $vendor = DB::table('vendors')->where('id', $vendorId)->select('name', 'name_eng')->first();
             $vendorName = $vendor->name;
             $vendorEngName = $vendor->name_eng;
-            $data = $this->operProductRegister($request, $account->username, $account->password, $vendorEngName, $productImage, $descImage);
+            $data = $this->insertExcel($request, $account->username, $account->password, $vendorEngName, $productImage, $descImage);
             $script = $data['return'];
             if ($data['status'] == -1) {
                 $failedVendors[] = $vendorName;
@@ -138,7 +137,7 @@ class ProductRegisterController extends Controller
             'productDescImage' => 'required|image',
             'itemName' => 'required|string',
             'invoiceName' => 'required|string',
-            'category' => 'required|string',
+            'category' => 'required',
             'keywords' => 'required|string|min:9|max:255|unique_keywords',
             'taxability' => 'required|string',
             'productImage' => 'required|image',
@@ -202,6 +201,14 @@ class ProductRegisterController extends Controller
             ->first();
 
         return $account;
+    }
+
+    public function insertExcel(Request $request, $username, $password, $vendorEngName, $productImage, $descImage)
+    {
+        $data = new FormController();
+        $data = $data->$vendorEngName($request, $username, $password, $request->category, $productImage, $descImage);
+
+        return $data;
     }
 
     // 응답 데이터 생성
