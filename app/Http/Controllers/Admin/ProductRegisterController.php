@@ -68,6 +68,7 @@ class ProductRegisterController extends Controller
             $vendor = DB::table('vendors')->where('id', $vendorId)->select('name', 'name_eng')->first();
             $vendorName = $vendor->name;
             $vendorEngName = $vendor->name_eng;
+            set_time_limit(0);
             $data = $this->insertExcel($request, $account->username, $account->password, $vendorEngName, $productImage, $descImage);
             if ($data['status'] == -1) {
                 $failedVendors[] = $vendorName;
