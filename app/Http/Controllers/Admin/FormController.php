@@ -4,83 +4,100 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Imports\ProductsImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Product;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class FormController extends Controller
 {
     public function ownerclan(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
     {
-        $filePath = public_path('assets/excel/ownerclan.xlsx');
-        $excel = Excel::load($filePath);
+        $spreadsheet = IOFactory::load(public_path('assets/excel/ownerclan.xlsx'));
+        $sheet = $spreadsheet->getSheet(0);
 
-        // 시트 선택 (시트 이름 또는 인덱스 사용 가능)
-        $sheet = $excel->getSheetByName('등록수정양식');
-
-
-
-        // 엑셀 파일 저장
-        $excel->store('xlsx', '경로/수정된_파일.xlsx');
+        // Medical 값 설정
         $medical = 0;
         if ($request->madicalEquipment == '의료기기') {
             $medical = 1;
-        }
-        if ($request->healthFunctional == '건강기능식품') {
+        } elseif ($request->healthFunctional == '건강기능식품') {
             $medical = 2;
         }
+        $informationContents = '상품 상세설명 참조
+        상품 상세설명 참조
+        상품 상세설명 참조
+        상품 상세설명 참조
+        상품 상세설명 참조
+        상품 상세설명 참조
+        상품 상세정보에 별도 표기
+        상품 상세정보에 별도 표기
+        상품 상세정보에 별도 표기
+        상품 상세정보에 별도 표기';
+
+        // 각 줄의 앞에 있는 공백 제거
+        $informationContents = preg_replace('/^\h+/m', '', $informationContents);
+        // 데이터 배열 생성
         $data = [
-            '',
-            $categoryCode,
-            '',
-            '',
-            $request->itemName,
-            $request->invoiceName,
-            $request->keywords,
-            $request->origin,
-            $request->vendor,
-            $request->model,
-            $request->price,
-            '자율',
-            '',
-            $request->taxability,
-            '',
-            '',
-            '',
-            'N,,',
-            asset('assets/images/product/') . $productImage,
-            '',
-            '<p align="center"><img src="' . asset('assets/images/product/desc') . $descImage . '"></p>',
-            $request->saleToMinor,
-            $request->shipping,
-            $request->shipCost,
-            $request->shipCost,
-            '',
-            '',
-            '',
-            '1',
-            '0',
-            '',
-            '35',
-            '상품 상세설명 참조
-        상품 상세설명 참조
-        상품 상세설명 참조
-        상품 상세설명 참조
-        상품 상세설명 참조
-        상품 상세설명 참조
-        상품 상세정보에 별도 표기
-        상품 상세정보에 별도 표기
-        상품 상세정보에 별도 표기
-        상품 상세정보에 별도 표기',
-            $medical,
-            '',
-            '',
-            '',
-            '',
-            ''
+            'productCode' => '',
+            'categoryCode' => $categoryCode,
+            'categoryName' => '',
+            'openmarketCategory' => '',
+            'exclusiveCode' => '',
+            'productName' => $request->itemName,
+            'invoiceName' => $request->invoiceName,
+            'keywords' => $request->keywords,
+            'originated' => $request->origin,
+            'vendor' => $request->vendor,
+            'model' => $request->model,
+            'productPrice' => $request->price,
+            'salesType' => '자율',
+            'customerPrice' => '',
+            'taxability' => $request->taxability,
+            'optionName' => '',
+            'optionValue' => '',
+            'optionPrice' => '',
+            'managementInformation' => '',
+            'productImage' => url('assets/images/product/') . $productImage,
+            'extraImages' => '',
+            'descImage' => '<p align="center"><img src="' . url('assets/images/product/desc') . $descImage . '</p>',
+            'saleToMinor' => $request->saleToMinor,
+            'shipType' => $request->shipping,
+            'shipCost' => $request->shipCost,
+            'refundCost' => $request->shipCost,
+            'bundledQuantity' => '',
+            'refundBlockReason' => '',
+            'refundAddress' => '',
+            'refundType' => '1',
+            'credentials' => '0',
+            'documents' => '',
+            'informationType' => '35',
+            'informationContents' => $informationContents,
+            'productAttribute' => $medical,
+            'shipAddress' => '',
+            'productRemark' => '',
+            'productIsActive' => '',
+            'createdAt' => '',
+            'updatedAt' => '',
         ];
-        // 열 추가
-        $sheet->appendRow($data);
-        $data['status'] = 1;
-        $data['return'] = 'success';
-        return $data;
+        // 추가할 새로운 행의 위치를 지정합니다.
+        $newRow = $sheet->getHighestRow() + 1; // 현재 데이터가 있는 가장 아래 행 다음에 추가하려면 +1을 사용합니다.
+        $col = 'A';
+        foreach ($data as $value) {
+            $sheet->setCellValue($col . $newRow, $value);
+            $col++;
+        }
+        // 엑셀 파일 업로드
+        // 변경된 내용을 파일로 저장
+        $writer = new Xlsx($spreadsheet);
+        $writer->save(public_path('assets/excel/formed/') . date('YmdHis') . '.xlsx');
+
+        // 응답 데이터 생성
+        $response = [
+            'status' => 1,
+            'return' => 'success',
+        ];
+
+        return $response;
     }
 }
