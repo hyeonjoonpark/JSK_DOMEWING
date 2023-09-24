@@ -58,7 +58,7 @@ class FormController extends Controller
             'optionValue' => '',
             'optionPrice' => '',
             'managementInformation' => 'N',
-            'productImage' => url('assets/images/product/desc') . '/' . $descImage,
+            'productImage' => url('assets/images/product') . '/' . $productImage,
             'extraImages' => '',
             'descImage' => '<p align="center"><img src="' . url('assets/images/product/desc') . '/' . $descImage . '"></p>',
             'saleToMinor' => $request->saleToMinor,

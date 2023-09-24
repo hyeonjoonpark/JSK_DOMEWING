@@ -172,8 +172,10 @@ class ProductRegisterController extends Controller
     protected function moveImage($remember_token, $image, $path, $type)
     {
         try {
+            $user = DB::table('users')->where('remember_token', $remember_token)->first();
+            $userId = $user->id;
             $ext = $image->getClientOriginalExtension();
-            $imageName = $remember_token . "_" . date('YmdHis') . "." . $ext;
+            $imageName = $userId . "_" . date('YmdHis') . "." . $ext;
 
             if ($type == 1) {
                 $image = Image::make($image)->fit(1000, 1000);
