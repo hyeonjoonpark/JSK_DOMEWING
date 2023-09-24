@@ -73,6 +73,7 @@ class ProductRegisterController extends Controller
                 $failedVendors[] = $vendorName;
             } else {
                 $formedExcel = $data['return'];
+                set_time_limit(0);
                 $command = 'node ' . public_path('js/register/' . $vendorEngName . '.js') . " \"$account->username\" \"$account->password\" \"$formedExcel\"";
                 try {
                     exec($command, $output, $exitCode);
@@ -202,7 +203,7 @@ class ProductRegisterController extends Controller
         $imageData = file_get_contents($path . $imageName);
 
         // Imgur API에 이미지 업로드
-        $clientID = '42fefd934114853';
+        $clientID = '52d53ac9b9f957b';
         $response = $this->uploadToImgur($imageData, $clientID);
 
         // 응답 처리
@@ -210,7 +211,7 @@ class ProductRegisterController extends Controller
             $imageLink = $response['data']['link'];
             return $this->getResponseData(1, $imageLink);
         } else {
-            return $this->getResponseData(-1, "이미지 업로드에 실패했습니다");
+            return $this->getResponseData(-1, $response['success']);
         }
     }
 
