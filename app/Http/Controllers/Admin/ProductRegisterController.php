@@ -171,23 +171,64 @@ class ProductRegisterController extends Controller
     // 이미지 업로드 처리
     protected function moveImage($remember_token, $image, $path, $type)
     {
-        try {
-            $user = DB::table('users')->where('remember_token', $remember_token)->first();
-            $userId = $user->id;
-            $ext = $image->getClientOriginalExtension();
-            $imageName = $userId . "_" . date('YmdHis') . "." . $ext;
+        // 사용자 정보 가져오기
+        $user = DB::table('users')->where('remember_token', $remember_token)->first();
+        $userId = $user->id;
 
-            if ($type == 1) {
-                $image = Image::make($image)->fit(1000, 1000);
-                $image->save($path . $imageName);
-            } else {
-                $image->move($path, $imageName);
-            }
+        // 이미지 파일 이름 생성
+        $ext = $image->getClientOriginalExtension();
+        $imageName = $userId . "_" . date('YmdHis') . "." . $ext;
 
-            return $this->getResponseData(1, $imageName);
-        } catch (Exception $e) {
-            return $this->getResponseData(-1, $e->getMessage());
+        // 이미지 리사이징 및 저장 (Type 1: 리사이즈, Type 2: 그대로 저장)
+        if ($type == 1) {
+            $image = Image::make($image)->fit(1000, 1000);
+            $image->save($path . $imageName);
+        } else {
+            $image->move($path, $imageName);
         }
+
+        // 이미지 데이터 가져오기
+        $imageData = file_get_contents($path . $imageName);
+
+        // Imgur API에 이미지 업로드
+        $clientID = '42fefd934114853';
+        $response = $this->uploadToImgur($imageData, $clientID);
+
+        // 응답 처리
+        if ($response['success'] === true && isset($response['data']['link'])) {
+            $imageLink = $response['data']['link'];
+            return $this->getResponseData(1, $imageLink);
+        } else {
+            return $this->getResponseData(-1, "이미지 업로드에 실패했습니다");
+        }
+    }
+
+    function uploadToImgur($imageData, $clientID)
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, 'https://api.imgur.com/3/image');
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt(
+            $curl,
+            CURLOPT_HTTPHEADER,
+            array(
+                'Authorization: Client-ID ' . $clientID
+            )
+        );
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt(
+            $curl,
+            CURLOPT_POSTFIELDS,
+            array(
+                'image' => base64_encode($imageData),
+            )
+        );
+        // 응답 받기
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        // JSON 응답 디코드
+        return json_decode($response, true);
     }
 
     // 업체 계정 가져오기

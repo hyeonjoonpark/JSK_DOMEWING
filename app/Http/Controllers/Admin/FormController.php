@@ -35,6 +35,7 @@ class FormController extends Controller
 
         // 각 줄의 앞에 있는 공백 제거
         $informationContents = preg_replace('/^\h+/m', '', $informationContents);
+
         // 데이터 배열 생성
         $data = [
             'productCode' => '',
@@ -56,9 +57,9 @@ class FormController extends Controller
             'optionValue' => '',
             'optionPrice' => '',
             'managementInformation' => 'N',
-            'productImage' => url('assets/images/product/' . $productImage),
+            'productImage' => $productImage,
             'extraImages' => '',
-            'descImage' => '<p align="center"><img src="' . url('assets/images/product/desc/' . $descImage) . '"></p>',
+            'descImage' => '<p align="center"><img src="' . $descImage . '"></p>',
             'saleToMinor' => $request->saleToMinor,
             'shipType' => $request->shipping,
             'shipCost' => $request->shipCost,
