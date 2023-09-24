@@ -69,17 +69,28 @@ class ProductRegisterController extends Controller
             $vendorName = $vendor->name;
             $vendorEngName = $vendor->name_eng;
             $data = $this->insertExcel($request, $account->username, $account->password, $vendorEngName, $productImage, $descImage);
-            $script = $data['return'];
             if ($data['status'] == -1) {
                 $failedVendors[] = $vendorName;
+            } else {
+                $formedExcel = $data['return'];
+                $command = 'node ' . public_path('js/register/' . $vendorEngName . '.js') . " \"$account->username\" \"$account->password\" \"$formedExcel\"";
+                try {
+                    exec($command, $output, $exitCode);
+                    if ($exitCode !== 0) {
+                        // 명령이 성공적으로 실행됨
+                        $failedVendors[] = $vendorName;
+                    }
+                } catch (Exception $e) {
+                    $failedVendors[] = $vendorName;
+                }
             }
         }
 
         if (empty($failedVendors)) {
-            return $this->getResponseData(1, '등록에 성공했습니다.' . $script);
+            return $this->getResponseData(1, '등록에 성공했습니다.');
         } else {
             $failedVendorList = implode(', ', $failedVendors);
-            return $this->getResponseData(-1, "등록에 실패한 업체: $script");
+            return $this->getResponseData(-1, "등록에 실패한 업체: $failedVendorList");
         }
     }
 

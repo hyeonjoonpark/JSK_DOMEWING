@@ -118,19 +118,21 @@
                                 <label class="form-label">원산지</label>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="origin" id="origin1"
-                                        checked>
+                                        disabled>
                                     <label class="form-check-label" for="origin1">
                                         국내
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="origin" id="origin2">
+                                    <input class="form-check-input" type="radio" name="origin" id="origin2"
+                                        disabled>
                                     <label class="form-check-label" for="origin2">
                                         해외
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="origin" id="origin3">
+                                    <input class="form-check-input" type="radio" name="origin" id="origin3"
+                                        checked>
                                     <label class="form-check-label" for="origin3">
                                         기타
                                     </label>
