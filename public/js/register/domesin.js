@@ -23,8 +23,17 @@ const path = require('path');
         await elementHandle.uploadFile(filePath);
         await page.waitForSelector('#main > form > table > tbody > tr:nth-child(2) > td:nth-child(3) > input');
         await page.click('#main > form > table > tbody > tr:nth-child(2) > td:nth-child(3) > input');
-        await page.waitForNavigation();
-        console.log(JSON.stringify());
+        await page.waitForSelector('body > table > tbody > tr > td:nth-child(2) > table.tb01 > tbody > tr:nth-child(2) > td:nth-child(5)');
+        // 엘리먼트의 텍스트를 추출합니다.
+        const extractedText = await page.evaluate(() => {
+            const element = document.querySelector('body > table > tbody > tr > td:nth-child(2) > table.tb01 > tbody > tr:nth-child(2) > td:nth-child(5)');
+            return element.textContent;
+        });
+        let status = -1;
+        if (extractedText === '성공') {
+            status = 1;
+        }
+        console.log(JSON.stringify(status));
     } catch (error) {
         console.error(error);
     } finally {
