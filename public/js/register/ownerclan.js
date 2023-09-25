@@ -17,6 +17,14 @@ const path = require('path');
         await frame.click('input[type="submit"]');
         await frame.waitForNavigation();
         await page.goto('https://ownerclan.com/vender/product_register_bulk.php');
+        // 팝업 창을 기다립니다.
+        const popupTarget = await browser.waitForTarget(target => target.opener() === currentPage.target());
+        const popupPage = await popupTarget.page();
+
+        // 팝업 페이지에서 필요한 작업을 수행합니다.
+
+        // 팝업 창 닫기
+        await popupPage.close();
         await page.waitForSelector('input[value="파일 업로드"]');
         await page.click('input[value="파일 업로드"]');
         const newPagePromise = new Promise(x => browser.once('targetcreated', target => x(target.page())));
