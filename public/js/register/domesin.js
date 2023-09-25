@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false, ignoreDefaultArgs: ['--enable-automation'] });
+    const browser = await puppeteer.launch({ headless: true, ignoreDefaultArgs: ['--enable-automation'] });
     const page = await browser.newPage();
 
     try {
