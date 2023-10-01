@@ -15,6 +15,7 @@ Route::middleware('auth')
         Route::get('/dashboard', [AdminController::class, 'dashboard']);
         Route::post('submit-post', [DashboardController::class, 'createPost']);
         Route::get('product/search', [AdminController::class, 'productSearch']);
+        Route::get('product/search-to-register', [AdminController::class, 'searchToRegister']);
         Route::get('product/register', [AdminController::class, 'productRegister']);
     });
 

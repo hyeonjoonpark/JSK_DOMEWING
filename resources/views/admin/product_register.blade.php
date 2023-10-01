@@ -53,14 +53,16 @@
                             <div class="form-group">
                                 <label class="form-label">상품명</label>
                                 <input type="text" class="form-control" id="productName" placeholder="상품명을 기입해주세요."
-                                    name="productName" onchange="productNameFormat(this);" required>
+                                    name="productName" onchange="productNameFormat(this);" value="{{ $name ?? '' }}"
+                                    required>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
                                 <label class="form-label">택배송장명</label>
                                 <input type="text" class="form-control" id="invoiceName" placeholder="택배송장명을 기입해주세요."
-                                    name="invoiceName" onchange="productNameFormat(this);" required>
+                                    name="invoiceName" onchange="productNameFormat(this);" value="{{ $name ?? '' }}"
+                                    required>
                             </div>
                         </div>
                         <div class="col-4">
@@ -209,7 +211,7 @@
                             <div class="form-group">
                                 <label class="form-label">가격</label>
                                 <input type="number" class="form-control" id="productPrice" placeholder="가격을 기입해주세요."
-                                    name="productPrice" required>
+                                    name="productPrice" value="{{ $price ?? '' }}" required>
                             </div>
                         </div>
                         <div class="col">
@@ -230,12 +232,20 @@
 
                     <div class="form-group">
                         <label class="form-label">이미지</label>
-                        <input type="file" class="form-control" id="productImage" name="productImage">
+                        <input type="file" class="form-control" id="productImage" name="productImage"
+                            accept="image/*" />
+                        @if (isset($image))
+                            <a class="btn btn-outline-primary" id="downloadLink" href="{{ $image }}"
+                                target="_blank" download>샘플
+                                이미지
+                                다운로드</a>
+                            <img src="{{ $image }}" id="sampleImage" name="sampleImage" alt="Sample Image">
+                        @endif
                     </div>
                     <div class="form-group">
                         <label class="form-label">상품 상세설명 이미지</label>
                         {{-- <div class="summernote-basic"></div> --}}
-                        <input type="file" class="form-control" id="descImage" name="descImage">
+                        <input type="file" class="form-control" id="descImage" name="descImage" accept="image/*">
                     </div>
                     <div class="form-group">
                         <label class="form-label">상품정보고시</label>

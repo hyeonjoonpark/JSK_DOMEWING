@@ -149,8 +149,8 @@
                     '" alt="Product" style="width:120px; height:120px;"></a>';
                 const nameHtml = '<a href="' + href + '" target="_blank" title="' + name + '">' + truncateText(name, 30) +
                     '</a>';
-                const actionHtml = '<button class="btn btn-primary" onclick="registerProduct(\'' + name +
-                    '\')">상품 등록</button>';
+                const actionHtml =
+                    `<button class="btn btn-primary" onclick="registerProduct('${name}', '${price}', '${image}')">상품 등록</button>`;
 
                 dataTable.row.add([
                     imageHtml,
@@ -172,14 +172,11 @@
             return text;
         }
 
-        function registerProduct(productName) {
-            // 이 함수는 상품 등록 버튼이 클릭되었을 때 호출되는 함수입니다.
-            // productName을 활용하여 필요한 동작을 수행하도록 구현합니다.
-            Swal.fire({
-                icon: "warning",
-                title: "준비 중",
-                text: "해당 기능은 차기 페이즈를 위해 업데이트 중입니다."
-            });
+        function registerProduct(name, price, image) {
+            const queryString = `?name=${name}&price=${price}&image=${image}`;
+            const newURL = 'search-to-register' + queryString;
+
+            window.location.replace(newURL);
         }
     </script>
 @endsection
