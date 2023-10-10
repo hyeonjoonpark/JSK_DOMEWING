@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NaverShopController;
+use App\Http\Controllers\TestController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware('auth')
@@ -32,3 +33,4 @@ Route::prefix('auth')->group(function () {
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/naver-shop/categories', [NaverShopController::class, 'getCategories']);
+Route::get('/test',[TestController::class, 'handle']);
