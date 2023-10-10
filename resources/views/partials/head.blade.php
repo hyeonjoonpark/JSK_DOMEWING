@@ -9,5 +9,5 @@
 <!-- Page Title  -->
 <title>도매윙 | B2B 도매 통합 플랫폼</title>
 <!-- StyleSheets  -->
-<link rel="stylesheet" href="{{ asset('assets/css/dashlite.css') }}">
-<link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/dashlite.css?ver=3.1.1') }}">
+<link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css?ver=3.1.1') }}">
