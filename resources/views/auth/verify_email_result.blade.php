@@ -9,7 +9,7 @@
     <meta name="description"
         content="A powerful and conceptual apps base dashboard template that especially build for developers and programmers.">
     <!-- Fav Icon  -->
-    <link rel="shortcut icon" href="./images/favicon.png">
+    <link rel="shortcut icon" href="{{asset('assets/images/favicon.png')}}">
     <!-- Page Title  -->
     <title>이메일 인증 결과 | 도매윙</title>
     <!-- StyleSheets  -->

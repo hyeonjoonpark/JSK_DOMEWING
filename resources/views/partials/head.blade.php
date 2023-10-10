@@ -5,7 +5,7 @@
     content="A powerful and conceptual apps base dashboard template that especially build for developers and programmers.">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <!-- Fav Icon  -->
-<link rel="shortcut icon" href="{{ asset('images/favicon.png') }}">
+<link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}">
 <!-- Page Title  -->
 <title>도매윙 | B2B 도매 통합 플랫폼</title>
 <!-- StyleSheets  -->
