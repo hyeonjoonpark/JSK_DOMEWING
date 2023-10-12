@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AdminController;
@@ -11,7 +12,7 @@ use App\Http\Controllers\TestController;
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::view('/dashboard', 'dashboard'); // 대시보드 페이지는 뷰로 직접 로드
+    Route::get('/dashboard', [AdminController::class, 'dashboard']); // 대시보드 페이지는 뷰로 직접 로드
     Route::post('submit-post', [DashboardController::class, 'createPost']);
     Route::get('product/search', [AdminController::class, 'productSearch']);
     Route::get('product/search-to-register', [AdminController::class, 'searchToRegister']);
