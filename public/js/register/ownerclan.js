@@ -42,31 +42,12 @@ const path = require('path');
 
         // await newPage.click('#btn_accept'); // "btn_accept" 버튼 클릭
         await newPage.evaluate(() => {
-            //20170426 경고키워드 발생시 체크안하면 진행불가
-            var testvalue = 0;
-            var checked = []
-            $("input[name='testcheck[]']:not(:checked)").each(function () {
-                alert('알림사항을 확인하시고 체크박스에 체크하여 동의하면 정상적으로 등록 가능합니다.');
-                testvalue = 1;
-                return false;
-            });
+            var myVar = window.frames["doFrame"].window;
+            var sfile = myVar.filepath;
 
-            if (testvalue == 1) {
-                return;
-            }
-
-
-            if (lastResult == false) {
-                alert("실행한 데이터가 온전하지 않아 적용할 수 없습니다");
-                return;
-            } else {
-                var myVar = window.frames["doFrame"].window;
-                var sfile = myVar.filepath;
-
-                window.opener.document.form1.categoryRecommend.value = $("input[name='categoryRecommend']:checked").val();
-                window.opener.setAccept(true, sfile);
-                self.close();
-            }
+            window.opener.document.form1.categoryRecommend.value = $("input[name='categoryRecommend']:checked").val();
+            window.opener.setAccept(true, sfile);
+            self.close();
         });
 
         await page.evaluate(() => {
