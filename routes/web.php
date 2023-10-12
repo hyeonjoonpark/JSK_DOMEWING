@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NaverShopController;
@@ -17,6 +18,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/search', [AdminController::class, 'productSearch']);
     Route::get('product/search-to-register', [AdminController::class, 'searchToRegister']);
     Route::get('product/register', [AdminController::class, 'productRegister']);
+    Route::post('upload-image', [ImageUploadController::class, 'handle']);
 });
 
 // 로그인 및 등록 라우트

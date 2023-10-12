@@ -17,9 +17,6 @@ const path = require('path');
         await frame.click('input[type="submit"]');
         await frame.waitForNavigation();
         await page.goto('https://ownerclan.com/vender/product_register_bulk.php');
-        await page.evaluate(() => {
-            document.all.Notice11.style.visibility = 'hidden';
-        });
         await page.waitForSelector('input[value="파일 업로드"]');
         await page.click('input[value="파일 업로드"]');
         const newPagePromise = new Promise(x => browser.once('targetcreated', target => x(target.page())));

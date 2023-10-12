@@ -48,11 +48,11 @@ class ProductRegisterController extends Controller
         }
 
         // 상품 설명 이미지 업로드
-        $descImage = $this->moveImage($request->remember_token, $request->productDescImage, public_path('assets/images/product/desc/'), 0);
-        if ($descImage['status'] == -1) {
-            return '상품 설명 이미지를 업로드하는 데 실패했습니다';
-        }
-        $descImage = $descImage['return'];
+        // $descImage = $this->moveImage($request->remember_token, $request->productDescImage, public_path('assets/images/product/desc/'), 0);
+        // if ($descImage['status'] == -1) {
+        //     return '상품 설명 이미지를 업로드하는 데 실패했습니다';
+        // }
+        $descImage = $request->productDesc;
 
         // 상품 대표 이미지 업로드
         $productImage = $this->moveImage($request->remember_token, $request->productImage, public_path('assets/images/product/'), 1);
@@ -146,7 +146,7 @@ class ProductRegisterController extends Controller
         $validator = Validator::make($request->all(), [
             'vendors' => 'required|array',
             'model' => 'required|string',
-            'productDescImage' => 'required|image',
+            'productDesc' => 'required',
             'itemName' => 'required|string|min:2|max:20',
             'invoiceName' => 'required|string',
             'category' => 'required',
@@ -165,7 +165,7 @@ class ProductRegisterController extends Controller
         ], [
             'vendors' => '상품을 등록할 업체를 선택해주세요',
             'model' => '모델명을 기입해주세요',
-            'productDescImage' => '상품 설명을 기입해주세요',
+            'productDesc' => '상품 설명을 기입해주세요',
             'category' => '상품 카테고리를 검색 후 선택해주세요',
             'itemName' => '상품명을 기입해주세요. 2자 이상 20자 이하.',
             'invoiceName' => '택배송장명을 기입해주세요',

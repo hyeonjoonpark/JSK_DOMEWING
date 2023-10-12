@@ -244,8 +244,8 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">상품 상세설명 이미지</label>
-                        {{-- <div class="summernote-basic"></div> --}}
-                        <input type="file" class="form-control" id="descImage" name="descImage" accept="image/*">
+                        <div class="summernote-basic" id="summernote"></div>
+                        {{-- <input type="file" class="form-control" id="descImage" name="descImage" accept="image/*"> --}}
                     </div>
                     <div class="form-group">
                         <label class="form-label">상품정보고시</label>
@@ -289,12 +289,42 @@
 @endsection
 @section('scripts')
     <link rel="stylesheet" href="{{ asset('assets/css/editors/summernote.css') }}">
-    {{-- <script src="{{ asset('assets/js/editors.js') }}"></script>
-    <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script> --}}
+    <script src="{{ asset('assets/js/editors.js') }}"></script>
+    <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
         // var productDescImg;
         var apiUrl = "http:/127.0.0.1:8000/";
+        $('#summernote').summernote({
+            height: 300,
+            callbacks: {
+                onImageUpload: function(files) {
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
+
+                    var $editor = $(this);
+                    var data = new FormData();
+                    data.append('file', files[0]); // 이미지 파일 업로드
+
+                    $.ajax({
+                        url: '/admin/upload-image', // 이미지를 업로드할 서버 경로
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken // CSRF 토큰을 헤더에 추가
+                        },
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            $editor.summernote('insertImage', response.return);
+                            console.log(response);
+                        },
+                        error: function(response) {
+                            console.log(response);
+                        }
+                    });
+                }
+            }
+        });
         // function insertImage(editor, welEditable, imageFile) {
         //     var reader = new FileReader();
         //     reader.onload = function(e) {
@@ -365,12 +395,13 @@
                     formData.append('vendors[]', checkVal);
                 }
             });
-            // const productDesc = $('.summernote-basic').summernote('code');
+            const productDesc = $('.summernote-basic').summernote('code');
             const model = $('input[name="model"]').val();
             formData.append('model', model);
-            const productDescImage = $('#descImage')[0].files[0];
-            formData.append('productDescImage', productDescImage);
-            // formData.append('productDesc', productDesc);
+            // const productDescImage = $('#descImage')[0].files[0];
+            // formData.append('productDescImage', productDescImage);
+            formData.append('productDesc', productDesc);
+            console.log(productDesc);
             formData.append('itemName', $("#productName").val());
             formData.append('invoiceName', $("#invoiceName").val());
             formData.append('category', $('#categoryResult option:selected').val());
