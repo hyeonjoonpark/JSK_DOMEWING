@@ -10,12 +10,15 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use App\Http\Controllers\Admin\CategoryMappingController;
 
 class FormController extends Controller
 {
     public function wholesaledepot(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
     {
         try {
+            $categoryMappingController = new CategoryMappingController();
+            $categoryCode = $categoryMappingController->wsConvertCategoryCode($categoryCode);
             $spreadsheet = IOFactory::load(public_path('assets/excel/wholesaledepot.xls'));
             $sheet = $spreadsheet->getsheet(0);
             if ($request->shipping != '선불') {
@@ -46,10 +49,10 @@ class FormController extends Controller
             $dataset = [
                 'productName' => $request->itemName,
                 'invoiceName' => $request->invoiceName,
-
+                'categoryCode' => $categoryCode,
                 'productCode' => '',
 
-                'categoryCode' => $domesinCode,
+
 
                 'productCode2' => '',
                 'originated' => $request->origin,
