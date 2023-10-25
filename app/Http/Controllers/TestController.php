@@ -2,35 +2,63 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
-use Goutte\Client;
-use Symfony\Component\DomCrawler\Crawler;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\DB;
 
 class TestController extends Controller
 {
-    public function handle(Request $request)
+    public function handle()
     {
-        $url = 'https://domesin.com/scm/login.html';
+        $excelPath = public_path('assets/excel/wholesaledepot.xls');
+        $data = $this->readExcelData($excelPath);
 
-        $client = new Client();
-        $crawler = $client->request('GET', $url);
+        foreach ($data as $row) {
+            $piTitle = $row['title'];
+            $piValue = $row['value'];
 
-        // 사용자 이름(ID) 필드에 값을 입력
-        $idField = $crawler->filter('input[name="m_id"]')->first();
-        $idField->setValue('sungiltradekorea');
+            $this->updateProductInformation($piTitle, $piValue);
+        }
+    }
 
-        // 비밀번호(PW) 필드에 값을 입력
-        $pwField = $crawler->filter('input[name="m_pw"]')->first();
-        $pwField->setValue('tjddlf88!@');
+    private function readExcelData($excelPath)
+    {
+        $spreadsheet = IOFactory::load($excelPath);
+        $sheet = $spreadsheet->getSheet(3);
 
-        // 로그인 버튼을 클릭
-        $loginButton = $crawler->filter('input[type="image"]')->first();
-        $form = $loginButton->form();
-        $client->submit($form);
+        $data = [];
+        $i = 0;
+        foreach ($sheet->getRowIterator() as $row) {
+            if ($i != 0) {
+                $cellIterator = $row->getCellIterator();
+                $titleCell = $cellIterator->current();
+                $title = $titleCell->getValue();
 
-        // 로그인 후 현재 페이지 내용을 가져옵니다
-        $content = $client->getResponse()->getContent();
+                $cellIterator->next(); // 다음 셀로 이동
+                $valueCell = $cellIterator->current();
+                $value = $valueCell->getValue();
 
-        return view('logged_in_page', ['content' => $content]);
+                $data[] = [
+                    'title' => $title,
+                    'value' => $value,
+                ];
+            }
+            $i++;
+        }
+
+        return $data;
+    }
+
+    private function updateProductInformation($piTitle, $piValue)
+    {
+        try {
+            DB::table('product_information')
+                ->where('content', 'LIKE', "%$piTitle%")
+                ->update(['wsd_value' => $piValue]);
+            echo $piTitle . $piValue;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
 }

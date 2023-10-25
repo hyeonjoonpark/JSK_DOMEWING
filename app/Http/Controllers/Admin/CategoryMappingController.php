@@ -33,7 +33,7 @@ class CategoryMappingController extends Controller
     }
     public function wdGetKeyword($categoryCode)
     {
-        $categoryString = DB::table('category')->where('id', $categoryCode)->select('wholeCategoryName')->first()->wholeCategoryName;
+        $categoryString = DB::table('category')->where('code', $categoryCode)->select('wholeCategoryName')->first()->wholeCategoryName;
         $categories = explode(">", $categoryString);
         // 배열의 마지막 요소를 선택합니다.
         $lastCategory = trim(end($categories));

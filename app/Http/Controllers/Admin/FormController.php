@@ -17,59 +17,58 @@ class FormController extends Controller
     public function wholesaledepot(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
     {
         try {
+            // 카테고리 코드 변환을 위한 컨트롤러 생성
             $categoryMappingController = new CategoryMappingController();
             $categoryCode = $categoryMappingController->wsConvertCategoryCode($categoryCode);
+
+            // 엑셀 파일 불러오기
             $spreadsheet = IOFactory::load(public_path('assets/excel/wholesaledepot.xls'));
-            $sheet = $spreadsheet->getsheet(0);
+            $sheet = $spreadsheet->getSheet(0);
+
+            // 배송비 설정
             if ($request->shipping != '선불') {
                 $shipCost = 0;
             } else {
                 $shipCost = $request->shipCost;
             }
-            // 데이터 배열 생성
-            $domesinCode = DB::table('category')->where('code', $categoryCode)->select('domesinCode')->first();
-            $domesinCode = $domesinCode->domesinCode;
-            if ($request->taxability === '과세') {
-                $taxability = 0;
-            } else {
-                $taxability = 1;
-            }
+
+            $taxability = ($request->taxability === '과세') ? 1 : 2;
+
             if ($request->shipping == '선불') {
                 $shipping = 0;
-            } else if ($request->shipping == '착불') {
-                $shipping = 2;
-            } else if ($request->shipping == '무료') {
+            } elseif ($request->shipping == '착불') {
+                $shipping = 3;
+            } elseif ($request->shipping == '무료') {
                 $shipping = 1;
             }
-            if ($request->saleToMinor == '가능') {
-                $saleToMinor = '';
-            } else {
-                $saleToMinor = '1';
-            }
+
+            $saleToMinor = ($request->saleToMinor == '가능') ? '2' : '1';
+
+            $productInformationCode = DB::table('product_information')
+                ->where('domesin_value', $request->product_information)
+                ->select('wsd_value')
+                ->first()
+                ->wsd_value;
+
+            // 제품 데이터 배열 생성
             $dataset = [
                 'productName' => $request->itemName,
                 'invoiceName' => $request->invoiceName,
                 'categoryCode' => $categoryCode,
                 'productCode' => '',
-
-
-
                 'productCode2' => '',
                 'originated' => $request->origin,
                 'vendor' => $request->vendor,
                 'brand' => $request->vendor,
-                'model' => $request->model,
                 'taxability' => $taxability,
                 'shipType' => $shipping,
-                'bundledQuantity' => '',
-                'isInternationalShipping' => '',
-                'shipCost' => $shipCost,
-                'refundCost' => $shipCost,
-                'refundAddress' => '1508',
+                'bundledQuantity' => '0',
+                'isInternationalShipping' => '0',
                 'keywords' => $request->keywords,
                 'productPrice' => $request->price,
                 'forcedPrice' => '',
-                'normalPrice' => '',
+                'isForced' => '0',
+                'isConsumerNotified' => '0',
                 'descImage' => $descImage,
                 'productImage' => $productImage,
                 'extraImage1' => '',
@@ -78,18 +77,19 @@ class FormController extends Controller
                 'extraImage4' => '',
                 'extraImage5' => '',
                 'isExclusive' => '0',
-                'selectedOption' => '',
+                'selectedOption' => '0',
                 'inputOption' => '',
-                'credentials' => '0',
+                'credentials' => 'C',
                 'credentialCode' => '',
-                'credentialNum' => '',
+                'refundAddress' => '1597',
                 'isRefundable' => '1',
+                'refundReason' => '',
                 'saleToMinor' => $saleToMinor,
                 'isSale' => '0',
                 'isDisplay' => '1',
-                'productCondition' => '',
+                'isNew' => 'N',
                 'productNotice' => '',
-                'productInformationCode' => $request->product_information,
+                'productInformationCode' => $productInformationCode,
                 'productInformation0' => '상품 상세설명에 표시',
                 'productInformation1' => '상품 상세설명에 표시',
                 'productInformation2' => '상품 상세설명에 표시',
@@ -113,28 +113,33 @@ class FormController extends Controller
                 'productInformation20' => '상품 상세설명에 표시',
                 'productInformation21' => '상품 상세설명에 표시',
             ];
-            // 추가할 새로운 행의 위치를 지정합니다.
-            $newRow = 4; // 현재 데이터가 있는 가장 아래 행 다음에 추가하려면 +1을 사용합니다.
+
+            // 제품 정보를 엑셀에 추가
+            $newRow = 5;
             $col = 'A';
             foreach ($dataset as $value) {
                 $sheet->setCellValue($col . $newRow, $value);
                 $col++;
             }
+
             // 엑셀 파일 업로드
-            // 변경된 내용을 파일로 저장
             $writer = new Xls($spreadsheet);
-            $fileName = $username . '_' . date('YmdHis') . '.xls';
+            $fileName = 'wsd_' . $username . '_' . date('YmdHis') . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer->save($formedExcelFile);
+
+            // 결과 반환
             $data['status'] = 1;
             $data['return'] = $fileName;
             return $data;
         } catch (Exception $e) {
+            // 오류가 발생한 경우 처리
             $data['status'] = -1;
             $data['return'] = $e->getMessage();
             return $data;
         }
     }
+
     public function domesin(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
     {
         try {

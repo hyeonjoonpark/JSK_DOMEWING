@@ -15,25 +15,25 @@ class ProductRegisterController extends Controller
     // 카테고리 검색
     protected function categorySearch(Request $request)
     {
-        $keyword = $request->keyword;
+        $keyword = $request->keyword; // 요청에서 키워드 값을 가져옴
 
         // 검증 규칙 설정
         $validator = Validator::make($request->all(), [
-            'keyword' => ['required', 'min:2', 'max:20']
+            'keyword' => ['required', 'min:2', 'max:20'] // 키워드 필드에 대한 유효성 검사 규칙 설정
         ], [
-            'keyword' => '검색어는 2자 이상 20자 이하로 기입해주세요.'
+            'keyword' => '검색어는 2자 이상 20자 이하로 기입해주세요.' // 유효성 검사 실패 시 반환할 오류 메시지 설정
         ]);
 
         // 유효성 검사 실패 시 오류 반환
         if ($validator->fails()) {
-            return $this->getResponseData(-1, $validator->errors()->first());
+            return $this->getResponseData(-1, $validator->errors()->first()); // 유효성 검사 실패 시 오류 메시지 반환
         }
 
-        $categories = DB::table('category')->where('wholeCategoryName', 'LIKE', '%' . $keyword . '%')->get();
+        $categories = DB::table('category')->where('wholeCategoryName', 'LIKE', '%' . $keyword . '%')->get(); // 카테고리 테이블에서 키워드를 포함하는 카테고리 검색
         if (!empty($categories)) {
-            return $this->getResponseData(1, $categories);
+            return $this->getResponseData(1, $categories); // 검색 결과가 있을 경우 결과 반환
         } else {
-            return $this->getResponseData(-1, '검색 결과가 없습니다. 다른 키워드로 검색해주세요.');
+            return $this->getResponseData(-1, '검색 결과가 없습니다. 다른 키워드로 검색해주세요.'); // 검색 결과가 없을 경우 오류 메시지 반환
         }
     }
 
@@ -70,7 +70,7 @@ class ProductRegisterController extends Controller
             $vendorEngName = $vendor->name_eng;
             $data = $this->insertExcel($request, $account->username, $account->password, $vendorEngName, $productImage, $descImage);
             if ($data['status'] == -1) {
-                $failedVendors[] = $vendorName;
+                $failedVendors[] = $vendorName . " " . $data['return'];
             } else {
                 $formedExcel = $data['return'];
                 set_time_limit(0);
