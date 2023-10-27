@@ -63,6 +63,7 @@ class ProductRegisterController extends Controller
 
         // 업체 등록 및 실패한 업체 확인
         $failedVendors = [];
+        $cnt = 0;
         foreach ($request->vendors as $vendorId) {
             $account = $this->getAccount($request, $vendorId);
             $vendor = DB::table('vendors')->where('id', $vendorId)->select('name', 'name_eng')->first();
@@ -72,19 +73,22 @@ class ProductRegisterController extends Controller
             if ($data['status'] == -1) {
                 $failedVendors[] = $vendorName . " " . $data['return'];
             } else {
-                // $formedExcel = $data['return'];
-                // set_time_limit(0);
-                // $command = 'node ' . public_path('js/register/' . $vendorEngName . '.js') . " \"$account->username\" \"$account->password\" \"$formedExcel\"";
-                // try {
-                //     exec($command, $output, $exitCode);
-                //     if ($exitCode !== 0) {
-                //         // 명령이 성공적으로 실행됨
-                //         $failedVendors[] = $vendorName;
-                //     }
-                // } catch (Exception $e) {
-                //     $failedVendors[] = $vendorName;
-                // }
+                if ($cnt < 3) {
+                    $formedExcel = $data['return'];
+                    set_time_limit(0);
+                    $command = 'node ' . public_path('js/register/' . $vendorEngName . '.js') . " \"$account->username\" \"$account->password\" \"$formedExcel\"";
+                    try {
+                        exec($command, $output, $exitCode);
+                        if ($exitCode !== 0) {
+                            // 명령이 성공적으로 실행됨
+                            $failedVendors[] = $vendorName;
+                        }
+                    } catch (Exception $e) {
+                        $failedVendors[] = $vendorName;
+                    }
+                }
             }
+            $cnt++;
         }
 
         if (empty($failedVendors)) {
