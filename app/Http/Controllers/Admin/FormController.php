@@ -14,6 +14,327 @@ use App\Http\Controllers\Admin\CategoryMappingController;
 
 class FormController extends Controller
 {
+    public function domeggook(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
+    {
+        try {
+            // 카테고리 코드 변환을 위한 컨트롤러 생성
+            $categoryMappingController = new CategoryMappingController();
+            $categoryCode = $categoryMappingController->domeatozCategoryCode($categoryCode);
+
+            // 엑셀 파일 불러오기
+            $spreadsheet = IOFactory::load(public_path('assets/excel/domeggook.xls'));
+            $sheet = $spreadsheet->getSheet(0);
+
+            if ($request->shipping == '선불') {
+                $shipPolicy = '선결제';
+            }
+            if ($request->shipping == '무료') {
+                $shipPolicy = '구매자선택';
+            }
+
+            $saleToMinor = ($request->saleToMinor == '가능') ? 'N' : 'Y';
+
+            $productInformationCode = DB::table('product_information')->where('domesin_value', $request->product_information)->select('domeggook_value');
+
+            $price = $request->price;
+            $minQuantity = (5000 / $price) + 1;
+            // 제품 데이터 배열 생성
+            $dataset = [
+                'productCode' => '',
+                'saleChannel' => '도매꾹, 도매매',
+                'saleType' => '직접판매',
+                'isClassified' => 'N',
+                'productName' => $request->itemName,
+                'keywords' => $request->keywords,
+                'categoryCode' => $categoryCode,
+                'originated' => $request->origin,
+                'model' => $request->model,
+                'vendor' => $request->vendor,
+                'safetyCertification' => 'N',
+                'saleToMinor' => $saleToMinor,
+                'volume' => '',
+                'weight' => '',
+                'supplierProductCode' => '',
+                'productImage' => $productImage,
+                'productDetail00' => $descImage,
+                'productDetail01' => '',
+                'productDetail02' => '',
+                'productDetail03' => '',
+                'detailUsePermitted' => 'Y',
+                'additionalText' => '',
+                'productInformationCode' => $productInformationCode,
+                'productInformationDetail' => '전체상세정보별도표시',
+                'tradeInformation' => '전체상세정보별도표시',
+                'domeggookSaleType' => 'Y',
+                'domeggookPrice' => $minQuantity . ':' . $price,
+                'maxQuantity' => '',
+                'multipleSale' => 'N',
+                'nego' => 'N',
+                'domemePrice' => '1:' . $price,
+                'minPrice' => $request->price,
+                'recomendPrice' => $request->price,
+                'option' => 'N',
+                'optionAdd' => '',
+                'optionanother' => "N",
+                'optionValue' => '',
+                'optionPrice' => '',
+                'optionPrice2' => '',
+                'stockInitialPrice' => '',
+                'stock' => '500',
+                'taxabilitiy' => $request->taxability,
+                'salerPoint' => '0',
+                'deliveryMethod' => '택배',
+                'internationalShipping' => 'N',
+                'immigration' => '',
+                'shipDuration' => '0',
+                'shipPolicy' => $shipPolicy . ':고정배송비',
+                'shipCost' => $request->shipCost,
+                'domemeShipCost' => $request->shipCost,
+                'bundleShipping' => '',
+                'refundAddress' => 'SA0058243',
+                'refundCost' => $request->shipCost,
+                'openDays' => '365',
+                'isDisplay' => 'Y',
+            ];
+
+            // 제품 정보를 엑셀에 추가
+            $newRow = 2;
+            $col = 'A';
+            foreach ($dataset as $value) {
+                $sheet->setCellValue($col . $newRow, $value);
+                $col++;
+            }
+
+            // 엑셀 파일 업로드
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'domeggook_' . $username . '_' . date('YmdHis') . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer->save($formedExcelFile);
+
+            // 결과 반환
+            $data['status'] = 1;
+            $data['return'] = $fileName;
+            return $data;
+        } catch (Exception $e) {
+            // 오류가 발생한 경우 처리
+            $data['status'] = -1;
+            $data['return'] = $e->getMessage();
+            return $data;
+        }
+    }
+    public function domero(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
+    {
+        try {
+            // 카테고리 코드 변환을 위한 컨트롤러 생성
+            $category = DB::table('category')->where('code', $request->category)->select('wholeCategoryName')->first()->wholeCategoryName;
+
+            // 엑셀 파일 불러오기
+            $spreadsheet = IOFactory::load(public_path('assets/excel/domeatoz.xlsx'));
+            $sheet = $spreadsheet->getSheet(0);
+
+            // 배송비 설정
+            if ($request->shipping == '무료') {
+                $shipCost = 0;
+            } else {
+                $shipCost = $request->shipCost;
+            }
+
+            $taxability = ($request->taxability === '과세') ? 'Y' : 'N';
+
+            $shipping = '배송비' . $request->shipping;
+
+            $saleToMinor = ($request->saleToMinor == '가능') ? 'Y' : 'N';
+
+            // 제품 데이터 배열 생성
+            $dataset = [
+                'categoryCode' => $category,
+                'productName' => $request->itemName,
+                'isInternationalShipping' => '',
+                'isSale' => '',
+                'salesPermission' => '',
+                'invoiceName' => '',
+                'keywords' => $request->keywords,
+                'taxability' => $taxability,
+                'productPrice' => $request->price,
+                'forcedPrice' => '',
+                'bundledQuantity' => '가능수량',
+                'shipType' => $shipping,
+                'parcelType' => '',
+                'shipCost' => $request->shipCost,
+                'refundCost' => $shipCost,
+                'jejuRefundCost' => $shipCost,
+                'mountainRefundCost' => $shipCost,
+                'vendor' => $request->vendor,
+                'originated' => $request->origin,
+                'brand' => $request->vendor,
+                'productImage' => $productImage,
+                'refundAddress' => '768',
+                'saleToMinor' => $saleToMinor,
+                'descImage' => $descImage,
+                'option' => '',
+                'optionDetail' => '',
+                'credentialType' => '0',
+                'credentialTitle' => '',
+                'credentialCode' => '',
+                'myCode' => '',
+                'mycode2' => '',
+                'productInformation' => '35',
+                'productInformation0' => '상품 상세설명에 표시',
+                'productInformation1' => '상품 상세설명에 표시',
+                'productInformation2' => '상품 상세설명에 표시',
+                'productInformation3' => '상품 상세설명에 표시',
+                'productInformation4' => '상품 상세설명에 표시',
+                'productInformation5' => '상품 상세설명에 표시',
+                'productInformation6' => '상품 상세설명에 표시',
+                'productInformation7' => '상품 상세설명에 표시',
+                'productInformation8' => '상품 상세설명에 표시',
+                'productInformation9' => '상품 상세설명에 표시',
+                'productInformation10' => '상품 상세설명에 표시',
+                'productInformation11' => '상품 상세설명에 표시',
+                'productInformation12' => '상품 상세설명에 표시',
+                'productInformation13' => '상품 상세설명에 표시',
+                'productInformation14' => '상품 상세설명에 표시',
+                'productInformation15' => '상품 상세설명에 표시',
+                'productInformation16' => '상품 상세설명에 표시',
+                'productInformation17' => '상품 상세설명에 표시',
+                'productInformation18' => '상품 상세설명에 표시',
+                'productInformation19' => '상품 상세설명에 표시',
+                'productInformation20' => '상품 상세설명에 표시',
+                'productInformation21' => '상품 상세설명에 표시',
+            ];
+
+            // 제품 정보를 엑셀에 추가
+            $newRow = 4;
+            $col = 'A';
+            foreach ($dataset as $value) {
+                $sheet->setCellValue($col . $newRow, $value);
+                $col++;
+            }
+
+            // 엑셀 파일 업로드
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'domero_' . $username . '_' . date('YmdHis') . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer->save($formedExcelFile);
+
+            // 결과 반환
+            $data['status'] = 1;
+            $data['return'] = $fileName;
+            return $data;
+        } catch (Exception $e) {
+            // 오류가 발생한 경우 처리
+            $data['status'] = -1;
+            $data['return'] = $e->getMessage();
+            return $data;
+        }
+    }
+    public function domeatoz(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
+    {
+        try {
+            // 카테고리 코드 변환을 위한 컨트롤러 생성
+            $categoryMappingController = new CategoryMappingController();
+            $categoryCode = $categoryMappingController->domeatozCategoryCode($categoryCode);
+
+            // 엑셀 파일 불러오기
+            $spreadsheet = IOFactory::load(public_path('assets/excel/domeatoz.xlsx'));
+            $sheet = $spreadsheet->getSheet(0);
+
+            // 배송비 설정
+            if ($request->shipping == '무료') {
+                $shipCost = 0;
+            } else {
+                $shipCost = $request->shipCost;
+            }
+
+            $taxability = ($request->taxability === '과세') ? 'Y' : 'N';
+
+            $shipping = '배송비' . $request->shipping;
+
+            $saleToMinor = ($request->saleToMinor == '가능') ? 'Y' : 'N';
+
+            // 제품 데이터 배열 생성
+            $dataset = [
+                'categoryCode' => $categoryCode,
+                'isInternationalShipping' => '',
+                'isSale' => '',
+                'productName' => $request->itemName,
+                'salesPermission' => '',
+                'invoiceName' => '',
+                'keywords' => $request->keywords,
+                'taxability' => $taxability,
+                'productPrice' => $request->price,
+                'forcedPrice' => '',
+                'bundledQuantity' => '가능수량',
+                'shipType' => $shipping,
+                'parcelType' => '',
+                'shipCost' => $request->shipCost,
+                'refundCost' => $shipCost,
+                'jejuRefundCost' => $shipCost,
+                'mountainRefundCost' => $shipCost,
+                'vendor' => $request->vendor,
+                'originated' => $request->origin,
+                'brand' => $request->vendor,
+                'productImage' => $productImage,
+                'refundAddress' => '768',
+                'saleToMinor' => $saleToMinor,
+                'descImage' => $descImage,
+                'option' => '',
+                'optionDetail' => '',
+                'credentialType' => '0',
+                'credentialTitle' => '',
+                'credentialCode' => '',
+                'myCode' => '',
+                'mycode2' => '',
+                'productInformation' => '35',
+                'productInformation0' => '상품 상세설명에 표시',
+                'productInformation1' => '상품 상세설명에 표시',
+                'productInformation2' => '상품 상세설명에 표시',
+                'productInformation3' => '상품 상세설명에 표시',
+                'productInformation4' => '상품 상세설명에 표시',
+                'productInformation5' => '상품 상세설명에 표시',
+                'productInformation6' => '상품 상세설명에 표시',
+                'productInformation7' => '상품 상세설명에 표시',
+                'productInformation8' => '상품 상세설명에 표시',
+                'productInformation9' => '상품 상세설명에 표시',
+                'productInformation10' => '상품 상세설명에 표시',
+                'productInformation11' => '상품 상세설명에 표시',
+                'productInformation12' => '상품 상세설명에 표시',
+                'productInformation13' => '상품 상세설명에 표시',
+                'productInformation14' => '상품 상세설명에 표시',
+                'productInformation15' => '상품 상세설명에 표시',
+                'productInformation16' => '상품 상세설명에 표시',
+                'productInformation17' => '상품 상세설명에 표시',
+                'productInformation18' => '상품 상세설명에 표시',
+                'productInformation19' => '상품 상세설명에 표시',
+                'productInformation20' => '상품 상세설명에 표시',
+                'productInformation21' => '상품 상세설명에 표시',
+            ];
+
+            // 제품 정보를 엑셀에 추가
+            $newRow = 3;
+            $col = 'A';
+            foreach ($dataset as $value) {
+                $sheet->setCellValue($col . $newRow, $value);
+                $col++;
+            }
+
+            // 엑셀 파일 업로드
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'domeatoz_' . $username . '_' . date('YmdHis') . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer->save($formedExcelFile);
+
+            // 결과 반환
+            $data['status'] = 1;
+            $data['return'] = $fileName;
+            return $data;
+        } catch (Exception $e) {
+            // 오류가 발생한 경우 처리
+            $data['status'] = -1;
+            $data['return'] = $e->getMessage();
+            return $data;
+        }
+    }
     public function wholesaledepot(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
     {
         try {
@@ -26,7 +347,7 @@ class FormController extends Controller
             $sheet = $spreadsheet->getSheet(0);
 
             // 배송비 설정
-            if ($request->shipping != '선불') {
+            if ($request->shipping == '무료') {
                 $shipCost = 0;
             } else {
                 $shipCost = $request->shipCost;
@@ -145,7 +466,7 @@ class FormController extends Controller
         try {
             $spreadsheet = IOFactory::load(public_path('assets/excel/domesin.xls'));
             $sheet = $spreadsheet->getsheet(0);
-            if ($request->shipping != '선불') {
+            if ($request->shipping != '무료') {
                 $shipCost = 0;
             } else {
                 $shipCost = $request->shipCost;

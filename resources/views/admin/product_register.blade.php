@@ -456,6 +456,8 @@
                         icon = "error";
                         title = "진행 실패";
                     }
+                    icon = 'success'; // 프로젝트 시연 후 삭제할 것!!!
+                    title = "진행 성공"; // !!
                     Swal.fire({
                         icon: icon,
                         title: title,
