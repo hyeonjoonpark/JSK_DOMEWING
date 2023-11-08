@@ -1,0 +1,28 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+<title>Excel Down</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style>
+br{mso-data-placement:same-cell;}
+.xl31{mso-number-format:"0_\)\;\\(0\\)";}
+.xl24{mso-number-format:"\@";} 
+table{font-size:13px;}
+.bold{font-weight:bold;}
+.title td{font-weight:bold; background-color:#cccccc; text-align:center;} 
+.title-bright td{font-weight:bold; background-color:#f6f6f6; text-align:center;} 
+</style>
+</head>
+<body>
+<table border="1">
+<tr class="title">
+<td>카테고리코드</td>
+<td>대분류</td>
+<td>중분류</td>
+<td>소분류</td>
+<td>세분류</td>
+</tr>
+<br />
+<b>Warning</b>:  Invalid argument supplied for foreach() in <b>/www/kdome0120/scm/action/category_excel_download.php</b> on line <b>49</b><br />
+</table>
+</body>
+</html>

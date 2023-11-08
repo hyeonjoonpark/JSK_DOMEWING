@@ -14,6 +14,113 @@ use App\Http\Controllers\Admin\CategoryMappingController;
 
 class FormController extends Controller
 {
+    public function domeatoz(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
+    {
+        try {
+            // 카테고리 코드 변환을 위한 컨트롤러 생성
+            $categoryMappingController = new CategoryMappingController();
+            $categoryCode = $categoryMappingController->domeatozCategoryCode($categoryCode);
+
+            // 엑셀 파일 불러오기
+            $spreadsheet = IOFactory::load(public_path('assets/excel/domeatoz.xlsx'));
+            $sheet = $spreadsheet->getSheet(0);
+
+            // 배송비 설정
+            if ($request->shipping == '무료') {
+                $shipCost = 0;
+            } else {
+                $shipCost = $request->shipCost;
+            }
+
+            $taxability = ($request->taxability === '과세') ? 'Y' : 'N';
+
+            $shipping = '배송비' . $request->shipping;
+
+            $saleToMinor = ($request->saleToMinor == '가능') ? 'Y' : 'N';
+
+            // 제품 데이터 배열 생성
+            $dataset = [
+                'categoryCode' => $categoryCode,
+                'isInternationalShipping' => '',
+                'isSale' => '',
+                'productName' => $request->itemName,
+                'salesPermission' => '',
+                'invoiceName' => '',
+                'keywords' => $request->keywords,
+                'taxability' => $taxability,
+                'productPrice' => $request->price,
+                'forcedPrice' => '',
+                'bundledQuantity' => '가능수량',
+                'shipType' => $shipping,
+                'parcelType' => '',
+                'shipCost' => $request->shipCost,
+                'refundCost' => $shipCost,
+                'jejuRefundCost' => $shipCost,
+                'mountainRefundCost' => $shipCost,
+                'vendor' => $request->vendor,
+                'originated' => $request->origin,
+                'brand' => $request->vendor,
+                'productImage' => $productImage,
+                'refundAddress' => '768',
+                'saleToMinor' => $saleToMinor,
+                'descImage' => $descImage,
+                'option' => '',
+                'optionDetail' => '',
+                'credentialType' => '0',
+                'credentialTitle' => '',
+                'credentialCode' => '',
+                'myCode' => '',
+                'mycode2' => '',
+                'productInformation' => '35',
+                'productInformation0' => '상품 상세설명에 표시',
+                'productInformation1' => '상품 상세설명에 표시',
+                'productInformation2' => '상품 상세설명에 표시',
+                'productInformation3' => '상품 상세설명에 표시',
+                'productInformation4' => '상품 상세설명에 표시',
+                'productInformation5' => '상품 상세설명에 표시',
+                'productInformation6' => '상품 상세설명에 표시',
+                'productInformation7' => '상품 상세설명에 표시',
+                'productInformation8' => '상품 상세설명에 표시',
+                'productInformation9' => '상품 상세설명에 표시',
+                'productInformation10' => '상품 상세설명에 표시',
+                'productInformation11' => '상품 상세설명에 표시',
+                'productInformation12' => '상품 상세설명에 표시',
+                'productInformation13' => '상품 상세설명에 표시',
+                'productInformation14' => '상품 상세설명에 표시',
+                'productInformation15' => '상품 상세설명에 표시',
+                'productInformation16' => '상품 상세설명에 표시',
+                'productInformation17' => '상품 상세설명에 표시',
+                'productInformation18' => '상품 상세설명에 표시',
+                'productInformation19' => '상품 상세설명에 표시',
+                'productInformation20' => '상품 상세설명에 표시',
+                'productInformation21' => '상품 상세설명에 표시',
+            ];
+
+            // 제품 정보를 엑셀에 추가
+            $newRow = 3;
+            $col = 'A';
+            foreach ($dataset as $value) {
+                $sheet->setCellValue($col . $newRow, $value);
+                $col++;
+            }
+
+            // 엑셀 파일 업로드
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'domeatoz_' . $username . '_' . date('YmdHis') . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer->save($formedExcelFile);
+
+            // 결과 반환
+            $data['status'] = 1;
+            $data['return'] = $fileName;
+            return $data;
+        } catch (Exception $e) {
+            // 오류가 발생한 경우 처리
+            $data['status'] = -1;
+            $data['return'] = $e->getMessage();
+            return $data;
+        }
+    }
     public function wholesaledepot(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
     {
         try {
@@ -26,7 +133,7 @@ class FormController extends Controller
             $sheet = $spreadsheet->getSheet(0);
 
             // 배송비 설정
-            if ($request->shipping != '선불') {
+            if ($request->shipping == '무료') {
                 $shipCost = 0;
             } else {
                 $shipCost = $request->shipCost;
@@ -145,7 +252,7 @@ class FormController extends Controller
         try {
             $spreadsheet = IOFactory::load(public_path('assets/excel/domesin.xls'));
             $sheet = $spreadsheet->getsheet(0);
-            if ($request->shipping != '선불') {
+            if ($request->shipping != '무료') {
                 $shipCost = 0;
             } else {
                 $shipCost = $request->shipCost;
