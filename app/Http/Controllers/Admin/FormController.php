@@ -14,8 +14,6 @@ use App\Http\Controllers\Admin\CategoryMappingController;
 
 class FormController extends Controller
 {
-<<<<<<< HEAD
-=======
     public function domeggook(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
     {
         try {
@@ -229,7 +227,6 @@ class FormController extends Controller
             return $data;
         }
     }
->>>>>>> 55aa3ea4bba2d2c79facbfa2f8468b2f30553303
     public function domeatoz(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
     {
         try {
@@ -468,15 +465,12 @@ class FormController extends Controller
         try {
             $spreadsheet = IOFactory::load(public_path('assets/excel/domesin.xls'));
             $sheet = $spreadsheet->getsheet(0);
-<<<<<<< HEAD
             if ($request->shipping != '무료') {
                 $shipCost = 0;
             } else {
                 $shipCost = $request->shipCost;
             }
-=======
             $shipCost = $request->shipCost;
->>>>>>> 55aa3ea4bba2d2c79facbfa2f8468b2f30553303
             // 데이터 배열 생성
             $domesinCode = DB::table('category')->where('code', $categoryCode)->select('domesinCode')->first();
             $domesinCode = $domesinCode->domesinCode;

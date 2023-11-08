@@ -9,8 +9,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CategoryMappingController extends Controller
 {
-<<<<<<< HEAD
-=======
     public function domeggookCategoryCode($code)
     {
         $categoryString = DB::table('category')->where('code', $code)->select('wholeCategoryName')->first()->wholeCategoryName;
@@ -61,7 +59,6 @@ class CategoryMappingController extends Controller
         }
         return $code . $keyword;
     }
->>>>>>> 55aa3ea4bba2d2c79facbfa2f8468b2f30553303
     public function domeatozCategoryCode($code)
     {
         $categoryString = DB::table('category')->where('code', $code)->select('wholeCategoryName')->first()->wholeCategoryName;

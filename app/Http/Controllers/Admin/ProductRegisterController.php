@@ -73,7 +73,6 @@ class ProductRegisterController extends Controller
             if ($data['status'] == -1) {
                 $failedVendors[] = $vendorName . " " . $data['return'];
             } else {
-<<<<<<< HEAD
                 // $formedExcel = $data['return'];
                 // set_time_limit(0);
                 // $command = 'node ' . public_path('js/register/' . $vendorEngName . '.js') . " \"$account->username\" \"$account->password\" \"$formedExcel\"";
@@ -86,7 +85,6 @@ class ProductRegisterController extends Controller
                 // } catch (Exception $e) {
                 //     $failedVendors[] = $vendorName;
                 // }
-=======
                 if ($cnt < 3) {
                     $formedExcel = $data['return'];
                     set_time_limit(0);
@@ -101,7 +99,6 @@ class ProductRegisterController extends Controller
                         $failedVendors[] = $vendorName;
                     }
                 }
->>>>>>> 55aa3ea4bba2d2c79facbfa2f8468b2f30553303
             }
             $cnt++;
         }
