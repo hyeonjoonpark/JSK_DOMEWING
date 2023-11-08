@@ -11,54 +11,25 @@ class TestController extends Controller
 {
     public function handle()
     {
-        $excelPath = public_path('assets/excel/wholesaledepot.xls');
-        $data = $this->readExcelData($excelPath);
-
-        foreach ($data as $row) {
-            $piTitle = $row['title'];
-            $piValue = $row['value'];
-
-            $this->updateProductInformation($piTitle, $piValue);
-        }
-    }
-
-    private function readExcelData($excelPath)
-    {
-        $spreadsheet = IOFactory::load($excelPath);
-        $sheet = $spreadsheet->getSheet(3);
-
+        $excel = IOFactory::load(public_path('assets/excel/domeatoz_product_information.xlsx'));
+        $sheet = $excel->getSheet(0);
         $data = [];
-        $i = 0;
+        $cnt = 0;
         foreach ($sheet->getRowIterator() as $row) {
-            if ($i != 0) {
+            if ($cnt != 0) {
                 $cellIterator = $row->getCellIterator();
-                $titleCell = $cellIterator->current();
-                $title = $titleCell->getValue();
-
-                $cellIterator->next(); // 다음 셀로 이동
-                $valueCell = $cellIterator->current();
-                $value = $valueCell->getValue();
-
-                $data[] = [
-                    'title' => $title,
-                    'value' => $value,
-                ];
+                $rowData = [];
+                foreach ($cellIterator as $cell) {
+                    $rowData[] = $cell->getValue();
+                }
+                $data[] = $rowData;
             }
-            $i++;
+            $cnt++;
         }
-
-        return $data;
-    }
-
-    private function updateProductInformation($piTitle, $piValue)
-    {
-        try {
-            DB::table('product_information')
-                ->where('content', 'LIKE', "%$piTitle%")
-                ->update(['wsd_value' => $piValue]);
-            echo $piTitle . $piValue;
-        } catch (Exception $e) {
-            return $e->getMessage();
+        foreach ($data as $row) {
+            DB::table('product_information')->where('content', 'LIKE', '%' . $row[0] . '%')->update([
+                'domeatoz_value' => $row[1]
+            ]);
         }
     }
 }

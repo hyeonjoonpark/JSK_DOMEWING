@@ -19,6 +19,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/search-to-register', [AdminController::class, 'searchToRegister']);
     Route::get('product/register', [AdminController::class, 'productRegister']);
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
+
+    //ving kong
+    Route::get('/content-management-system', [AdminController::class, 'contentManagementSystem']);
 });
 
 // 로그인 및 등록 라우트

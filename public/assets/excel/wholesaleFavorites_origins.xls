@@ -1,0 +1,2954 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+	xmlns:o="urn:schemas-microsoft-com:office:office"
+	xmlns:x="urn:schemas-microsoft-com:office:excel"
+	xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+	xmlns:html="http://www.w3.org/TR/REC-html40">
+	<Worksheet ss:Name="국내산">
+		<Table>
+			<Row>
+				<Cell><Data ss:Type="String">원산지코드</Data></Cell>
+				<Cell><Data ss:Type="String">구분</Data></Cell>
+				<Cell><Data ss:Type="String">시도</Data></Cell>
+				<Cell><Data ss:Type="String">시군구</Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-db</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[도봉구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-ddm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동대문구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-dj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동작구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-ep</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[은평구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-ga</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[관악구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-gb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강북구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-gc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[금천구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-gd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-gj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광진구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-gn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강남구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-gr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[구로구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강서구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-jg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-jrn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중랑구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-jro</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[종로구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-mp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[마포구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-nw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[노원구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-sb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[성북구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-sc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서초구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-sdg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[성동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-sdm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서대문구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-sp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[송파구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-yc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[양천구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-yd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영등포구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-02-ys</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서울특별시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[용산구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-asg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[안성시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-asn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[안산시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-asndw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[안산시 단원구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-asnsr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[안산시 상록구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-ay</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[안양시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-ayda</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[안양시 동안구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-ayma</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[안양시 만안구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-bc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-ddc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동두천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[과천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광명시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gmp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[김포시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gpg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[가평군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gpo</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[군포시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[구리시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[고양시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gydy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[고양시 덕양구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gyisd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[고양시 일산동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-gyiss</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[고양시 일산서구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-hn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[하남시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-hs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[화성시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-ic</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[이천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-nyj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남양주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-os</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오산시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-pc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[포천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-pj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[파주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-pt</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[평택시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-sh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[시흥시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-sn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[성남시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-snbd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[성남시 분당구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-snjw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[성남시 중원구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-snsj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[성남시 수정구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-sw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수원시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-swgs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수원시 권선구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-swja</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수원시 장안구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-swpd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수원시 팔달구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-swyt</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수원시 영통구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-ujb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[의정부시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-uw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[의왕시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-yc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[연천군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-yej</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[여주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-yi</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[용인시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-yici</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[용인시 처인구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-yigh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[용인시 기흥구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-yisj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[용인시 수지구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-ynj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[양주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-031-yp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경기도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[양평군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-bp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부평구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-dg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-gh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강화군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-gw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[계양구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-jg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-mch</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[미추홀구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-nd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-oj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[옹진군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-sg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-032-ys</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인천광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[연수구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-cc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[춘천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-cw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[철원군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-dh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동해시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-gr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강릉시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[고성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-hnc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[홍천군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-hs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[횡성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-hwc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[화천군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-ij</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인제군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-js</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[정선군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-pc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[평창군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-sck</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[삼척시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-sco</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[속초시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-tb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[태백시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-wj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[원주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-yg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[양구군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-yw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영월군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-033-yy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강원도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[양양군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-as</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아산시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-br</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[보령시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-by</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부여군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-ca</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[천안시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-cadn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[천안시 동남구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-casb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[천안시 서북구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-cy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[청양군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-dj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[당진시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-gj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[공주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-gr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[계룡시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[금산군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-hs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[홍성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-ns</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[논산시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-sc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서천군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-ss</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서산시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-ta</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[태안군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-041-ys</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[예산군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-042</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대전광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-042-dd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대전광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대덕구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-042-dg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대전광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-042-jg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대전광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-042-sg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대전광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-042-ys</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대전광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유성구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-be</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[보은군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-cej</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[청주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-cejcw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[청주시 청원구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-cejhd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[청주시 흥덕구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-cejsd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[청주시 상당구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-cejsw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[청주시 서원구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-cuj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-dy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[단양군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-es</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[음성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[괴산군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-jec</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[제천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-jnc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[진천군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-jp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[증평군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-oc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[옥천군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-043-yd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[충청북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영동군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-044</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[세종특별자치시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-bg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[북구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-bsj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산진구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-dg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-dr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동래구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-gij</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[기장군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-gmj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[금정구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강서구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-hwd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[해운대구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-jg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-ng</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-sg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-sh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[사하구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-ss</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[사상구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-sy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수영구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-yd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영도구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-051-yj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[연제구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-052</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[울산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-052-bg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[울산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[북구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-052-dg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[울산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-052-jg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[울산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-052-ng</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[울산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-052-uj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[울산광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[울주군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-053</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대구광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-053-bg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대구광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[북구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-053-dg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대구광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-053-dsg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대구광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[달서구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-053-dsn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대구광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[달성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-053-jg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대구광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-053-ng</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대구광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-053-sg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대구광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-053-ss</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[대구광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수성구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-ad</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[안동시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-bh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[봉화군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-cd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[청도군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-cg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[칠곡군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-cs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[청송군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-gc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[김천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-gj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-gm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[구미시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-gr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[고령군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경산시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-gw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[군위군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-mg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[문경시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-ph</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[포항시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-phb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[포항시 북구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-phn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[포항시 남구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-saj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[상주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-sej</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[성주군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-uj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[울진군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-ul</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[울릉군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-us</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[의성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-yd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영덕군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-yec</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[예천군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-yj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-ync</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-054-yy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영양군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-cn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[창녕군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-cw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[창원시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-cwhp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[창원시 마산합포구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-cwhw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[창원시 마산회원구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-cwjh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[창원시 진해구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-cwss</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[창원시 성산구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-cwuc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[창원시 의창구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-gc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[거창군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-gh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[김해시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-gj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[거제시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[고성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-han</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[함안군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-hay</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[함양군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-hc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[합천군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-hd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[하동군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-jj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[진주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-my</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[밀양시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-nh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남해군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-sac</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[사천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-snc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[산청군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-ty</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[통영시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-ur</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[의령군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-055-ys</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[경상남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[양산시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-bs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[보성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-dy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[담양군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-gh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[고흥군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-gj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[강진군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-gr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[구례군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[곡성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-gy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광양시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-hn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[해남군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-hp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[함평군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-hs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[화순군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-jd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[진도군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-jh</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[장흥군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-js</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[장성군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-ma</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[무안군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-mp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[목포시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-nj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[나주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-sa</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[신안군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-sc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[순천시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-wd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[완도군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-ya</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영암군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-yg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영광군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-061-ys</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라남도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[여수시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-062</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광주광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-062-bg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광주광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[북구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-062-dg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광주광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-062-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광주광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광산구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-062-ng</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광주광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-062-sg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[광주광역시]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-ba</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부안군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-gc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[고창군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-gj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[김제시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-gs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[군산시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-iks</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[익산시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-ims</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[임실군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-ja</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[진안군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-je</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[정읍시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-jj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-jjdj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전주시 덕진구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-jjws</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전주시 완산구]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-js</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[장수군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-mj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[무주군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-nw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남원시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-sc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[순창군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-063-wj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[전라북도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[완주군]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-064</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[제주특별자치도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-064-jj</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[제주특별자치도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[제주시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">a-064-sgp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[국내산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[제주특별자치도]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[서귀포시]]></Data></Cell>
+			</Row>
+		</Table>
+	</Worksheet>
+	<Worksheet ss:Name="수입산">
+		<Table>
+			<Row>
+				<Cell><Data ss:Type="String">원산지코드</Data></Cell>
+				<Cell><Data ss:Type="String">구분</Data></Cell>
+				<Cell><Data ss:Type="String">권역</Data></Cell>
+				<Cell><Data ss:Type="String">국가</Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-ago</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[앙골라]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-bdi</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부룬디]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-ben</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[베냉]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-bfa</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부르키나파소]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-bwa</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[보츠와나]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-caf</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중앙아프리카 공화국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-civ</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[코트디부아르]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-cmr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[카메룬]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-cod</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[콩고 민주 공화국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-cog</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[콩고 공화국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-com</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[코모로]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-cpv</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[카보베르데]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-dji</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[지부티]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-dza</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[알제리]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-egy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[이집트]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-eri</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[에리트레아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-eth</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[에티오피아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-gab</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[가봉]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-gha</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[가나]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-gin</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[기니]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-gmb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[감비아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-gnb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[기니비사우]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-gnq</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[적도 기니]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-ken</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[케냐]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-lbr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[라이베리아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-lby</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[리비아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-lso</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[레소토]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-mar</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[모로코]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-mdg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[마다가스카르]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-mli</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[말리]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-moz</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[모잠비크]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-mrt</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[모리타니]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-mus</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[모리셔스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-mwi</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[말라위]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-nam</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[나미비아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-ner</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[니제르]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-nga</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[나이지리아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-rwa</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[르완다]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-sdn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수단]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-sen</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[세네갈]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-sle</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[시에라리온]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-som</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[소말리아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-ssd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남수단]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-stp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[상투메 프린시페]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-swz</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[에스와티니 (구 스와질란드)]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-syc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[세이셸]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-tcd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[차드]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-tgo</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[토고]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-tun</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[튀니지]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-tza</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[탄자니아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-uga</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[우간다]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-zaf</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남아프리카 공화국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-zmb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[잠비아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-af-zwe</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[짐바브웨]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-arg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아르헨티나]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-atg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[앤티가 바부다]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-bhs</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[바하마]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-blz</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[벨리즈]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-bol</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[볼리비아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-bra</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[브라질]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-brb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[바베이도스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-can</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[캐나다]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-chl</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[칠레]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-col</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[콜롬비아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-cri</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[코스타리카]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-cub</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[쿠바]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-dma</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[도미니카 연방]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-dom</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[도미니카 공화국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-ecu</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[에콰도르]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-grd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[그레나다]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-gtm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[과테말라]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-guy</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[가이아나]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-hnd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[온두라스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-hti</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아이티]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-jam</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[자메이카]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-kna</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[세인트키츠 네비스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-lca</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[세인트루시아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-mex</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[멕시코]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-nic</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[니카라과]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-pan</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[파나마]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-per</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[페루]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-pry</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[파라과이]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-slv</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[엘살바도르]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-sur</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수리남]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-tto</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[트리니다드 토바고]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-ury</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[우루과이]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-usa</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[미국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-vct</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[세인트빈센트 그레나딘]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-am-ven</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아메리카]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[베네수엘라]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-afg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아프가니스탄]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-are</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아랍에미리트]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-arm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아르메니아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-aze</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아제르바이잔]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-bgd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[방글라데시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-bhr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[바레인]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-brn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[브루나이]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-btn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[부탄]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-chn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-cyp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[키프로스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-geo</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[조지아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-hkg</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[홍콩]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-idn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인도네시아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-ind</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[인도]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-irn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[이란]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-irq</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[이라크]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-isr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[이스라엘]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-jor</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[요르단]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-jpn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[일본]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-kaz</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[카자흐스탄]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-kgz</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[키르기스스탄]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-khm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[캄보디아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-ksa</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[사우디아라비아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-kwt</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[쿠웨이트]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-lao</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[라오스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-lbn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[레바논]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-lka</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[스리랑카]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-mac</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[마카오]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-mdv</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[몰디브]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-mmr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[미얀마]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-mng</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[몽골]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-mys</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[말레이시아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-npl</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[네팔]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-omn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오만]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-pak</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[파키스탄]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-phl</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[필리핀]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-prk</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[북한]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-pse</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[팔레스타인]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-qat</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[카타르]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-sgp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[싱가포르]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-syr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[시리아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-tha</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[태국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-tjk</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[타지키스탄]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-tkm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[투르크메니스탄]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-tls</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[동티모르]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-tur</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[터키]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-twn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[중화민국 (대만)]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-uzb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[우즈베키스탄]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-vnm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[베트남]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-as-yem</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아시아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[예멘]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-alb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[알바니아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-and</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[안도라]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-aut</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오스트리아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-bel</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[벨기에]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-bgr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[불가리아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-bih</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[보스니아 헤르체고비나]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-blr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[벨라루스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-che</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[스위스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-cze</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[체코]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-deu</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[독일]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-dnk</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[덴마크]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-esp</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[스페인]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-est</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[에스토니아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-fin</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[핀란드]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-fra</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[프랑스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-gbr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[영국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-grc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[그리스]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-hrv</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[크로아티아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-hun</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[헝가리]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-irl</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아일랜드]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-isl</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[아이슬란드]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-ita</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[이탈리아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-kos</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[코소보]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-lie</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[리히텐슈타인]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-ltu</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[리투아니아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-lux</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[룩셈부르크]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-lva</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[라트비아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-mco</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[모나코]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-mda</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[몰도바]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-mkd</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[북마케도니아 (구 마케도니아)]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-mlt</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[몰타]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-mne</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[몬테네그로]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-nld</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[네덜란드]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-nor</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[노르웨이]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-pol</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[폴란드]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-prt</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[포르투갈]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-rou</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[루마니아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-rus</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[러시아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-smr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[산마리노]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-srb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[세르비아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-svk</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[슬로바키아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-svn</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[슬로베니아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-swe</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[스웨덴]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-ukr</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[우크라이나]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-eu-vat</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[유럽]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[바티칸 시국]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-aus</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오스트레일리아 (호주)]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-fji</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[피지]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-fsm</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[미크로네시아 연방]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-kir</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[키리바시]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-mhl</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[마셜 제도]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-nru</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[나우루]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-nzl</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[뉴질랜드]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-plw</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[팔라우]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-png</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[파푸아뉴기니]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-sam</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[사모아]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-slb</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[솔로몬 제도]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-ton</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[통가]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-tuv</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[투발루]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">b-oc-vut</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[수입산]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[오세아니아]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[바누아투]]></Data></Cell>
+			</Row>
+		</Table>
+	</Worksheet>
+	<Worksheet ss:Name="기타">
+		<Table>
+			<Row>
+				<Cell><Data ss:Type="String">원산지코드</Data></Cell>
+				<Cell><Data ss:Type="String">구분</Data></Cell>
+				<Cell><Data ss:Type="String">상세</Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">c</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[기타]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">c-ata</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[기타]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[남극]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">c-det</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[기타]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[상세설명 참조]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">c-oce</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[기타]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[원양]]></Data></Cell>
+			</Row>
+			<Row>
+				<Cell><Data ss:Type="String">x</Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[직접입력]]></Data></Cell>
+				<Cell><Data ss:Type="String"><![CDATA[]]></Data></Cell>
+			</Row>
+		</Table>
+	</Worksheet>
+</Workbook>
