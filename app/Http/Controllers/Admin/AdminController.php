@@ -45,4 +45,9 @@ class AdminController extends Controller
             'image' => $request->image
         ]);
     }
+
+    public function contentManagementSystem(Request $request)
+    {
+        return view('admin/content-management-system');
+    }
 }
