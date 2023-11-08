@@ -49,9 +49,8 @@
                         </div>
                         <div class="nk-block-head-content">
                             <a class="btn btn-white btn-dim  btn-outline-primary">
-                                <em class="icon fa-solid fa-upload"></em><span>Upload Add</span>
+                                <em class="icon fa-solid fa-upload"></em><span>Upload New</span>
                             </a>
-
                         </div>
                     </div>
 

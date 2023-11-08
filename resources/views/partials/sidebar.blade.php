@@ -40,7 +40,7 @@
                             </a>
                         </li>
                         <li class="nk-menu-item">
-                            <a href="/admin/content-management-system" class="nk-menu-link">
+                            <a href="/admin/content_management_system" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
                                 <span class="nk-menu-text">CMS 저작물 관리 시스템</span>
                             </a>
