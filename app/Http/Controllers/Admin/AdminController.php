@@ -48,6 +48,6 @@ class AdminController extends Controller
 
     public function contentManagementSystem(Request $request)
     {
-        return view('admin/content-management-system');
+        return view('admin/content_management_system');
     }
 }
