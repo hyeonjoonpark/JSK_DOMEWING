@@ -41,8 +41,8 @@
                         </li>
                         <li class="nk-menu-item">
                             <a href="/admin/content-management-system" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-list-check"></em></span>
-                                <span class="nk-menu-text">컨텐츠 매니지먼트</span>
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
+                                <span class="nk-menu-text">CMS 저작물 관리 시스템</span>
                             </a>
                         </li>
                         <li class="nk-menu-item">
