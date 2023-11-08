@@ -48,9 +48,19 @@
                             <h6 class="card-subtitle mb-2">Upload your images here.</h6>
                         </div>
                         <div class="nk-block-head-content">
-                            <a class="btn btn-white btn-dim  btn-outline-primary">
+                            <form id="uploadForm" action="/admin/upload-image-banner" method="post"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <label class="btn btn-white btn-dim btn-outline-primary">
+                                    <input type="file" name="file" style="display:none;" accept="image/*"
+                                        onchange="uploadFile(this)">
+                                    <em class="icon fa-solid fa-upload"></em><span>Upload</span>
+                                </label>
+                            </form>
+
+                            {{-- <a class="btn btn-white btn-dim btn-outline-primary">
                                 <em class="icon fa-solid fa-upload"></em><span>Upload New</span>
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
 
@@ -1096,6 +1106,56 @@
             </div>
         </div>
     </div>
+
+    @if (session('success'))
+        <div class="modal fade" tabindex="-1" id="modalSuccess">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross"></em></a>
+                    <div class="modal-body modal-body-lg text-center">
+                        <div class="nk-modal">
+                            <em class="nk-modal-icon icon icon-circle icon-circle-xxl ni ni-check bg-success"></em>
+                            <h4 class="nk-modal-title">{{ session('success') }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="modal fade" tabindex="-1" id="modalFailed">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross"></em></a>
+                    <div class="modal-body modal-body-lg text-center">
+                        <div class="nk-modal">
+                            <em class="nk-modal-icon icon icon-circle icon-circle-xxl ni ni-cross bg-danger"></em>
+                            <h4 class="nk-modal-title">{{ session('error') }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
 @section('scripts')
+    <script>
+        function uploadFile(input) {
+            var form = input.form;
+            form.submit();
+        }
+
+        $(document).ready(function() {
+            // Show success modal
+            @if (session('success'))
+                $('#modalSuccess').modal('show');
+            @endif
+
+            // Show error modal
+            @if (session('error'))
+                $('#modalFailed').modal('show');
+            @endif
+        });
+    </script>
 @endsection

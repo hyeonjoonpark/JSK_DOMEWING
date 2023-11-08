@@ -22,6 +22,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     //ving kong
     Route::get('/content_management_system', [AdminController::class, 'contentManagementSystem']);
+    Route::post('upload-image-banner', [AdminController::class, 'uploadImageBanner']);
 });
 
 // 로그인 및 등록 라우트

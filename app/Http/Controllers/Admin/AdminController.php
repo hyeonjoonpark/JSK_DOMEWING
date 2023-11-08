@@ -50,4 +50,24 @@ class AdminController extends Controller
     {
         return view('admin/content_management_system');
     }
+
+    public function uploadImageBanner(Request $request)
+    {
+        $image = $request->file('file');
+
+        // Check if a file was uploaded
+        if ($image) {
+
+            $ext = $image->getClientOriginalExtension();
+            $imageName = "IMG" . date('YmdHis') . "." . $ext;
+
+            // Move the uploaded file to the public library directory
+            $image->move(public_path('library'), $imageName);
+
+            return redirect()->to('/admin/content_management_system')->with('success', 'File uploaded successfully!');
+
+        } else {
+            return redirect()->to('/admin/content_management_system')->with('error', 'No file uploaded.');
+        }
+    }
 }
