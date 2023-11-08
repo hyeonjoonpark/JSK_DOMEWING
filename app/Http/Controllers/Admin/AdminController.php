@@ -46,7 +46,8 @@ class AdminController extends Controller
         ]);
     }
 
-    public function contentManagementSystem(){
-        return view('admin/content_management_system');
+    public function contentManagementSystem(Request $request)
+    {
+        return view('admin/content-management-system');
     }
 }
