@@ -37,6 +37,6 @@ const path = require('path');
     } catch (error) {
         console.error(error);
     } finally {
-        await browser.close();
+        // await browser.close();
     }
 })();

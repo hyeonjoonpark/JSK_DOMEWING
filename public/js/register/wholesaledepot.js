@@ -30,6 +30,7 @@ const path = require('path');
         const sbmBtn = await page.waitForSelector('#btn_indb');
         await sbmBtn.click();
         await sbmBtn.click();
+        await page.waitForNavigation();
     } catch (error) {
         console.error(error);
     } finally {

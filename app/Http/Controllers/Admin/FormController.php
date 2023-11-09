@@ -661,7 +661,7 @@ class FormController extends Controller
             // 엑셀 파일 업로드
             // 변경된 내용을 파일로 저장
             $writer = new Xlsx($spreadsheet);
-            $fileName = $username . '_' . date('YmdHis') . '.xlsx';
+            $fileName = 'ownerclan_' . $username . '_' . date('YmdHis') . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer->save($formedExcelFile);
             $data['status'] = 1;
