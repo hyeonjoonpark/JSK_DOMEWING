@@ -21,8 +21,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
 
     //ving kong
-    Route::get('/content_management_system', [AdminController::class, 'contentManagementSystem']);
+    Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard']);
+    Route::post('register-domain', [AdminController::class, 'registerDomain']);
+    Route::get('/cms_dashboard/content_management_system', [AdminController::class, 'contentManagementSystem']);
     Route::post('upload-image-banner', [AdminController::class, 'uploadImageBanner']);
+    Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard']);
 });
 
 // 로그인 및 등록 라우트
