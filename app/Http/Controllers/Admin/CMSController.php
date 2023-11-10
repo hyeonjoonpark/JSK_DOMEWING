@@ -17,6 +17,8 @@ class CMSController extends Controller
 
         $image_banners = DB::table('image_banner')->where('domain_id', $id)->where('status', 'ACTIVE')->where('status', '!=', 'INACTIVE')->get();
 
+        $theme_color = DB::table('theme_color')->where('domain_id',  $id)->first();
+
         foreach ($images as $image) {
             $image->formatted_created_at = Carbon::parse($image->created_at)->format('d M Y');
         }
@@ -25,6 +27,7 @@ class CMSController extends Controller
             'domain' => $domain,
             'images' => $images,
             'image_banners' => $image_banners,
+            'theme_color' => $theme_color,
         ]);
     }
 
@@ -157,7 +160,7 @@ class CMSController extends Controller
         }else{
             //update the color
             try{
-                DB::table('theme_color')->where('id',$checkColor->id)->insert([
+                DB::table('theme_color')->where('id',$checkColor->id)->update([
                     'color_code' => $color,
                     'updated_at' => now()
                 ]);

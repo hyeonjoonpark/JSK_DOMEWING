@@ -17,8 +17,13 @@
                             <h6 class="card-subtitle mb-2">Pick your favourite theme color.</h6>
                         </div>
                         <div class="nk-block-head-content">
-                            <input type="color" id="colorpicker" value="#0000ff"
-                                onchange="changeThemeColor({{ $domain->domain_id }})">
+                            @if ($theme_color != null)
+                                <input type="color" id="colorpicker" value="{{ $theme_color->color_code }}"
+                                    onchange="changeThemeColor({{ $domain->domain_id }})">
+                            @else
+                                <input type="color" id="colorpicker" value="#0000ff"
+                                    onchange="changeThemeColor({{ $domain->domain_id }})">
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -97,9 +102,15 @@
                                     <td class="nk-tb-col tb-col-md text-center">
                                         <span>{{ $image->formatted_created_at }}</span>
                                     </td>
-                                    <td class="nk-tb-col text-center">
-                                        <span class="tb-status text-success">{{ $image->status }}</span>
-                                    </td>
+                                    @if ($image->status == 'ACTIVE')
+                                        <td class="nk-tb-col text-center">
+                                            <span class="tb-status text-success">{{ $image->status }}</span>
+                                        </td>
+                                    @else
+                                        <td class="nk-tb-col text-center">
+                                            <span class="tb-status text-warning">{{ $image->status }}</span>
+                                        </td>
+                                    @endif
                                     <td class="nk-tb-col nk-tb-col-tools">
                                         <ul class="nk-tb-actions gx-1">
                                             <li>
@@ -206,11 +217,11 @@
 
             $.ajax({
                 url: '/api/admin/change-theme-color',
-                type: 'POST',
+                type: 'post',
                 dataType: 'json',
                 data: {
                     color: color,
-                    domain_id: domain_id,
+                    domain_id: domain_id
                 },
                 success: function(response) {
                     const status = parseInt(response.status);
@@ -218,13 +229,11 @@
                         Swal.fire({
                             icon: 'success',
                             title: response.return,
-                        }).then((result) => {
-                            location.reload();
-                        });
+                        })
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Unable to process',
+                            title: 'Opps',
                             text: response.return
                         });
                     }
@@ -232,7 +241,7 @@
                 error: function(response) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error Occured',
+                        title: 'Opps',
                         text: response
                     });
                 }
