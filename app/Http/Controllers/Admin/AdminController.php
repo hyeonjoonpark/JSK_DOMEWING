@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Database\QueryException;
+
+//vingkong - use this to format date
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -44,6 +49,58 @@ class AdminController extends Controller
             'price' => $request->price,
             'image' => $request->image
         ]);
+    }
+
+    public function cmsDashboard(Request $request)
+    {
+        $domains = DB::table('cms_domain')
+                    ->where('is_active', 'ACTIVE')
+                    ->get();
+
+        foreach ($domains as $domain) {
+            $domain->formatted_created_at = Carbon::parse($domain->created_at)->format('d M Y');
+        }
+
+        return view('admin/cms_dashboard', ['domains' => $domains]);
+    }
+
+    public function registerDomain(Request $request)
+    {
+        $companyName = $request->input('companyName');
+        $domainName = $request->input('domainName');
+
+        // Check if the domain already exists and is active
+        $existingDomain = DB::table('cms_domain')
+                            ->where('domain_name', $domainName)
+                            ->where('is_active', 'ACTIVE')
+                            ->first();
+
+        if ($existingDomain) {
+            return response()->json([
+                'status' => -1,
+                'message' => "Domain name already exists and is active"
+            ]);
+        }
+
+        // Add your code to store the domain in the database here
+
+        $saveDomain = DB::table('cms_domain')->insert([
+            'company_name' => $companyName,
+            'domain_name' => $domainName,
+            'created_at' => now(),
+        ]);
+
+        if($saveDomain){
+            return response()->json([
+                'status' => 1,
+                'message' => "Domain saved successfully"
+            ]);
+        }else{
+            return response()->json([
+                'status' => -1,
+                'message' => "Opps, something went wrong. Please try again later."
+            ]);
+        }
     }
 
     public function contentManagementSystem(Request $request)
