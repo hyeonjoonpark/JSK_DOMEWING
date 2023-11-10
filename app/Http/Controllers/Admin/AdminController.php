@@ -59,72 +59,19 @@ class AdminController extends Controller
 
         foreach ($domains as $domain) {
             $domain->formatted_created_at = Carbon::parse($domain->created_at)->format('d M Y');
+            $domain->formatted_updated_at = Carbon::parse($domain->updated_at)->format('d M Y');
         }
 
         return view('admin/cms_dashboard', ['domains' => $domains]);
     }
 
-    public function registerDomain(Request $request)
+    public function contentManagementSystem(Request $request, $id)
     {
-        $companyName = $request->input('companyName');
-        $domainName = $request->input('domainName');
-
-        // Check if the domain already exists and is active
-        $existingDomain = DB::table('cms_domain')
-                            ->where('domain_name', $domainName)
-                            ->where('is_active', 'ACTIVE')
-                            ->first();
-
-        if ($existingDomain) {
-            return response()->json([
-                'status' => -1,
-                'message' => "Domain name already exists and is active"
-            ]);
-        }
-
-        // Add your code to store the domain in the database here
-
-        $saveDomain = DB::table('cms_domain')->insert([
-            'company_name' => $companyName,
-            'domain_name' => $domainName,
-            'created_at' => now(),
-        ]);
-
-        if($saveDomain){
-            return response()->json([
-                'status' => 1,
-                'message' => "Domain saved successfully"
-            ]);
-        }else{
-            return response()->json([
-                'status' => -1,
-                'message' => "Opps, something went wrong. Please try again later."
-            ]);
-        }
+        $domain = DB::table('cms_domain')
+                    ->where('domain_id',  $id)
+                    ->first();
+        return view('admin/content_management_system',['domain' => $domain]);
     }
 
-    public function contentManagementSystem(Request $request)
-    {
-        return view('admin/content_management_system');
-    }
 
-    public function uploadImageBanner(Request $request)
-    {
-        $image = $request->file('file');
-
-        // Check if a file was uploaded
-        if ($image) {
-
-            $ext = $image->getClientOriginalExtension();
-            $imageName = "IMG" . date('YmdHis') . "." . $ext;
-
-            // Move the uploaded file to the public library directory
-            $image->move(public_path('library'), $imageName);
-
-            return redirect()->to('/admin/content_management_system')->with('success', 'File uploaded successfully!');
-
-        } else {
-            return redirect()->to('/admin/content_management_system')->with('error', 'No file uploaded.');
-        }
-    }
 }

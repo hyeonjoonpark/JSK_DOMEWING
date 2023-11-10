@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ImageUploadController;
 
+use App\Http\Controllers\Admin\DomainController;
+use App\Http\Controllers\Admin\CMSController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -28,3 +31,12 @@ Route::post('/delete-post', [DashboardController::class, 'deletePost']);
 Route::post('/product/search', [ProductSearchController::class, 'productSearch']);
 Route::post('/product/category', [ProductRegisterController::class, 'categorySearch']);
 Route::post('/product/register', [ProductRegisterController::class, 'handle']);
+
+Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
+Route::post('/admin/register-domain', [DomainController::class, 'registerDomain']);
+Route::get('/admin/get-domain', [DomainController::class, 'getDomain']);
+Route::post('admin/edit-domain', [DomainController::class,'editDomain']);
+Route::post('admin/upload-image-banner', [CMSController::class, 'uploadImageBanner']);
+Route::post('admin/change-image-status', [CMSController::class, 'changeImageStatus']);
+Route::post('admin/remove-image-banner', [CMSController::class, 'removeImage']);
+Route::post('/admin/change-theme-color', [CMSController::class, 'changeThemeColor']);

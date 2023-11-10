@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NaverShopController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\Admin\CMSController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -21,11 +22,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
 
     //ving kong
-    Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard']);
-    Route::post('register-domain', [AdminController::class, 'registerDomain']);
-    Route::get('/cms_dashboard/content_management_system', [AdminController::class, 'contentManagementSystem']);
-    Route::post('upload-image-banner', [AdminController::class, 'uploadImageBanner']);
-    Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard']);
+    Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');
+    Route::get('/cms_dashboard/content_management_system/{id}', [CMSController::class, 'loadCMS']);
+
 });
 
 // 로그인 및 등록 라우트
