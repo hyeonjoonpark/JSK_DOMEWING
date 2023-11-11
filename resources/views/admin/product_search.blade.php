@@ -64,10 +64,113 @@
                                 </tr>
                             </thead>
                             <tbody id="productList">
+                                <tr class="odd">
+                                    <td class="dtr-control" tabindex="0"><a
+                                            href="http://domeggook.com//10732325?from=lstGen" target="_blank"><img
+                                                src="https://cdn1.domeggook.com//upload/item/2020/09/04/15991991428E9D6BD09F80F34309382F/15991991428E9D6BD09F80F34309382F_img_330?hash=d4086f0619c10063fe1803851a89df3d"
+                                                alt="Product" style="width:120px; height:120px;"></a></td>
+                                    <td><a href="http://domeggook.com//10732325?from=lstGen" target="_blank"
+                                            title="초경량고리형마스크스트랩끈스토퍼내장길이조절가능간편사용오염방지개별포장코로나필수품">초경량고리형마스크스트랩끈스토퍼내장길이조절가능간편사용오염...</a>
+                                    </td>
+                                    <td class="sorting_1">99</td>
+                                    <td>도매매</td>
+                                    <td class="dtr-hidden" style="display: none;"><button class="btn btn-primary"
+                                            onclick="registerProduct('초경량고리형마스크스트랩끈스토퍼내장길이조절가능간편사용오염방지개별포장코로나필수품', '99', 'https://cdn1.domeggook.com//upload/item/2020/09/04/15991991428E9D6BD09F80F34309382F/15991991428E9D6BD09F80F34309382F_img_330?hash=d4086f0619c10063fe1803851a89df3d')">상품
+                                            등록</button></td>
+                                </tr>
                                 <!-- 데이터는 JavaScript 코드로 동적으로 추가됩니다 -->
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalForm">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">상품 인스턴트 등록</h5>
+                    <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <em class="icon ni ni-cross"></em>
+                    </a>
+                </div>
+                <div class="modal-body">
+                    <form action="#" class="form-validate is-alter">
+                        <div class="form-group">
+                            <label class="form-label" for="category">상품 카테고리</label>
+                            <div class="form-control-wrap d-flex text-nowrap mb-3">
+                                <input type="text" class="form-control" placeholder="카테고리 검색 키워드를 입력해주세요."
+                                    id="categoryKeyword">
+                                <button class="btn btn-primary" onclick="categorySearch();"
+                                    id="categorySearchBtn">검색</button>
+                            </div>
+                            <div class="form-control-wrap">
+                                <select name="category" id="category" class="form-control js-select2"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="productName">상품명</label>
+                            <div class="form-control-wrap">
+                                <input type="text" class="form-control" id="productName" placeholder="상품명을 기입해주세요.">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="invoiceName">택배송장명</label>
+                            <div class="form-control-wrap">
+                                <input type="text" class="form-control" id="invoiceName"
+                                    placeholder="택배송장명을 기입해주세요.">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="productKeywords">키워드</label>
+                            <div class="form-control-wrap">
+                                <input type="text" class="form-control" id="productKeywords"
+                                    placeholder="상품 키워드를 , 단위로 구분하여 최소 5개를 기입해주세요.">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="productModel">모델명</label>
+                            <div class="form-control-wrap">
+                                <input type="text" class="form-control" id="productModel" placeholder="모델명을 기입해주세요.">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col">
+                                <label class="form-label" for="productPrice">상품 가격</label>
+                                <div class="form-control-wrap">
+                                    <input type="text" class="form-control" id="productPrice"
+                                        placeholder="상품 가격을 기입해주세요.">
+                                </div>
+                            </div>
+                            <div class="col">
+                                <label class="form-label" for="shippingCost">배송비</label>
+                                <div class="form-control-wrap">
+                                    <input type="text" class="form-control" id="shippingCost"
+                                        placeholder="상품 가격을 기입해주세요.">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="productVendor">제조사/브랜드</label>
+                            <div class="form-control-wrap">
+                                <input type="text" class="form-control" id="productVendor"
+                                    placeholder="상품의 제조사 혹은 브랜드를 기입해주세요.">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="productVendor">상품 대표 이미지</label>
+                            <div class="w-100">
+                                <img src="" alt="상품 대표 이미지" id="productImage">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-lg btn-primary">등록하기</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light">
+                    <span class="sub-text">Powered by ChilledWatermelon</span>
                 </div>
             </div>
         </div>
@@ -151,7 +254,6 @@
                     '</a>';
                 const actionHtml =
                     `<button class="btn btn-primary" onclick="registerProduct('${name}', '${price}', '${image}')">상품 등록</button>`;
-
                 dataTable.row.add([
                     imageHtml,
                     nameHtml,
@@ -173,10 +275,71 @@
         }
 
         function registerProduct(name, price, image) {
-            const queryString = `?name=${name}&price=${price}&image=${image}`;
-            const newURL = 'search-to-register' + queryString;
+            nameFormatter(name);
+            $("#productPrice").val(price);
+            $("#productImage").attr("src", image);
+            $("#modalForm").modal("show");
+        }
 
-            window.location.replace(newURL);
+        function nameFormatter(name) {
+            const MAX_LENGTH = 20;
+            let newName = '';
+
+            for (let i = 0; i < name.length && newName.length < MAX_LENGTH; i++) {
+                const char = name[i];
+                const asciiCode = char.charCodeAt(0);
+
+                const isKorean = (asciiCode >= 44032 && asciiCode <= 55203);
+                const isDigit = (asciiCode >= 48 && asciiCode <= 57);
+                const isUpperCase = (asciiCode >= 65 && asciiCode <= 90);
+                const isLowerCase = (asciiCode >= 97 && asciiCode <= 122);
+
+                if (isKorean || isDigit || isUpperCase || isLowerCase) {
+                    newName += char;
+                }
+            }
+
+            $("#productName").val(name);
+            $("#invoiceName").val(name);
+        }
+
+
+        function categorySearch() {
+            const keyword = $("#categoryKeyword").val();
+            $("#categorySearchBtn").html("검색 중...");
+            $("#categorySearchBtn").prop("disabled", true);
+            $.ajax({
+                url: '/api/product/category',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    keyword: keyword
+                },
+                success: function(result) {
+                    console.log(result);
+                    $("#categorySearchBtn").html("검색");
+                    $("#categorySearchBtn").prop("disabled", false);
+                    if (result.status == 1) {
+                        let html = "";
+                        for (let i = 0; i < result.return.length; i++) {
+                            html += "<option value='" + result.return[i].code + "'>" + result.return[i]
+                                .wholeCategoryName + "</option>";
+                        }
+                        $("#category").html(html);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '진행 실패',
+                            text: result.return
+                        });
+                    }
+                },
+                error: function(response) {
+                    $("#categorySearchBtn").html("검색");
+                    $("#categorySearchBtn").prop("disabled", false);
+                    console.log(response);
+                }
+            });
         }
     </script>
 @endsection

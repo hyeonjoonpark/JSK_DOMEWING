@@ -27,4 +27,4 @@ Route::post('/set-post-confirmed', [DashboardController::class, 'setPostConfirme
 Route::post('/delete-post', [DashboardController::class, 'deletePost']);
 Route::post('/product/search', [ProductSearchController::class, 'productSearch']);
 Route::post('/product/category', [ProductRegisterController::class, 'categorySearch']);
-Route::post('/product/register', [ProductRegisterController::class, 'handle']);
+Route::post('/product/register', [ProductRegisterController::class, 'handle']); 
