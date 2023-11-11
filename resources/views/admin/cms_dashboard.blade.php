@@ -3,7 +3,8 @@
     Content Management System - Dashboard
 @endsection
 @section('subtitle')
-    <p>Manage Customer's Webpage Content</p>
+    <p>
+        Manage Customer's Webpage Content</p>
 @endsection
 @section('content')
     <div class="row g-gs">
@@ -39,14 +40,22 @@
                                     <td class="nk-tb-col">
                                         <div class="user-card">
                                             <div class="user-info">
-                                                <span class="tb-lead">{{ $domain->company_name }}<span
-                                                        class="dot dot-warning d-md-none ms-1"></span></span>
+                                                <a
+                                                    href="/admin/cms_dashboard/content_management_system/{{ $domain->domain_id }}">
+                                                    <span class="tb-lead">{{ $domain->company_name }}</span>
+                                                </a>
                                                 <span>domewing/{{ $domain->domain_name }}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="nk-tb-col tb-col-md">
-                                        <span>{{ $domain->formatted_created_at }}</span>
+                                        <div class="user-info">
+                                            <span class="tb-lead">{{ $domain->formatted_created_at }}</span>
+                                            @if ($domain->updated_at)
+                                                <span>Updated: {{ $domain->formatted_updated_at }}</span>
+                                            @endif
+                                        </div>
+
                                     </td>
                                     <td class="nk-tb-col">
                                         <span class="tb-status text-success">{{ $domain->is_active }}</span>
@@ -55,18 +64,18 @@
                                         <ul class="nk-tb-actions gx-1">
                                             <li>
                                                 <div class="drodown">
-                                                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger"
+                                                    <a class="dropdown-toggle btn btn-icon btn-trigger"
                                                         data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
                                                     <div class="dropdown-menu dropdown-menu-end">
                                                         <ul class="link-list-opt no-bdr">
                                                             <li>
-                                                                <a href="#">
+                                                                <a onclick="editDomainInit({{ $domain->domain_id }});">
                                                                     <em
                                                                         class="icon fa-solid fa-pen-to-square"></em><span>Edit</span>
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                <a href="#">
+                                                                <a onclick="removeDomainInit({{ $domain->domain_id }});">
                                                                     <em
                                                                         class="icon fa-solid fa-user-xmark"></em><span>Remove</span>
                                                                 </a>
@@ -91,12 +100,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Register New Domain</h5>
-                    <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <a class="close" data-bs-dismiss="modal" aria-label="Close">
                         <em class="icon ni ni-cross"></em>
                     </a>
                 </div>
                 <div class="modal-body">
-                    <form action="#" class="form-validate is-alter">
+                    <form class="form-validate is-alter">
                         <div class="form-group input-group-lg">
                             <label class="form-label" for="company-name">Company Name</label>
                             <div class="form-control-wrap">
@@ -127,14 +136,59 @@
         </div>
     </div>
 
-    <div class="modal fade" tabindex="-1" id="modalAlert">
+    <div class="modal fade" id="modalEdit">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <a href="#" class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross"></em></a>
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Domain</h5>
+                    <a class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <em class="icon ni ni-cross"></em>
+                    </a>
+                </div>
+                <div class="modal-body">
+                    <form class="form-validate is-alter">
+                        <div class="form-group input-group-lg">
+                            <label class="form-label" for="edit-company-name">Company Name</label>
+                            <div class="form-control-wrap">
+                                <div class="input-group input-group-lg">
+                                    <input type="text" class="form-control" id="edit-company-name"
+                                        onchange="companyNameFormat(this);" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="edit-domain-name">Domain Name</label>
+                            <div class="form-control-wrap">
+                                <div class="input-group input-group-lg">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon3">domewing/</span>
+                                    </div>
+                                    <input type="text" class="form-control" aria-label="Large" id="edit-domain-name"
+                                        onchange="domainNameFormat(this);" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group text-center">
+                            <button id="confirmEdit" class="btn btn-lg btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalRemove">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <a class="close" data-bs-dismiss="modal"><em class="icon ni ni-cross"></em></a>
                 <div class="modal-body modal-body-lg text-center">
                     <div class="nk-modal">
-                        <em class="nk-modal-icon icon icon-circle icon-circle-xxl ni ni-check bg-success"></em>
-                        <h4 class="nk-modal-title"></h4>
+                        <em class="nk-modal-icon icon icon-circle icon-circle-xxl ni ni-property-remove bg-danger"></em>
+                        <h4 class="nk-modal-title">Are you sure to remove this domain?</h4>
+                    </div>
+                    <div class="text-center pt-5 d-flex justify-content-around">
+                        <button data-bs-dismiss="modal" class="btn btn-lg btn-primary">Cancel</button>
+                        <button id="confirmRemove" class="btn btn-lg btn-danger">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -143,55 +197,175 @@
 @endsection
 @section('scripts')
     <script>
+        //edit domain
+        function editDomainInit(domainId) {
+            $("#confirmEdit").attr("onclick", 'editDomain(' + domainId + ')');
+            $.ajax({
+                url: '/api/admin/get-domain',
+                type: 'get',
+                dataType: 'json',
+                data: {
+                    domainId: domainId
+                },
+                success: function(response) {
+                    const status = parseInt(response.status);
+                    if (status == 1) {
+
+                        $('#edit-company-name').val(response.companyName);
+                        $('#edit-domain-name').val(response.domainName);
+                        $('#modalEdit').modal('show');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Opps',
+                            text: response.return
+                        });
+                    }
+                },
+                error: function(response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Opps',
+                        text: response
+                    });
+                }
+            });
+        }
+
+        function editDomain(domainId) {
+            var companyName = $('#edit-company-name').val();
+            var domainName = $('#edit-domain-name').val();
+
+            if (companyName != "" && domainName != "") {
+                $.ajax({
+                    url: '/api/admin/edit-domain',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        companyName: companyName,
+                        domainName: domainName,
+                        domainId: domainId,
+                    },
+                    success: function(response) {
+                        const status = parseInt(response.status);
+                        if (status == 1) {
+                            $('.modal').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.return,
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Opps',
+                                text: response.return
+                            });
+                        }
+                    },
+                    error: function(error) {
+                        // Handle error response
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Unable to process',
+                            text: error
+                        });
+                    }
+                });
+            }
+
+
+        }
+
+        //remove domain
+        function removeDomainInit(domainId) {
+            $("#confirmRemove").attr("onclick", 'removeDomain(' + domainId + ')');
+            $('#modalRemove').modal('show');
+        }
+
+        function removeDomain(domainId) {
+            $.ajax({
+                url: '/api/admin/remove-domain',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    domainId: domainId
+                },
+                success: function(response) {
+                    const status = parseInt(response.status);
+                    $('.modal').modal('hide');
+                    if (status == 1) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Domain Remove Successfully',
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Unable to process',
+                            text: response.return
+                        });
+                    }
+                },
+                error: function(response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unable to process',
+                        text: response
+                    });
+                }
+            });
+        }
+
+        //register domain
         $(document).ready(function() {
             $('#modalForm form').submit(function(e) {
-                var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
                 e.preventDefault();
 
                 var companyName = $('#company-name').val();
                 var domainName = $('#domain-name').val();
 
-                $.ajax({
-                    url: '/admin/register-domain',
-                    type: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    data: {
-                        companyName: companyName,
-                        domainName: domainName
-                    },
-                    success: function(response) {
-
-                        if (response.status == 1) {
-                            // Handle success response
-                            console.log(response.message);
-                            $('#modalAlert .nk-modal-icon')
-                                .removeClass()
-                                .addClass(
-                                    'nk-modal-icon icon icon-circle icon-circle-xxl ni ni-check bg-success'
-                                );
-                            $('#modalAlert .nk-modal-title').text(response.message);
-                            $('#modalAlert').modal('show');
-                            // Close the modal (if needed)
-                            $('#modalForm').modal('hide');
-                            location.reload();
-                        } else {
-                            console.log(response.message);
-                            $('#modalAlert .nk-modal-icon')
-                                .removeClass()
-                                .addClass(
-                                    'nk-modal-icon icon icon-circle icon-circle-xxl ni ni-cross bg-danger'
-                                );
-                            $('#modalAlert .nk-modal-title').text(response.message);
-                            $('#modalAlert').modal('show');
+                if (companyName != "" && domainName != "") {
+                    $.ajax({
+                        url: '/api/admin/register-domain',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            companyName: companyName,
+                            domainName: domainName
+                        },
+                        success: function(response) {
+                            const status = parseInt(response.status);
+                            if (status == 1) {
+                                $('.modal').modal('hide');
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: response.message,
+                                }).then((result) => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Unable to process',
+                                    text: response.message
+                                });
+                            }
+                        },
+                        error: function(error) {
+                            // Handle error response
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Unable to process',
+                                text: error
+                            });
                         }
-                    },
-                    error: function(error) {
-                        // Handle error response
-                        console.error(error);
-                    }
-                });
+                    });
+                }
             });
         });
 
