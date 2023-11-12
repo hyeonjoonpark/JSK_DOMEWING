@@ -34,7 +34,7 @@ class WebhookController extends Controller
     }
     protected function updateCodeAndCache()
     {
-        $output = shell_exec("cd " . base_path() . " && git pull origin master && composer dump-autoload && php artisan config:clear && php artisan cache:clear");
+        $output = shell_exec("cd " . base_path() . " && git pull origin master && composer install && php artisan config:cache && php artisan optimize && php artisan route:clear");
 
         Log::info("Project updated: " . $output);
     }
