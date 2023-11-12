@@ -182,6 +182,11 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label class="form-label">상품 상세설명 이미지</label>
+                            <div class="summernote-basic" id="summernote"></div>
+                            {{-- <input type="file" class="form-control" id="descImage" name="descImage" accept="image/*"> --}}
+                        </div>
+                        <div class="form-group">
                             <button type="submit" class="btn btn-lg btn-primary"
                                 onclick="productInstantRegisterInit();">등록하기</button>
                         </div>
@@ -195,7 +200,47 @@
     </div>
 @endsection
 @section('scripts')
+    <link rel="stylesheet" href="{{ asset('assets/css/editors/summernote.css') }}">
+    <script src="{{ asset('assets/js/editors.js') }}"></script>
+    <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
+        $('#summernote').summernote({
+            height: 300,
+            callbacks: {
+                onImageUpload: function(files) {
+                    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    var $editor = $(this);
+                    var data = new FormData();
+                    data.append('file', files[0]);
+
+                    $.ajax({
+                        url: '/admin/upload-image',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status === 1) {
+                                // 이미지 업로드 성공 시
+                                $editor.summernote('insertImage', response.return);
+                            } else {
+                                // 이미지 업로드 실패 시
+                                console.error('Image upload failed');
+                            }
+                        },
+                        error: function(response) {
+                            console.error('Image upload error:', response);
+                        }
+                    });
+                }
+            }
+        });
+        var imageUrl = "https://i.imgur.com/oQDlUeW.jpg";
+        var imageCode = '<img src="' + imageUrl + '" alt="image">';
+        $('#summernote').summernote('pasteHTML', imageCode);
         const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}';
         // 이미지를 미리 로딩
         const image = new Image();
