@@ -17,7 +17,7 @@
                         <label class="form-label">등록할 업체</label>
                         <div class='row'>
                             @foreach ($vendors as $vendor)
-                                <div class='col-3'>
+                                <div class='col-3 mb-3'>
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input" checked name="vendors"
                                             id="vendor{{ $vendor->vendor_id }}" value="{{ $vendor->vendor_id }}">

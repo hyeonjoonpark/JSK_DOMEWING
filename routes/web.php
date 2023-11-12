@@ -9,6 +9,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NaverShopController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\Admin\CMSController;
+
+use App\Http\Controllers\Admin\DomainController;
+use App\Http\Controllers\Domewing\GeneralController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -19,6 +23,18 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/search-to-register', [AdminController::class, 'searchToRegister']);
     Route::get('product/register', [AdminController::class, 'productRegister']);
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
+    Route::get('account-setting', [AdminController::class, 'accountSetting']);
+
+    //ving kong
+    Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');
+    Route::get('/cms_dashboard/content_management_system/{id}', [CMSController::class, 'loadCMS']);
+
+});
+
+//ving kong
+Route::prefix('domewing')->group( function() {
+    Route::get('/', [GeneralController::class, 'loadBusinessPage']);
+    Route::get('/{domain_name}', [DomainController::class, 'loadDomain']);
 });
 
 // 로그인 및 등록 라우트

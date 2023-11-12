@@ -73,6 +73,18 @@ class ProductRegisterController extends Controller
             if ($data['status'] == -1) {
                 $failedVendors[] = $vendorName . " " . $data['return'];
             } else {
+                // $formedExcel = $data['return'];
+                // set_time_limit(0);
+                // $command = 'node ' . public_path('js/register/' . $vendorEngName . '.js') . " \"$account->username\" \"$account->password\" \"$formedExcel\"";
+                // try {
+                //     exec($command, $output, $exitCode);
+                //     if ($exitCode !== 0) {
+                //         // 명령이 성공적으로 실행됨
+                //         $failedVendors[] = $vendorName;
+                //     }
+                // } catch (Exception $e) {
+                //     $failedVendors[] = $vendorName;
+                // }
                 if ($cnt < 3) {
                     $formedExcel = $data['return'];
                     set_time_limit(0);
