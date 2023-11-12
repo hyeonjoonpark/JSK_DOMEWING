@@ -1,9 +1,11 @@
 @extends('layouts.main')
 @section('title')
-    상품 대량 검색
+    상품 가공
 @endsection
 @section('subtitle')
-    <p>상품 대량 검색 엔진을 가동합니다.</p>
+    <p>
+        각종 업체들로부터 상품 정보들을 검색하고 가공 및 수집합니다.
+    </p>
 @endsection
 @section('content')
     <div class="row g-gs">
@@ -35,8 +37,7 @@
                                 <input type="text" class="form-control" id="productUrl" placeholder="상품 키워드 기입해주세요." />
                             </div>
                             <div class="col-auto">
-                                <button class="btn btn-primary" onclick="collectInit();">수집
-                                    시작</button>
+                                <button class="btn btn-primary" onclick="collectInit();">상품 검색</button>
                             </div>
                         </div>
                     </div>
@@ -48,8 +49,8 @@
         <div class="col">
             <div class="card card-bordered preview">
                 <div class="card-inner">
-                    <h5 class="card-title">수집 결과</h5>
-                    <h6 class="card-subtitle mb-2">해당 상품 정보에 대한 수집 결과입니다:</h6>
+                    <h5 class="card-title">상품 가공 및 수집</h5>
+                    <h6 class="card-subtitle mb-2">검색 결과로부터 상품을 가공 및 수집합니다.</h6>
                     <p class="card-text">총 <span class="fw-bold" id="numResult"></span>건이 검색되었습니다</p>
                     <div id="collectResult">
                         <table id="productTable" class="datatable-init-export nowrap table" data-export-title="Export"
@@ -74,9 +75,9 @@
                                     </td>
                                     <td class="sorting_1">99</td>
                                     <td>도매매</td>
-                                    <td class="dtr-hidden" style="display: none;"><button class="btn btn-primary"
-                                            onclick="registerProduct('초경량고리형마스크스트랩끈스토퍼내장길이조절가능간편사용오염방지개별포장코로나필수품', '99', 'https://cdn1.domeggook.com//upload/item/2020/09/04/15991991428E9D6BD09F80F34309382F/15991991428E9D6BD09F80F34309382F_img_330?hash=d4086f0619c10063fe1803851a89df3d')">상품
-                                            등록</button></td>
+                                    <td><button class="btn btn-primary"
+                                            onclick="registerProduct('초경량고리형마스크스트랩끈스토퍼내장길이조절가능간편사용오염방지개별포장코로나필수품', '99', 'https://cdn1.domeggook.com//upload/item/2020/09/04/15991991428E9D6BD09F80F34309382F/15991991428E9D6BD09F80F34309382F_img_330?hash=d4086f0619c10063fe1803851a89df3d', '도매매', 'http://domeggook.com//10732325?from=lstGen')">상품
+                                            가공</button></td>
                                 </tr>
                                 <!-- 데이터는 JavaScript 코드로 동적으로 추가됩니다 -->
                             </tbody>
@@ -146,12 +147,12 @@
                                     placeholder="상품 키워드를 , 단위로 구분하여 최소 5개를 기입해주세요.">
                             </div>
                         </div>
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label class="form-label" for="productModel">모델명</label>
                             <div class="form-control-wrap">
                                 <input type="text" class="form-control" id="productModel" placeholder="모델명을 기입해주세요.">
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="form-group row">
                             <div class="col">
                                 <label class="form-label" for="productPrice">상품 가격</label>
@@ -193,7 +194,7 @@
                     </div>
                 </div>
                 <div class="modal-footer bg-light">
-                    <span class="sub-text">Powered by ColdWatermelon</span>
+                    <span class="sub-text">Powered by Chantermelon</span>
                 </div>
             </div>
         </div>
@@ -313,7 +314,7 @@
                 const nameHtml = '<a href="' + href + '" target="_blank" title="' + name + '">' + truncateText(name, 30) +
                     '</a>';
                 const actionHtml =
-                    `<button class="btn btn-primary" onclick="registerProduct('${name}', '${price}', '${image}')">상품 등록</button>`;
+                    `<button class="btn btn-primary" onclick="registerProduct('${name}', '${price}', '${image}', '${platform}', '${href}')">상품 등록</button>`;
                 dataTable.row.add([
                     imageHtml,
                     nameHtml,
@@ -355,12 +356,12 @@
             $(input).val(newPrice);
         }
 
-        function registerProduct(name, price, image) {
+        function registerProduct(name, price, image, platform, href) {
+            loadProductDetail(platform, href);
             $('#productName').val(nameFormatter(name));
             $('#invoiceName').val(nameFormatter(name));
-            $("#productPrice").val(price);
+            $("#productPrice").val(Math.round(price * {{ $marginRate }}));
             $("#productImage").attr("src", image);
-            $("#modalForm").modal("show");
         }
 
         function nameFormatter(name) {
@@ -433,7 +434,7 @@
                 }
             });
             const productDesc = $('.summernote-basic').summernote('code');
-            const model = $('input[name="model"]').val();
+            const model = "MODEL001";
             formData.append('model', model);
             // const productDescImage = $('#descImage')[0].files[0];
             // formData.append('productDescImage', productDescImage);
@@ -504,6 +505,47 @@
                 error: function(response) {
                     $('#registerBtn').prop('disabled', false);
                     $("#registerBtn").html('등록');
+                    console.log(response);
+                }
+            });
+        }
+
+        function loadProductDetail(platform, href) {
+            $('.btn').prop('disabled', true);
+            const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}'
+            let html = '<img src="' + image.src + '" class="w-75" />'
+            html += '<h2 class="swal2-title mt-5">상품 정보를 추출 중입니다<br>잠시만 기다려주세요</h2>'
+            Swal.fire({
+                html: html,
+                allowOutsideClick: false,
+                showConfirmButton: false
+            });
+            $.ajax({
+                url: '/api/product/load-product-detail',
+                type: 'POST',
+                dataType: "JSON",
+                data: {
+                    platform: platform,
+                    href: href
+                },
+                success: function(response) {
+                    $('.btn').prop('disabled', false);
+                    Swal.close();
+                    if (response.status == 1) {
+                        console.log(response);
+                        $('#summernote').summernote('code', response.return.productDetail);
+                        $('#productVendor').val(response.return.vendor);
+                        $("#modalForm").modal("show");
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "진행 실패",
+                            text: response.return
+                        });
+                    }
+                },
+                error: function(response) {
+                    $('.btn').prop('disabled', false);
                     console.log(response);
                 }
             });
