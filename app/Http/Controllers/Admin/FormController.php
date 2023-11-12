@@ -19,7 +19,7 @@ class FormController extends Controller
         try {
             // 카테고리 코드 변환을 위한 컨트롤러 생성
             $categoryMappingController = new CategoryMappingController();
-            $categoryCode = $categoryMappingController->domeatozCategoryCode($categoryCode);
+            $categoryCode = $categoryMappingController->domeggookCategoryCode($categoryCode);
 
             // 엑셀 파일 불러오기
             $spreadsheet = IOFactory::load(public_path('assets/excel/domeggook.xls'));
@@ -34,8 +34,7 @@ class FormController extends Controller
 
             $saleToMinor = ($request->saleToMinor == '가능') ? 'N' : 'Y';
 
-            $productInformationCode = DB::table('product_information')->where('domesin_value', $request->product_information)->select('domeggook_value');
-
+            $productInformationCode = DB::table('product_information')->where('domesin_value', $request->product_information)->select('domeggook_value')->first()->domeggok_value;
             $price = $request->price;
             $minQuantity = (5000 / $price) + 1;
             // 제품 데이터 배열 생성
@@ -471,6 +470,7 @@ class FormController extends Controller
             } else {
                 $shipCost = $request->shipCost;
             }
+            $shipCost = $request->shipCost;
             // 데이터 배열 생성
             $domesinCode = DB::table('category')->where('code', $categoryCode)->select('domesinCode')->first();
             $domesinCode = $domesinCode->domesinCode;
@@ -661,7 +661,7 @@ class FormController extends Controller
             // 엑셀 파일 업로드
             // 변경된 내용을 파일로 저장
             $writer = new Xlsx($spreadsheet);
-            $fileName = $username . '_' . date('YmdHis') . '.xlsx';
+            $fileName = 'ownerclan_' . $username . '_' . date('YmdHis') . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer->save($formedExcelFile);
             $data['status'] = 1;

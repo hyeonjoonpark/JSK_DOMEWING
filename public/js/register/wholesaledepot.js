@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const mysql = require('mysql2/promise');
 const path = require('path');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true, ignoreDefaultArgs: ['--enable-automation'] });
+    const browser = await puppeteer.launch({ headless: false, ignoreDefaultArgs: ['--enable-automation'] });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -30,6 +30,7 @@ const path = require('path');
         const sbmBtn = await page.waitForSelector('#btn_indb');
         await sbmBtn.click();
         await sbmBtn.click();
+        await page.waitForNavigation();
     } catch (error) {
         console.error(error);
     } finally {
