@@ -238,9 +238,6 @@
                 }
             }
         });
-        var imageUrl = "https://i.imgur.com/oQDlUeW.jpg";
-        var imageCode = '<img src="' + imageUrl + '" alt="image">';
-        $('#summernote').summernote('pasteHTML', imageCode);
         const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}';
         // 이미지를 미리 로딩
         const image = new Image();
