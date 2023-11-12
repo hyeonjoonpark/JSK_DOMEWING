@@ -46,6 +46,12 @@
                             </a>
                         </li>
                         <li class="nk-menu-item">
+                            <a href="/admin/account-setting" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-gear"></em></span>
+                                <span class="nk-menu-text">환경설정</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
                             <a href="/auth/logout" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em
                                         class="icon fa-solid fa-arrow-right-from-bracket"></em></span>

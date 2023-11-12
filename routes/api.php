@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AccountSettingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductRegisterController;
 use App\Http\Controllers\Admin\ProductSearchController;
@@ -31,6 +32,8 @@ Route::post('/delete-post', [DashboardController::class, 'deletePost']);
 Route::post('/product/search', [ProductSearchController::class, 'productSearch']);
 Route::post('/product/category', [ProductRegisterController::class, 'categorySearch']);
 Route::post('/product/register', [ProductRegisterController::class, 'handle']);
+// account-setting
+Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 
 Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
 Route::post('/admin/register-domain', [DomainController::class, 'registerDomain']);
