@@ -16,12 +16,10 @@ class WebhookController extends Controller
     protected function updateProject()
     {
         try {
-            // 캐시를 업데이트하고 로깅
-            $this->updateCaches();
-
             // Git에서 코드 업데이트 및 캐시 업데이트
             $this->updateCodeAndCache();
-
+            // 캐시를 업데이트하고 로깅
+            $this->updateCaches();
         } catch (\Exception $e) {
             Log::error("Error updating project: " . $e->getMessage());
         }
