@@ -65,20 +65,7 @@
                                 </tr>
                             </thead>
                             <tbody id="productList">
-                                <tr class="odd">
-                                    <td class="dtr-control" tabindex="0"><a
-                                            href="http://domeggook.com//10732325?from=lstGen" target="_blank"><img
-                                                src="https://cdn1.domeggook.com//upload/item/2020/09/04/15991991428E9D6BD09F80F34309382F/15991991428E9D6BD09F80F34309382F_img_330?hash=d4086f0619c10063fe1803851a89df3d"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td><a href="http://domeggook.com//10732325?from=lstGen" target="_blank"
-                                            title="초경량고리형마스크스트랩끈스토퍼내장길이조절가능간편사용오염방지개별포장코로나필수품">초경량고리형마스크스트랩끈스토퍼내장길이조절가능간편사용오염...</a>
-                                    </td>
-                                    <td class="sorting_1">99</td>
-                                    <td>도매매</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('초경량고리형마스크스트랩끈스토퍼내장길이조절가능간편사용오염방지개별포장코로나필수품', '99', 'https://cdn1.domeggook.com//upload/item/2020/09/04/15991991428E9D6BD09F80F34309382F/15991991428E9D6BD09F80F34309382F_img_330?hash=d4086f0619c10063fe1803851a89df3d', '도매매', 'http://domeggook.com//10732325?from=lstGen')">상품
-                                            가공</button></td>
-                                </tr>
+
                                 <!-- 데이터는 JavaScript 코드로 동적으로 추가됩니다 -->
                             </tbody>
                         </table>
@@ -107,7 +94,7 @@
                                     id="categorySearchBtn">검색</button>
                             </div>
                             <div class="form-control-wrap">
-                                <select name="categoryId" id="categoryId" class="form-control js-select2"></select>
+                                <select name="categoryId" id="categoryId" class="form-select"></select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -173,7 +160,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">상품정보고시</label>
-                            <select class="form-select js-select2" name="product_information" id="product_information">
+                            <select class="form-select" name="product_information" id="product_information">
                                 @foreach ($productInformation as $i)
                                     <option value="{{ $i->id }}">{{ $i->content }}</option>
                                 @endforeach
@@ -402,6 +389,7 @@
                                 .wholeCategoryName + "</option>";
                         }
                         $("#categoryId").html(html);
+                        console.log(html);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -424,7 +412,7 @@
             const productDetail = $('.summernote-basic').summernote('code');
             formData.append('productDetail', productDetail);
             formData.append('productName', $("#productName").val());
-            formData.append('categoryId', $('#categoryId option:selected').val());
+            formData.append('categoryId', $('#categoryId').val());
             formData.append('keywords', $('#keywords').val());
             formData.append('taxability', 0);
             const productImage = $('#productImage').attr('src');
@@ -437,7 +425,7 @@
             formData.append('shippingCost', $('#shippingCost').val());
             formData.append('productPrice', $('#productPrice').val());
             formData.append('productVendor', $('#productVendor').val());
-            formData.append('productInformationId', $('#product_information option:selected').val());
+            formData.append('productInformationId', $('#product_information').val());
             console.log($('#product_information option:selected').val());
             formData.append('productHref', productHref);
             $('.btn').prop('disabled', true);
