@@ -99,23 +99,7 @@
                 <div class="modal-body">
                     <div class="form-validate is-alter">
                         <div class="form-group">
-                            <label for="vendors" class="form-label">등록할 업체</label>
-                            <div class='row'>
-                                @foreach ($productRegisterVendors as $vendor)
-                                    <div class='col-4 mb-3'>
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input" checked name="vendors"
-                                                id="vendor{{ $vendor->vendor_id }}" value="{{ $vendor->vendor_id }}">
-                                            <label class="custom-control-label" for="vendor{{ $vendor->vendor_id }}">
-                                                {{ $vendor->name }}
-                                            </label>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="category">상품 카테고리</label>
+                            <label class="form-label" for="categoryId">상품 카테고리</label>
                             <div class="form-control-wrap d-flex text-nowrap mb-3">
                                 <input type="text" class="form-control" placeholder="카테고리 검색 키워드를 입력해주세요."
                                     id="categoryKeyword">
@@ -123,7 +107,7 @@
                                     id="categorySearchBtn">검색</button>
                             </div>
                             <div class="form-control-wrap">
-                                <select name="category" id="category" class="form-control js-select2"></select>
+                                <select name="categoryId" id="categoryId" class="form-control js-select2"></select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -188,8 +172,16 @@
                             {{-- <input type="file" class="form-control" id="descImage" name="descImage" accept="image/*"> --}}
                         </div>
                         <div class="form-group">
+                            <label class="form-label">상품정보고시</label>
+                            <select class="form-select js-select2" name="product_information" id="product_information">
+                                @foreach ($productInformation as $i)
+                                    <option value="{{ $i->id }}">{{ $i->content }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <button type="submit" class="btn btn-lg btn-primary"
-                                onclick="productInstantRegisterInit();">등록하기</button>
+                                onclick="productCollect();">등록하기</button>
                         </div>
                     </div>
                 </div>
@@ -205,6 +197,7 @@
     <script src="{{ asset('assets/js/editors.js') }}"></script>
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
+        var productHref;
         $('#summernote').summernote({
             height: 300,
             callbacks: {
@@ -362,6 +355,7 @@
             $('#invoiceName').val(nameFormatter(name));
             $("#productPrice").val(Math.round(price * {{ $marginRate }}));
             $("#productImage").attr("src", image);
+            productHref = href;
         }
 
         function nameFormatter(name) {
@@ -404,10 +398,10 @@
                     if (result.status == 1) {
                         let html = "";
                         for (let i = 0; i < result.return.length; i++) {
-                            html += "<option value='" + result.return[i].code + "'>" + result.return[i]
+                            html += "<option value='" + result.return[i].id + "'>" + result.return[i]
                                 .wholeCategoryName + "</option>";
                         }
-                        $("#category").html(html);
+                        $("#categoryId").html(html);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -424,87 +418,56 @@
             });
         }
 
-        function productInstantRegisterInit() {
+        function productCollect() {
             const formData = new FormData(); // FormData 객체 생성
             formData.append('remember_token', '{{ Auth::user()->remember_token }}');
-            $("input[name='vendors']").each(function() {
-                if ($(this).is(":checked") == true) {
-                    var checkVal = $(this).val();
-                    formData.append('vendors[]', checkVal);
-                }
-            });
-            const productDesc = $('.summernote-basic').summernote('code');
-            const model = "MODEL001";
-            formData.append('model', model);
-            // const productDescImage = $('#descImage')[0].files[0];
-            // formData.append('productDescImage', productDescImage);
-            formData.append('productDesc', productDesc);
-            console.log(productDesc);
-            formData.append('itemName', $("#productName").val());
-            formData.append('invoiceName', $("#invoiceName").val());
-            formData.append('category', $('#categoryResult option:selected').val());
+            const productDetail = $('.summernote-basic').summernote('code');
+            formData.append('productDetail', productDetail);
+            formData.append('productName', $("#productName").val());
+            formData.append('categoryId', $('#categoryId option:selected').val());
             formData.append('keywords', $('#keywords').val());
-
-            const taxability = $("input[name='taxability']:checked").next().text().trim();
-            formData.append('taxability', taxability);
-
-            const selectedFile = $('#productImage')[0].files[0];
-            formData.append('productImage', selectedFile);
-
-            const saleToMinor = $("input[name='saleToMinor']:checked").next().text().trim();
-            formData.append('saleToMinor', saleToMinor);
-
-            const origin = $("input[name='origin']:checked").next().text().trim();
-            formData.append('origin', origin);
-
-            const madicalEquipment = $("input[name='madicalEquipment']:checked").next().text().trim();
-            formData.append('madicalEquipment', madicalEquipment);
-
-            const healthFunctional = $("input[name='healthFunctional']:checked").next().text().trim();
-            formData.append('healthFunctional', healthFunctional);
-
-            const shipping = $("input[name='shipping']:checked").next().text().trim();
-            formData.append('shipping', shipping);
-            formData.append('shipCost', $('#shipCost').val());
-            formData.append('price', $('#productPrice').val());
-            formData.append('vendor', $('#vendor').val());
-            const productInformation = $('#product_information').val();
-            formData.append('product_information', productInformation);
-            $('#registerBtn').prop('disabled', true);
-            $("#registerBtn").html('로딩 중...');
+            formData.append('taxability', 0);
+            const productImage = $('#productImage').attr('src');
+            formData.append('productImage', productImage);
+            formData.append('saleToMinor', 0);
+            formData.append('origin', 2);
+            formData.append('isMedicalDevice', 0);
+            formData.append('isMedicalFoods', 0);
+            formData.append('shippingPolicy', 0);
+            formData.append('shippingCost', $('#shippingCost').val());
+            formData.append('productPrice', $('#productPrice').val());
+            formData.append('productVendor', $('#productVendor').val());
+            formData.append('productInformationId', $('#product_information option:selected').val());
+            console.log($('#product_information option:selected').val());
+            formData.append('productHref', productHref);
+            $('.btn').prop('disabled', true);
             $.ajax({
-                url: '/api/product/register',
+                url: '/api/product/collect',
                 type: 'post',
                 dataType: 'json',
                 data: formData,
                 processData: false, // FormData 처리 설정
                 contentType: false, // Content-Type 설정
                 success: function(response) {
-                    $('#registerBtn').prop('disabled', false);
-                    $("#registerBtn").html('등록');
-                    console.log(response);
-                    const status = parseInt(response.status);
-                    const successVendors = response.success_vendors;
-                    const errorVendors = response.error_vendors;
-                    let icon, title;
-                    if (status == 1) {
-                        icon = 'success';
-                        title = "진행 성공";
+                    $('.btn').prop('disabled', false);
+                    if (response.status == 1) {
+                        $('.modal').modal('hide');
+                        Swal.close();
+                        Swal.fire({
+                            icon: 'success',
+                            title: '진행 성공',
+                            text: response.return
+                        });
                     } else {
-                        icon = "error";
-                        title = "진행 실패";
+                        Swal.fire({
+                            icon: 'error',
+                            title: '진행 실패',
+                            text: response.return
+                        });
                     }
-                    icon = 'success'; // 프로젝트 시연 후 삭제할 것!!!
-                    title = "진행 성공"; // !!
-                    Swal.fire({
-                        icon: icon,
-                        title: title,
-                        text: response.return
-                    });
                 },
                 error: function(response) {
-                    $('#registerBtn').prop('disabled', false);
-                    $("#registerBtn").html('등록');
+                    $('.btn').prop('disabled', false);
                     console.log(response);
                 }
             });

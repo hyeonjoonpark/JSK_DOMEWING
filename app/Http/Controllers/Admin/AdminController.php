@@ -26,10 +26,12 @@ class AdminController extends Controller
         $productRegisterVendors = DB::table('product_register')->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')->where('product_register.is_active', 'Y')->get();
         $marginRate = DB::table('margin_rate')->where('userId', Auth::user()->id)->select('rate')->first()->rate;
         $marginRate = (100 + $marginRate) / 100;
+        $productInformation = DB::table('product_information')->get();
         return view('admin/product_search', [
             'vendors' => $vendors,
             'productRegisterVendors' => $productRegisterVendors,
-            'marginRate' => $marginRate
+            'marginRate' => $marginRate,
+            'productInformation' => $productInformation
         ]);
     }
     public function productRegister()

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Admin\ImageUploadController;
+use App\Http\Controllers\Admin\ProductCollectController;
 use App\Http\Controllers\Admin\ProductDetailController;
 use App\Http\Controllers\Admin\ProductRegisterController;
 use App\Http\Controllers\Admin\ProductSearchController;
@@ -36,6 +37,7 @@ Route::post('/product/register', [ProductRegisterController::class, 'handle']);
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 // Load product details
 Route::post('/product/load-product-detail', [ProductDetailController::class, 'index']);
+Route::post('/product/collect', [ProductCollectController::class, 'index']);
 
 Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
 Route::post('/admin/register-domain', [DomainController::class, 'registerDomain']);
