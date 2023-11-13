@@ -413,7 +413,7 @@
             formData.append('productDetail', productDetail);
             formData.append('productName', $("#productName").val());
             formData.append('categoryId', $('#categoryId').val());
-            formData.append('keywords', $('#keywords').val());
+            formData.append('keywords', $('#productKeywords').val());
             formData.append('taxability', 0);
             const productImage = $('#productImage').attr('src');
             formData.append('productImage', productImage);
