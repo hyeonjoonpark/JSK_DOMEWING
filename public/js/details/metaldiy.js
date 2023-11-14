@@ -8,10 +8,8 @@ const puppeteer = require('puppeteer');
         await page.waitForSelector('#detail > img');
         const imgSrc = await page.$eval('#detail > img', img => img.src);
         const productDetail = '<center><img src="' + imgSrc + '"></center>';
-        const vendor = "철물박사";
         const data = {
-            productDetail: productDetail,
-            vendor: vendor
+            productDetail: productDetail
         };
         console.log(JSON.stringify(data));
     } catch (error) {

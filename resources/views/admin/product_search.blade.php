@@ -142,10 +142,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="productVendor">제조사/브랜드</label>
-                            <div class="form-control-wrap">
-                                <input type="text" class="form-control" id="productVendor"
-                                    placeholder="상품의 제조사 혹은 브랜드를 기입해주세요.">
-                            </div>
+                            <input type="text" class="form-control" value="LADAM">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="productVendor">상품 대표 이미지</label>
@@ -485,7 +482,6 @@
                     if (response.status == 1) {
                         console.log(response);
                         $('#summernote').summernote('code', response.return.productDetail);
-                        $('#productVendor').val(response.return.vendor);
                         $("#modalForm").modal("show");
                     } else {
                         Swal.fire({

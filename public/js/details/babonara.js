@@ -7,10 +7,8 @@ const puppeteer = require('puppeteer');
         await page.goto(href);
         await page.waitForSelector('#contents > table > tbody > tr > td');
         const productDetail = await page.$eval('#contents > table > tbody > tr > td', container => container.innerHTML);
-        const vendor = "상세페이지 참조";
         const data = {
-            productDetail: productDetail,
-            vendor: vendor
+            productDetail: productDetail
         };
         console.log(JSON.stringify(data));
     } catch (error) {

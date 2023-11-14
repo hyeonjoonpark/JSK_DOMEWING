@@ -20,13 +20,9 @@ const puppeteer = require('puppeteer');
 
             return resultHtml;
         });
-        const vendor = await page.$eval(
-            '#lInfoViewItemInfoWrap > div.lTblWrap > div:nth-child(2) > div:nth-child(1) > div',
-            element => element.textContent.trim()
-        );
+
         const data = {
-            productDetail: productDetail,
-            vendor: vendor
+            productDetail: productDetail
         };
         console.log(JSON.stringify(data));
     } catch (error) {

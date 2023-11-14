@@ -60,8 +60,8 @@ class ProductCollectController extends Controller
             'shippingPolicy' => 'required|integer',
             'shippingCost' => 'required|integer',
             'productPrice' => 'required|integer',
-            'productVendor' => 'required|string',
             'productInformationId' => 'required|integer',
+            'productVendor' => 'required|string|min:2|max:255'
         ], [
             'remember_token' => '잘못된 접근입니다.',
             'productDetail' => '상품 상세정보를 작성해주세요.',
@@ -77,8 +77,8 @@ class ProductCollectController extends Controller
             'shippingPolicy' => '배송 정책을 선택해주세요.',
             'shippingCost' => '배송 금액을 기입해주세요.',
             'productPrice' => '상품 가격을 기입해주세요.',
-            'productVendor' => '상품 제조사/브랜드를 기입해주세요.',
             'productInformationId' => '상품정보고시를 선택해주세요.',
+            'productVendor' => '상품 제조사/브랜드를 2글자 이상으로 기입해주세요.'
         ]);
         return $validator;
     }
