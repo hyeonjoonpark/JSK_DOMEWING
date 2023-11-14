@@ -23,7 +23,16 @@ class AdminController extends Controller
     public function productSearch()
     {
         $vendors = DB::table('product_search')->join('vendors', 'vendors.id', '=', 'product_search.vendor_id')->where('product_search.is_active', 'Y')->get();
-        return view('admin/product_search', ['vendors' => $vendors]);
+        $productRegisterVendors = DB::table('product_register')->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')->where('product_register.is_active', 'Y')->get();
+        $marginRate = DB::table('margin_rate')->where('userId', Auth::user()->id)->select('rate')->first()->rate;
+        $marginRate = (100 + $marginRate) / 100;
+        $productInformation = DB::table('product_information')->get();
+        return view('admin/product_search', [
+            'vendors' => $vendors,
+            'productRegisterVendors' => $productRegisterVendors,
+            'marginRate' => $marginRate,
+            'productInformation' => $productInformation
+        ]);
     }
     public function productRegister()
     {
@@ -54,8 +63,8 @@ class AdminController extends Controller
     public function cmsDashboard(Request $request)
     {
         $domains = DB::table('cms_domain')
-                    ->where('is_active', 'ACTIVE')
-                    ->get();
+            ->where('is_active', 'ACTIVE')
+            ->get();
 
         foreach ($domains as $domain) {
             $domain->formatted_created_at = Carbon::parse($domain->created_at)->format('d M Y');
@@ -68,10 +77,17 @@ class AdminController extends Controller
     public function contentManagementSystem(Request $request, $id)
     {
         $domain = DB::table('cms_domain')
-                    ->where('domain_id',  $id)
-                    ->first();
-        return view('admin/content_management_system',['domain' => $domain]);
+            ->where('domain_id', $id)
+            ->first();
+        return view('admin/content_management_system', ['domain' => $domain]);
     }
 
-
+    public function accountSetting(Request $request)
+    {
+        $userId = Auth::user()->id;
+        $marginRate = DB::table('margin_rate')->where('userId', $userId)->first()->rate;
+        return view('admin/account-setting', [
+            'marginRate' => $marginRate
+        ]);
+    }
 }

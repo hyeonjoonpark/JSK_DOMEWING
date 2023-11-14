@@ -23,6 +23,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/search-to-register', [AdminController::class, 'searchToRegister']);
     Route::get('product/register', [AdminController::class, 'productRegister']);
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
+    Route::get('account-setting', [AdminController::class, 'accountSetting']);
 
     //ving kong
     Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');

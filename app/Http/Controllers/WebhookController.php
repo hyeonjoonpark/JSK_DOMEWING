@@ -16,12 +16,10 @@ class WebhookController extends Controller
     protected function updateProject()
     {
         try {
-            // 캐시를 업데이트하고 로깅
-            $this->updateCaches();
-
             // Git에서 코드 업데이트 및 캐시 업데이트
             $this->updateCodeAndCache();
-
+            // 캐시를 업데이트하고 로깅
+            $this->updateCaches();
         } catch (\Exception $e) {
             Log::error("Error updating project: " . $e->getMessage());
         }
@@ -34,7 +32,7 @@ class WebhookController extends Controller
     }
     protected function updateCodeAndCache()
     {
-        $output = shell_exec("cd " . base_path() . " && git pull origin master && composer dump-autoload && php artisan config:clear && php artisan cache:clear");
+        $output = shell_exec("cd " . base_path() . " && git add . && git add . && git commit -m 'commit' && git pull");
 
         Log::info("Project updated: " . $output);
     }

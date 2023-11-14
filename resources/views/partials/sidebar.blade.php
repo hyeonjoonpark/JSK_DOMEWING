@@ -30,19 +30,31 @@
                         <li class="nk-menu-item">
                             <a href="/admin/product/search" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-magnifying-glass"></em></span>
-                                <span class="nk-menu-text">상품 대량 검색</span>
+                                <span class="nk-menu-text">상품 수집</span>
                             </a>
                         </li>
                         <li class="nk-menu-item">
                             <a href="/admin/product/register" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-boxes-packing"></em></span>
-                                <span class="nk-menu-text">상품 개별 등록</span>
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
+                                <span class="nk-menu-text">신규 상품 생성</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
+                            <a href="/admin/product/register" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-cloud-arrow-up"></em></span>
+                                <span class="nk-menu-text">상품 업로드</span>
                             </a>
                         </li>
                         <li class="nk-menu-item">
                             <a href="/admin/cms_dashboard" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
                                 <span class="nk-menu-text">CMS 저작물 관리 시스템</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
+                            <a href="/admin/account-setting" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-gear"></em></span>
+                                <span class="nk-menu-text">환경설정</span>
                             </a>
                         </li>
                         <li class="nk-menu-item">
