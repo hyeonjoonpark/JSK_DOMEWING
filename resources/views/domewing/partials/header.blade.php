@@ -75,7 +75,7 @@
                 <div class="hstack pt-3">
                     <div class="px-2 fs-22px" style="color:var(--cyan-blue)">Category</div>
                     <div class="px-2"></div>
-                    <div class="vr vr-dark" style="color:var(--cyan-blue); width:2px;"></div>
+                    <div class="vr" style="color:var(--cyan-blue); width:2px; opacity:1;"></div>
                     <div class="px-2"></div>
                     <ul class="nav horizontal-scrolling">
                         <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
