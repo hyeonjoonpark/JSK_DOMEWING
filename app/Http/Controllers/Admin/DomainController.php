@@ -140,7 +140,5 @@ class DomainController extends Controller
         return $data;
     }
 
-    public function loadDomain(Request $request){
-        return view('domewing.product_catalog');
-    }
+
 }
