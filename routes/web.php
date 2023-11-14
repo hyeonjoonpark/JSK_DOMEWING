@@ -33,8 +33,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 //ving kong
 Route::prefix('domewing')->group( function() {
+    Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
-    Route::get('/{domain_name}', [DomainController::class, 'loadDomain']);
 });
 
 // 로그인 및 등록 라우트
