@@ -93,28 +93,28 @@ class GeneralController extends Controller
     public function getProduct(){
         $product_items = [
             [
-                'image' => 'https://cdn1.npcdn.net/image/1668578748821c8af71ec3b8f7d3b415bbad340051.jpg?md5id=9866b8a83d35abdd89ed76d565d71f75&new_width=1150&new_height=2500&w=-62170009200',
-                'title' => 'Bed 1',
+                'image' => 'https://www.fluidbranding.ie/media/catalog/product/cache/5d8e184087b91b8c6788f82b1ec6b2b1/1/2/12155DUR_Durham-ColourCoat-Mug.jpg',
+                'title' => 'Direct Mug',
             ],
             [
-                'image' => 'https://image.invaluable.com/housePhotos/clars/88/752188/H0054-L341207066.jpg',
-                'title' => 'Drawer 1',
+                'image' => 'https://marketplace.canva.com/print-mockup/bundle/E2C1MVoPF2T/surface:marketplace/surface:marketplace/EAFI6d4WLz4/1/0/1600w/canva-blue-minimalist-floral-mug-Kfl3ugdeswE.jpg?sig=9c962e01dc53dd8083a1d30fc26686f5&width=400',
+                'title' => 'Lovely Cup',
             ],
             [
-                'image' => 'https://image.made-in-china.com/202f0j00ecNhLPGbfilF/32mm-S-Speed-Sample-Provided-Furniture-Adjustable-Office-Desk-with-Low-Price.webp',
-                'title' => 'Desk 2',
+                'image' => 'https://www.ikea.com/my/en/images/products/faergklar-mug-glossy-beige__1010305_pe828022_s5.jpg?f=xl',
+                'title' => 'Simple Cup',
             ],
             [
-                'image' => 'https://cdn0.rubylane.com/_podl/item/1518436/TVC3364A/Goodyear-Salesman-Sample-Miniature-Airfoam-Couch-pic-1A-2048%3A10.10-93eee4a0-f.webp',
-                'title' => 'Sofa',
+                'image' => 'https://www.nitori.my/cdn/shop/products/896769801_512x512.jpg?v=1616037232',
+                'title' => 'Greeny Looking Cup',
             ],
             [
-                'image' => 'https://images.squarespace-cdn.com/content/v1/5ca3410da09a7e6e7ed285ea/1653477235891-25RV6FR3GT1EZILWOBX4/ArrowCoffeeTable2.jpg?format=750w',
-                'title' => 'Sofa Table',
+                'image' => 'https://teapsy.co.uk/cdn/shop/products/FairyMugPackshot_grande.png?v=1674757458',
+                'title' => 'Cute Pink Cup',
             ],
             [
-                'image' => 'https://www.furniturebrands4u.co.uk/image/cache/catalog/clearance/ercol-clearance/marino-chr-c686-june-23/ercol-marino-chair-c686-320x320h.jpg',
-                'title' => 'Chair',
+                'image' => 'https://theobroma.in/cdn/shop/files/Mug_Green_2.jpg?v=1687724641',
+                'title' => 'Customise Drawing Cup',
             ],
         ];
 
