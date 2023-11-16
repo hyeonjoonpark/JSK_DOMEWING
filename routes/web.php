@@ -43,6 +43,7 @@ Route::prefix('domewing')->group(function () {
 Route::prefix('domewing/auth')->group( function() {
     Route::get('/login', [DomewingLoginController::class, 'login']);
     Route::get('/register', [DomewingRegisterController::class, 'register']);
+    Route::post('login', [DomewingLoginController::class, 'login']);
 });
 
 // 로그인 및 등록 라우트
