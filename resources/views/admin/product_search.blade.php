@@ -34,10 +34,11 @@
                         <label class="form-label">상품 키워드</label>
                         <div class="row g-0">
                             <div class="col">
-                                <input type="text" class="form-control" id="productUrl" placeholder="상품 키워드 기입해주세요." />
+                                <input type="text" class="form-control" id="productUrl"
+                                    placeholder="상품 키워드 기입해주세요."onkeydown="handleEnter(event)" />
                             </div>
                             <div class="col-auto">
-                                <button class="btn btn-primary" onclick="collectInit();">상품 검색</button>
+                                <button class="btn btn-primary" id="searchBtn" onclick="collectInit();">상품 검색</button>
                             </div>
                         </div>
                     </div>
@@ -53,11 +54,12 @@
                     <h6 class="card-subtitle mb-2">검색 결과로부터 상품을 가공 및 수집합니다.</h6>
                     <p class="card-text">총 <span class="fw-bold" id="numResult"></span>건이 검색되었습니다</p>
                     <div class="w-100 d-flex justify-content-center">
-                        <button class="btn btn-warning" onclick="productBulkCollect();">상품 다중 수집</button>
+                        <button class="btn btn-warning" id="bulkCollectBtn" onclick="productBulkCollect();">상품 다중
+                            수집</button>
                     </div>
                     <div id="collectResult">
                         <table id="productTable" class="datatable-init-export nowrap table" data-export-title="Export"
-                            data-order='[[2, "asc"]]'>
+                            data-order='[[3, "asc"]]'>
                             <thead>
                                 <tr>
                                     <th class="nk-tb-col nk-tb-col-check">
@@ -74,302 +76,6 @@
                                 </tr>
                             </thead>
                             <tbody id="productList">
-
-                                <!-- 데이터는 JavaScript 코드로 동적으로 추가됩니다 -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                <tr class="odd">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid116"
-                                                value="1216빨아쓰는슬림규조토발매트욕실주방싱크대매트러그논슬립발닦개물기흡수, 6500, 도매매, https://cdn1.domeggook.com//upload/item/2022/03/31/1648698231E69623E78F80B724175699/1648698231E69623E78F80B724175699_img_330?hash=031566ac3401f48465dd6bb7bad9d17f, http://domeggook.com//21146576?from=lstGen"><label
-                                                class="custom-control-label" for="uid116"></label></div>
-                                    </td>
-                                    <td><a href="http://domeggook.com//21146576?from=lstGen" target="_blank"><img
-                                                src="https://cdn1.domeggook.com//upload/item/2022/03/31/1648698231E69623E78F80B724175699/1648698231E69623E78F80B724175699_img_330?hash=031566ac3401f48465dd6bb7bad9d17f"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a href="http://domeggook.com//21146576?from=lstGen"
-                                            target="_blank"
-                                            title="1216빨아쓰는슬림규조토발매트욕실주방싱크대매트러그논슬립발닦개물기흡수">1216빨아쓰는슬림규조토발매트욕실주방싱크대매트러그논슬립...</a>
-                                    </td>
-                                    <td>6500</td>
-                                    <td>도매매</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('1216빨아쓰는슬림규조토발매트욕실주방싱크대매트러그논슬립발닦개물기흡수', '6500', 'https://cdn1.domeggook.com//upload/item/2022/03/31/1648698231E69623E78F80B724175699/1648698231E69623E78F80B724175699_img_330?hash=031566ac3401f48465dd6bb7bad9d17f', '도매매', 'http://domeggook.com//21146576?from=lstGen')">상품
-                                            등록</button></td>
-                                </tr>
-                                <tr class="even">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid204"
-                                                value="2P다용도팬더싱크대문걸이고리주방수납걸이, 890, 도매매, https://cdn1.domeggook.com//upload/item/2022/04/21/16505271660B6E95B3DF11DEC4ED7CB1/16505271660B6E95B3DF11DEC4ED7CB1_stt_330.png?hash=0529da27e9a62fdfd4f9e4afb7657a0f, http://domeggook.com//22152716?from=lstGen"><label
-                                                class="custom-control-label" for="uid204"></label></div>
-                                    </td>
-                                    <td><a href="http://domeggook.com//22152716?from=lstGen" target="_blank"><img
-                                                src="https://cdn1.domeggook.com//upload/item/2022/04/21/16505271660B6E95B3DF11DEC4ED7CB1/16505271660B6E95B3DF11DEC4ED7CB1_stt_330.png?hash=0529da27e9a62fdfd4f9e4afb7657a0f"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a href="http://domeggook.com//22152716?from=lstGen"
-                                            target="_blank" title="2P다용도팬더싱크대문걸이고리주방수납걸이">2P다용도팬더싱크대문걸이고리주방수납걸이</a></td>
-                                    <td>890</td>
-                                    <td>도매매</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('2P다용도팬더싱크대문걸이고리주방수납걸이', '890', 'https://cdn1.domeggook.com//upload/item/2022/04/21/16505271660B6E95B3DF11DEC4ED7CB1/16505271660B6E95B3DF11DEC4ED7CB1_stt_330.png?hash=0529da27e9a62fdfd4f9e4afb7657a0f', '도매매', 'http://domeggook.com//22152716?from=lstGen')">상품
-                                            등록</button></td>
-                                </tr>
-                                <tr class="odd">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid42"
-                                                value="2p싱크대개수통홀컵, 880, 도매토피아, https://dmtusr.vipweb.kr/goods_img/1/2008/10/1855/1855_0_d912e463b1adefe3b06b3cc9e6182d3e5994list1.jpg, https://dometopia.com/goods/view?no=1855&amp;code="><label
-                                                class="custom-control-label" for="uid42"></label></div>
-                                    </td>
-                                    <td><a href="https://dometopia.com/goods/view?no=1855&amp;code=" target="_blank"><img
-                                                src="https://dmtusr.vipweb.kr/goods_img/1/2008/10/1855/1855_0_d912e463b1adefe3b06b3cc9e6182d3e5994list1.jpg"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a href="https://dometopia.com/goods/view?no=1855&amp;code="
-                                            target="_blank" title="2p싱크대개수통홀컵">2p싱크대개수통홀컵</a></td>
-                                    <td>880</td>
-                                    <td>도매토피아</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('2p싱크대개수통홀컵', '880', 'https://dmtusr.vipweb.kr/goods_img/1/2008/10/1855/1855_0_d912e463b1adefe3b06b3cc9e6182d3e5994list1.jpg', '도매토피아', 'https://dometopia.com/goods/view?no=1855&amp;code=')">상품
-                                            등록</button></td>
-                                </tr>
-                                <tr class="even">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid170"
-                                                value="2단소형철제주방싱크대수세미보관부착식선반BD1750, 1450, 도매매, https://cdn1.domeggook.com//upload/item/2022/10/27/166684711573418A1406154AD271305B/166684711573418A1406154AD271305B_stt_330.png?hash=3e24ed7fc5636483d5d8a534c1e552f7, http://domeggook.com//29813705?from=lstGen"><label
-                                                class="custom-control-label" for="uid170"></label></div>
-                                    </td>
-                                    <td><a href="http://domeggook.com//29813705?from=lstGen" target="_blank"><img
-                                                src="https://cdn1.domeggook.com//upload/item/2022/10/27/166684711573418A1406154AD271305B/166684711573418A1406154AD271305B_stt_330.png?hash=3e24ed7fc5636483d5d8a534c1e552f7"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a href="http://domeggook.com//29813705?from=lstGen"
-                                            target="_blank"
-                                            title="2단소형철제주방싱크대수세미보관부착식선반BD1750">2단소형철제주방싱크대수세미보관부착식선반BD1750</a></td>
-                                    <td>1450</td>
-                                    <td>도매매</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('2단소형철제주방싱크대수세미보관부착식선반BD1750', '1450', 'https://cdn1.domeggook.com//upload/item/2022/10/27/166684711573418A1406154AD271305B/166684711573418A1406154AD271305B_stt_330.png?hash=3e24ed7fc5636483d5d8a534c1e552f7', '도매매', 'http://domeggook.com//29813705?from=lstGen')">상품
-                                            등록</button></td>
-                                </tr>
-                                <tr class="odd">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid126"
-                                                value="2단싱크대하부선반/싱크인선반/싱크대정리, 7500, 도매매, https://cdn1.domeggook.com//upload/item/2020/06/22/159278516545735993DD00F275C49B3F/159278516545735993DD00F275C49B3F_stt_330.png?hash=76c45030f691c07f46fc266f3a14aa6c, http://domeggook.com//10366815?from=lstGen"><label
-                                                class="custom-control-label" for="uid126"></label></div>
-                                    </td>
-                                    <td><a href="http://domeggook.com//10366815?from=lstGen" target="_blank"><img
-                                                src="https://cdn1.domeggook.com//upload/item/2020/06/22/159278516545735993DD00F275C49B3F/159278516545735993DD00F275C49B3F_stt_330.png?hash=76c45030f691c07f46fc266f3a14aa6c"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a href="http://domeggook.com//10366815?from=lstGen"
-                                            target="_blank" title="2단싱크대하부선반/싱크인선반/싱크대정리">2단싱크대하부선반/싱크인선반/싱크대정리</a></td>
-                                    <td>7500</td>
-                                    <td>도매매</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('2단싱크대하부선반/싱크인선반/싱크대정리', '7500', 'https://cdn1.domeggook.com//upload/item/2020/06/22/159278516545735993DD00F275C49B3F/159278516545735993DD00F275C49B3F_stt_330.png?hash=76c45030f691c07f46fc266f3a14aa6c', '도매매', 'http://domeggook.com//10366815?from=lstGen')">상품
-                                            등록</button></td>
-                                </tr>
-                                <tr class="even">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid87"
-                                                value="304스텐와이어주방세척솔(25.5cm), 9240, 도매토피아, https://dmtusr.vipweb.kr/goods_img/1/2023/05/175062/O1CN0_581list1.jpg, https://dometopia.com/goods/view?no=175062&amp;code="><label
-                                                class="custom-control-label" for="uid87"></label></div>
-                                    </td>
-                                    <td><a href="https://dometopia.com/goods/view?no=175062&amp;code="
-                                            target="_blank"><img
-                                                src="https://dmtusr.vipweb.kr/goods_img/1/2023/05/175062/O1CN0_581list1.jpg"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a href="https://dometopia.com/goods/view?no=175062&amp;code="
-                                            target="_blank" title="304스텐와이어주방세척솔(25.5cm)">304스텐와이어주방세척솔(25.5cm)</a></td>
-                                    <td>9240</td>
-                                    <td>도매토피아</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('304스텐와이어주방세척솔(25.5cm)', '9240', 'https://dmtusr.vipweb.kr/goods_img/1/2023/05/175062/O1CN0_581list1.jpg', '도매토피아', 'https://dometopia.com/goods/view?no=175062&amp;code=')">상품
-                                            등록</button></td>
-                                </tr>
-                                <tr class="odd">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid88"
-                                                value="304스텐와이어주방세척솔(26cm), 11220, 도매토피아, https://dmtusr.vipweb.kr/goods_img/1/2023/05/175060/O1CN0_884list1.jpg, https://dometopia.com/goods/view?no=175060&amp;code="><label
-                                                class="custom-control-label" for="uid88"></label></div>
-                                    </td>
-                                    <td><a href="https://dometopia.com/goods/view?no=175060&amp;code="
-                                            target="_blank"><img
-                                                src="https://dmtusr.vipweb.kr/goods_img/1/2023/05/175060/O1CN0_884list1.jpg"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a href="https://dometopia.com/goods/view?no=175060&amp;code="
-                                            target="_blank" title="304스텐와이어주방세척솔(26cm)">304스텐와이어주방세척솔(26cm)</a></td>
-                                    <td>11220</td>
-                                    <td>도매토피아</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('304스텐와이어주방세척솔(26cm)', '11220', 'https://dmtusr.vipweb.kr/goods_img/1/2023/05/175060/O1CN0_884list1.jpg', '도매토피아', 'https://dometopia.com/goods/view?no=175060&amp;code=')">상품
-                                            등록</button></td>
-                                </tr>
-                                <tr class="even">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid182"
-                                                value="[30매]물빠짐음식물쓰레기봉투/타공/싱크대/봉지, 1800, 도매매, https://cdn1.domeggook.com//upload/item/2019/08/05/15649697637D0EF630AD6FB0AFEF3405/15649697637D0EF630AD6FB0AFEF3405_stt_330.png?hash=37377fa2b531187b093db55ffe8325c4, http://domeggook.com//9001372?from=lstGen"><label
-                                                class="custom-control-label" for="uid182"></label></div>
-                                    </td>
-                                    <td><a href="http://domeggook.com//9001372?from=lstGen" target="_blank"><img
-                                                src="https://cdn1.domeggook.com//upload/item/2019/08/05/15649697637D0EF630AD6FB0AFEF3405/15649697637D0EF630AD6FB0AFEF3405_stt_330.png?hash=37377fa2b531187b093db55ffe8325c4"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a href="http://domeggook.com//9001372?from=lstGen"
-                                            target="_blank"
-                                            title="[30매]물빠짐음식물쓰레기봉투/타공/싱크대/봉지">[30매]물빠짐음식물쓰레기봉투/타공/싱크대/봉지</a></td>
-                                    <td>1800</td>
-                                    <td>도매매</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('[30매]물빠짐음식물쓰레기봉투/타공/싱크대/봉지', '1800', 'https://cdn1.domeggook.com//upload/item/2019/08/05/15649697637D0EF630AD6FB0AFEF3405/15649697637D0EF630AD6FB0AFEF3405_stt_330.png?hash=37377fa2b531187b093db55ffe8325c4', '도매매', 'http://domeggook.com//9001372?from=lstGen')">상품
-                                            등록</button></td>
-                                </tr>
-                                <tr class="odd">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid17"
-                                                value="[LVT] 매직커버/ 싱크대 배수구 커버/싱크대 배수구 마개/배수구 마개/속마개/속뚜껑/음식물처리 , 4500, 바보나라, http://babonara.co.kr/shop/data/goods/1437666861617s0.jpg, http://babonara.co.kr/shop/goods/goods_view.php?goodsno=43&amp;category=002002"><label
-                                                class="custom-control-label" for="uid17"></label></div>
-                                    </td>
-                                    <td><a href="http://babonara.co.kr/shop/goods/goods_view.php?goodsno=43&amp;category=002002"
-                                            target="_blank"><img
-                                                src="http://babonara.co.kr/shop/data/goods/1437666861617s0.jpg"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a
-                                            href="http://babonara.co.kr/shop/goods/goods_view.php?goodsno=43&amp;category=002002"
-                                            target="_blank"
-                                            title="[LVT] 매직커버/ 싱크대 배수구 커버/싱크대 배수구 마개/배수구 마개/속마개/속뚜껑/음식물처리 ">[LVT] 매직커버/ 싱크대
-                                            배수구 커버/싱크대 배수구...</a></td>
-                                    <td>4500</td>
-                                    <td>바보나라</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('[LVT] 매직커버/ 싱크대 배수구 커버/싱크대 배수구 마개/배수구 마개/속마개/속뚜껑/음식물처리 ', '4500', 'http://babonara.co.kr/shop/data/goods/1437666861617s0.jpg', '바보나라', 'http://babonara.co.kr/shop/goods/goods_view.php?goodsno=43&amp;category=002002')">상품
-                                            등록</button></td>
-                                </tr>
-                                <tr class="even">
-                                    <td class="dtr-control" tabindex="0">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext"><input
-                                                type="checkbox" class="custom-control-input" id="uid7"
-                                                value="[LVT] 싱크대 배수구 겉뚜껑/악취방지용/대형배수구/배수구덮개/배수구캡/배수트랩/싱크배수구/주방배수구/배수구속뚜껑/싱크대속뚜껑, 2500, 바보나라, http://babonara.co.kr/shop/data/goods/1439274513315s0.jpg, http://babonara.co.kr/shop/goods/goods_view.php?goodsno=63&amp;category=002002"><label
-                                                class="custom-control-label" for="uid7"></label></div>
-                                    </td>
-                                    <td><a href="http://babonara.co.kr/shop/goods/goods_view.php?goodsno=63&amp;category=002002"
-                                            target="_blank"><img
-                                                src="http://babonara.co.kr/shop/data/goods/1439274513315s0.jpg"
-                                                alt="Product" style="width:120px; height:120px;"></a></td>
-                                    <td class="sorting_1"><a
-                                            href="http://babonara.co.kr/shop/goods/goods_view.php?goodsno=63&amp;category=002002"
-                                            target="_blank"
-                                            title="[LVT] 싱크대 배수구 겉뚜껑/악취방지용/대형배수구/배수구덮개/배수구캡/배수트랩/싱크배수구/주방배수구/배수구속뚜껑/싱크대속뚜껑">[LVT]
-                                            싱크대 배수구 겉뚜껑/악취방지용/대형배수구/...</a></td>
-                                    <td>2500</td>
-                                    <td>바보나라</td>
-                                    <td><button class="btn btn-primary"
-                                            onclick="registerProduct('[LVT] 싱크대 배수구 겉뚜껑/악취방지용/대형배수구/배수구덮개/배수구캡/배수트랩/싱크배수구/주방배수구/배수구속뚜껑/싱크대속뚜껑', '2500', 'http://babonara.co.kr/shop/data/goods/1439274513315s0.jpg', '바보나라', 'http://babonara.co.kr/shop/goods/goods_view.php?goodsno=63&amp;category=002002')">상품
-                                            등록</button></td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -509,7 +215,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-lg btn-primary" onclick="productBulkCollect();">가공
+                            <button type="submit" class="btn btn-lg btn-primary" onclick="saveBulkProducts();">가공
                                 완료</button>
                         </div>
                     </div>
@@ -625,26 +331,35 @@
             }).nodes();
             $('input[type="checkbox"]', rows).prop('checked', this.checked);
         });
+        var collectedProducts;
 
         function updateDataTable(products) {
             var dataTable = $('#productTable').DataTable();
 
             dataTable.clear().draw();
-
+            collectedProducts = [];
             for (let i = 0; i < products.length; i++) {
                 const name = products[i].name;
                 const price = products[i].price;
                 const platform = products[i].platform;
                 const image = products[i].image;
                 const href = products[i].href;
+                const tmpProduct = {
+                    index: i,
+                    name: name,
+                    price: price,
+                    platform: platform,
+                    image: image,
+                    href: href
+                };
+                collectedProducts.push(tmpProduct);
 
                 const checkbox =
                     '<div class="custom-control custom-control-sm custom-checkbox notext"><input type="checkbox" class="custom-control-input" id="uid' +
-                    i + '" value="' + name + ', ' + price + ', ' + platform + ', ' + image + ', ' + href +
-                    '"><label class="custom-control-label" for="uid' + i + '"></label></div>';
+                    i + '"><label class="custom-control-label" for="uid' + i + '"></label></div>';
                 const imageHtml = '<a href="' + href + '" target="_blank"><img src="' + image +
                     '" alt="Product" style="width:120px; height:120px;"></a>';
-                const nameHtml = '<a href="' + href + '" target="_blank" title="' + name + '">' + truncateText(name, 30) +
+                const nameHtml = '<a href="' + href + '" target="_blank" title="' + name + '">' + truncateText(name, 20) +
                     '</a>';
                 const actionHtml =
                     `<button class="btn btn-primary" onclick="registerProduct('${name}', '${price}', '${image}', '${platform}', '${href}')">상품 등록</button>`;
@@ -892,23 +607,134 @@
             });
         }
 
-        function productBulkCollect() {
-            // 선택된 체크박스 요소를 담을 배열 초기화
-            var selectedCheckboxes = [];
+        function extractNumericPart(id) {
+            // 정규 표현식을 사용하여 "uid" 다음의 숫자 부분을 추출
+            const numericPart = id.replace(/^uid(\d+)$/, '$1');
+            return numericPart;
+        }
+        var selectedProducts
 
-            // DataTables 테이블의 모든 체크박스 요소 선택
-            const products = $('#productTable tbody input[type="checkbox"]:checked').each(function() {
-                // 선택된 체크박스의 값을 가져와 배열에 추가
-                const productValue = $(this).val();
-                selectedCheckboxes.push(productValue.defaultValue);
+        function productBulkCollect() {
+            const selectedCheckboxes = [];
+            $('#productTable tbody input[type="checkbox"]:checked').each(function() {
+                const uid = extractNumericPart($(this).attr('id'));
+                selectedCheckboxes.push(uid);
+            });
+            selectedProducts = [];
+            // collectedProducts 와 selectedCheckboxes 를 활용해서 필터링하는 법.
+            for (let i = 0; i < selectedCheckboxes.length; i++) {
+                const tmpIndex = selectedCheckboxes[i];
+                const tmpProduct = collectedProducts.find(function(product) {
+                    return product.index == tmpIndex;
+                });
+
+                if (tmpProduct) {
+                    selectedProducts.push(tmpProduct);
+                }
+            }
+            console.log(collectedProducts);
+            console.log(selectedProducts);
+            $('#productBulkCollectWizard').modal('show');
+        }
+
+        function loadBulkDetails(products) {
+            $('.btn').prop("disabled", true);
+            $('.modal').modal("hide");
+            Swal.close();
+            let html = '<img src="' + image.src + '" class="w-75" />'
+            html += '<h2 class="swal2-title mt-5">선택된 상품들의 정보들을 수집 및 가공 중입니다.</h2>'
+            Swal.fire({
+                html: html,
+                allowOutsideClick: false,
+                showConfirmButton: false
+            });
+            $.ajax({
+                url: "/api/product/load-bulk-details",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    products: products
+                },
+                success: function(response) {
+                    $('.modal').modal("hide");
+                    Swal.close();
+                    $('.btn').prop('disabled', false);
+                    console.log(response);
+                    insertProductDB(response.return);
+                },
+                error: function(response) {
+                    Swal.close();
+                    $('.modal').modal('hide');
+                    console.log(response);
+                }
+            });
+        }
+
+        function insertProductDB(products) {
+            $('.modal').modal("hide");
+            Swal.close();
+            let html = '<img src="' + image.src + '" class="w-75" />'
+            html += '<h2 class="swal2-title mt-5">가공된 상품들을 DB에 저장 중입니다.</h2>'
+            Swal.fire({
+                html: html,
+                allowOutsideClick: false,
+                showConfirmButton: false
             });
             const productKeywords = $('#pBCDKeywords').val();
             const categoryId = $('#pBCDCategoryId').val();
-
-            console.log(products);
-
-            $('#productBulkCollectWizard').modal('show');
+            $.ajax({
+                url: "/api/product/insert-bulk-products",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    remember_token: '{{ Auth::user()->remember_token }}',
+                    products: products,
+                    keywords: productKeywords,
+                    categoryId: categoryId
+                },
+                success: function(response) {
+                    Swal.close();
+                    $('.modal').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: '진행 성공',
+                        text: response.return
+                    });
+                    console.log(response);
+                },
+                error: function(response) {
+                    Swal.close();
+                    $('.modal').modal('hide');
+                    console.log(response);
+                }
+            });
         }
+
+        function saveBulkProducts() {
+            loadBulkDetails(selectedProducts);
+        }
+
+        function scrapeProductDetail(platform, href) {
+            $.ajax({
+                url: '/api/product/load-product-detail',
+                type: 'POST',
+                dataType: "JSON",
+                data: {
+                    platform: platform,
+                    href: href
+                },
+                success: function(response) {
+                    return response;
+                },
+                error: function(response) {
+                    return {
+                        status: -1,
+                        return: '상품 정보 수집에 실패했습니다.'
+                    };
+                }
+            });
+        }
+
 
         function elementEraser() {
             // 각 입력 필드의 값을 초기화
@@ -922,6 +748,13 @@
             $('#productVendor').val('LADAM');
             $('#productImage').attr('src', ''); // 이미지 초기화
             $('#summernote').summernote('code', ''); // Summernote 초기화
+        }
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // 엔터키의 기본 동작(새 줄 삽입)을 방지
+                document.getElementById('searchBtn').click(); // 버튼 클릭 이벤트 실행
+            }
         }
     </script>
 @endsection

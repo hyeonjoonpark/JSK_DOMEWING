@@ -38,6 +38,8 @@ Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'c
 // Load product details
 Route::post('/product/load-product-detail', [ProductDetailController::class, 'index']);
 Route::post('/product/collect', [ProductCollectController::class, 'index']);
+Route::post('/product/load-bulk-details', [ProductDetailController::class, 'bulk']);
+Route::post('/product/insert-bulk-products', [ProductCollectController::class, 'bulk']);
 
 Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
 Route::post('/admin/register-domain', [DomainController::class, 'registerDomain']);

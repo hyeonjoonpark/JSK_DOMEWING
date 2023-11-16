@@ -90,4 +90,12 @@ class AdminController extends Controller
             'marginRate' => $marginRate
         ]);
     }
+
+    public function productManage(Request $request)
+    {
+        $products = DB::table('collected_products')->where('isActive', 'Y')->get();
+        return view('admin/product_manage', [
+            'products' => $products
+        ]);
+    }
 }

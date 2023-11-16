@@ -43,6 +43,43 @@ class ProductCollectController extends Controller
             return $this->getResponseData(-1, $e->getMessage());
         }
     }
+    public function bulk(Request $request)
+    {
+        $products = $request->products;
+        $categoryId = $request->categoryId;
+        $keywords = $request->keywords;
+        $userId = DB::table('users')->where('remember_token', $request->remember_token)->select('id')->first()->id;
+        $marginRate = DB::table('margin_rate')->where('userId', $userId)->select('rate')->first()->rate;
+        $marginRate = (100 + $marginRate) / 100;
+        try {
+            foreach ($products as $product) {
+                $price = ceil($product['price'] * $marginRate);
+                // $price = $product->price;
+                DB::table('collected_products')->insert([
+                    'userId' => $userId,
+                    'productName' => $product['name'],
+                    'productDetail' => $product['detail'],
+                    'categoryId' => $categoryId,
+                    'keywords' => $keywords,
+                    'taxability' => 0,
+                    'saleToMinor' => 0,
+                    'origin' => 2,
+                    'isMedicalDevice' => 0,
+                    'isMedicalFoods' => 0,
+                    'shippingPolicy' => 0,
+                    'productPrice' => $price,
+                    'productVendor' => "LADAM",
+                    'shippingCost' => "3000",
+                    'productImage' => $product['image'],
+                    'productInformationId' => 43,
+                    'productHref' => $product['href']
+                ]);
+            }
+            return $this->getResponseData(1, '상품을 성공적으로 가공한 후, 수집하였습니다!');
+        } catch (Exception $e) {
+            return $this->getResponseData(-1, $e->getMessage());
+        }
+    }
     protected function validation(Request $request)
     {
         $validator = Validator::make($request->all(), [

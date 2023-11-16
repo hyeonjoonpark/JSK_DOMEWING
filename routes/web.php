@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\CMSController;
 
 use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Domewing\GeneralController;
+use App\Http\Controllers\Domewing\DomewingLoginController;
+use App\Http\Controllers\Domewing\DomewingRegisterController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -22,6 +24,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/search', [AdminController::class, 'productSearch']);
     Route::get('product/search-to-register', [AdminController::class, 'searchToRegister']);
     Route::get('product/register', [AdminController::class, 'productRegister']);
+    Route::get('product/manage', [AdminController::class, 'productManage']);
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
     Route::get('account-setting', [AdminController::class, 'accountSetting']);
 
@@ -32,9 +35,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 });
 
 //ving kong
-Route::prefix('domewing')->group( function() {
+Route::prefix('domewing')->group(function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
+});
+
+Route::prefix('domewing/auth')->group( function() {
+    Route::get('/login', [DomewingLoginController::class, 'login']);
+    Route::get('/register', [DomewingRegisterController::class, 'register']);
 });
 
 // 로그인 및 등록 라우트

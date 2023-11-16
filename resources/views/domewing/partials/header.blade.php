@@ -4,14 +4,13 @@
     <div class="container-fluid px-4">
         <div class="nk-header-wrap pt-3 pb-1">
             <div class="btn-group">
-                <button type="button" class="btn fs-22px" style="color: var(--dark-blue)"><em
-                        class="icon fa-solid fa-globe pe-2"></em>Language</button>
-                <button type="button" class="btn btn-xl dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+                <button type="button" class="btn fs-22px dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
                     aria-expanded="false" style="color: var(--dark-blue)">
-                    <em class="icon ni ni-chevron-down "></em><span class="visually-hidden">Toggle
-                        Dropdown</span>
+                    <img class="icon-size me-1" src={{ asset('media\Asset_Nav_Language.svg') }}>
+                    Language
+                    <img class="icon-size ms-1" src={{ asset('media\Asset_Control_SmallDropdown.svg') }}>
                 </button>
-                <div class="dropdown-menu" style="">
+                <div class="dropdown-menu dropdown-menu-end">
                     <ul class="link-list-opt no-bdr">
                         <li><a href="#"><span>English</span></a></li>
                         <li><a href="#"><span>Korea</span></a></li>
@@ -58,17 +57,18 @@
         style="background-color: {{ $theme_color->color_code ?? 'var(--dark-blue)' }} !important;">
         <div class="row py-3">
             <div class="col-3 m-auto d-none d-lg-block">
-                <img class="img-fluid" style="max-width:80%;" src="{{ asset('media/Asset_Logo_Darkbg.svg') }}"
-                    alt="Logo">
+                <img class="img-fluid" src="{{ asset('media/Asset_Logo_Darkbg.svg') }}" alt="Logo">
             </div>
             <div class="col-lg-8 col-md-12">
                 <div class="form-control-wrap">
                     <div class="input-group input-group-lg">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon1"><em
-                                    class="icon fa-solid fa-magnifying-glass"></em></span>
+                            <span class="input-group-text" style="background-color: var(--white);">
+                                <img class="icon-size" src={{ asset('media\Asset_Nav_Search.svg') }}>
+                            </span>
                         </div>
-                        <input type="text" class="form-control" placeholder="Product Name" required>
+                        <input type="text" style="background-color: var(--white); border-left:none;"
+                            class="form-control" placeholder="Product Name" required>
                     </div>
                 </div>
 
@@ -122,9 +122,8 @@
                 </div>
             </div>
             <div class="col-1 d-none d-lg-block">
-                <button type="button" class="btn btn-lg"
-                    style="background-color: var(--white); color: var(--dark-blue)"><em
-                        class="icon fa-solid fa-cart-shopping fa-flip-horizontal"></em></button>
+                <button type="button" class="btn" style="background-color: var(--white);"><img
+                        class="icon-size clickable" src={{ asset('media\Asset_Nav_Cart.svg') }}></button>
             </div>
         </div>
     </div>

@@ -23,6 +23,30 @@ class ProductDetailController extends Controller
             return $this->getResponseData(-1, $e->getMessage());
         }
     }
+    public function bulk(Request $request)
+    {
+        $products = $request->products;
+        $processedProducts = [];
+        foreach ($products as $product) {
+            $vendor = DB::table('vendors')->where('name', $product['platform'])->select('name_eng')->first();
+            $href = $product['href'];
+            $script = public_path('js/details/' . $vendor->name_eng . '.js');
+            $command = "node " . escapeshellarg($script) . " " . escapeshellarg($href);
+            set_time_limit(0);
+            exec($command, $output, $returnCode);
+            $productDetail = json_decode($output[0], true);
+            $processedProduct = [
+                'name' => $product['name'],
+                'price' => $product['price'],
+                'href' => $product['href'],
+                'detail' => $productDetail['productDetail'],
+                'image' => $product['image'],
+                'platform' => $product['platform']
+            ];
+            $processedProducts[] = $processedProduct;
+        }
+        return $this->getResponseData(1, $processedProducts);
+    }
     protected function getResponseData($status, $return)
     {
         return ['status' => $status, 'return' => $return];
