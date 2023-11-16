@@ -40,9 +40,9 @@
                             </a>
                         </li>
                         <li class="nk-menu-item">
-                            <a href="/admin/product/register" class="nk-menu-link">
+                            <a href="/admin/product/manage" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-cloud-arrow-up"></em></span>
-                                <span class="nk-menu-text">상품 업로드</span>
+                                <span class="nk-menu-text">상품 데이터 관리</span>
                             </a>
                         </li>
                         <li class="nk-menu-item">

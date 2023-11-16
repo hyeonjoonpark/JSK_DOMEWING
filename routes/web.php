@@ -22,6 +22,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/search', [AdminController::class, 'productSearch']);
     Route::get('product/search-to-register', [AdminController::class, 'searchToRegister']);
     Route::get('product/register', [AdminController::class, 'productRegister']);
+    Route::get('product/manage', [AdminController::class, 'productManage']);
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
     Route::get('account-setting', [AdminController::class, 'accountSetting']);
 
@@ -32,7 +33,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 });
 
 //ving kong
-Route::prefix('domewing')->group( function() {
+Route::prefix('domewing')->group(function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
 });
