@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AccountSettingController;
 use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DomainController;
+use App\Http\Controllers\Admin\FormController;
 use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Admin\ProductCollectController;
 use App\Http\Controllers\Admin\ProductDetailController;
@@ -33,6 +34,7 @@ Route::post('/delete-post', [DashboardController::class, 'deletePost']);
 Route::post('/product/search', [ProductSearchController::class, 'productSearch']);
 Route::post('/product/category', [ProductRegisterController::class, 'categorySearch']);
 Route::post('/product/register', [ProductRegisterController::class, 'handle']);
+Route::post('/product/upload', [FormController::class, 'index']);
 // account-setting
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 // Load product details

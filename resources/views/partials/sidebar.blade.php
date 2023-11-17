@@ -39,12 +39,22 @@
                                 <span class="nk-menu-text">신규 상품 생성</span>
                             </a>
                         </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/product/manage" class="nk-menu-link">
+                        <li class="nk-menu-item has-sub">
+                            <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-cloud-arrow-up"></em></span>
-                                <span class="nk-menu-text">상품 데이터 관리</span>
+                                <span class="nk-menu-text">상품 데이터 센터</span>
                             </a>
-                        </li>
+                            <ul class="nk-menu-sub">
+                                <li class="nk-menu-item">
+                                    <a href="/admin/product/manage" class="nk-menu-link"><span class="nk-menu-text">수집된
+                                            상품 데이터</span></a>
+                                </li>
+                                <li class="nk-menu-item">
+                                    <a href="/admin/product/uploaded" class="nk-menu-link"><span
+                                            class="nk-menu-text">업로드된 상품 데이터</span></a>
+                                </li>
+                            </ul><!-- .nk-menu-sub -->
+                        </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item">
                             <a href="/admin/cms_dashboard" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
