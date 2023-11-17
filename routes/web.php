@@ -45,10 +45,12 @@ Route::prefix('domewing')->group(function () {
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
 });
 
-Route::prefix('domewing/auth')->group(function () {
-    Route::get('/login', [DomewingLoginController::class, 'login']);
-    Route::get('/register', [DomewingRegisterController::class, 'register']);
+Route::prefix('domewing/auth')->group( function() {
+    Route::get('/login', [DomewingLoginController::class, 'showLoginForm']);
+    Route::get('/register', [DomewingRegisterController::class, 'showRegisterForm']);
     Route::post('login', [DomewingLoginController::class, 'login']);
+    Route::get('logout', [DomewingLoginController::class, 'logout']);
+    Route::post('register', [DomewingRegisterController::class, 'register']);
 });
 
 // 로그인 및 등록 라우트

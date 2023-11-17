@@ -36,16 +36,24 @@
                                 <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
                                     href="#">Help</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                    href="#">Sign
-                                    Up</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                    href="/domewing/auth/login">Log
-                                    in</a>
-                            </li>
+
+
+                            @if (Auth::guard('member')->check())
+                                <li class="nav-item">
+                                    <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                        href="/domewing/auth/logout">Logout</a>
+                                </li>
+                            @else
+                                <li class="nav-item">
+                                    <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                        href="/domewing/auth/register">Sign
+                                        Up</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                        href="/domewing/auth/login">Login</a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 </div>

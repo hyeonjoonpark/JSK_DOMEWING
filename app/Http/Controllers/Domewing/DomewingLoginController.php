@@ -36,7 +36,7 @@ class DomewingLoginController extends Controller
 
     public function logout()
     {
-        Auth::logout();
+        Auth::guard('member')->logout();
         return redirect()->to('/domewing/auth/login');
     }
 }
