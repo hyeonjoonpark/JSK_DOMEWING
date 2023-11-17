@@ -16,10 +16,13 @@ class FormController extends Controller
 {
     public function index(Request $request)
     {
-        $collectedProducts = DB::table('collected_products')
-            ->leftJoin('uploaded_products', 'uploaded_products.productId', '=', 'collected_products.id')
-            ->whereNull('uploaded_products.productId')
-            ->get();
+        $collectedProducts = DB::select("
+            SELECT cp.*
+            FROM collected_products cp
+            LEFT JOIN uploaded_products up ON up.productId = cp.id
+            WHERE up.productId IS NULL
+            AND (cp.id=3 OR cp.id=4)
+        ");
         $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
         $data = $this->ownerclan($collectedProducts, $userId);
         return $data;
@@ -598,30 +601,79 @@ class FormController extends Controller
             $rowIndex = 4;
             foreach ($products as $product) {
                 $categoryId = $product->categoryId;
-                $ownerclanCategoryCode = DB::table('category')->where('id', $categoryId)->value('code');
+                $ownerclanCategoryCode = DB::table('category')->where('id', $categoryId)->select('code')->first()->code;
+                $imageUploadController = new ImageUploadController();
+                $productImage = $product->productImage;
+                $resziedImage = $imageUploadController->resizeImage($productImage, 1000, 1000);
+                $imgurUrl = $imageUploadController->uploadToImgur($resziedImage)['return'];
                 $data = [
                     '',
                     $ownerclanCategoryCode,
-                    // 다른 데이터 필드 추가
+                    '',
+                    '',
+                    '',
+                    $product->productName,
+                    $product->productName,
+                    $product->keywords,
+                    '기타',
+                    $product->productVendor,
+                    '',
+                    $product->productPrice,
+                    '자율',
+                    '',
+                    '과세',
+                    '',
+                    '',
+                    '',
+                    'N',
+                    $imgurUrl,
+                    '',
+                    $product->productDetail,
+                    '가능',
+                    '선불',
+                    $product->shippingCost,
+                    $product->shippingCost,
+                    '',
+                    '',
+                    '',
+                    1,
+                    0,
+                    '',
+                    35,
+                    '상품 상세설명 참조
+                    상품 상세설명 참조
+                    상품 상세설명 참조
+                    상품 상세설명 참조
+                    상품 상세설명 참조
+                    상품 상세설명 참조
+                    상품 상세정보에 별도 표기
+                    상품 상세정보에 별도 표기
+                    상품 상세정보에 별도 표기
+                    상품 상세정보에 별도 표기',
+                    0,
+                    '',
+                    '',
+                    '',
+                    '',
+                    ''
                 ];
-
                 // 엑셀에 데이터 추가
                 $colIndex = 1;
                 foreach ($data as $value) {
                     $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex, $value);
                     $colIndex++;
                 }
-
                 $rowIndex++;
             }
-
             // 엑셀 파일 저장
-            $username = DB::table('users')->where('id', $userId)->value('username');
+            $username = DB::table('users')
+                ->join('accounts', 'accounts.user_id', '=', 'users.id')
+                ->where('vendor_id', 5)
+                ->value('accounts.username');
             $fileName = 'ownerclan_' . $username . '_' . now()->format('YmdHis') . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
-
             // 응답 데이터 반환
             return [
                 'status' => 1,
