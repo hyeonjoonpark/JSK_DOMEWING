@@ -24,10 +24,16 @@ class MembersAuth
         $response->header('Pragma', 'no-cache');
         $response->header('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
 
-        // 사용자가 인증되어 있지 않거나 비활성 상태인 경우 로그아웃 후 로그인 페이지로 리디렉션
-        if (!Auth::check() || Auth::user()->is_active !== 'ACTIVE') {
-            Auth::logout();
-            return redirect()->route('auth.login');
+        if (!Auth::guard('member')->check()) {
+            // If user is not authenticated, logout and redirect to login
+            Auth::guard('member')->logout();
+            return redirect()->route('domewing.auth.login')->withErrors(['email' => 'You Must Login To Access'])->withInput();
+        } else {
+            $user = Auth::guard('member')->user();
+            if ($user && $user->is_active === 'PENDING') {
+                // Handle PENDING state, redirect to a verification page or show a message
+                return redirect()->route('domewing.auth.login')->withErrors(['email' => 'Email Not Verified'])->withInput();
+            }
         }
 
         return $response;

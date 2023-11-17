@@ -26,8 +26,21 @@ class DomewingLoginController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::guard('member')->attempt($credentials)) {
-            // Authentication successful
-            return redirect()->to('/domewing');
+            $user = Auth::guard('member')->user();
+
+            if ($user && $user->is_active === 'ACTIVE') {
+                // Authentication successful and user is active
+                return redirect()->to('domewing');
+            } elseif ($user && $user->is_active === 'PENDING') {
+                // Handle PENDING state, redirect to a verification page or show a message
+                // For example:
+                Auth::guard('member')->logout();
+                return back()->withErrors(['email' => 'Email Not Verified'])->withInput();
+            } else {
+                // Handle other cases like INACTIVE or unexpected states
+                Auth::guard('member')->logout();
+                return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
+            }
         } else {
             // Authentication failed
             return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
@@ -36,7 +49,7 @@ class DomewingLoginController extends Controller
 
     public function logout()
     {
-        Auth::logout();
+        Auth::guard('member')->logout();
         return redirect()->to('/domewing/auth/login');
     }
 }

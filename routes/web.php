@@ -36,7 +36,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 });
 
 Route::middleware('auth.members')->prefix('domewing')->group(function () {
-
+    Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
 });
 
 //ving kong
@@ -45,10 +45,12 @@ Route::prefix('domewing')->group(function () {
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
 });
 
-Route::prefix('domewing/auth')->group(function () {
-    Route::get('/login', [DomewingLoginController::class, 'login']);
-    Route::get('/register', [DomewingRegisterController::class, 'register']);
+Route::prefix('domewing/auth')->group( function() {
+    Route::get('/login', [DomewingLoginController::class, 'showLoginForm'])->name('domewing.auth.login');
+    Route::get('/register', [DomewingRegisterController::class, 'showRegisterForm']);
     Route::post('login', [DomewingLoginController::class, 'login']);
+    Route::get('logout', [DomewingLoginController::class, 'logout']);
+    Route::post('register', [DomewingRegisterController::class, 'register']);
 });
 
 // 로그인 및 등록 라우트
