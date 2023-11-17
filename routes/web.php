@@ -35,8 +35,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 });
 
-Route::middle(['auth.members'])->prefix('domewing')->group(function () {
-    Route::get('/account-setting', []);
+Route::middleware('auth.members')->prefix('domewing')->group(function () {
+
 });
 
 //ving kong
