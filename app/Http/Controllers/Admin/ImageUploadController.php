@@ -54,6 +54,9 @@ class ImageUploadController extends Controller
         // 응답 처리
         if ($response['success'] === true && isset($response['data']['link'])) {
             $imageLink = $response['data']['link'];
+            if ($imageLink == 0) {
+                $this->uploadToImgur($imageData);
+            }
             return $this->getResponseData(1, $imageLink);
         } else {
             return $this->getResponseData(-1, $response['success']);

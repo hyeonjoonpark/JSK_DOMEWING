@@ -21,7 +21,7 @@ class FormController extends Controller
             FROM collected_products cp
             LEFT JOIN uploaded_products up ON up.productId = cp.id
             WHERE up.productId IS NULL
-            AND (cp.id=3 OR cp.id=4)
+            AND (cp.id=35 OR cp.id=59)
         ");
         $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
         $data = $this->ownerclan($collectedProducts, $userId);
