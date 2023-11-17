@@ -13,8 +13,8 @@ use App\Http\Controllers\Admin\CMSController;
 
 use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Domewing\GeneralController;
-use App\Http\Controllers\Domewing\DomewingLoginController;
-use App\Http\Controllers\Domewing\DomewingRegisterController;
+use App\Http\Controllers\Domewing\Auth\LoginMemberController;
+use App\Http\Controllers\Domewing\Auth\RegisterMemberController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -46,11 +46,11 @@ Route::prefix('domewing')->group(function () {
 });
 
 Route::prefix('domewing/auth')->group( function() {
-    Route::get('/login', [DomewingLoginController::class, 'showLoginForm'])->name('domewing.auth.login');
-    Route::get('/register', [DomewingRegisterController::class, 'showRegisterForm']);
-    Route::post('login', [DomewingLoginController::class, 'login']);
-    Route::get('logout', [DomewingLoginController::class, 'logout']);
-    Route::post('register', [DomewingRegisterController::class, 'register']);
+    Route::get('/login', [LoginMemberController::class, 'showLoginForm'])->name('domewing.auth.login');
+    Route::get('/register', [RegisterMemberController::class, 'showRegisterForm']);
+    Route::post('login', [LoginMemberController::class, 'login']);
+    Route::get('logout', [LoginMemberController::class, 'logout']);
+    Route::post('register', [RegisterMemberController::class, 'register']);
 });
 
 // 로그인 및 등록 라우트

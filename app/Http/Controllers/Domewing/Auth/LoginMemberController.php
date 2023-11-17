@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Domewing;
+namespace App\Http\Controllers\Domewing\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\ValidationException;
 
-class DomewingLoginController extends Controller
+class LoginMemberController extends Controller
 {
     public function showLoginForm(Request $request){
         return view('domewing.auth.login');
@@ -33,7 +33,6 @@ class DomewingLoginController extends Controller
                 return redirect()->to('domewing');
             } elseif ($user && $user->is_active === 'PENDING') {
                 // Handle PENDING state, redirect to a verification page or show a message
-                // For example:
                 Auth::guard('member')->logout();
                 return back()->withErrors(['email' => 'Email Not Verified'])->withInput();
             } else {
