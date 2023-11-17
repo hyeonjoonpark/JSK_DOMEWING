@@ -43,7 +43,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                    href="#">Log
+                                    href="/domewing/auth/login">Log
                                     in</a>
                             </li>
                         </ul>
