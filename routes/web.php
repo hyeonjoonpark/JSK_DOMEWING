@@ -36,7 +36,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 });
 
 Route::middleware('auth.members')->prefix('domewing')->group(function () {
-
+    Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
 });
 
 //ving kong
@@ -46,7 +46,7 @@ Route::prefix('domewing')->group(function () {
 });
 
 Route::prefix('domewing/auth')->group( function() {
-    Route::get('/login', [DomewingLoginController::class, 'showLoginForm']);
+    Route::get('/login', [DomewingLoginController::class, 'showLoginForm'])->name('domewing.auth.login');
     Route::get('/register', [DomewingRegisterController::class, 'showRegisterForm']);
     Route::post('login', [DomewingLoginController::class, 'login']);
     Route::get('logout', [DomewingLoginController::class, 'logout']);

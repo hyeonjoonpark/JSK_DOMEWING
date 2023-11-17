@@ -24,7 +24,7 @@
                     </div>
                     <div class="col-12 py-1">
                         <div class="form-group">
-                            <label class="form-label" style="color:var(--light-blue);" for="passwordInput">Password</label>
+                            <label class="form-label" style="color:var(--light-blue);" for="password">Password</label>
                             <div class="form-control-wrap">
                                 <div class="form-icon form-icon-right my-auto mx-2" style="height: 45px;">
                                     <a onclick="togglePasswordVisibility()" id="show_hide_password">
@@ -57,7 +57,7 @@
 @section('scripts')
     <script>
         function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('passwordInput');
+            const passwordInput = document.getElementById('password');
             const showHidePasswordIcon = document.getElementById('show_hide_password').querySelector('img');
 
             if (passwordInput.type === 'password') {
