@@ -54,7 +54,7 @@ class ImageUploadController extends Controller
         // 응답 처리
         if ($response['success'] === true && isset($response['data']['link'])) {
             $imageLink = $response['data']['link'];
-            if ($imageLink == 0) {
+            if ($imageLink == 0 || $imageLink == '') {
                 $this->uploadToImgur($imageData);
             }
             return $this->getResponseData(1, $imageLink);
@@ -62,37 +62,36 @@ class ImageUploadController extends Controller
             return $this->getResponseData(-1, $response['success']);
         }
     }
-    function resizeImage($imagePath, $newWidth, $newHeight)
+    function downloadImage($url)
     {
-        // 이미지 확장자 가져오기
-        $imageExtension = pathinfo($imagePath, PATHINFO_EXTENSION);
+        $tempPath = tempnam(sys_get_temp_dir(), 'img');
+        file_put_contents($tempPath, file_get_contents($url));
+        return $tempPath;
+    }
+    function resizeImage($imageFullPath, $newWidth, $newHeight)
+    {
+        $tempImage = $this->downloadImage($imageFullPath);
+        $imageExtension = pathinfo($tempImage, PATHINFO_EXTENSION);
 
-        // 원본 이미지를 불러옵니다.
         switch ($imageExtension) {
             case 'jpg':
             case 'jpeg':
-                $sourceImage = imagecreatefromjpeg($imagePath);
+                $sourceImage = imagecreatefromjpeg($tempImage);
                 break;
             case 'png':
-                $sourceImage = imagecreatefrompng($imagePath);
+                $sourceImage = imagecreatefrompng($tempImage);
                 break;
             case 'gif':
-                $sourceImage = imagecreatefromgif($imagePath);
+                $sourceImage = imagecreatefromgif($tempImage);
                 break;
-            // 다른 이미지 확장자를 처리할 수 있도록 필요한 경우 추가합니다.
             default:
-                // 지원하지 않는 이미지 형식인 경우 처리
-                return null;
+                return false;
         }
 
-        // 새로운 크기로 이미지를 조정합니다.
         $destinationImage = imagecreatetruecolor($newWidth, $newHeight);
         imagecopyresampled($destinationImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, imagesx($sourceImage), imagesy($sourceImage));
-
-        // 메모리에서 이미지를 제거합니다.
         imagedestroy($sourceImage);
 
-        // 이미지 데이터를 반환합니다.
         ob_start();
         switch ($imageExtension) {
             case 'jpg':
@@ -105,21 +104,12 @@ class ImageUploadController extends Controller
             case 'gif':
                 imagegif($destinationImage);
                 break;
-            // 다른 이미지 확장자를 처리할 수 있도록 필요한 경우 추가합니다.
         }
         $imageData = ob_get_clean();
         imagedestroy($destinationImage);
+        unlink($tempImage);
 
-
-        $this->saveImageToFile($imageData, public_path('images\product'));
-    }
-    function saveImageToFile($imageData, $filePath)
-    {
-        // 파일에 이미지 데이터를 쓴다.
-        $result = file_put_contents($filePath, $imageData);
-
-        // 파일 쓰기 성공 여부를 반환한다.
-        return $result !== false;
+        return $imageData;
     }
     // 응답 데이터 생성
     protected function getResponseData($status, $return)

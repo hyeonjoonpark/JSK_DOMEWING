@@ -21,7 +21,7 @@ class FormController extends Controller
             FROM collected_products cp
             LEFT JOIN uploaded_products up ON up.productId = cp.id
             WHERE up.productId IS NULL
-            AND (cp.id=35 OR cp.id=59)
+            AND cp.id=70;
         ");
         $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
         $data = $this->ownerclan($collectedProducts, $userId);
@@ -612,8 +612,8 @@ class FormController extends Controller
                     '',
                     '',
                     '',
-                    $product->productName,
-                    $product->productName,
+                    $this->editProductName($product->productName),
+                    $this->editProductName($product->productName),
                     $product->keywords,
                     '기타',
                     $product->productVendor,
@@ -685,5 +685,30 @@ class FormController extends Controller
                 'return' => $e->getMessage(),
             ];
         }
+    }
+
+    function editProductName($productName)
+    {
+        $byteLimit = 50;
+        $byteCount = 0;
+        $editedName = '';
+
+        for ($i = 0; $i < mb_strlen($productName, 'UTF-8') && $byteCount < $byteLimit; $i++) {
+            $char = mb_substr($productName, $i, 1, 'UTF-8');
+
+            // 한글인 경우 2바이트로 계산
+            if (preg_match('/[\x{AC00}-\x{D7AF}]/u', $char)) {
+                $byteCount += 2;
+            } else {
+                // 그 외 문자는 1바이트로 계산
+                $byteCount += 1;
+            }
+
+            if ($byteCount <= $byteLimit) {
+                $editedName .= $char;
+            }
+        }
+
+        return $editedName;
     }
 }
