@@ -21,7 +21,7 @@ class FormController extends Controller
             FROM collected_products cp
             LEFT JOIN uploaded_products up ON up.productId = cp.id
             WHERE up.productId IS NULL
-            AND cp.id=70;
+            AND cp.id=71;
         ");
         $pIC = new ProductImageController();
         foreach ($collectedProducts as $collectedProduct) {
