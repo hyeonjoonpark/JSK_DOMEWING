@@ -23,6 +23,10 @@ class FormController extends Controller
             WHERE up.productId IS NULL
             AND cp.id=70;
         ");
+        $pIC = new ProductImageController();
+        foreach ($collectedProducts as $collectedProduct) {
+            $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
+        }
         $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
         $data = $this->ownerclan($collectedProducts, $userId);
         return $data;
@@ -596,16 +600,11 @@ class FormController extends Controller
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/ownerclan.xlsx'));
             $sheet = $spreadsheet->getSheet(0);
-
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
                 $categoryId = $product->categoryId;
                 $ownerclanCategoryCode = DB::table('category')->where('id', $categoryId)->select('code')->first()->code;
-                $imageUploadController = new ImageUploadController();
-                $productImage = $product->productImage;
-                $resziedImage = $imageUploadController->resizeImage($productImage, 1000, 1000);
-                $imgurUrl = $imageUploadController->uploadToImgur($resziedImage)['return'];
                 $data = [
                     '',
                     $ownerclanCategoryCode,
@@ -626,7 +625,7 @@ class FormController extends Controller
                     '',
                     '',
                     'N',
-                    $imgurUrl,
+                    $product->newImageHref,
                     '',
                     $product->productDetail,
                     '가능',
