@@ -26,6 +26,12 @@ class FormController extends Controller
         set_time_limit(0);
         foreach ($collectedProducts as $collectedProduct) {
             $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
+            if ($collectedProduct->newImageHref == false) {
+                DB::table('collected_products')->where('id', $collectedProduct->id)->update([
+                    'isActive' => 'N'
+                ]);
+            }
+            $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
         }
         $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
         $data = $this->ownerclan($collectedProducts, $userId);
