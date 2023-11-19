@@ -16,16 +16,30 @@ class FormController extends Controller
 {
     public function index(Request $request)
     {
+        DB::statement("UPDATE collected_products
+            SET isActive = 'N'
+            WHERE productName IN (
+                SELECT productName
+                FROM (
+                    SELECT productName
+                    FROM collected_products
+                    GROUP BY productName
+                    HAVING COUNT(*) > 1
+                ) AS subquery
+            )
+            OR productHref IN (
+                SELECT productHref
+                FROM (
+                    SELECT productHref
+                    FROM collected_products
+                    GROUP BY productHref
+                    HAVING COUNT(*) > 1
+                ) AS subquery);");
         $collectedProducts = DB::select("SELECT cp.*
         FROM collected_products cp
         LEFT JOIN uploaded_products up ON up.productId = cp.id
         WHERE up.productId IS NULL
-        AND cp.isActive = 'Y'
-        AND cp.id IN (
-            SELECT MIN(cp2.id)
-            FROM collected_products cp2
-            GROUP BY cp2.productHref, cp2.productName
-            HAVING COUNT(cp2.id) = 1);");
+        AND cp.isActive = 'Y';");
         $pIC = new ProductImageController();
         set_time_limit(0);
         $processedProducts = [];
@@ -50,115 +64,125 @@ class FormController extends Controller
             }
         }
         $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
-        $data = $this->ownerclan($processedProducts, $userId);
-        $data = $this->domesin($processedProducts, $userId);
+        $data = $this->domeggook($processedProducts, $userId);
         return $data;
     }
-    public function domeggook(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
+    public function domeggook($products, $userId)
     {
         try {
-            // 카테고리 코드 변환을 위한 컨트롤러 생성
-            $categoryMappingController = new CategoryMappingController();
-            $categoryCode = $categoryMappingController->domeggookCategoryCode($categoryCode);
-
-            // 엑셀 파일 불러오기
-            $spreadsheet = IOFactory::load(public_path('assets/excel/domeggook.xls'));
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/ownerclan.xlsx'));
             $sheet = $spreadsheet->getSheet(0);
+            // 데이터 추가
+            $rowIndex = 4;
+            foreach ($products as $product) {
+                $categoryId = $product->categoryId;
+                $categoryMappingController = new CategoryMappingController();
+                $categoryCode = $categoryMappingController->domeggookCategoryCode($categoryId);
+                $data = [
+                    '',
+                    '도매꾹,도매매',
+                    '직접판매',
+                    'N',
+                    $product->newProductName,
+                    $product->keywords,
+                    $categoryCode,
+                    '상세정보별도표기',
+                    '',
+                    $product->productVendor,
+                    'N',
+                    'N',
+                    '',
+                    '',
+                    '',
+                    $product->newImageHref,
+                    $product->productDetail,
+                    '',
+                    '',
+                    '',
+                    'N',
+                    '',
+                    40,
+                    '전체상세정보별도표시',
+                    '전체상세정보별도표시',
+                    'N',
+                    '1:' . $product->productPrice,
+                    '',
+                    'N',
+                    'N',
+                    '1:' . $product->productPrice,
+                    '',
+                    '',
+                    'N',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '99999',
+                    '과세',
+                    '',
+                    '택배',
+                    'Y',
+                    '',
+                    0,
+                    '선결제:고정배송비',
+                    $product->shippingCost,
+                    '선결제:고정배송비',
+                    $product->shippingCost,
+                    '',
 
-            if ($request->shipping == '선불') {
-                $shipPolicy = '선결제';
+
+                    '',
+                    '',
+                    '',
+                    $product->newProductName,
+                    $product->newProductName,
+                    $product->keywords,
+                    '기타',
+                    $product->productVendor,
+                    '',
+                    $product->productPrice,
+                    '자율',
+                    '',
+                    '과세',
+                    '',
+                    '',
+                    '',
+                    'N',
+                    'SA0058243',
+                    $product->productPrice,
+                    'N',
+                    365,
+                    'Y'
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
             }
-            if ($request->shipping == '무료') {
-                $shipPolicy = '구매자선택';
-            }
-
-            $saleToMinor = ($request->saleToMinor == '가능') ? 'N' : 'Y';
-
-            $productInformationCode = DB::table('product_information')->where('domesin_value', $request->product_information)->select('domeggook_value')->first()->domeggok_value;
-            $price = $request->price;
-            $minQuantity = (5000 / $price) + 1;
-            // 제품 데이터 배열 생성
-            $dataset = [
-                'productCode' => '',
-                'saleChannel' => '도매꾹, 도매매',
-                'saleType' => '직접판매',
-                'isClassified' => 'N',
-                'productName' => $request->itemName,
-                'keywords' => $request->keywords,
-                'categoryCode' => $categoryCode,
-                'originated' => $request->origin,
-                'model' => $request->model,
-                'vendor' => $request->vendor,
-                'safetyCertification' => 'N',
-                'saleToMinor' => $saleToMinor,
-                'volume' => '',
-                'weight' => '',
-                'supplierProductCode' => '',
-                'productImage' => $productImage,
-                'productDetail00' => $descImage,
-                'productDetail01' => '',
-                'productDetail02' => '',
-                'productDetail03' => '',
-                'detailUsePermitted' => 'Y',
-                'additionalText' => '',
-                'productInformationCode' => $productInformationCode,
-                'productInformationDetail' => '전체상세정보별도표시',
-                'tradeInformation' => '전체상세정보별도표시',
-                'domeggookSaleType' => 'Y',
-                'domeggookPrice' => $minQuantity . ':' . $price,
-                'maxQuantity' => '',
-                'multipleSale' => 'N',
-                'nego' => 'N',
-                'domemePrice' => '1:' . $price,
-                'minPrice' => $request->price,
-                'recomendPrice' => $request->price,
-                'option' => 'N',
-                'optionAdd' => '',
-                'optionanother' => "N",
-                'optionValue' => '',
-                'optionPrice' => '',
-                'optionPrice2' => '',
-                'stockInitialPrice' => '',
-                'stock' => '500',
-                'taxabilitiy' => $request->taxability,
-                'salerPoint' => '0',
-                'deliveryMethod' => '택배',
-                'internationalShipping' => 'N',
-                'immigration' => '',
-                'shipDuration' => '0',
-                'shipPolicy' => $shipPolicy . ':고정배송비',
-                'shipCost' => $request->shipCost,
-                'domemeShipCost' => $request->shipCost,
-                'bundleShipping' => '',
-                'refundAddress' => 'SA0058243',
-                'refundCost' => $request->shipCost,
-                'openDays' => '365',
-                'isDisplay' => 'Y',
-            ];
-
-            // 제품 정보를 엑셀에 추가
-            $newRow = 2;
-            $col = 'A';
-            foreach ($dataset as $value) {
-                $sheet->setCellValue($col . $newRow, $value);
-                $col++;
-            }
-
-            // 엑셀 파일 업로드
-            $writer = new Xlsx($spreadsheet);
-            $fileName = 'domeggook_' . $username . '_' . date('YmdHis') . '.xlsx';
+            // 엑셀 파일 저장
+            $username = DB::table('users')
+                ->join('accounts', 'accounts.user_id', '=', 'users.id')
+                ->where('vendor_id', 5)
+                ->value('accounts.username');
+            $fileName = 'domeggook_' . $username . '_' . now()->format('YmdHis') . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
-
-            // 결과 반환
-            $data['status'] = 1;
-            $data['return'] = $fileName;
-            return $data;
+            // 응답 데이터 반환
+            return [
+                'status' => 1,
+                'return' => $fileName,
+            ];
         } catch (Exception $e) {
-            // 오류가 발생한 경우 처리
-            $data['status'] = -1;
-            $data['return'] = $e->getMessage();
-            return $data;
+            return [
+                'status' => -1,
+                'return' => $e->getMessage(),
+            ];
         }
     }
     public function domero(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
