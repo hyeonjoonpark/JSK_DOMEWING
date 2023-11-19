@@ -18,8 +18,9 @@ class CategoryMappingController extends Controller
         $keywords = array_reverse($keywords);
         foreach ($keywords as $keyword) {
             $keyword = trim($keyword);
-            $code = DB::table('domeggook_category')->where('category', 'LIKE', '%' . $keyword . '%')->first()->code;
+            $code = DB::table('domeggook_category')->where('category', 'LIKE', '%' . $keyword . '%')->first();
             if ($code !== "") {
+                $code = $code->code;
                 break;
             }
         }
