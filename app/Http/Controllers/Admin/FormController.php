@@ -71,7 +71,7 @@ class FormController extends Controller
     {
         try {
             // 엑셀 파일 로드
-            $spreadsheet = IOFactory::load(public_path('assets/excel/ownerclan.xlsx'));
+            $spreadsheet = IOFactory::load(public_path('assets/excel/domeggook.xls'));
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
             $rowIndex = 4;
@@ -169,9 +169,9 @@ class FormController extends Controller
                 ->join('accounts', 'accounts.user_id', '=', 'users.id')
                 ->where('vendor_id', 5)
                 ->value('accounts.username');
-            $fileName = 'domeggook_' . $username . '_' . now()->format('YmdHis') . '.xlsx';
+            $fileName = 'domeggook_' . $username . '_' . now()->format('YmdHis') . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
-            $writer = new Xlsx($spreadsheet);
+            $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             // 응답 데이터 반환
             return [
