@@ -9,9 +9,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CategoryMappingController extends Controller
 {
-    public function domeggookCategoryCode($code)
+    public function domeggookCategoryCode($categoryId)
     {
-        $categoryString = DB::table('category')->where('code', $code)->select('wholeCategoryName')->first()->wholeCategoryName;
+        $categoryString = DB::table('category')->where('id', $categoryId)->select('wholeCategoryName')->first()->wholeCategoryName;
         $categories = explode(">", $categoryString);
         // 배열의 마지막 요소를 선택합니다.
         $keyword = trim(end($categories));
