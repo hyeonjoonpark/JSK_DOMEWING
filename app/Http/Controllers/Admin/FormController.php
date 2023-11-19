@@ -16,13 +16,16 @@ class FormController extends Controller
 {
     public function index(Request $request)
     {
-        $collectedProducts = DB::select("
-            SELECT cp.*
-            FROM collected_products cp
-            LEFT JOIN uploaded_products up ON up.productId = cp.id
-            WHERE up.productId IS NULL
-            AND cp.isActive = 'Y';
-        ");
+        $collectedProducts = DB::select("SELECT cp.*
+        FROM collected_products cp
+        LEFT JOIN uploaded_products up ON up.productId = cp.id
+        WHERE up.productId IS NULL
+        AND cp.isActive = 'Y'
+        AND cp.id IN (
+            SELECT MIN(cp2.id)
+            FROM collected_products cp2
+            GROUP BY cp2.productHref, cp2.productName
+            HAVING COUNT(cp2.id) = 1);");
         $pIC = new ProductImageController();
         set_time_limit(0);
         $processedProducts = [];
@@ -507,7 +510,7 @@ class FormController extends Controller
             $rowIndex = 4;
             foreach ($products as $product) {
                 $categoryId = $product->categoryId;
-                $categoryCode = DB::table('category')->where('id', $categoryId)->select('domesinCode')->first()->code;
+                $categoryCode = DB::table('category')->where('id', $categoryId)->select('domesinCode')->first()->domesinCode;
                 $data = [
                     '',
                     $product->newProductName,
