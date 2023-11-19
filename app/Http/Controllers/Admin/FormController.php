@@ -691,9 +691,25 @@ class FormController extends Controller
         $byteLimit = 50;
         $byteCount = 0;
         $editedName = '';
+        $previousCharWasSpace = false;
 
         for ($i = 0; $i < mb_strlen($productName, 'UTF-8') && $byteCount < $byteLimit; $i++) {
             $char = mb_substr($productName, $i, 1, 'UTF-8');
+
+            // 한글, 숫자, 영어, 공백만 허용
+            if (!preg_match('/[가-힣0-9a-zA-Z ]/', $char)) {
+                continue;
+            }
+
+            // 연속된 공백 방지
+            if ($char == ' ') {
+                if ($previousCharWasSpace) {
+                    continue;
+                }
+                $previousCharWasSpace = true;
+            } else {
+                $previousCharWasSpace = false;
+            }
 
             // 한글인 경우 2바이트로 계산
             if (preg_match('/[\x{AC00}-\x{D7AF}]/u', $char)) {
@@ -710,4 +726,5 @@ class FormController extends Controller
 
         return $editedName;
     }
+
 }
