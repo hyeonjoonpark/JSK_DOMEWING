@@ -16,7 +16,8 @@ class CategoryMappingController extends Controller
             ->value('wholeCategoryName');
 
         if (!$categoryString) {
-            return rand(5, 4524); // 혹은 적절한 기본값 또는 예외 처리
+            $rand = rand(1, 3565);
+            return DB::table('domeggook_category')->where('id', $rand)->first()->value('code'); // 혹은 적절한 기본값 또는 예외 처리
         }
 
         $keywords = array_reverse(explode(">", $categoryString));
@@ -32,7 +33,8 @@ class CategoryMappingController extends Controller
             }
         }
 
-        return rand(5, 4524); // 혹은 적절한 기본값
+        $rand = rand(1, 3565);
+        return DB::table('domeggook_category')->where('id', $rand)->first()->value('code'); // 혹은 적절한 기본값 또는 예외 처리
     }
 
     public function domeroCategoryCode($code)
