@@ -74,7 +74,7 @@ class FormController extends Controller
             $spreadsheet = IOFactory::load(public_path('assets/excel/domeggook.xls'));
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
-            $rowIndex = 4;
+            $rowIndex = 2;
             foreach ($products as $product) {
                 $categoryId = $product->categoryId;
                 $categoryMappingController = new CategoryMappingController();
@@ -119,6 +119,7 @@ class FormController extends Controller
                     '',
                     '',
                     '',
+                    '',
                     '99999',
                     '과세',
                     '',
@@ -131,27 +132,8 @@ class FormController extends Controller
                     '선결제:고정배송비',
                     $product->shippingCost,
                     '',
-
-
-                    '',
-                    '',
-                    '',
-                    $product->newProductName,
-                    $product->newProductName,
-                    $product->keywords,
-                    '기타',
-                    $product->productVendor,
-                    '',
-                    $product->productPrice,
-                    '자율',
-                    '',
-                    '과세',
-                    '',
-                    '',
-                    '',
-                    'N',
                     'SA0058243',
-                    $product->productPrice,
+                    $product->shippingCost,
                     'N',
                     365,
                     'Y'
