@@ -31,7 +31,8 @@ class ProductImageController extends Controller
             $image->save($savePathWithFile); // 이미지 저장
             return "https://www.sellwing.kr/images/product/" . $newImageName;
         } catch (\Exception $e) {
-            $this->index($imageUrl);
+            error_log("Error processing image: " . $e->getMessage());
+            return false;
         }
     }
 }
