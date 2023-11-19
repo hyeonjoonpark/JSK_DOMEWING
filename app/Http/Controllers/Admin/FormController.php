@@ -20,7 +20,8 @@ class FormController extends Controller
             SELECT cp.*
             FROM collected_products cp
             LEFT JOIN uploaded_products up ON up.productId = cp.id
-            WHERE up.productId IS NULL;
+            WHERE up.productId IS NULL
+            AND cp.isActive = 'Y';
         ");
         $pIC = new ProductImageController();
         set_time_limit(0);
@@ -620,8 +621,8 @@ class FormController extends Controller
                     '',
                     '',
                     '',
-                    $this->editProductName($product->productName),
-                    $this->editProductName($product->productName),
+                    $product->newProductName,
+                    $product->newProductName,
                     $product->keywords,
                     '기타',
                     $product->productVendor,
@@ -735,5 +736,6 @@ class FormController extends Controller
 
         return $editedName;
     }
+
 
 }
