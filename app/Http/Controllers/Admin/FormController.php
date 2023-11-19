@@ -521,7 +521,6 @@ class FormController extends Controller
                     $product->productVendor,
                     '',
                     '',
-                    '',
                     0,
                     0,
                     '',
