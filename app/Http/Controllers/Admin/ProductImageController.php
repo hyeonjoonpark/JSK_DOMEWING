@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
 
 class ProductImageController extends Controller
 {
@@ -18,57 +19,25 @@ class ProductImageController extends Controller
     {
         $newWidth = 1000;
         $newHeight = 1000;
-        $savePath = public_path('/images/product/');
+        $savePath = public_path('images/product/'); // 경로 수정
         $tempImage = $this->downloadImage($imageUrl);
 
-        list($originalWidth, $originalHeight) = getimagesize($tempImage);
-        $path = parse_url($imageUrl, PHP_URL_PATH);
+        try {
+            $image = Image::make($tempImage)->resize($newWidth, $newHeight);
 
-        // pathinfo() 함수를 사용하여 파일 확장자를 추출
-        $imageExtension = pathinfo($path, PATHINFO_EXTENSION);
+            $path = parse_url($imageUrl, PHP_URL_PATH);
+            $imageExtension = pathinfo($path, PATHINFO_EXTENSION);
+            $newImageName = uniqid() . '.' . $imageExtension;
+            $savePathWithFile = $savePath . $newImageName;
 
-        // Debug: Check the detected image extension
-        error_log("Image extension: " . $imageExtension);
+            $image->save($savePathWithFile); // 이미지 저장
 
-        switch ($imageExtension) {
-            case 'jpg':
-            case 'jpeg':
-                $sourceImage = imagecreatefromjpeg($tempImage);
-                break;
-            case 'png':
-                $sourceImage = imagecreatefrompng($tempImage);
-                break;
-            case 'gif':
-                $sourceImage = imagecreatefromgif($tempImage);
-                break;
-            default:
-                echo "Unsupported image format: " . $imageExtension;
-                return false;
+            unlink($tempImage); // 임시 파일 삭제
+
+            return "https://www.sellwing.kr/images/product/" . $newImageName;
+        } catch (\Exception $e) {
+            error_log("Error processing image: " . $e->getMessage());
+            return false;
         }
-
-        $destinationImage = imagecreatetruecolor($newWidth, $newHeight);
-        imagecopyresampled($destinationImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
-        imagedestroy($sourceImage);
-
-
-        $newImageName = uniqid() . '.' . $imageExtension;
-        $savePathWithFile = $savePath . $newImageName;
-
-        switch ($imageExtension) {
-            case 'jpg':
-            case 'jpeg':
-                imagejpeg($destinationImage, $savePathWithFile);
-                break;
-            case 'png':
-                imagepng($destinationImage, $savePathWithFile);
-                break;
-            case 'gif':
-                imagegif($destinationImage, $savePathWithFile);
-                break;
-        }
-
-        imagedestroy($destinationImage);
-        unlink($tempImage);
-        return "https://www.sellwing.kr/images/product/" . $newImageName;
     }
 }

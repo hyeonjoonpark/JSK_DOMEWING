@@ -23,6 +23,7 @@ class FormController extends Controller
             WHERE up.productId IS NULL;
         ");
         $pIC = new ProductImageController();
+        set_time_limit(0);
         foreach ($collectedProducts as $collectedProduct) {
             $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
         }
