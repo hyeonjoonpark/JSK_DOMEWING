@@ -77,7 +77,7 @@ class FormController extends Controller
             $rowIndex = 2;
             foreach ($products as $product) {
                 $minAmount = 5000;
-                $minQuantity = ceil($minAmount / $product->price);
+                $minQuantity = ceil($minAmount / $product->productPrice);
                 $categoryId = $product->categoryId;
                 $categoryMappingController = new CategoryMappingController();
                 $categoryCode = $categoryMappingController->domeggookCategoryCode($categoryId);
