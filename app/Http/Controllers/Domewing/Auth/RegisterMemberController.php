@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Domewing;
+namespace App\Http\Controllers\Domewing\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class DomewingRegisterController extends Controller
+class RegisterMemberController extends Controller
 {
     public function showRegisterForm(Request $request){
         return view('domewing.auth.register');

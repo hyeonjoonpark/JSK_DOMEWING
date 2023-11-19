@@ -54,7 +54,8 @@
                             <label class="form-label" style="color:var(--light-blue);" for="lname">Phone Number*</label>
                             <div class="form-control-wrap">
                                 <div class="input-group">
-                                    <input type="hidden" id="phoneCodeHidden" name="phoneCodeHidden">
+                                    <input type="hidden" id="phoneCodeHidden" name="phoneCodeHidden"
+                                        value="{{ old('phoneCode') }}">
                                     <button id="phoneCodeButton" class="input-group-text fs-18px" type="button"
                                         data-bs-toggle="dropdown" aria-expanded="false" name="phoneCode"
                                         style="border-right: none; height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)">
@@ -207,7 +208,7 @@
                 icon: 'success',
                 title: '{{ session('success') }}',
             }).then((result) => {
-                //location.reload();
+                window.location.href = 'login';
             });
         </script>
     @endif
