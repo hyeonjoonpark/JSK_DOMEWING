@@ -587,7 +587,7 @@ class FormController extends Controller
                 ->join('accounts', 'accounts.user_id', '=', 'users.id')
                 ->where('vendor_id', 6)
                 ->value('accounts.username');
-            $fileName = 'domesin_' . $username . '_' . now()->format('YmdHis') . '.xlsx';
+            $fileName = 'domesin_' . $username . '_' . now()->format('YmdHis') . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
