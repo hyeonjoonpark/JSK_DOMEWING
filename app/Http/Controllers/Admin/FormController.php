@@ -16,25 +16,24 @@ class FormController extends Controller
 {
     public function index(Request $request)
     {
-        DB::statement("UPDATE collected_products
-            SET isActive = 'N'
-            WHERE productName IN (
+        DB::statement("UPDATE collected_products AS cp
+        SET cp.isActive = 'N'
+        WHERE cp.isActive = 'Y' AND (
+            cp.productName IN (
                 SELECT productName
-                FROM (
-                    SELECT productName
-                    FROM collected_products
-                    GROUP BY productName
-                    HAVING COUNT(*) > 1
-                ) AS subquery
+                FROM collected_products
+                WHERE isActive = 'Y'
+                GROUP BY productName
+                HAVING COUNT(*) > 1
             )
-            OR productHref IN (
+            OR cp.productHref IN (
                 SELECT productHref
-                FROM (
-                    SELECT productHref
-                    FROM collected_products
-                    GROUP BY productHref
-                    HAVING COUNT(*) > 1
-                ) AS subquery);");
+                FROM collected_products
+                WHERE isActive = 'Y'
+                GROUP BY productHref
+                HAVING COUNT(*) > 1
+            )
+        );");
         $collectedProducts = DB::select("SELECT cp.*
         FROM collected_products cp
         LEFT JOIN uploaded_products up ON up.productId = cp.id
@@ -42,6 +41,7 @@ class FormController extends Controller
         AND cp.isActive = 'Y';");
         $pIC = new ProductImageController();
         set_time_limit(0);
+        ini_set('memory_limit', '256M');
         $processedProducts = [];
         foreach ($collectedProducts as $collectedProduct) {
             $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
