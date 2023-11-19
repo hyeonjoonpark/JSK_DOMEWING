@@ -30,11 +30,20 @@ class FormController extends Controller
             $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
             if ($collectedProduct->newImageHref == false) {
                 DB::table('collected_products')->where('id', $collectedProduct->id)->update([
-                    'isActive' => 'N'
+                    'isActive' => 'N',
+                    'remark' => 'Fail to load image'
                 ]);
             } else {
-                $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
-                $processedProducts[] = $collectedProduct;
+                $duplicated = DB::table('existed_product_name')->where('productName', $this->editProductName($collectedProduct->productName))->first();
+                if ($duplicated) {
+                    DB::table('collected_products')->where('id', $collectedProduct->id)->update([
+                        'isActive' => 'N',
+                        'remark' => 'Duplicated product'
+                    ]);
+                } else {
+                    $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
+                    $processedProducts[] = $collectedProduct;
+                }
             }
         }
         $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
@@ -707,7 +716,7 @@ class FormController extends Controller
             $char = mb_substr($productName, $i, 1, 'UTF-8');
 
             // 한글, 숫자, 영어, 공백만 허용
-            if (!preg_match('/[가-힣0-9a-zA-Z ]/', $char)) {
+            if (!preg_match('/[가-힣0-9a-zA-Z ]/u', $char)) {
                 continue;
             }
 
@@ -736,6 +745,4 @@ class FormController extends Controller
 
         return $editedName;
     }
-
-
 }
