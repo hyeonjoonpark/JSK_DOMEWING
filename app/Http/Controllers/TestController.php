@@ -11,15 +11,17 @@ class TestController extends Controller
 {
     public function index()
     {
-        $spreadsheet = IOFactory::load(public_path('assets/excel/unique_product_name.xlsx'));
-        $worksheet = $spreadsheet->getActiveSheet();
+        $spreadsheet = IOFactory::load(public_path('assets/excel/domeggook_codes.xlsx'));
+        $worksheet = $spreadsheet->getSheet(3);
 
         $highestRow = $worksheet->getHighestRow(); // 총 행 수
 
-        for ($row = 1; $row <= $highestRow; ++$row) {
-            $cellValue = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
-            DB::table('existed_product_name')->insert([
-                'productName' => $cellValue
+        for ($row = 2; $row <= $highestRow; ++$row) {
+            $category = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
+            $code = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
+            DB::table('domeggook_category')->insert([
+                'code' => $code,
+                'category' => $category
             ]);
         }
     }

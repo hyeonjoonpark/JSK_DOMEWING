@@ -76,6 +76,8 @@ class FormController extends Controller
             // 데이터 추가
             $rowIndex = 2;
             foreach ($products as $product) {
+                $minAmount = 5000;
+                $minQuantity = ceil($minAmount / $product->price);
                 $categoryId = $product->categoryId;
                 $categoryMappingController = new CategoryMappingController();
                 $categoryCode = $categoryMappingController->domeggookCategoryCode($categoryId);
@@ -92,21 +94,21 @@ class FormController extends Controller
                     $product->productVendor,
                     'N',
                     'N',
-                    '',
-                    '',
+                    '상세정보별도표기',
+                    '상세정보별도표기',
                     '',
                     $product->newImageHref,
                     $product->productDetail,
                     '',
                     '',
                     '',
-                    'N',
+                    'Y',
                     '',
                     40,
                     '전체상세정보별도표시',
                     '전체상세정보별도표시',
                     'N',
-                    '1:' . $product->productPrice,
+                    $minQuantity . ':' . $product->productPrice,
                     '',
                     'N',
                     'N',

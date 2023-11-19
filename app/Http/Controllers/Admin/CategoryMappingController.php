@@ -12,24 +12,15 @@ class CategoryMappingController extends Controller
     public function domeggookCategoryCode($categoryId)
     {
         $categoryString = DB::table('category')->where('id', $categoryId)->select('wholeCategoryName')->first()->wholeCategoryName;
-        $categories = explode(">", $categoryString);
+        $keywords = explode(">", $categoryString);
         // 배열의 마지막 요소를 선택합니다.
-        $keyword = trim(end($categories));
-        $spreadsheet = IOFactory::load(public_path('assets/excel/domeggook_codes.xlsx'));
-        $worksheet = $spreadsheet->getSheet(3);
-        $data = [];
-        foreach ($worksheet->getRowIterator() as $row) {
-            $cellIterator = $row->getCellIterator();
-            $rowData = [];
-            foreach ($cellIterator as $cell) {
-                $rowData[] = $cell->getValue();
-            }
-            $data[] = $rowData;
-        }
-        $code = '5';
-        foreach ($data as $row) {
-            if (in_array($keyword, $row)) {
-                $code = $row[0];
+        // $keyword = trim(end($keywords));
+        $keywords = array_reverse($keywords);
+        foreach ($keywords as $keyword) {
+            $keyword = trim($keyword);
+            $code = DB::table('domeggook_category')->where('category', 'LIKE', '%' . $keyword . '%')->first()->code;
+            if ($code !== "") {
+                break;
             }
         }
         return $code;
