@@ -11,21 +11,30 @@ class CategoryMappingController extends Controller
 {
     public function domeggookCategoryCode($categoryId)
     {
-        $categoryString = DB::table('category')->where('id', $categoryId)->select('wholeCategoryName')->first()->wholeCategoryName;
-        $keywords = explode(">", $categoryString);
-        // 배열의 마지막 요소를 선택합니다.
-        // $keyword = trim(end($keywords));
-        $keywords = array_reverse($keywords);
+        $categoryString = DB::table('category')
+            ->where('id', $categoryId)
+            ->value('wholeCategoryName');
+
+        if (!$categoryString) {
+            return rand(5, 4524); // 혹은 적절한 기본값 또는 예외 처리
+        }
+
+        $keywords = array_reverse(explode(">", $categoryString));
+
         foreach ($keywords as $keyword) {
-            $keyword = trim($keyword);
-            $code = DB::table('domeggook_category')->where('category', 'LIKE', '%' . $keyword . '%')->first();
-            if ($code !== "") {
-                $code = $code->code;
-                break;
+            $trimmedKeyword = trim($keyword);
+            $categoryCode = DB::table('domeggook_category')
+                ->where('category', 'LIKE', '%' . $trimmedKeyword . '%')
+                ->value('code');
+
+            if ($categoryCode) {
+                return $categoryCode;
             }
         }
-        return $code;
+
+        return rand(5, 4524); // 혹은 적절한 기본값
     }
+
     public function domeroCategoryCode($code)
     {
         $categoryString = DB::table('category')->where('code', $code)->select('wholeCategoryName')->first()->wholeCategoryName;
