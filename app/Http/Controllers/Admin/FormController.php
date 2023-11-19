@@ -48,6 +48,7 @@ class FormController extends Controller
         }
         $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
         $data = $this->ownerclan($processedProducts, $userId);
+        $data = $this->domesin($processedProducts, $userId);
         return $data;
     }
     public function domeggook(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
@@ -496,7 +497,7 @@ class FormController extends Controller
         }
     }
 
-    public function domesin($products)
+    public function domesin($products, $userId)
     {
         try {
             // 엑셀 파일 로드
