@@ -7,11 +7,6 @@ use Illuminate\Http\Request;
 
 class ProductImageController extends Controller
 {
-    public function index(Request $request)
-    {
-        // Your code for listing or managing images
-    }
-
     public function downloadImage($url)
     {
         $tempPath = tempnam(sys_get_temp_dir(), 'img');
@@ -19,7 +14,7 @@ class ProductImageController extends Controller
         return $tempPath;
     }
 
-    function resizeAndSaveImage($imageUrl)
+    function index($imageUrl)
     {
         $newWidth = 1000;
         $newHeight = 1000;
@@ -55,7 +50,9 @@ class ProductImageController extends Controller
         imagecopyresampled($destinationImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
         imagedestroy($sourceImage);
 
-        $savePathWithFile = $savePath . uniqid() . '.' . $imageExtension;
+
+        $newImageName = uniqid() . '.' . $imageExtension;
+        $savePathWithFile = $savePath . $newImageName;
 
         switch ($imageExtension) {
             case 'jpg':
@@ -72,11 +69,6 @@ class ProductImageController extends Controller
 
         imagedestroy($destinationImage);
         unlink($tempImage);
-        return $savePathWithFile;
+        return "https://www.sellwing.kr/images/product/" . $newImageName;
     }
 }
-
-// Example usage
-$pic = new ProductImageController();
-$imageUrl = "https://i.imgur.com/CVLdNCG.jpg"; // Replace with actual image URL
-$pic->resizeAndSaveImage($imageUrl);
