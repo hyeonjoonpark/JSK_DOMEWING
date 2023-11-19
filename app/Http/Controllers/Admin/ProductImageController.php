@@ -20,10 +20,8 @@ class ProductImageController extends Controller
         $newWidth = 1000;
         $newHeight = 1000;
         $savePath = public_path('images/product/'); // 경로 수정
-        $tempImage = $this->downloadImage($imageUrl);
-
         try {
-            $image = Image::make($tempImage)->resize($newWidth, $newHeight);
+            $image = Image::make($imageUrl)->resize($newWidth, $newHeight);
 
             $path = parse_url($imageUrl, PHP_URL_PATH);
             $imageExtension = pathinfo($path, PATHINFO_EXTENSION);
@@ -31,9 +29,6 @@ class ProductImageController extends Controller
             $savePathWithFile = $savePath . $newImageName;
 
             $image->save($savePathWithFile); // 이미지 저장
-
-            unlink($tempImage); // 임시 파일 삭제
-
             return "https://www.sellwing.kr/images/product/" . $newImageName;
         } catch (\Exception $e) {
             error_log("Error processing image: " . $e->getMessage());
