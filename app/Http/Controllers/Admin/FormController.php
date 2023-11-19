@@ -41,7 +41,7 @@ class FormController extends Controller
         AND cp.isActive = 'Y';");
         $pIC = new ProductImageController();
         set_time_limit(0);
-        ini_set('memory_limit', '256M');
+        ini_set('memory_limit', '-1');
         $processedProducts = [];
         foreach ($collectedProducts as $collectedProduct) {
             $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
