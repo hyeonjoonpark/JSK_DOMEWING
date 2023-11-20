@@ -1,139 +1,167 @@
 @extends('domewing.layouts.main')
 @section('content')
+    <style>
+        .rounded-checkbox .custom-control-input:checked~.custom-control-label::before {
+            border-radius: 50% !important;
+        }
+
+        .rounded-checkbox .custom-control-label::before {
+            border-radius: 50% !important;
+        }
+    </style>
+
     <div class="px-5" style="background: var(--thin-blue); padding-top: 30px; padding-bottom:50px;">
-        <div class="px-lg-5 px-md-0">
-            {{-- Example 1 --}}
+        <div class="px-lg-5">
+            <div class="p-4 rounded"style="background: var(--white);">
+                <div class="d-flex">
+                    <div class="p-md-2 p-sm-0 my-auto">
+                        <div class="custom-control custom-control-lg custom-checkbox rounded-checkbox">
+                            <input type="checkbox" class="custom-control-input " id="customCheck2">
+                            <label class="custom-control-label fw-bold text-break text-nowrap"
+                                style="color: var(--dark-blue);" for="customCheck2">Supplier 1</label>
+                            <a class="px-2" href="#">
+                                <img src={{ asset('media\Asset_Control_Next.svg') }} alt="Next Page" class="icon-size">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ms-auto p-md-2 p-sm-0 my-auto">
+                        <div class="d-inline-block">
+                            <a href="#">
+                                <h5 style="color: var(--dark-blue);">Edit</h5>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {{-- <div style="background: var(--white); padding: 50px; border-radius:20px;">
-                    <div class="hstack gap-3 align-items-center pb-2">
-                        <div class="form-check d-inline-block" style="padding-left:0px;">
-                            <input class="form-check-input text-xl" style="margin:0px; border-radius:50%;" type="checkbox"
-                                value="" id="supplier1">
+                <div class="hstack gap-3 align-items-center pb-2">
+                    <div class="form-check d-inline-block" style="padding-left:0px;">
+                        <input class="form-check-input text-xl" style="margin:0px; border-radius:50%;" type="checkbox"
+                            value="" id="supplier1">
 
-                        </div>
-                        <a href="#" class="d-inline-flex align-items-center">
-                            <div class="text-xl text-bold text-dark-blue" for="supplier1">Supplier 1</div>
-                            <img src="media\Asset_Control_Next.svg" alt="Next Page" class="icon-size"
-                                style="margin-left: 10px">
-                        </a>
-                        <a href="#" class="d-inline-flex align-items-center ms-auto">
-                            <div class="text-xl text-regular text-dark-blue">Edit</div>
-                        </a>
                     </div>
+                    <a href="#" class="d-inline-flex align-items-center">
+                        <div class="text-xl text-bold text-dark-blue" for="supplier1">Supplier 1</div>
+                        <img src="media\Asset_Control_Next.svg" alt="Next Page" class="icon-size" style="margin-left: 10px">
+                    </a>
+                    <a href="#" class="d-inline-flex align-items-center ms-auto">
+                        <div class="text-xl text-regular text-dark-blue">Edit</div>
+                    </a>
+                </div>
 
-                    <div style="border-bottom: 2px solid var(--cyan-blue)"></div>
+                <div style="border-bottom: 2px solid var(--cyan-blue)"></div>
 
-                    <div style="padding-top:30px"></div>
+                <div style="padding-top:30px"></div>
 
-                    <div class="hstack gap-3 align-items-start pb-3">
-                        <div class="form-check d-inline-block" style="padding-left:0px;">
-                            <input class="form-check-input text-xl" style="margin:0px; border-radius:50%;" type="checkbox"
-                                value="" id="product1">
+                <div class="hstack gap-3 align-items-start pb-3">
+                    <div class="form-check d-inline-block" style="padding-left:0px;">
+                        <input class="form-check-input text-xl" style="margin:0px; border-radius:50%;" type="checkbox"
+                            value="" id="product1">
+                    </div>
+                    <img src="https://image.invaluable.com/housePhotos/clars/88/752188/H0054-L341207066.jpg"
+                        class="shopping-cart-img" />
+                    <div>
+                        <div class="text-xl text-bold text-dark-blue pb-3 text-truncate">
+                            Product Name
                         </div>
-                        <img src="https://image.invaluable.com/housePhotos/clars/88/752188/H0054-L341207066.jpg"
-                            class="shopping-cart-img" />
-                        <div>
-                            <div class="text-xl text-bold text-dark-blue pb-3 text-truncate">
-                                Product Name
+                        <table class="table table-sm table-borderless align-middle" style="--bs-table-bg: var(--white);">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <p class="text-regular text-dark-blue text-md pe-5">Deliveries Fees</p>
+                                    </td>
+                                    <td>
+                                        <p class="text-regular text-dark-blue text-md">MYR 39.00</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="text-regular text-dark-blue text-md pe-5">Promotions Applied</p>
+                                    </td>
+                                    <td>
+                                        <p class="text-regular text-dark-blue text-md">Wholesales Discount</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="padding-top:30px"></div>
+                        <div class="d-flex">
+                            <button class="btn"
+                                style="--bs-btn-border-radius: 5px !important; background-color: var(--cyan-blue); min-width:50px;">
+                                <img src="media\Asset_Control_Minus.svg" class="icon-size">
+                            </button>
+                            <div class="text-xl px-3 text-dark-blue w-50">
+                                <input class="text-center w-100" style="border-radius:5px;" value=200 />
                             </div>
-                            <table class="table table-sm table-borderless align-middle"
-                                style="--bs-table-bg: var(--white);">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <p class="text-regular text-dark-blue text-md pe-5">Deliveries Fees</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-regular text-dark-blue text-md">MYR 39.00</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <p class="text-regular text-dark-blue text-md pe-5">Promotions Applied</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-regular text-dark-blue text-md">Wholesales Discount</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div style="padding-top:30px"></div>
-                            <div class="d-flex">
-                                <button class="btn"
-                                    style="--bs-btn-border-radius: 5px !important; background-color: var(--cyan-blue); min-width:50px;">
-                                    <img src="media\Asset_Control_Minus.svg" class="icon-size">
-                                </button>
-                                <div class="text-xl px-3 text-dark-blue w-50">
-                                    <input class="text-center w-100" style="border-radius:5px;" value=200 />
-                                </div>
-                                <button class="btn"
-                                    style="--bs-btn-border-radius: 5px !important; background-color: var(--cyan-blue); min-width:50px;">
-                                    <img src="media\Asset_Control_Add.svg" class="icon-size">
-                                </button>
-                            </div>
-                            <div class="d-flex pb-2 pt-2">
-                                <div class ="text-xl text-pink text-bold">RM 22.00 <span
-                                        class ="text-md text-regular text-pink text-decoration-line-through">RM 11.00</span>
-                                </div>
+                            <button class="btn"
+                                style="--bs-btn-border-radius: 5px !important; background-color: var(--cyan-blue); min-width:50px;">
+                                <img src="media\Asset_Control_Add.svg" class="icon-size">
+                            </button>
+                        </div>
+                        <div class="d-flex pb-2 pt-2">
+                            <div class ="text-xl text-pink text-bold">RM 22.00 <span
+                                    class ="text-md text-regular text-pink text-decoration-line-through">RM 11.00</span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="hstack gap-3 align-items-start pb-3">
-                        <div class="form-check d-inline-block" style="padding-left:0px;">
-                            <input class="form-check-input text-xl" style="margin:0px; border-radius:50%;" type="checkbox"
-                                value="" id="product2">
+                <div class="hstack gap-3 align-items-start pb-3">
+                    <div class="form-check d-inline-block" style="padding-left:0px;">
+                        <input class="form-check-input text-xl" style="margin:0px; border-radius:50%;" type="checkbox"
+                            value="" id="product2">
+                    </div>
+                    <img src="https://image.made-in-china.com/202f0j00ecNhLPGbfilF/32mm-S-Speed-Sample-Provided-Furniture-Adjustable-Office-Desk-with-Low-Price.webp"
+                        class="shopping-cart-img" />
+                    <div>
+                        <div class="text-xl text-bold text-dark-blue pb-3 text-truncate">
+                            Product Name
                         </div>
-                        <img src="https://image.made-in-china.com/202f0j00ecNhLPGbfilF/32mm-S-Speed-Sample-Provided-Furniture-Adjustable-Office-Desk-with-Low-Price.webp"
-                            class="shopping-cart-img" />
-                        <div>
-                            <div class="text-xl text-bold text-dark-blue pb-3 text-truncate">
-                                Product Name
+                        <table class="table table-sm table-borderless align-middle" style="--bs-table-bg: var(--white);">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <p class="text-regular text-dark-blue text-md pe-5">Deliveries Fees</p>
+                                    </td>
+                                    <td>
+                                        <p class="text-regular text-dark-blue text-md">MYR 39.00</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="text-regular text-dark-blue text-md pe-5">Promotions Applied</p>
+                                    </td>
+                                    <td>
+                                        <p class="text-regular text-dark-blue text-md">Wholesales Discount</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="padding-top:30px"></div>
+                        <div class="d-flex">
+                            <button class="btn"
+                                style="--bs-btn-border-radius: 5px !important; background-color: var(--cyan-blue); min-width:50px;">
+                                <img src="media\Asset_Control_Minus.svg" class="icon-size">
+                            </button>
+                            <div class="text-xl px-3 text-dark-blue w-50">
+                                <input class="text-center w-100" style="border-radius:5px;" value=200 />
                             </div>
-                            <table class="table table-sm table-borderless align-middle"
-                                style="--bs-table-bg: var(--white);">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <p class="text-regular text-dark-blue text-md pe-5">Deliveries Fees</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-regular text-dark-blue text-md">MYR 39.00</p>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <p class="text-regular text-dark-blue text-md pe-5">Promotions Applied</p>
-                                        </td>
-                                        <td>
-                                            <p class="text-regular text-dark-blue text-md">Wholesales Discount</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div style="padding-top:30px"></div>
-                            <div class="d-flex">
-                                <button class="btn"
-                                    style="--bs-btn-border-radius: 5px !important; background-color: var(--cyan-blue); min-width:50px;">
-                                    <img src="media\Asset_Control_Minus.svg" class="icon-size">
-                                </button>
-                                <div class="text-xl px-3 text-dark-blue w-50">
-                                    <input class="text-center w-100" style="border-radius:5px;" value=200 />
-                                </div>
-                                <button class="btn"
-                                    style="--bs-btn-border-radius: 5px !important; background-color: var(--cyan-blue); min-width:50px;">
-                                    <img src="media\Asset_Control_Add.svg" class="icon-size">
-                                </button>
-                            </div>
-                            <div class="d-flex pb-2 pt-2">
-                                <div class ="text-xl text-pink text-bold">RM 22.00 <span
-                                        class ="text-md text-regular text-pink text-decoration-line-through">RM 11.00</span>
-                                </div>
+                            <button class="btn"
+                                style="--bs-btn-border-radius: 5px !important; background-color: var(--cyan-blue); min-width:50px;">
+                                <img src="media\Asset_Control_Add.svg" class="icon-size">
+                            </button>
+                        </div>
+                        <div class="d-flex pb-2 pt-2">
+                            <div class ="text-xl text-pink text-bold">RM 22.00 <span
+                                    class ="text-md text-regular text-pink text-decoration-line-through">RM 11.00</span>
                             </div>
                         </div>
                     </div>
-                </div> --}}
+                </div>
+            </div> --}}
 
-            <div style="padding-bottom:50px"></div>
+            <div style="padding-bottom:50px">
+            </div>
             {{-- Example 1 End --}}
 
             {{-- Example 2 --}}

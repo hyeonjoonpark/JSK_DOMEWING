@@ -121,3 +121,13 @@
     right: 0;
     width: 100%;
 }
+
+.rounded-checkbox
+    .custom-control-input:checked
+    ~ .custom-control-label::before {
+    border-radius: 50%;
+}
+
+.rounded-checkbox .custom-control-label::before {
+    border-radius: 50%;
+}
