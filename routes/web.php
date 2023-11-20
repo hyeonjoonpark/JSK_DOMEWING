@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Domewing\GeneralController;
 use App\Http\Controllers\Domewing\Auth\LoginMemberController;
 use App\Http\Controllers\Domewing\Auth\RegisterMemberController;
+use App\Http\Controllers\Domewing\ShoppingCartController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -37,6 +38,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 Route::middleware('auth.members')->prefix('domewing')->group(function () {
     Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
+    Route::get('/shopping-cart', [ShoppingCartController::class,'showShoppingCart']);
 });
 
 //ving kong
