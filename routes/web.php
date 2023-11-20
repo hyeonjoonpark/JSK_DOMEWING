@@ -64,6 +64,6 @@ Route::prefix('auth')->group(function () {
     Route::get('logout', [LoginController::class, 'logout']);
 });
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('home');
 Route::get('/naver-shop/categories', [NaverShopController::class, 'getCategories']);
 Route::get('/test', [TestController::class, 'handle']);
