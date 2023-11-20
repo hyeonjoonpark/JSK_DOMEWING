@@ -37,7 +37,7 @@
                                     <label class="custom-control-label" for="product{{ $uploadedProduct->id }}"></label>
                                 </div>
                             </td>
-                            <td class="nk-tb-col">
+                            <td class="nk-tb-col col-4">
                                 <a href="{{ $uploadedProduct->productHref }}" target="_blank" class="user-card">
                                     <div class="user-avatar bg-dim-primary d-none d-sm-flex">
                                         <img src="{{ $uploadedProduct->productImage }}" alt="상품 대표 이미지">
@@ -49,14 +49,14 @@
                                     </div>
                                 </a>
                             </td>
-                            <td class="nk-tb-col tb-col-mb" data-order="35040.34">
+                            <td class="nk-tb-col" data-order="{{ $uploadedProduct->productPrice }}">
                                 <span class="tb-amount">{{ number_format($uploadedProduct->productPrice, 0) }} <span
                                         class="currency">원</span></span>
                             </td>
-                            <td class="nk-tb-col tb-col-md">
+                            <td class="nk-tb-col">
                                 <span>{{ $uploadedProduct->createdAt }}</span>
                             </td>
-                            <td class="nk-tb-col tb-col-lg" data-order="Email Verified - Kyc Unverified">
+                            <td class="nk-tb-col" data-order="Email Verified - Kyc Unverified">
                                 <span>{{ $uploadedProduct->updatedAt }}</span>
                             </td>
                             <td class="nk-tb-col">
