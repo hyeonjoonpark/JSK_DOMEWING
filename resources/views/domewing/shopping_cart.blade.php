@@ -10,27 +10,28 @@
         }
     </style>
 
-    <div class="px-5" style="background: var(--thin-blue); padding-top: 30px; padding-bottom:50px;">
-        <div class="px-lg-5">
+    <div class="px-lg-5 px-2" style="background: var(--thin-blue); padding-top: 30px; padding-bottom:50px;">
+        <div class="px-lg-5 px-md-2 px-0">
             <div class="p-4 rounded"style="background: var(--white);">
                 <div class="d-flex">
-                    <div class="p-md-2 p-sm-0 my-auto">
-                        <div class="custom-control custom-control-lg custom-checkbox rounded-checkbox">
+
+                    <div class="p-md-2 p-1">
+                        <div class="custom-control custom-control-md custom-checkbox rounded-checkbox ">
                             <input type="checkbox" class="custom-control-input " id="customCheck2">
-                            <label class="custom-control-label fw-bold text-break text-nowrap"
-                                style="color: var(--dark-blue);" for="customCheck2">Supplier 1</label>
+                            <label class="custom-control-label my-auto col-9" style="color: var(--dark-blue);"
+                                for="customCheck2">
+                                <p class="fw-bold text-break text-truncate ">Supplier 1 lkfnaf aflknasfa slakmf
+                                    lkasdmfa flam flksmfl afml
+                                </p>
+                            </label>
                             <a class="px-2" href="#">
-                                <img src={{ asset('media\Asset_Control_Next.svg') }} alt="Next Page" class="icon-size">
+                                <img src={{ asset('media\Asset_Control_Next.svg') }} alt="Next Page"
+                                    style="object-fit: fill; min-width:20px; min-height:20px;">
                             </a>
                         </div>
+
                     </div>
-                    <div class="ms-auto p-md-2 p-sm-0 my-auto">
-                        <div class="d-inline-block">
-                            <a href="#">
-                                <h5 style="color: var(--dark-blue);">Edit</h5>
-                            </a>
-                        </div>
-                    </div>
+
                 </div>
             </div>
             {{-- <div style="background: var(--white); padding: 50px; border-radius:20px;">
