@@ -77,7 +77,7 @@ class FormController extends Controller
             $rowIndex = 2;
             foreach ($products as $product) {
                 DB::table('uploaded_products')->insert([
-                    'productId' => $product->productId,
+                    'productId' => $product->id,
                     'userId' => $userId,
                     'newImageHref' => $product->newImageHref
                 ]);
