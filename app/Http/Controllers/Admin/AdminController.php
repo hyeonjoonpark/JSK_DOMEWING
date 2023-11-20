@@ -101,9 +101,16 @@ class AdminController extends Controller
 
     public function uploadedProducts(Request $request)
     {
-        $uploadedProducts = DB::table('uploaded_products')->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')->where([
-            'uploaded_products.isActive' => 'Y'
-        ])->get();
+        $uploadedProducts = DB::table('uploaded_products')
+            ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
+            ->where(['uploaded_products.isActive' => 'Y'])
+            ->select(
+                'uploaded_products.*',
+                'collected_products.*',
+                'uploaded_products.createdAt as uploadedCreatedAt',
+                'collected_products.createdAt as collectedCreatedAt'
+            )
+            ->get();
         return view('admin/product_uploaded', [
             'uploadedProducts' => $uploadedProducts
         ]);
