@@ -16,56 +16,76 @@ class FormController extends Controller
 {
     public function index(Request $request)
     {
-        DB::statement("UPDATE collected_products AS cp
-        SET cp.isActive = 'N'
-        WHERE cp.isActive = 'Y' AND (
-            cp.productName IN (
-                SELECT productName
-                FROM collected_products
-                WHERE isActive = 'Y'
-                GROUP BY productName
-                HAVING COUNT(*) > 1
-            )
-            OR cp.productHref IN (
-                SELECT productHref
-                FROM collected_products
-                WHERE isActive = 'Y'
-                GROUP BY productHref
-                HAVING COUNT(*) > 1
-            )
-        );");
-        $collectedProducts = DB::select("SELECT cp.*
-        FROM collected_products cp
-        LEFT JOIN uploaded_products up ON up.productId = cp.id
-        WHERE up.productId IS NULL
-        AND cp.isActive = 'Y';");
-        $pIC = new ProductImageController();
-        set_time_limit(0);
-        ini_set('memory_limit', '-1');
-        $processedProducts = [];
-        foreach ($collectedProducts as $collectedProduct) {
-            $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
-            if ($collectedProduct->newImageHref == false) {
-                DB::table('collected_products')->where('id', $collectedProduct->id)->update([
-                    'isActive' => 'N',
-                    'remark' => 'Fail to load image'
-                ]);
-            } else {
-                $duplicated = DB::table('existed_product_name')->where('productName', $this->editProductName($collectedProduct->productName))->first();
-                if ($duplicated) {
+        try {
+            DB::statement("UPDATE collected_products AS cp
+            SET cp.isActive = 'N'
+            WHERE cp.isActive = 'Y' AND (
+                cp.productName IN (
+                    SELECT productName
+                    FROM collected_products
+                    WHERE isActive = 'Y'
+                    GROUP BY productName
+                    HAVING COUNT(*) > 1
+                )
+                OR cp.productHref IN (
+                    SELECT productHref
+                    FROM collected_products
+                    WHERE isActive = 'Y'
+                    GROUP BY productHref
+                    HAVING COUNT(*) > 1
+                )
+            );");
+            $collectedProducts = DB::select("SELECT cp.*
+            FROM collected_products cp
+            LEFT JOIN uploaded_products up ON up.productId = cp.id
+            WHERE up.productId IS NULL
+            AND cp.isActive = 'Y';");
+            $pIC = new ProductImageController();
+            set_time_limit(0);
+            ini_set('memory_limit', '-1');
+            $processedProducts = [];
+            foreach ($collectedProducts as $collectedProduct) {
+                $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
+                if ($collectedProduct->newImageHref == false) {
                     DB::table('collected_products')->where('id', $collectedProduct->id)->update([
                         'isActive' => 'N',
-                        'remark' => 'Duplicated product'
+                        'remark' => 'Fail to load image'
                     ]);
                 } else {
-                    $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
-                    $processedProducts[] = $collectedProduct;
+                    $duplicated = DB::table('existed_product_name')->where('productName', $this->editProductName($collectedProduct->productName))->first();
+                    if ($duplicated) {
+                        DB::table('collected_products')->where('id', $collectedProduct->id)->update([
+                            'isActive' => 'N',
+                            'remark' => 'Duplicated product'
+                        ]);
+                    } else {
+                        $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
+                        $processedProducts[] = $collectedProduct;
+                    }
                 }
             }
+            $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
+            $activedUploadVendors = DB::select("SELECT *
+            FROM product_register pr
+            INNER JOIN vendors v
+            ON v.id=pr.vendor_id
+            WHERE pr.is_active='Y';");
+            $data['return']['successVendors'] = [];
+            foreach ($activedUploadVendors as $vendor) {
+                $vendorEngName = $vendor->name_eng;
+                $response = $this->$vendorEngName($processedProducts, $userId);
+                if ($response['status'] == 1) {
+                    $data['return']['successVendors'][] = $vendor->name;
+                }
+            }
+            $data['status'] = 1;
+            return $data;
+        } catch (Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
         }
-        $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
-        $data = $this->domeggook($processedProducts, $userId);
-        return $data;
     }
     public function domeggook($products, $userId)
     {
@@ -76,11 +96,6 @@ class FormController extends Controller
             // 데이터 추가
             $rowIndex = 2;
             foreach ($products as $product) {
-                DB::table('uploaded_products')->insert([
-                    'productId' => $product->id,
-                    'userId' => $userId,
-                    'newImageHref' => $product->newImageHref
-                ]);
                 $minAmount = 5000;
                 $minQuantity = ceil($minAmount / $product->productPrice);
                 $categoryId = $product->categoryId;
@@ -387,130 +402,231 @@ class FormController extends Controller
             return $data;
         }
     }
-    public function wholesaledepot(Request $request, $username, $password, $categoryCode, $productImage, $descImage)
+    public function wholesaledepot($products, $userId)
     {
         try {
-            // 카테고리 코드 변환을 위한 컨트롤러 생성
-            $categoryMappingController = new CategoryMappingController();
-            $categoryCode = $categoryMappingController->wsConvertCategoryCode($categoryCode);
-
-            // 엑셀 파일 불러오기
+            // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/wholesaledepot.xls'));
             $sheet = $spreadsheet->getSheet(0);
-
-            // 배송비 설정
-            if ($request->shipping == '무료') {
-                $shipCost = 0;
-            } else {
-                $shipCost = $request->shipCost;
+            // 데이터 추가
+            $rowIndex = 5;
+            foreach ($products as $product) {
+                $categoryId = $product->categoryId;
+                $categoryMappingController = new CategoryMappingController();
+                $categoryCode = $categoryMappingController->wsConvertCategoryCode($categoryId);
+                $data = [
+                    $product->newProductName,
+                    $product->newProductName,
+                    $categoryCode,
+                    '',
+                    '',
+                    '기타',
+                    $product->productVendor,
+                    $product->productVendor,
+                    1,
+                    0,
+                    '',
+                    0,
+                    $product->keywords,
+                    $product->productPrice,
+                    '',
+                    0,
+                    0,
+                    $product->productDetail,
+                    $product->newImageHref,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    0,
+                    0,
+                    '',
+                    'C',
+                    '',
+                    1597,
+                    1,
+                    '',
+                    2,
+                    0,
+                    1,
+                    'N',
+                    '',
+                    35,
+                    '',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시'
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
             }
-
-            $taxability = ($request->taxability === '과세') ? 1 : 2;
-
-            if ($request->shipping == '선불') {
-                $shipping = 0;
-            } elseif ($request->shipping == '착불') {
-                $shipping = 3;
-            } elseif ($request->shipping == '무료') {
-                $shipping = 1;
-            }
-
-            $saleToMinor = ($request->saleToMinor == '가능') ? '2' : '1';
-
-            $productInformationCode = DB::table('product_information')
-                ->where('domesin_value', $request->product_information)
-                ->select('wsd_value')
-                ->first()
-                ->wsd_value;
-
-            // 제품 데이터 배열 생성
-            $dataset = [
-                'productName' => $request->itemName,
-                'invoiceName' => $request->invoiceName,
-                'categoryCode' => $categoryCode,
-                'productCode' => '',
-                'productCode2' => '',
-                'originated' => $request->origin,
-                'vendor' => $request->vendor,
-                'brand' => $request->vendor,
-                'taxability' => $taxability,
-                'shipType' => $shipping,
-                'bundledQuantity' => '0',
-                'isInternationalShipping' => '0',
-                'keywords' => $request->keywords,
-                'productPrice' => $request->price,
-                'forcedPrice' => '',
-                'isForced' => '0',
-                'isConsumerNotified' => '0',
-                'descImage' => $descImage,
-                'productImage' => $productImage,
-                'extraImage1' => '',
-                'extraImage2' => '',
-                'extraImage3' => '',
-                'extraImage4' => '',
-                'extraImage5' => '',
-                'isExclusive' => '0',
-                'selectedOption' => '0',
-                'inputOption' => '',
-                'credentials' => 'C',
-                'credentialCode' => '',
-                'refundAddress' => '1597',
-                'isRefundable' => '1',
-                'refundReason' => '',
-                'saleToMinor' => $saleToMinor,
-                'isSale' => '0',
-                'isDisplay' => '1',
-                'isNew' => 'N',
-                'productNotice' => '',
-                'productInformationCode' => $productInformationCode,
-                'productInformation0' => '상품 상세설명에 표시',
-                'productInformation1' => '상품 상세설명에 표시',
-                'productInformation2' => '상품 상세설명에 표시',
-                'productInformation3' => '상품 상세설명에 표시',
-                'productInformation4' => '상품 상세설명에 표시',
-                'productInformation5' => '상품 상세설명에 표시',
-                'productInformation6' => '상품 상세설명에 표시',
-                'productInformation7' => '상품 상세설명에 표시',
-                'productInformation8' => '상품 상세설명에 표시',
-                'productInformation9' => '상품 상세설명에 표시',
-                'productInformation10' => '상품 상세설명에 표시',
-                'productInformation11' => '상품 상세설명에 표시',
-                'productInformation12' => '상품 상세설명에 표시',
-                'productInformation13' => '상품 상세설명에 표시',
-                'productInformation14' => '상품 상세설명에 표시',
-                'productInformation15' => '상품 상세설명에 표시',
-                'productInformation16' => '상품 상세설명에 표시',
-                'productInformation17' => '상품 상세설명에 표시',
-                'productInformation18' => '상품 상세설명에 표시',
-                'productInformation19' => '상품 상세설명에 표시',
-                'productInformation20' => '상품 상세설명에 표시',
-                'productInformation21' => '상품 상세설명에 표시',
-            ];
-
-            // 제품 정보를 엑셀에 추가
-            $newRow = 5;
-            $col = 'A';
-            foreach ($dataset as $value) {
-                $sheet->setCellValue($col . $newRow, $value);
-                $col++;
-            }
-
-            // 엑셀 파일 업로드
-            $writer = new Xls($spreadsheet);
-            $fileName = 'wsd_' . $username . '_' . date('YmdHis') . '.xls';
+            // 엑셀 파일 저장
+            $username = DB::table('users')
+                ->join('accounts', 'accounts.user_id', '=', 'users.id')
+                ->where('vendor_id', 5)
+                ->value('accounts.username');
+            $fileName = 'wholesaledepot_' . $username . '_' . now()->format('YmdHis') . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
-
-            // 결과 반환
-            $data['status'] = 1;
-            $data['return'] = $fileName;
-            return $data;
+            // 응답 데이터 반환
+            return [
+                'status' => 1,
+                'return' => $fileName,
+            ];
         } catch (Exception $e) {
-            // 오류가 발생한 경우 처리
-            $data['status'] = -1;
-            $data['return'] = $e->getMessage();
-            return $data;
+            return [
+                'status' => -1,
+                'return' => $e->getMessage(),
+            ];
         }
+        // try {
+        //     // 카테고리 코드 변환을 위한 컨트롤러 생성
+        //     $categoryMappingController = new CategoryMappingController();
+        //     $categoryCode = $categoryMappingController->wsConvertCategoryCode($categoryCode);
+
+        //     // 엑셀 파일 불러오기
+        //     $spreadsheet = IOFactory::load(public_path('assets/excel/wholesaledepot.xls'));
+        //     $sheet = $spreadsheet->getSheet(0);
+
+        //     // 배송비 설정
+        //     if ($request->shipping == '무료') {
+        //         $shipCost = 0;
+        //     } else {
+        //         $shipCost = $request->shipCost;
+        //     }
+
+        //     $taxability = ($request->taxability === '과세') ? 1 : 2;
+
+        //     if ($request->shipping == '선불') {
+        //         $shipping = 0;
+        //     } elseif ($request->shipping == '착불') {
+        //         $shipping = 3;
+        //     } elseif ($request->shipping == '무료') {
+        //         $shipping = 1;
+        //     }
+
+        //     $saleToMinor = ($request->saleToMinor == '가능') ? '2' : '1';
+
+        //     $productInformationCode = DB::table('product_information')
+        //         ->where('domesin_value', $request->product_information)
+        //         ->select('wsd_value')
+        //         ->first()
+        //         ->wsd_value;
+
+        //     // 제품 데이터 배열 생성
+        //     $dataset = [
+        //         'productName' => $request->itemName,
+        //         'invoiceName' => $request->invoiceName,
+        //         'categoryCode' => $categoryCode,
+        //         'productCode' => '',
+        //         'productCode2' => '',
+        //         'originated' => $request->origin,
+        //         'vendor' => $request->vendor,
+        //         'brand' => $request->vendor,
+        //         'taxability' => $taxability,
+        //         'shipType' => $shipping,
+        //         'bundledQuantity' => '0',
+        //         'isInternationalShipping' => '0',
+        //         'keywords' => $request->keywords,
+        //         'productPrice' => $request->price,
+        //         'forcedPrice' => '',
+        //         'isForced' => '0',
+        //         'isConsumerNotified' => '0',
+        //         'descImage' => $descImage,
+        //         'productImage' => $productImage,
+        //         'extraImage1' => '',
+        //         'extraImage2' => '',
+        //         'extraImage3' => '',
+        //         'extraImage4' => '',
+        //         'extraImage5' => '',
+        //         'isExclusive' => '0',
+        //         'selectedOption' => '0',
+        //         'inputOption' => '',
+        //         'credentials' => 'C',
+        //         'credentialCode' => '',
+        //         'refundAddress' => '1597',
+        //         'isRefundable' => '1',
+        //         'refundReason' => '',
+        //         'saleToMinor' => $saleToMinor,
+        //         'isSale' => '0',
+        //         'isDisplay' => '1',
+        //         'isNew' => 'N',
+        //         'productNotice' => '',
+        //         'productInformationCode' => $productInformationCode,
+        //         'productInformation0' => '상품 상세설명에 표시',
+        //         'productInformation1' => '상품 상세설명에 표시',
+        //         'productInformation2' => '상품 상세설명에 표시',
+        //         'productInformation3' => '상품 상세설명에 표시',
+        //         'productInformation4' => '상품 상세설명에 표시',
+        //         'productInformation5' => '상품 상세설명에 표시',
+        //         'productInformation6' => '상품 상세설명에 표시',
+        //         'productInformation7' => '상품 상세설명에 표시',
+        //         'productInformation8' => '상품 상세설명에 표시',
+        //         'productInformation9' => '상품 상세설명에 표시',
+        //         'productInformation10' => '상품 상세설명에 표시',
+        //         'productInformation11' => '상품 상세설명에 표시',
+        //         'productInformation12' => '상품 상세설명에 표시',
+        //         'productInformation13' => '상품 상세설명에 표시',
+        //         'productInformation14' => '상품 상세설명에 표시',
+        //         'productInformation15' => '상품 상세설명에 표시',
+        //         'productInformation16' => '상품 상세설명에 표시',
+        //         'productInformation17' => '상품 상세설명에 표시',
+        //         'productInformation18' => '상품 상세설명에 표시',
+        //         'productInformation19' => '상품 상세설명에 표시',
+        //         'productInformation20' => '상품 상세설명에 표시',
+        //         'productInformation21' => '상품 상세설명에 표시',
+        //     ];
+
+        //     // 제품 정보를 엑셀에 추가
+        //     $newRow = 5;
+        //     $col = 'A';
+        //     foreach ($dataset as $value) {
+        //         $sheet->setCellValue($col . $newRow, $value);
+        //         $col++;
+        //     }
+
+        //     // 엑셀 파일 업로드
+        //     $writer = new Xls($spreadsheet);
+        //     $fileName = 'wsd_' . $username . '_' . date('YmdHis') . '.xls';
+        //     $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+        //     $writer->save($formedExcelFile);
+
+        //     // 결과 반환
+        //     $data['status'] = 1;
+        //     $data['return'] = $fileName;
+        //     return $data;
+        // } catch (Exception $e) {
+        //     // 오류가 발생한 경우 처리
+        //     $data['status'] = -1;
+        //     $data['return'] = $e->getMessage();
+        //     return $data;
+        // }
     }
 
     public function domesin($products, $userId)

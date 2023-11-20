@@ -87,27 +87,53 @@ class CategoryMappingController extends Controller
         }
         return $code;
     }
-    public function wsConvertCategoryCode($categoryCode)
+    public function wsConvertCategoryCode($categoryId)
     {
-        $spreadsheet = IOFactory::load(public_path('assets/excel/wholesaledepot.xls'));
-        $worksheet = $spreadsheet->getSheetByName('도매창고 분류코드표');
-        $data = [];
-        foreach ($worksheet->getRowIterator() as $row) {
-            $cellIterator = $row->getCellIterator();
-            $rowData = [];
-            foreach ($cellIterator as $cell) {
-                $rowData[] = $cell->getValue();
-            }
-            $data[] = $rowData;
+        $categoryString = DB::table('category')
+            ->where('id', $categoryId)
+            ->value('wholeCategoryName');
+
+        if (!$categoryString) {
+            $rand = rand(1, 4666);
+            return DB::table('wholesaledepot_category')->where('id', $rand)->value('code'); // 수정됨
         }
-        $keyword = $this->wdGetKeyword($categoryCode);
-        $code = 4;
-        foreach ($data as $row) {
-            if (in_array($keyword, $row)) {
-                $code = $row[0];
+
+        $keywords = array_reverse(explode(">", $categoryString));
+
+        foreach ($keywords as $keyword) {
+            $trimmedKeyword = trim($keyword);
+            foreach (['lg', 'md', 'sm', 'xs'] as $type) {
+                $categoryCode = DB::table('wholesaledepot_category')
+                    ->where($type, 'LIKE', '%' . $trimmedKeyword . '%')
+                    ->value('code');
+
+                if ($categoryCode) {
+                    return $categoryCode;
+                }
             }
         }
-        return $code;
+
+        $rand = rand(1, 4666);
+        return DB::table('wholesaledepot_category')->where('id', $rand)->value('code'); // 수정됨
+        // $spreadsheet = IOFactory::load(public_path('assets/excel/wholesaledepot.xls'));
+        // $worksheet = $spreadsheet->getSheetByName('도매창고 분류코드표');
+        // $data = [];
+        // foreach ($worksheet->getRowIterator() as $row) {
+        //     $cellIterator = $row->getCellIterator();
+        //     $rowData = [];
+        //     foreach ($cellIterator as $cell) {
+        //         $rowData[] = $cell->getValue();
+        //     }
+        //     $data[] = $rowData;
+        // }
+        // $keyword = $this->wdGetKeyword($categoryCode);
+        // $code = 4;
+        // foreach ($data as $row) {
+        //     if (in_array($keyword, $row)) {
+        //         $code = $row[0];
+        //     }
+        // }
+        // return $code;
     }
     public function wdGetKeyword($categoryCode)
     {
