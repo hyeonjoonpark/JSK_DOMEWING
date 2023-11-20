@@ -76,6 +76,11 @@ class FormController extends Controller
             // 데이터 추가
             $rowIndex = 2;
             foreach ($products as $product) {
+                DB::table('uploaded_products')->insert([
+                    'productId' => $product->productId,
+                    'userId' => $userId,
+                    'newImageHref' => $product->newImageHref
+                ]);
                 $minAmount = 5000;
                 $minQuantity = ceil($minAmount / $product->productPrice);
                 $categoryId = $product->categoryId;
