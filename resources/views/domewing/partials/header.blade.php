@@ -26,6 +26,10 @@
                         <ul class="nav">
                             <li class="nav-item">
                                 <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                    href={{ route('admin.dashboard') }}>공급사 페이지</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
                                     href="#">About</a>
                             </li>
                             <li class="nav-item">
@@ -130,8 +134,9 @@
                 </div>
             </div>
             <div class="col-1 d-none d-lg-block">
-                <button type="button" class="btn" style="background-color: var(--white);"><img
-                        class="icon-size clickable" src={{ asset('media\Asset_Nav_Cart.svg') }}></button>
+                <button type="button" class="btn" style="background-color: var(--white);"><a
+                        href="/domewing/shopping-cart"><img class="icon-size clickable"
+                            src={{ asset('media\Asset_Nav_Cart.svg') }}></a></button>
             </div>
         </div>
     </div>

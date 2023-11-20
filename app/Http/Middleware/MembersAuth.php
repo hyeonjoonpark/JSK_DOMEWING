@@ -34,6 +34,10 @@ class MembersAuth
                 // Handle PENDING state, redirect to a verification page or show a message
                 return redirect()->route('domewing.auth.login')->withErrors(['email' => 'Email Not Verified'])->withInput();
             }
+            if ($user && $user->is_active === 'INACTIVE') {
+                // Handle PENDING state, redirect to a verification page or show a message
+                return redirect()->route('domewing.auth.login')->withErrors(['email' => 'User Not Found'])->withInput();
+            }
         }
 
         return $response;

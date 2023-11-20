@@ -51,7 +51,7 @@ class RegisterMemberController extends Controller
         $username = $request->input('username');
         $remember_token = Str::random(60);
 
-        $checkExistingEmail = DB::table('members')->where('email', $email)->where('is_active', 'ACTIVE')->first();
+        $checkExistingEmail = DB::table('members')->where('email', $email)->first();
 
         if($checkExistingEmail){
             return redirect()->back()->withErrors(['email' => 'The email already exists'])->withInput();
