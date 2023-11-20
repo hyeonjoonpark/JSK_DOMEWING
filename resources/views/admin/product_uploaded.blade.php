@@ -54,7 +54,7 @@
                                         class="currency">원</span></span>
                             </td>
                             <td class="nk-tb-col">
-                                <span>{{ $uploadedProduct->createdAt }}</span>
+                                <span>{{ $uploadedProduct->uploadedCreatedAt }}</span>
                             </td>
                             <td class="nk-tb-col" data-order="Email Verified - Kyc Unverified">
                                 <span>{{ $uploadedProduct->updatedAt }}</span>
