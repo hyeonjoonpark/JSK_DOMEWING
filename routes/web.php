@@ -51,6 +51,7 @@ Route::prefix('domewing/auth')->group( function() {
     Route::post('login', [LoginMemberController::class, 'login']);
     Route::get('logout', [LoginMemberController::class, 'logout']);
     Route::post('register', [RegisterMemberController::class, 'register']);
+    Route::get('verify-email', [RegisterMemberController::class, 'verifyEmail'])->name('domewing.auth.verifyEmail');
 });
 
 // 로그인 및 등록 라우트

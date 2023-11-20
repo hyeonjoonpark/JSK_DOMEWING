@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EmailVerificationMember;
 
 class RegisterMemberController extends Controller
 {
@@ -47,6 +49,7 @@ class RegisterMemberController extends Controller
         $phoneNumber = $request->input('phoneNumber');
         $confirmPassword = $request->input('confirmPassword');
         $username = $request->input('username');
+        $remember_token = Str::random(60);
 
         $checkExistingEmail = DB::table('members')->where('email', $email)->where('is_active', 'ACTIVE')->first();
 
@@ -64,13 +67,17 @@ class RegisterMemberController extends Controller
                 'phone_number' => $phoneNumber,
                 'password' => bcrypt($confirmPassword),
                 'username' => $username,
-                'remember_token' => Str::random(60),
+                'remember_token' => $remember_token,
                 'created_at' => now(),
                 'updated_at' => now(),
                 'is_active' => 'PENDING',
             ]);
 
             if ($register) {
+                Mail::to($email)->send(new EmailVerificationMember([
+                    'name' => $username,
+                    'remember_token' => $remember_token
+                ]));
                 return redirect()->back()->with('success', 'Registration Successful!');
             } else {
                 return redirect()->back()->with('error', 'Failed to Register.');
@@ -79,5 +86,36 @@ class RegisterMemberController extends Controller
         } catch (Exception $e){
             return redirect()->back()->with('error', 'Error Occured. Please Try Again Later');
         }
+    }
+
+    protected function verifyEmail(Request $request)
+    {
+        try {
+            $remember_token = $request->input('remember_token');
+            $user = DB::table('members')->where([
+                'remember_token' => $remember_token,
+                'email_verified_at' => null
+            ])->get();
+            if ($user->isEmpty()) {
+                return view('domewing/auth/verify_email_result', [
+                    'title' => "Email verification failed",
+                    'content' => "This is not a valid link."
+                ]);
+            }
+            DB::table('members')->where('remember_token', $remember_token)->update([
+                'email_verified_at' => now(),
+                'is_active' => 'ACTIVE',
+            ]);
+            $title = "Your email has been successfully verified";
+            $content = "You can log in with the email and password you signed up with.";
+        } catch (Exception $e) {
+            $title = "Email verification failed";
+            $content = "This is not a valid link.";
+        }
+
+        return view('domewing/auth/verify_email_result', [
+            'title' => $title,
+            'content' => $content
+        ]);
     }
 }
