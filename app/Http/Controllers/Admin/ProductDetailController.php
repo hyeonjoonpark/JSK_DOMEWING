@@ -28,6 +28,7 @@ class ProductDetailController extends Controller
         $products = $request->products;
         $processedProducts = [];
         foreach ($products as $product) {
+            $productDetail = "";
             $vendor = DB::table('vendors')->where('name', $product['platform'])->select('name_eng')->first();
             $href = $product['href'];
             $script = public_path('js/details/' . $vendor->name_eng . '.js');
