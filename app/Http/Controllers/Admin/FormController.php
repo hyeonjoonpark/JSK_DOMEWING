@@ -52,16 +52,18 @@ class FormController extends Controller
                         'remark' => 'Fail to load image'
                     ]);
                 } else {
-                    $duplicated = DB::table('existed_product_name')->where('productName', $this->editProductName($collectedProduct->productName))->first();
-                    if ($duplicated) {
-                        DB::table('collected_products')->where('id', $collectedProduct->id)->update([
-                            'isActive' => 'N',
-                            'remark' => 'Duplicated product'
-                        ]);
-                    } else {
-                        $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
-                        $processedProducts[] = $collectedProduct;
-                    }
+                    // $duplicated = DB::table('existed_product_name')->where('productName', $this->editProductName($collectedProduct->productName))->first();
+                    // if ($duplicated) {
+                    //     DB::table('collected_products')->where('id', $collectedProduct->id)->update([
+                    //         'isActive' => 'N',
+                    //         'remark' => 'Duplicated product'
+                    //     ]);
+                    // } else {
+                    //     $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
+                    //     $processedProducts[] = $collectedProduct;
+                    // }
+                    $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
+                    $processedProducts[] = $collectedProduct;
                 }
             }
             $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
