@@ -326,9 +326,7 @@
         }
         $('#selectAll').on('change', function() {
             var dataTable = $('#productTable').DataTable();
-            var rows = dataTable.rows({
-                page: 'current'
-            }).nodes();
+            var rows = dataTable.rows().nodes();
             $('input[type="checkbox"]', rows).prop('checked', this.checked);
         });
         var collectedProducts;

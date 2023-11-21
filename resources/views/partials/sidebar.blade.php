@@ -56,6 +56,12 @@
                             </ul><!-- .nk-menu-sub -->
                         </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item">
+                            <a href="/admin/product/keywords" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
+                                <span class="nk-menu-text">상품 키워드 테스트</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
                             <a href="/admin/cms_dashboard" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
                                 <span class="nk-menu-text">CMS 저작물 관리 시스템</span>

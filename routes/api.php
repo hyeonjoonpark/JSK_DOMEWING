@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\FormController;
 use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Admin\ProductCollectController;
 use App\Http\Controllers\Admin\ProductDetailController;
+use App\Http\Controllers\Admin\ProductKeywordController;
 use App\Http\Controllers\Admin\ProductRegisterController;
 use App\Http\Controllers\Admin\ProductSearchController;
 use App\Http\Controllers\WebhookController;
@@ -35,6 +36,7 @@ Route::post('/product/search', [ProductSearchController::class, 'productSearch']
 Route::post('/product/category', [ProductRegisterController::class, 'categorySearch']);
 Route::post('/product/register', [ProductRegisterController::class, 'handle']);
 Route::post('/product/upload', [FormController::class, 'index']);
+Route::post('/product/keywords', [ProductKeywordController::class, 'index']);
 // account-setting
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 // Load product details

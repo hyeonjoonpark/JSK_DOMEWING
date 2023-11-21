@@ -115,4 +115,9 @@ class AdminController extends Controller
             'uploadedProducts' => $uploadedProducts
         ]);
     }
+
+    public function productKeywords(Request $request)
+    {
+        return view('admin/product_keywords');
+    }
 }

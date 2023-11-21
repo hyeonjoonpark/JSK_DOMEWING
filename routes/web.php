@@ -27,6 +27,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/register', [AdminController::class, 'productRegister']);
     Route::get('product/manage', [AdminController::class, 'productManage']);
     Route::get('product/uploaded', [AdminController::class, 'uploadedProducts']);
+    Route::get('product/keywords', [AdminController::class, 'productKeywords']);
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
     Route::get('account-setting', [AdminController::class, 'accountSetting']);
 
@@ -38,7 +39,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 Route::middleware('auth.members')->prefix('domewing')->group(function () {
     Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
-    Route::get('/shopping-cart', [ShoppingCartController::class,'showShoppingCart']);
+    Route::get('/shopping-cart', [ShoppingCartController::class, 'showShoppingCart']);
 });
 
 //ving kong
@@ -47,7 +48,7 @@ Route::prefix('domewing')->group(function () {
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
 });
 
-Route::prefix('domewing/auth')->group( function() {
+Route::prefix('domewing/auth')->group(function () {
     Route::get('/login', [LoginMemberController::class, 'showLoginForm'])->name('domewing.auth.login');
     Route::get('/register', [RegisterMemberController::class, 'showRegisterForm']);
     Route::post('login', [LoginMemberController::class, 'login']);
