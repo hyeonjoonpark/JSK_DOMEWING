@@ -126,8 +126,17 @@
     .custom-control-input:checked
     ~ .custom-control-label::before {
     border-radius: 50%;
+    border: var(--dark-blue) solid 1px;
 }
 
 .rounded-checkbox .custom-control-label::before {
     border-radius: 50%;
+    border: var(--dark-blue) solid 1px;
+}
+
+.shopping-cart-img {
+    min-width: 40%;
+    max-width: 330px;
+    max-height: 330px;
+    object-fit: contain;
 }
