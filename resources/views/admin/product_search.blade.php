@@ -359,7 +359,7 @@
                     i + '"><label class="custom-control-label" for="uid' + i + '"></label></div>';
                 const imageHtml = '<a href="' + href + '" target="_blank"><img src="' + image +
                     '" alt="Product" style="width:120px; height:120px;"></a>';
-                const nameHtml = '<a href="' + href + '" target="_blank" title="' + name + '">' + truncateString(name, 20) +
+                const nameHtml = '<a href="' + href + '" target="_blank" title="' + name + '">' + name +
                     '</a>';
                 const actionHtml =
                     `<button class="btn btn-primary" onclick="registerProduct('${name}', '${price}', '${image}', '${platform}', '${href}')">상품 등록</button>`;
