@@ -1,15 +1,5 @@
 @extends('domewing.layouts.main')
 @section('content')
-    <style>
-        .rounded-checkbox .custom-control-input:checked~.custom-control-label::before {
-            border-radius: 50% !important;
-        }
-
-        .rounded-checkbox .custom-control-label::before {
-            border-radius: 50% !important;
-        }
-    </style>
-
     <div class="px-lg-5 px-2" style="background: var(--thin-blue); padding-top: 30px; padding-bottom:50px;">
         <div class="px-lg-5 px-md-2 px-0">
             <div class="p-4 rounded"style="background: var(--white);">
@@ -61,7 +51,8 @@
                                                     <button class="btn btn-icon btn-primary number-spinner-btn number-minus"
                                                         data-number="minus"><em class="icon ni ni-minus"></em></button>
                                                     <input type="number" class="form-control number-spinner"
-                                                        placeholder="number" value="20" step="10">
+                                                        placeholder="number" value="20" step="10"
+                                                        style="color: var(--dark-blue);">
                                                     <button class="btn btn-icon btn-primary number-spinner-btn number-plus"
                                                         data-number="plus"><em class="icon ni ni-plus"></em></button>
                                                 </div>
@@ -118,7 +109,8 @@
                                                     <button class="btn btn-icon btn-primary number-spinner-btn number-minus"
                                                         data-number="minus"><em class="icon ni ni-minus"></em></button>
                                                     <input type="number" class="form-control number-spinner"
-                                                        placeholder="number" value="20" step="10">
+                                                        placeholder="number" value="20" step="10"
+                                                        style="color: var(--dark-blue);">
                                                     <button class="btn btn-icon btn-primary number-spinner-btn number-plus"
                                                         data-number="plus"><em class="icon ni ni-plus"></em></button>
                                                 </div>
@@ -160,7 +152,7 @@
                 <ul class="pricing-features fs-18px px-4 flex-grow-1 text-nowrap text-lg-end text-md-start py-2"
                     style="color: var(--dark-blue);">
                     <li><span class="w-50 align-self-center">Total</span>
-                        <h3 class="ms-auto fw-bold">MYR
+                        <h3 class="ms-auto fw-bold" style="color: var(--dark-blue);">MYR
                             4000.00</h3>
                     </li>
                     <li><span class="w-50 align-self-center">Saved</span><span class="ms-auto">MYR 120.00</span>
@@ -169,46 +161,11 @@
                 <button class="btn btn-secondary justify-content-center py-2" type="button"
                     style="background: var(--dark-blue);">
                     <a href="#">
-                        <p class="text-nowrap text-white px-2">Check Out</p>
+                        <p class="text-nowrap text-white px-1 fs-22px">Check Out</p>
                     </a>
                 </button>
             </div>
 
-
-            {{-- <div class="hstack align-items-center" style="padding-top:30px;">
-                <div class="form-check d-inline-block" style="padding-left:0px;">
-                    <input class="form-check-input text-xl" style="margin:0px; border-radius:50%;" type="checkbox"
-                        value="" id="all">
-                </div>
-                <div class="text-xl text-regular text-dark-blue" for="all">All</div>
-                <div class="ms-auto">
-                    <table class="table table-sm table-borderless align-middle" style="--bs-table-bg: var(--thin-blue);">
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <p class="text-regular text-dark-blue text-md pe-2">Total</p>
-                                </td>
-                                <td>
-                                    <p class="text-bold text-dark-blue text-xl">MYR 4758.00</p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <p class="text-regular text-dark-blue text-md pe-2">Saved</p>
-                                </td>
-                                <td>
-                                    <p class="text-regular text-dark-blue text-md">MYR 120.00</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <button class="btn btn-secondary" style="background: var(--dark-blue);">
-                    <a href="#">
-                        <p class="text-regular text-xl text-white px-2">Check Out</p>
-                    </a>
-                </button>
-            </div> --}}
             {{-- Grand Total End --}}
         </div>
     </div>

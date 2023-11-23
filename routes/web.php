@@ -33,8 +33,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     //ving kong
     Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');
-    Route::get('/cms_dashboard/content_management_system/{id}', [CMSController::class, 'loadCMS']);
-
+    Route::get('/cms_dashboard/content_management_system/{id}', [DomainController::class, 'loadCMS']);
+    Route::get('/cms/{id}',[CMSController::class, 'loadSellerCMS']);
 });
 
 Route::middleware('auth.members')->prefix('domewing')->group(function () {

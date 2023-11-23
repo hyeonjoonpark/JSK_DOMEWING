@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class DomainController extends Controller
 {
@@ -16,7 +18,6 @@ class DomainController extends Controller
 
             $data=[
                 'status'=>1,
-                'companyName'=> $domain->company_name,
                 'domainName' => $domain->domain_name,
                 'return'=>'success'
             ];
@@ -33,7 +34,6 @@ class DomainController extends Controller
 
     public function editDomain(Request $request){
         $domainId=$request->input('domainId');
-        $companyName=$request->input('companyName');
         $domainName=$request->input('domainName');
 
         // Check if the domain already exists and is active
@@ -56,7 +56,6 @@ class DomainController extends Controller
         try{
             DB::table('cms_domain')->where('domain_id',$domainId)->update([
                 'domain_name'=>$domainName,
-                'company_name'=>$companyName,
                 'updated_at'=>now(),
             ]);
             $data=[
@@ -96,49 +95,67 @@ class DomainController extends Controller
         return $data;
     }
 
-    public function registerDomain(Request $request)
-    {
-        $companyName = $request->input('companyName');
-        $domainName = $request->input('domainName');
+    // public function registerDomain(Request $request)
+    // {
+    //     $domainName = $request->input('domainName');
 
-        // Check if the domain already exists and is active
-        $existingDomain = DB::table('cms_domain')
-                            ->where('domain_name', $domainName)
-                            ->where('is_active', 'ACTIVE')
-                            ->first();
+    //     // Check if the domain already exists and is active
+    //     $existingDomain = DB::table('cms_domain')
+    //                         ->where('domain_name', $domainName)
+    //                         ->where('is_active', 'ACTIVE')
+    //                         ->first();
 
-        if ($existingDomain) {
+    //     if ($existingDomain) {
 
-            $data=[
-                'status'=>-1,
-                'message'=>'Domain Name Already Taken'
-            ];
+    //         $data=[
+    //             'status'=>-1,
+    //             'message'=>'Domain Name Already Taken'
+    //         ];
 
-            return $data;
+    //         return $data;
+    //     }
+
+    //     // store the domain in the database here
+    //     try{
+
+    //         $saveDomain = DB::table('cms_domain')->insert([
+    //             'domain_name' => $domainName,
+    //             'created_at' => now(),
+    //         ]);
+
+    //         $data=[
+    //             'status' => 1,
+    //             'message' => 'Domain Saved Successfully'
+    //         ];
+
+    //     }catch(Exception $e){
+    //         $data=[
+    //             'status'=>-1,
+    //             'return'=>$e->getMessage()
+    //         ];
+    //     }
+    //     return $data;
+    // }
+
+    public function loadCMS(Request $request , $id){
+
+        $domain = DB::table('cms_domain')->where('domain_id',  $id)->first();
+
+        $images = DB::table('image_banner')->where('domain_id', $id)->where('status', '!=', 'INACTIVE')->get();
+
+        $image_banners = DB::table('image_banner')->where('domain_id', $id)->where('status', 'ACTIVE')->where('status', '!=', 'INACTIVE')->get();
+
+        $theme_color = DB::table('theme_color')->where('domain_id',  $id)->first();
+
+        foreach ($images as $image) {
+            $image->formatted_created_at = Carbon::parse($image->created_at)->format('d M Y');
         }
 
-        // store the domain in the database here
-        try{
-
-            $saveDomain = DB::table('cms_domain')->insert([
-                'company_name' => $companyName,
-                'domain_name' => $domainName,
-                'created_at' => now(),
-            ]);
-
-            $data=[
-                'status' => 1,
-                'message' => 'Domain Saved Successfully'
-            ];
-
-        }catch(Exception $e){
-            $data=[
-                'status'=>-1,
-                'return'=>$e->getMessage()
-            ];
-        }
-        return $data;
+        return view('admin/content_management_system',[
+            'domain' => $domain,
+            'images' => $images,
+            'image_banners' => $image_banners,
+            'theme_color' => $theme_color,
+        ]);
     }
-
-
 }

@@ -16,12 +16,12 @@
                             <h5 class="card-title">Domains</h5>
                             <h6 class="card-subtitle mb-2">This is a list of registered domains.</h6>
                         </div>
-                        <div class="nk-block-head-content">
+                        {{-- <div class="nk-block-head-content">
                             <button type="button" class="btn btn-white btn-dim btn-outline-primary" data-bs-toggle="modal"
                                 data-bs-target="#modalForm">
                                 <em class="icon fa-solid fa-add"></em><span>Register New</span>
                             </button>
-                        </div>
+                        </div> --}}
                     </div>
 
                     <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="false">
@@ -42,7 +42,7 @@
                                             <div class="user-info">
                                                 <a
                                                     href="/admin/cms_dashboard/content_management_system/{{ $domain->domain_id }}">
-                                                    <span class="tb-lead">{{ $domain->company_name }}</span>
+                                                    <span class="tb-lead">{{ $domain->company }}</span>
                                                 </a>
                                                 <span>domewing/{{ $domain->domain_name }}</span>
                                             </div>
@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalForm">
+    {{-- <div class="modal fade" id="modalForm">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -134,7 +134,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="modal fade" id="modalEdit">
         <div class="modal-dialog" role="document">
@@ -147,15 +147,6 @@
                 </div>
                 <div class="modal-body">
                     <form class="form-validate is-alter">
-                        <div class="form-group input-group-lg">
-                            <label class="form-label" for="edit-company-name">Company Name</label>
-                            <div class="form-control-wrap">
-                                <div class="input-group input-group-lg">
-                                    <input type="text" class="form-control" id="edit-company-name"
-                                        onchange="companyNameFormat(this);" required>
-                                </div>
-                            </div>
-                        </div>
                         <div class="form-group">
                             <label class="form-label" for="edit-domain-name">Domain Name</label>
                             <div class="form-control-wrap">
@@ -210,8 +201,6 @@
                 success: function(response) {
                     const status = parseInt(response.status);
                     if (status == 1) {
-
-                        $('#edit-company-name').val(response.companyName);
                         $('#edit-domain-name').val(response.domainName);
                         $('#modalEdit').modal('show');
                     } else {
@@ -233,16 +222,14 @@
         }
 
         function editDomain(domainId) {
-            var companyName = $('#edit-company-name').val();
             var domainName = $('#edit-domain-name').val();
 
-            if (companyName != "" && domainName != "") {
+            if (domainName != "") {
                 $.ajax({
                     url: '/api/admin/edit-domain',
                     type: 'POST',
                     dataType: 'json',
                     data: {
-                        companyName: companyName,
                         domainName: domainName,
                         domainId: domainId,
                     },
@@ -260,7 +247,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Opps',
-                                text: response.return
+                                text: response.return,
                             });
                         }
                     },
@@ -320,91 +307,91 @@
             });
         }
 
-        //register domain
-        $(document).ready(function() {
-            $('#modalForm form').submit(function(e) {
+        //register domain - removed
+        // $(document).ready(function() {
+        //     $('#modalForm form').submit(function(e) {
 
-                e.preventDefault();
+        //         e.preventDefault();
 
-                var companyName = $('#company-name').val();
-                var domainName = $('#domain-name').val();
+        //         var companyName = $('#company-name').val();
+        //         var domainName = $('#domain-name').val();
 
-                if (companyName != "" && domainName != "") {
-                    $.ajax({
-                        url: '/api/admin/register-domain',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            companyName: companyName,
-                            domainName: domainName
-                        },
-                        success: function(response) {
-                            const status = parseInt(response.status);
-                            if (status == 1) {
-                                $('.modal').modal('hide');
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: response.message,
-                                }).then((result) => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Unable to process',
-                                    text: response.message
-                                });
-                            }
-                        },
-                        error: function(error) {
-                            // Handle error response
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Unable to process',
-                                text: error
-                            });
-                        }
-                    });
-                }
-            });
-        });
+        //         if (companyName != "" && domainName != "") {
+        //             $.ajax({
+        //                 url: '/api/admin/register-domain',
+        //                 type: 'POST',
+        //                 dataType: 'json',
+        //                 data: {
+        //                     companyName: companyName,
+        //                     domainName: domainName
+        //                 },
+        //                 success: function(response) {
+        //                     const status = parseInt(response.status);
+        //                     if (status == 1) {
+        //                         $('.modal').modal('hide');
+        //                         Swal.fire({
+        //                             icon: 'success',
+        //                             title: response.message,
+        //                         }).then((result) => {
+        //                             location.reload();
+        //                         });
+        //                     } else {
+        //                         Swal.fire({
+        //                             icon: 'error',
+        //                             title: 'Unable to process',
+        //                             text: response.message
+        //                         });
+        //                     }
+        //                 },
+        //                 error: function(error) {
+        //                     // Handle error response
+        //                     Swal.fire({
+        //                         icon: 'error',
+        //                         title: 'Unable to process',
+        //                         text: error
+        //                     });
+        //                 }
+        //             });
+        //         }
+        //     });
+        // });
 
-        function companyNameFormat(inputElement) {
-            // 사용자가 입력한 값을 가져옴
-            var inputValue = inputElement.value;
+        // function companyNameFormat(inputElement) {
+        //     // 사용자가 입력한 값을 가져옴
+        //     var inputValue = inputElement.value;
 
-            // 허용할 문자의 아스키 코드 범위를 정의
-            var allowedRanges = [
-                [48, 57], // 숫자 (0-9)
-                [65, 90], // 대문자 영어 (A-Z)
-                [97, 122], // 소문자 영어 (a-z)
-                [44032, 55203], // 한글 범위 (가-힣)
-                [32, 32], // 공백
-            ];
+        //     // 허용할 문자의 아스키 코드 범위를 정의
+        //     var allowedRanges = [
+        //         [48, 57], // 숫자 (0-9)
+        //         [65, 90], // 대문자 영어 (A-Z)
+        //         [97, 122], // 소문자 영어 (a-z)
+        //         [44032, 55203], // 한글 범위 (가-힣)
+        //         [32, 32], // 공백
+        //     ];
 
-            // 입력값을 필터링하여 허용된 문자로 대체
-            var filteredValue = "";
-            for (var i = 0; i < inputValue.length; i++) {
-                var charCode = inputValue.charCodeAt(i);
-                var isAllowed = false;
+        //     // 입력값을 필터링하여 허용된 문자로 대체
+        //     var filteredValue = "";
+        //     for (var i = 0; i < inputValue.length; i++) {
+        //         var charCode = inputValue.charCodeAt(i);
+        //         var isAllowed = false;
 
-                // 허용된 범위에 속하는지 확인
-                for (var j = 0; j < allowedRanges.length; j++) {
-                    var range = allowedRanges[j];
-                    if (charCode >= range[0] && charCode <= range[1]) {
-                        isAllowed = true;
-                        break;
-                    }
-                }
+        //         // 허용된 범위에 속하는지 확인
+        //         for (var j = 0; j < allowedRanges.length; j++) {
+        //             var range = allowedRanges[j];
+        //             if (charCode >= range[0] && charCode <= range[1]) {
+        //                 isAllowed = true;
+        //                 break;
+        //             }
+        //         }
 
-                if (isAllowed) {
-                    filteredValue += inputValue[i];
-                }
-            }
+        //         if (isAllowed) {
+        //             filteredValue += inputValue[i];
+        //         }
+        //     }
 
-            // 입력 필드에 필터링된 값을 설정
-            inputElement.value = filteredValue;
-        }
+        //     // 입력 필드에 필터링된 값을 설정
+        //     inputElement.value = filteredValue;
+        // }
 
         function domainNameFormat(inputElement) {
             // 사용자가 입력한 값을 가져옴

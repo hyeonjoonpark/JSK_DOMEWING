@@ -63,23 +63,17 @@ class AdminController extends Controller
     public function cmsDashboard(Request $request)
     {
         $domains = DB::table('cms_domain')
-            ->where('is_active', 'ACTIVE')
+            ->select('cms_domain.*', 'users.*', 'cms_domain.created_at as domain_created_at', 'cms_domain.updated_at as domain_updated_at')
+            ->join('users', 'users.id', '=', 'cms_domain.user_id')
+            ->where('cms_domain.is_active', 'ACTIVE')
             ->get();
 
         foreach ($domains as $domain) {
-            $domain->formatted_created_at = Carbon::parse($domain->created_at)->format('d M Y');
-            $domain->formatted_updated_at = Carbon::parse($domain->updated_at)->format('d M Y');
+            $domain->formatted_created_at = Carbon::parse($domain->domain_created_at)->format('d M Y');
+            $domain->formatted_updated_at = Carbon::parse($domain->domain_updated_at)->format('d M Y');
         }
 
         return view('admin/cms_dashboard', ['domains' => $domains]);
-    }
-
-    public function contentManagementSystem(Request $request, $id)
-    {
-        $domain = DB::table('cms_domain')
-            ->where('domain_id', $id)
-            ->first();
-        return view('admin/content_management_system', ['domain' => $domain]);
     }
 
     public function accountSetting(Request $request)

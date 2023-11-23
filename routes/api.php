@@ -46,9 +46,10 @@ Route::post('/product/load-bulk-details', [ProductDetailController::class, 'bulk
 Route::post('/product/insert-bulk-products', [ProductCollectController::class, 'bulk']);
 
 Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
-Route::post('/admin/register-domain', [DomainController::class, 'registerDomain']);
+//Route::post('/admin/register-domain', [DomainController::class, 'registerDomain']); -removed
 Route::get('/admin/get-domain', [DomainController::class, 'getDomain']);
 Route::post('admin/edit-domain', [DomainController::class, 'editDomain']);
+Route::post('admin/edit-domain-name', [CMSController::class, 'editDomainName']);
 Route::post('admin/upload-image-banner', [CMSController::class, 'uploadImageBanner']);
 Route::post('admin/change-image-status', [CMSController::class, 'changeImageStatus']);
 Route::post('admin/remove-image-banner', [CMSController::class, 'removeImage']);
