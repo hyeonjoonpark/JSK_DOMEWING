@@ -208,7 +208,7 @@
             var domain_name = $('#domain-name').val();
 
             $.ajax({
-                url: '/api/admin/edit-domain-name',
+                url: '/api/seller/edit-domain-name',
                 type: 'post',
                 dataType: 'json',
                 data: {
@@ -288,7 +288,7 @@
             formData.append('remember_token', '{{ Auth::user()->remember_token }}');
 
             $.ajax({
-                url: '../../../api/admin/upload-image-banner',
+                url: '../../../api/seller/upload-image-banner',
                 type: 'POST',
                 processData: false,
                 contentType: false,
@@ -327,7 +327,7 @@
             var remember_token = "{{ Auth::user()->remember_token }}";
 
             $.ajax({
-                url: '/api/admin/change-theme-color',
+                url: '/api/seller/change-theme-color',
                 type: 'post',
                 dataType: 'json',
                 data: {
@@ -371,7 +371,7 @@
             var remember_token = "{{ Auth::user()->remember_token }}";
 
             $.ajax({
-                url: '/api/admin/remove-image-banner',
+                url: '/api/seller/remove-image-banner',
                 type: 'post',
                 dataType: 'json',
                 data: {
@@ -411,7 +411,7 @@
             var remember_token = "{{ Auth::user()->remember_token }}";
 
             $.ajax({
-                url: '/api/admin/change-image-status',
+                url: '/api/seller/change-image-status',
                 type: 'post',
                 dataType: 'json',
                 data: {

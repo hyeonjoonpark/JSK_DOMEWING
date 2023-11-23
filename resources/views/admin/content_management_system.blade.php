@@ -205,16 +205,16 @@
     <script>
         function updateDomainName() {
             var remember_token = "{{ Auth::user()->remember_token }}";
+            var domain_id = "{{ $domain->domain_id }}";
             var domain_name = $('#domain-name').val();
 
-            console.log(domain_name);
-
             $.ajax({
-                url: '/api/admin/edit-domain-name',
+                url: '/api/admin/edit-domain',
                 type: 'post',
                 dataType: 'json',
                 data: {
-                    domain_name: domain_name,
+                    domainName: domain_name,
+                    domainId: domain_id,
                     remember_token: remember_token
                 },
                 success: function(response) {
@@ -238,6 +238,7 @@
                         title: 'Opps',
                         text: response
                     });
+                    console.log(response);
                 }
             });
 
@@ -391,31 +392,32 @@
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Opps',
+                            title: 'Unable to process',
                             text: response.return
                         });
                     }
                 },
                 error: function(response) {
-                    console.log(response);
                     Swal.fire({
                         icon: 'error',
                         title: 'Unable to process',
                         text: response
                     });
-
                 }
             });
         }
 
         //show or hide image from banner
         function changeStatus(image_id) {
+            var remember_token = "{{ Auth::user()->remember_token }}";
+
             $.ajax({
                 url: '/api/admin/change-image-status',
                 type: 'post',
                 dataType: 'json',
                 data: {
-                    image_id: image_id
+                    image_id: image_id,
+                    remember_token: remember_token,
                 },
                 success: function(response) {
                     const status = parseInt(response.status);
@@ -433,14 +435,13 @@
                             title: 'Unable to process',
                             text: response.return
                         });
-                        console.log(response);
                     }
                 },
                 error: function(response) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Unable to process',
-                        text: response
+                        text: response,
                     });
                     console.log(response);
                 }
