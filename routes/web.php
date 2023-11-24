@@ -46,6 +46,7 @@ Route::middleware('auth.members')->prefix('domewing')->group(function () {
 Route::prefix('domewing')->group(function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
+    Route::get('/product/{id}', [GeneralController::class, 'loadProductDetail']);
 });
 
 Route::prefix('domewing/auth')->group(function () {

@@ -33,7 +33,7 @@ class GeneralController extends Controller
             ->first();
 
             $categoriesTop = $this->getCategory();
-            $product_items = $this->getProduct();
+            $product_items = $this->getProducts($check_domain->domain_id);
 
             return view('domewing.product_catalog', [
                 'theme_color' => $theme_color,
@@ -45,6 +45,18 @@ class GeneralController extends Controller
         }else{
             return redirect('/domewing')->with('error', 'Domain not found');
         }
+    }
+
+    public function getProducts($id){
+        $product_items = DB::table('cms_domain')
+                            ->join('collected_products', 'cms_domain.user_id', '=', 'collected_products.userId')
+                            ->join('uploaded_products_test', 'collected_products.id', '=', 'uploaded_products_test.productId')
+                            ->where('cms_domain.domain_id', $id)
+                            ->where('uploaded_products_test.isActive', 'Y')
+                            ->select('uploaded_products_test.id as upload_id','collected_products.id', 'collected_products.productName as title', 'collected_products.productImage as image')
+                            ->get();
+
+        return $product_items;
     }
 
     public function getCategory(){
@@ -94,34 +106,57 @@ class GeneralController extends Controller
         return $categoriesTop;
     }
 
-    public function getProduct(){
-        $product_items = [
-            [
-                'image' => 'https://www.fluidbranding.ie/media/catalog/product/cache/5d8e184087b91b8c6788f82b1ec6b2b1/1/2/12155DUR_Durham-ColourCoat-Mug.jpg',
-                'title' => 'Direct Mug',
-            ],
-            [
-                'image' => 'https://marketplace.canva.com/print-mockup/bundle/E2C1MVoPF2T/surface:marketplace/surface:marketplace/EAFI6d4WLz4/1/0/1600w/canva-blue-minimalist-floral-mug-Kfl3ugdeswE.jpg?sig=9c962e01dc53dd8083a1d30fc26686f5&width=400',
-                'title' => 'Lovely Cup',
-            ],
-            [
-                'image' => 'https://www.ikea.com/my/en/images/products/faergklar-mug-glossy-beige__1010305_pe828022_s5.jpg?f=xl',
-                'title' => 'Simple Cup',
-            ],
-            [
-                'image' => 'https://www.nitori.my/cdn/shop/products/896769801_512x512.jpg?v=1616037232',
-                'title' => 'Greeny Looking Cup',
-            ],
-            [
-                'image' => 'https://teapsy.co.uk/cdn/shop/products/FairyMugPackshot_grande.png?v=1674757458',
-                'title' => 'Cute Pink Cup',
-            ],
-            [
-                'image' => 'https://theobroma.in/cdn/shop/files/Mug_Green_2.jpg?v=1687724641',
-                'title' => 'Customise Drawing Cup',
-            ],
-        ];
+    public function loadProductDetail(Request $request, $id){
 
-        return $product_items;
+        //Load all the product details here
+        $productInfo = DB::table('uploaded_products_test')
+                        ->join('collected_products', 'uploaded_products_test.productId', '=', 'collected_products.id')
+                        ->where('uploaded_products_test.id', $id)
+                        ->where('uploaded_products_test.isActive', 'Y')
+                        ->select('collected_products.*')
+                        ->first();
+
+        if($productInfo == null){
+            return redirect('/domewing')->with('error', 'Product not found');
+        }
+
+        $otherProducts = $this->getOtherProducts($productInfo->userId, $productInfo->id);
+        $similarProducts = $this->getSimilarProducts($productInfo->userId, $productInfo->id);
+
+        return view('domewing.product_detail', [
+            'productInfo' => $productInfo,
+            'otherProducts' => $otherProducts,
+            'similarProducts' => $similarProducts,
+        ]);
+    }
+
+    public function getOtherProducts($seller_id, $product_id){
+
+        //Getting top 10 item from the same seller
+        $otherProducts = DB::table('uploaded_products_test')
+                        ->join('collected_products', 'uploaded_products_test.productId', '=', 'collected_products.id')
+                        ->where('collected_products.userId', $seller_id)
+                        ->where('collected_products.id', '!=', $product_id)
+                        ->where('uploaded_products_test.isActive', 'Y')
+                        ->select('collected_products.*', 'uploaded_products_test.id as upload_id')
+                        ->limit(10)
+                        ->get();
+
+        return $otherProducts;
+    }
+
+    public function getSimilarProducts($seller_id, $product_id){
+
+        //for testing purpose, need to change this algorithm to fins similar products
+        $similarProducts = DB::table('uploaded_products_test')
+                        ->join('collected_products', 'uploaded_products_test.productId', '=', 'collected_products.id')
+                        ->where('collected_products.userId',"!=", $seller_id)
+                        ->where('collected_products.id', '!=', $product_id)
+                        ->where('uploaded_products_test.isActive', 'Y')
+                        ->select('collected_products.*', 'uploaded_products_test.id as upload_id')
+                        ->limit(10)
+                        ->get();
+
+        return $similarProducts;
     }
 }
