@@ -49,11 +49,11 @@ class ProductCollectController extends Controller
         $categoryId = $request->categoryId;
         $keywords = $request->keywords;
         $userId = DB::table('users')->where('remember_token', $request->remember_token)->select('id')->first()->id;
-        $marginRate = DB::table('margin_rate')->where('userId', $userId)->select('rate')->first()->rate;
-        $marginRate = (100 + $marginRate) / 100;
+        // $marginRate = DB::table('margin_rate')->where('userId', $userId)->select('rate')->first()->rate;
+        // $marginRate = (100 + $marginRate) / 100;
         try {
             foreach ($products as $product) {
-                $price = ceil($product['price'] * $marginRate);
+                $price = $product['$price'];
                 // $price = $product->price;
                 DB::table('collected_products')->insert([
                     'userId' => $userId,
