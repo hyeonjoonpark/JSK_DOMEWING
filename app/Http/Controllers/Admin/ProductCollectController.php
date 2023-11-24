@@ -53,7 +53,7 @@ class ProductCollectController extends Controller
         // $marginRate = (100 + $marginRate) / 100;
         try {
             foreach ($products as $product) {
-                $price = $product->price;
+                $price = $product['price'];
                 // $price = $product->price;
                 DB::table('collected_products')->insert([
                     'userId' => $userId,
