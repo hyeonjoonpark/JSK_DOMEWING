@@ -1,7 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    <a class="back-to text-secondary" href={{ route('admin.cms_dashboard') }}>
-        <em class="icon ni ni-arrow-left"></em><span>Content Management System</span></a>
+    Content Management System
 @endsection
 @section('subtitle')
     <p>Manage Your Own Content Here.</p>
@@ -209,12 +208,12 @@
             var domain_name = $('#domain-name').val();
 
             $.ajax({
-                url: '/api/admin/edit-domain',
+                url: '/api/seller/edit-domain-name',
                 type: 'post',
                 dataType: 'json',
                 data: {
-                    domainName: domain_name,
-                    domainId: domain_id,
+                    domain_name: domain_name,
+                    domain_id: domain_id,
                     remember_token: remember_token
                 },
                 success: function(response) {
@@ -289,7 +288,7 @@
             formData.append('remember_token', '{{ Auth::user()->remember_token }}');
 
             $.ajax({
-                url: '../../../api/admin/upload-image-banner',
+                url: '../../../api/seller/upload-image-banner',
                 type: 'POST',
                 processData: false,
                 contentType: false,
@@ -328,7 +327,7 @@
             var remember_token = "{{ Auth::user()->remember_token }}";
 
             $.ajax({
-                url: '/api/admin/change-theme-color',
+                url: '/api/seller/change-theme-color',
                 type: 'post',
                 dataType: 'json',
                 data: {
@@ -372,7 +371,7 @@
             var remember_token = "{{ Auth::user()->remember_token }}";
 
             $.ajax({
-                url: '/api/admin/remove-image-banner',
+                url: '/api/seller/remove-image-banner',
                 type: 'post',
                 dataType: 'json',
                 data: {
@@ -412,7 +411,7 @@
             var remember_token = "{{ Auth::user()->remember_token }}";
 
             $.ajax({
-                url: '/api/admin/change-image-status',
+                url: '/api/seller/change-image-status',
                 type: 'post',
                 dataType: 'json',
                 data: {
@@ -441,7 +440,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Unable to process',
-                        text: response,
+                        text: response
                     });
                     console.log(response);
                 }
