@@ -409,7 +409,7 @@
             loadProductDetail(platform, href);
             $('#productName').val(nameFormatter(name));
             $('#invoiceName').val(nameFormatter(name));
-            $("#productPrice").val(Math.round(price * {{ $marginRate }}));
+            $("#productPrice").val(price);
             $("#productImage").attr("src", image);
             productHref = href;
         }
