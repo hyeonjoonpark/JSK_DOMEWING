@@ -32,7 +32,7 @@ const puppeteer = require('puppeteer');
 
             for (const productElement of productElements) {
                 const nameText = productElement.querySelector('li > div.main > a').textContent;
-                const name = nameText.replace(/\s+/g, '');
+                const name = nameText;
                 const priceText = productElement.querySelector('li > div.amtqty > div.amt > b').textContent;
                 const priceNumber = priceText.match(/\d+/g);
                 const price = parseInt(priceNumber.join(''), 10);

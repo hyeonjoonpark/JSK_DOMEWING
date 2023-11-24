@@ -35,7 +35,7 @@ const puppeteer = require('puppeteer');
                 const hrefQuery = productElement.querySelector('dl > dt > span > a');
                 if (nameQuery != null && priceQuery != null && imageQuery != null && hrefQuery != null) {
                     const nameText = productElement.querySelector('dl > dd.goodsDisplayTitle > div > a > h6').textContent;
-                    const name = nameText.replace(/\s+/g, '');
+                    const name = nameText;
                     const priceText = productElement.querySelector('dl > dd.goodsDisplaySalePrice.clfix > div > table > tbody > tr > td.price_num').textContent;
                     const priceNumber = priceText.match(/\d+/g);
                     const price = parseInt(priceNumber.join(''), 10);

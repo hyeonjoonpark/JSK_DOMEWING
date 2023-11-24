@@ -11,24 +11,40 @@ class TestController extends Controller
 {
     public function index()
     {
-        $spreadsheet = IOFactory::load(public_path('assets/excel/domeatoz_category.xlsx'));
-        $worksheet = $spreadsheet->getSheet(0);
-
-        $highestRow = $worksheet->getHighestRow(); // 총 행 수
-
-        for ($row = 2; $row <= $highestRow; ++$row) {
-            $code = $worksheet->getCellByColumnAndRow(5, $row)->getValue();
-            $lg = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
-            $md = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
-            $sm = $worksheet->getCellByColumnAndRow(3, $row)->getValue();
-            $xs = $worksheet->getCellByColumnAndRow(4, $row)->getValue();
-            DB::table('domeatoz_category')->insert([
-                'code' => $code,
-                'lg' => $lg,
-                'md' => $md,
-                'sm' => $sm,
-                'xs' => $xs,
-            ]);
+        $products = DB::table('collected_products')
+            ->where('id', '>=', 1)
+            ->where('id', '<=', 4039)
+            ->get();
+        foreach ($products as $product) {
+            $output = [];
+            $parsedUrl = parse_url($product->productHref);
+            $domain = $parsedUrl['host'];
+            // 'www.' 제거
+            $domain = str_replace('www.', '', $domain);
+            if ($domain == 'dometopia.com') {
+                $domain = 'dometopia.js';
+            }
+            if ($domain == 'babonara.co.kr') {
+                $domain = 'babonara.js';
+            }
+            if ($domain == 'metaldiy.com') {
+                $domain = 'metaldiy.js';
+            }
+            if ($domain == 'domeggook.com') {
+                $domain = 'domemedb.js';
+            }
+            $script = public_path('js/price/' . $domain);
+            $command = "node " . escapeshellarg($script) . " " . escapeshellarg($product->productHref);
+            set_time_limit(0);
+            exec($command, $output, $returnCode);
+            if ($returnCode == 0 && isset($output[0])) {
+                // 성공적으로 처리된 경우, 상품 정보를 추가하고 반복문을 종료
+                $productPrice = json_decode($output[0], true);
+                DB::table('collected_products')->where('id', $product->id)->update([
+                    'productPrice' => $productPrice['productPrice']
+                ]);
+            }
+            echo "Success";
         }
     }
 }
