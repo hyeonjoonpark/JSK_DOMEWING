@@ -611,7 +611,7 @@
             const numericPart = id.replace(/^uid(\d+)$/, '$1');
             return numericPart;
         }
-        var selectedProducts
+        var selectedProducts = [];
 
         function productBulkCollect() {
             const selectedCheckboxes = [];

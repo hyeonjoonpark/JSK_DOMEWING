@@ -47,9 +47,7 @@ class ProductCollectController extends Controller
     public function bulk(Request $request)
     {
         $validator = $this->bulkValidation($request);
-        if ($validator->fails()) {
-            return $this->getResponseData(-1, $validator->errors()->first());
-        } else {
+        if ($validator['status'] == 1) {
             $products = $request->products;
             $categoryId = $request->categoryId;
             $keywords = $request->keywords;
@@ -82,36 +80,27 @@ class ProductCollectController extends Controller
             } catch (Exception $e) {
                 return $this->getResponseData(-1, $e->getMessage());
             }
+        } else {
+            return $validator;
         }
     }
     public function bulkValidation(Request $request)
     {
-        Validator::extend('valid_keywords', function ($attribute, $value, $parameters, $validator) {
-            // 키워드를 쉼표로 분리
-            $keywords = explode(',', $value);
-
-            // 키워드 개수 검사 (5개 이상, 10개 이하)
-            $keywordsCount = count($keywords);
-            if ($keywordsCount < 5 || $keywordsCount > 10) {
-                return false;
+        $keywords = $request->keywords;
+        $keywords = explode(',', $keywords);
+        if (count($keywords) < 5 || count($keywords) > 10) {
+            return $this->getResponseData(-1, '키워드의 갯수는 5개 이하, 10개 이하로 기입해주세요.');
+        }
+        $uniqueKeywords = array_unique($keywords);
+        if (count($uniqueKeywords) !== count($keywords)) {
+            return $this->getResponseData(-1, '중복된 키워드를 제거해주세요.');
+        }
+        foreach ($keywords as $keyword) {
+            if (Str::length($keyword) < 2 || Str::length($keyword) > 10) {
+                return $this->getResponseData(-1, '각 키워드는 2글자 이상, 10글자 이하입니다.');
             }
-
-            // 각 키워드의 길이 검사 (2글자 이상, 10글자 이하)
-            foreach ($keywords as $keyword) {
-                $keyword = trim($keyword); // 공백 제거
-                if (Str::length($keyword) < 2 || Str::length($keyword) > 10) {
-                    return false;
-                }
-            }
-
-            return true;
-        });
-        $validator = Validator::make($request->all(), [
-            'keywords' => ['required', 'string', 'valid_keywords']
-        ], [
-            'keywords' => '상품 키워드를 , 단위로 구분하여 최소 5개를 기입해주세요.'
-        ]);
-        return $validator;
+        }
+        return $this->getResponseData(1, 'success');
     }
     protected function validation(Request $request)
     {
