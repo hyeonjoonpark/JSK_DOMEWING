@@ -151,7 +151,7 @@
 
                                 <div class="d-flex flex-wrap">
                                     <button class="btn btn-secondary me-3 my-1"
-                                        style="padding: 10px 15px; background: var(--dark-blue)">
+                                        style="padding: 10px 15px; background: var(--dark-blue)" onclick='checkUser(1)'>
                                         <p class="text-regular text-white text-md">{{ $translation['add_to_cart'] }}</p>
                                     </button>
                                     <button class="btn btn-secondary me-3 my-1"
@@ -285,6 +285,100 @@
 
 @section('scripts')
     <script>
+        function checkUser($option) {
+            try {
+                const userId = '{{ Auth::guard('member')->id() }}';
+
+                if (userId !== '') {
+                    if ($option == 1) {
+                        addToCart();
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops',
+                        text: 'User must log in to access this feature'
+                    }).then((result) => {
+                        location.href = '/domewing/auth/login';
+                    });
+                }
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops',
+                    text: 'User must log in to access this feature'
+                }).then((result) => {
+                    location.href = '/domewing/auth/login';
+                });
+            }
+        }
+
+        function addToCart() {
+            const productId = '{{ $productInfo->uploadedId }}';
+            const quantity = document.getElementById('quantity').value;
+            const remember_token = '{{ Auth::guard('member')->user()->remember_token }}';
+
+            $.ajax({
+                url: '/api/member/add-to-cart',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    productId: productId,
+                    quantity: quantity,
+                    remember_token: remember_token,
+                },
+                success: function(response) {
+                    const status = parseInt(response.status);
+
+                    if (status == 1) {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: response.return,
+                        })
+                    } else if (status == -2) {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: response.title,
+                            text: response.return
+                        }).then((result) => {
+                            location.href = '/domewing/auth/login';
+                        });
+                    } else if (status == -3) {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: reponse.title,
+                            text: response.return,
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, proceed!',
+                            cancelButtonText: 'No, cancel!',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                removeCartItem();
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: response.title,
+                            text: response.return
+                        });
+                    }
+                },
+                error: function(response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unable to process',
+                        text: response,
+                    });
+                }
+            });
+
+        }
+
+        function removeCartItem() {
+            console.log('OK');
+        }
+
         function formatCurrency(amount) {
             const formatter = new Intl.NumberFormat('en-US', {
                 style: 'currency',

@@ -15,6 +15,8 @@ use App\Http\Controllers\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Domewing\ProductDetailsController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -57,3 +59,7 @@ Route::post('seller/upload-image-banner', [CMSController::class, 'uploadImageBan
 Route::post('seller/change-image-status', [CMSController::class, 'changeImageStatus']);
 Route::post('seller/remove-image-banner', [CMSController::class, 'removeImage']);
 Route::post('seller/change-theme-color', [CMSController::class, 'changeThemeColor']);
+
+Route::post('member/add-to-cart', [ProductDetailsController::class, 'addToCart']);
+
+

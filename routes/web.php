@@ -16,6 +16,7 @@ use App\Http\Controllers\Domewing\GeneralController;
 use App\Http\Controllers\Domewing\Auth\LoginMemberController;
 use App\Http\Controllers\Domewing\Auth\RegisterMemberController;
 use App\Http\Controllers\Domewing\ShoppingCartController;
+use App\Http\Controllers\Domewing\ProductDetailsController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -37,7 +38,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cms/{id}',[CMSController::class, 'loadSellerCMS']);
 });
 
-Route::middleware('auth.members')->prefix('domewing')->group(function () {
+Route::middleware('auth.members')->middleware('translation')->prefix('domewing')->group(function () {
     Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
     Route::get('/shopping-cart', [ShoppingCartController::class, 'showShoppingCart']);
 });
@@ -46,10 +47,10 @@ Route::middleware('auth.members')->prefix('domewing')->group(function () {
 Route::prefix('domewing')->middleware('translation')->group( function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
-    Route::get('/product/{id}', [GeneralController::class, 'loadProductDetail']);
+    Route::get('/product/{id}', [ProductDetailsController::class, 'loadProductDetail']);
 });
 
-Route::prefix('domewing/auth')->group(function () {
+Route::prefix('domewing/auth')->middleware('translation')->group(function () {
     Route::get('/login', [LoginMemberController::class, 'showLoginForm'])->name('domewing.auth.login');
     Route::get('/register', [RegisterMemberController::class, 'showRegisterForm']);
     Route::post('login', [LoginMemberController::class, 'login']);
