@@ -18,7 +18,7 @@ class FormController extends Controller
     {
         try {
             DB::statement("UPDATE collected_products
-            SET is_active = 'N'
+            SET isActive = 'N'
             WHERE id IN (
                 SELECT id
                 FROM (
