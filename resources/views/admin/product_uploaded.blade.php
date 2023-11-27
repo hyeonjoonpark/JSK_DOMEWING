@@ -10,6 +10,7 @@
 @section('content')
     <div class="row g-gs">
         <div class="col">
+            <button class="btn btn-warning mb-5" onclick="productsUpload();">업로드 테스트</button>
             <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="true" data-order='[[3, "asc"]]'>
                 <thead>
                     <tr class="nk-tb-item nk-tb-head">
@@ -74,5 +75,22 @@
     <link rel="stylesheet" href="{{ asset('assets/css/editors/summernote.css') }}">
     <script src="{{ asset('assets/js/editors.js') }}"></script>
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
-    <script></script>
+    <script>
+        function productsUpload() {
+            $.ajax({
+                url: '/api/product/upload',
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    remember_token: '{{ Auth::user()->remember_token }}'
+                },
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
 @endsection

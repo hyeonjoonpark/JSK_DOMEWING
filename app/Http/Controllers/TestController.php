@@ -12,7 +12,7 @@ class TestController extends Controller
     public function index()
     {
         $products = DB::table('collected_products')
-            ->where('id', '>=', 1)
+            ->where('id', '>=', 1100)
             ->where('id', '<=', 4039)
             ->get();
         foreach ($products as $product) {
@@ -41,7 +41,8 @@ class TestController extends Controller
                 // 성공적으로 처리된 경우, 상품 정보를 추가하고 반복문을 종료
                 $productPrice = json_decode($output[0], true);
                 DB::table('collected_products')->where('id', $product->id)->update([
-                    'productPrice' => $productPrice['productPrice']
+                    'productPrice' => $productPrice['productPrice'],
+                    'updatedAt' => now()
                 ]);
             }
             echo "Success";

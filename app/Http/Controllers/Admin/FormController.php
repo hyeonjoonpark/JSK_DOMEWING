@@ -39,7 +39,8 @@ class FormController extends Controller
             FROM collected_products cp
             LEFT JOIN uploaded_products up ON up.productId = cp.id
             WHERE up.productId IS NULL
-            AND cp.isActive = 'Y';");
+            AND cp.isActive = 'Y'
+            LIMIT 500;");
             $pIC = new ProductImageController();
             set_time_limit(0);
             ini_set('memory_limit', '-1');

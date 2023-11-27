@@ -10,7 +10,6 @@
 @section('content')
     <div class="row g-gs">
         <div class="col">
-            <button class="btn btn-warning mb-5" onclick="productsUpload();">업로드 테스트</button>
             <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="true" data-order='[[3, "asc"]]'>
                 <thead>
                     <tr class="nk-tb-item nk-tb-head">
