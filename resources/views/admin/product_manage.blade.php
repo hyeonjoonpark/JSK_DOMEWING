@@ -176,6 +176,7 @@
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
         function productsUpload() {
+            $('.btn').prop('disabled', true);
             $.ajax({
                 url: '/api/product/upload',
                 type: "POST",
@@ -184,6 +185,7 @@
                     remember_token: '{{ Auth::user()->remember_token }}'
                 },
                 success: function(response) {
+                    $('.btn').prop('disabled', false);
                     console.log(response);
                 },
                 error: function(response) {

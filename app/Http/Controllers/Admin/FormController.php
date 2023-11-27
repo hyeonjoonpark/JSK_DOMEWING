@@ -74,6 +74,8 @@ class FormController extends Controller
             ON v.id=pr.vendor_id
             WHERE pr.is_active='Y';");
             $data['return']['successVendors'] = [];
+            set_time_limit(0);
+            ini_set('memory_limit', '-1');
             foreach ($activedUploadVendors as $vendor) {
                 $vendorEngName = $vendor->name_eng;
                 $response = $this->$vendorEngName($processedProducts, $userId);
