@@ -65,12 +65,14 @@
                                 <div class="row pb-3">
                                     @foreach ($product_items as $key => $product_item)
                                         <div class="col-xl-3 col-lg-6 pb-3 px-3">
-                                            <img src="{{ $product_item['image'] }}" alt="{{ $product_item['title'] }}"
+                                            <img src="{{ $product_item->image }}" alt="{{ $product_item->title }}"
                                                 href="#" style="height:80%; width:100%;" class="img-fluid">
                                             <div class="pt-3"></div>
-                                            <p class="fs-22px text-nowrap text-truncate" href="#"
-                                                style="color: var(--dark-blue)">
-                                                {{ $product_item['title'] }}</p>
+                                            <a href="product/{{ $product_item->upload_id }}">
+                                                <p class="fs-22px text-nowrap text-truncate"
+                                                    style="color: var(--dark-blue)">
+                                                    {{ $product_item->title }}</p>
+                                            </a>
                                         </div>
                                     @endforeach
                                 </div>
@@ -117,12 +119,12 @@
                                 <div class="row pb-3">
                                     @foreach ($product_items as $key => $product_item)
                                         <div class="col-xl-3 col-lg-6 pb-3 px-3">
-                                            <img src="{{ $product_item['image'] }}" alt="{{ $product_item['title'] }}"
+                                            <img src="{{ $product_item->image }}" alt="{{ $product_item->title }}"
                                                 href="#" style="height:80%; width:100%;" class="img-fluid">
                                             <div class="pt-3"></div>
                                             <p class="fs-22px text-nowrap text-truncate" href="#"
                                                 style="color: var(--dark-blue)">
-                                                {{ $product_item['title'] }}</p>
+                                                {{ $product_item->title }}</p>
                                         </div>
                                     @endforeach
                                 </div>
