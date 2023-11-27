@@ -24,13 +24,7 @@ class FormController extends Controller
                 FROM (
                     SELECT id
                     FROM collected_products
-                    WHERE productName IN (
-                        SELECT productName
-                        FROM collected_products
-                        GROUP BY productName
-                        HAVING COUNT(*) > 1
-                    )
-                    OR productHref IN (
+                    WHERE productHref IN (
                         SELECT productHref
                         FROM collected_products
                         GROUP BY productHref
