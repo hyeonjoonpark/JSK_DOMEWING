@@ -694,12 +694,19 @@
                 success: function(response) {
                     Swal.close();
                     $('.modal').modal('hide');
-                    Swal.fire({
-                        icon: 'success',
-                        title: '진행 성공',
-                        text: response.return
-                    });
-                    console.log(response);
+                    if (parseInt(response.status) == 1) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '진행 성공',
+                            text: response.return
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '진행 실패',
+                            text: response.return
+                        });
+                    }
                 },
                 error: function(response) {
                     Swal.close();
