@@ -43,7 +43,7 @@ Route::middleware('auth.members')->prefix('domewing')->group(function () {
 });
 
 //ving kong
-Route::prefix('domewing')->group(function () {
+Route::prefix('domewing')->middleware('translation')->group( function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
     Route::get('/product/{id}', [GeneralController::class, 'loadProductDetail']);
@@ -72,3 +72,13 @@ Route::prefix('auth')->group(function () {
 Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('home');
 Route::get('/naver-shop/categories', [NaverShopController::class, 'getCategories']);
 Route::get('/test', [TestController::class, 'handle']);
+
+//Set Default Language
+session(['languageId' => 2]);
+
+Route::get('lang/{languageId}', function ($languageId) {
+    // Store the selected language ID in the session or as needed
+    session(['languageId' => $languageId]);
+
+    return redirect()->back(); // Redirect to the previous page or any specific page
+});
