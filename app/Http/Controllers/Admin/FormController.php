@@ -17,23 +17,25 @@ class FormController extends Controller
     public function index(Request $request)
     {
         try {
-            DB::statement("UPDATE collected_products AS cp
-            JOIN (
-                SELECT productName
+            DB::statement("WITH Duplicates AS (
+                SELECT id
                 FROM collected_products
-                WHERE isActive = 'Y'
-                GROUP BY productName
-                HAVING COUNT(*) > 1
-            ) AS dup_names ON cp.productName = dup_names.productName
-            JOIN (
-                SELECT productHref
-                FROM collected_products
-                WHERE isActive = 'Y'
-                GROUP BY productHref
-                HAVING COUNT(*) > 1
-            ) AS dup_hrefs ON cp.productHref = dup_hrefs.productHref
-            SET cp.isActive = 'N'
-            WHERE cp.isActive = 'Y';");
+                WHERE productName IN (
+                    SELECT productName
+                    FROM collected_products
+                    GROUP BY productName
+                    HAVING COUNT(*) > 1
+                )
+                OR productHref IN (
+                    SELECT productHref
+                    FROM collected_products
+                    GROUP BY productHref
+                    HAVING COUNT(*) > 1
+                )
+            )
+            UPDATE collected_products
+            SET is_active = 'N'
+            WHERE id IN (SELECT id FROM Duplicates);");
             $collectedProducts = DB::select("SELECT cp.*
             FROM collected_products cp
             LEFT JOIN uploaded_products up ON up.productId = cp.id
@@ -52,16 +54,6 @@ class FormController extends Controller
                         'remark' => 'Fail to load image'
                     ]);
                 } else {
-                    // $duplicated = DB::table('existed_product_name')->where('productName', $this->editProductName($collectedProduct->productName))->first();
-                    // if ($duplicated) {
-                    //     DB::table('collected_products')->where('id', $collectedProduct->id)->update([
-                    //         'isActive' => 'N',
-                    //         'remark' => 'Duplicated product'
-                    //     ]);
-                    // } else {
-                    //     $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
-                    //     $processedProducts[] = $collectedProduct;
-                    // }
                     $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
                     $processedProducts[] = $collectedProduct;
                 }
