@@ -17,25 +17,27 @@ class FormController extends Controller
     public function index(Request $request)
     {
         try {
-            DB::statement("WITH Duplicates AS (
-                SELECT id
-                FROM collected_products
-                WHERE productName IN (
-                    SELECT productName
-                    FROM collected_products
-                    GROUP BY productName
-                    HAVING COUNT(*) > 1
-                )
-                OR productHref IN (
-                    SELECT productHref
-                    FROM collected_products
-                    GROUP BY productHref
-                    HAVING COUNT(*) > 1
-                )
-            )
-            UPDATE collected_products
+            DB::statement("UPDATE collected_products
             SET is_active = 'N'
-            WHERE id IN (SELECT id FROM Duplicates);");
+            WHERE id IN (
+                SELECT id
+                FROM (
+                    SELECT id
+                    FROM collected_products
+                    WHERE productName IN (
+                        SELECT productName
+                        FROM collected_products
+                        GROUP BY productName
+                        HAVING COUNT(*) > 1
+                    )
+                    OR productHref IN (
+                        SELECT productHref
+                        FROM collected_products
+                        GROUP BY productHref
+                        HAVING COUNT(*) > 1
+                    )
+                ) AS SubQuery
+            );");
             $collectedProducts = DB::select("SELECT cp.*
             FROM collected_products cp
             LEFT JOIN uploaded_products up ON up.productId = cp.id
