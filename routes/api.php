@@ -61,5 +61,5 @@ Route::post('seller/remove-image-banner', [CMSController::class, 'removeImage'])
 Route::post('seller/change-theme-color', [CMSController::class, 'changeThemeColor']);
 
 Route::post('member/add-to-cart', [ProductDetailsController::class, 'addToCart']);
-
+Route::post('member/remove-all-cart', [ProductDetailsController::class, 'removeAllCartItem']);
 

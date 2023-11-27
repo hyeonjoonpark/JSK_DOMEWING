@@ -134,7 +134,7 @@ class ProductDetailsController extends Controller
                 'status' => -3,
                 'icon' => 'warning',
                 'title' => 'Info',
-                'return' => 'Are you sure you want to remove all items from your shopping cart?'
+                'return' => 'Shopping Cart only can place item from single supplier. Do you want to remove all items from your current shopping cart first?'
             ];
         }
 
@@ -174,7 +174,31 @@ class ProductDetailsController extends Controller
     }
 
     public function removeAllCartItem(Request $request){
+        $remember_token = $request->input('remember_token');
 
+        $member = DB::table('members')->where('remember_token', $remember_token)->first();
+
+        if(!$member){
+            return [
+                'status' => -2,
+                'icon' => 'warning',
+                'title' => 'Opps',
+                'return' => 'Session Invalid. Please Login Again.'
+            ];
+        }
+
+        $update= DB::table('shopping_cart')
+                    ->where('user_id', $member->id)
+                    ->where('is_Active', 'ACTIVE')
+                    ->update(['is_Active' => 'INACTIVE','updated_at' => now()]);
+
+        if($update){
+            return [
+                'status' => 1,
+                'icon' => 'success',
+                'return' => 'Items Removed Successfully From Shopping Cart.'
+            ];
+        }
     }
 
 }

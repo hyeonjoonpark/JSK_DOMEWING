@@ -346,7 +346,7 @@
                     } else if (status == -3) {
                         Swal.fire({
                             icon: response.icon,
-                            title: reponse.title,
+                            title: response.title,
                             text: response.return,
                             showCancelButton: true,
                             confirmButtonText: 'Yes, proceed!',
@@ -376,7 +376,39 @@
         }
 
         function removeCartItem() {
-            console.log('OK');
+            const remember_token = '{{ Auth::guard('member')->user()->remember_token }}';
+
+            $.ajax({
+                url: '/api/member/remove-all-cart',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    remember_token: remember_token,
+                },
+                success: function(response) {
+                    const status = parseInt(response.status);
+
+                    if (status == 1) {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: response.return,
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: response.title,
+                            text: response.return
+                        });
+                    }
+                },
+                error: function(response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unable to process',
+                        text: response,
+                    });
+                }
+            });
         }
 
         function formatCurrency(amount) {
