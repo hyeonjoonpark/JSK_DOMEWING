@@ -18,23 +18,22 @@ class FormController extends Controller
     {
         try {
             DB::statement("UPDATE collected_products AS cp
+            JOIN (
+                SELECT productName
+                FROM collected_products
+                WHERE isActive = 'Y'
+                GROUP BY productName
+                HAVING COUNT(*) > 1
+            ) AS dup_names ON cp.productName = dup_names.productName
+            JOIN (
+                SELECT productHref
+                FROM collected_products
+                WHERE isActive = 'Y'
+                GROUP BY productHref
+                HAVING COUNT(*) > 1
+            ) AS dup_hrefs ON cp.productHref = dup_hrefs.productHref
             SET cp.isActive = 'N'
-            WHERE cp.isActive = 'Y' AND (
-                cp.productName IN (
-                    SELECT productName
-                    FROM collected_products
-                    WHERE isActive = 'Y'
-                    GROUP BY productName
-                    HAVING COUNT(*) > 1
-                )
-                OR cp.productHref IN (
-                    SELECT productHref
-                    FROM collected_products
-                    WHERE isActive = 'Y'
-                    GROUP BY productHref
-                    HAVING COUNT(*) > 1
-                )
-            );");
+            WHERE cp.isActive = 'Y';");
             $collectedProducts = DB::select("SELECT cp.*
             FROM collected_products cp
             LEFT JOIN uploaded_products up ON up.productId = cp.id
