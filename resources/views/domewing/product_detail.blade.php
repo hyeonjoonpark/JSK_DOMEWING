@@ -76,13 +76,13 @@
                                         <li><em class="icon ni ni-star"></em></li>
                                     </ul>
                                     <h6 class="p-1 text-center my-auto" style="color: var(--dark-blue);">(378)
-                                        sold</h6>
+                                        {{ $translation['sold'] }}</h6>
                                     <div class="hstack horizontal-scrolling py-1">
                                         <h6 class="product-tags px-2 py-1 mx-1 my-auto">
-                                            Location
+                                            {{ $translation['location'] }}
                                         </h6>
                                         <h6 class="product-tags px-2 py-1 mx-1 my-auto">
-                                            Promotion Tag
+                                            {{ $translation['promotion_tag'] }}
                                         </h6>
                                     </div>
                                 </div>
@@ -90,34 +90,37 @@
                                 <div class="d-flex align-items-end py-4">
                                     <h4 class ="text-pink fw-bold m-0 pe-1">KRW
                                         {{ number_format($productInfo->productPrice, 2) }}</h4>
-                                    <h6 class ="text-pink">/Unit</h6>
+                                    <h6 class ="text-pink">
+                                        {{ $translation['Unit'] }}
+                                    </h6>
                                 </div>
 
                                 <ul class="pricing-features pb-3 fs-18px" style="color: var(--dark-blue);">
                                     <li>
-                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">Available
-                                            Units</h6>
+                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
+                                            {{ $translation['available_units'] }}</h6>
                                         <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">3000</h6>
                                     </li>
                                     <li>
-                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">Unit In</h6>
+                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
+                                            {{ $translation['unit_in'] }}</h6>
                                         <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">Carbon</h6>
                                     </li>
                                     <li>
-                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">Minimum
-                                            Order</h6>
+                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
+                                            {{ $translation['minimum_order'] }}</h6>
                                         <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">20 Units
                                         </h6>
                                     </li>
                                     <li>
-                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">Wholesale
-                                            Price</h6>
+                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
+                                            {{ $translation['wholesale_price'] }}</h6>
                                         <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
                                             Buy 200 and more, KRW 2000.00 /Unit</h6>
                                     </li>
                                     <li>
-                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">Shipping
-                                            Cost</h6>
+                                        <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
+                                            {{ $translation['shipping_cost'] }}</h6>
                                         <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
                                             KRW {{ number_format($productInfo->shippingCost, 2) }}</h6>
                                     </li>
@@ -149,15 +152,17 @@
                                 <div class="d-flex flex-wrap">
                                     <button class="btn btn-secondary me-3 my-1"
                                         style="padding: 10px 15px; background: var(--dark-blue)">
-                                        <p class="text-regular text-white text-md">Add to Cart</p>
+                                        <p class="text-regular text-white text-md">{{ $translation['add_to_cart'] }}</p>
                                     </button>
                                     <button class="btn btn-secondary me-3 my-1"
                                         style="padding: 10px 15px; background: var(--pure-white); border: 1px solid var(--dark-blue)">
-                                        <p class="text-regular text-md" style="color: var(--dark-blue)">Purchase Now</p>
+                                        <p class="text-regular text-md" style="color: var(--dark-blue)">
+                                            {{ $translation['purchase_now'] }}</p>
                                     </button>
                                     <button class="btn btn-secondary me-3 my-1"
                                         style="padding: 10px 15px; background: var(--pink); border: none">
-                                        <p class="text-regular text-white text-md">Add to Wishlist</p>
+                                        <p class="text-regular text-white text-md">{{ $translation['add_to_wishlist'] }}
+                                        </p>
                                     </button>
                                 </div>
                             </div>
@@ -165,7 +170,7 @@
 
                             {{-- Product Details --}}
                             <div class="py-4">
-                                <h4 style="color: var(--dark-blue);">Product Details</h4>
+                                <h4 style="color: var(--dark-blue);">{{ $translation['product_detail'] }}</h4>
                                 <div class="pb-1" style="border-bottom: 2px solid var(--cyan-blue)"></div>
                                 <div class="py-3 text-center">
                                     {!! $productInfo->productDetail !!}
@@ -184,7 +189,8 @@
             <div class="card card-bordered">
                 <div class="p-lg-5 p-4" style="background: var(--white);">
                     <div class="py-3" style="background: var(--pure-white);">
-                        <h2 class="fw-bold" style="color: var(--dark-blue);">Products From Same Supplier</h2>
+                        <h2 class="fw-bold pb-2" style="color: var(--dark-blue);">
+                            {{ $translation['product_from_same_supplier'] }}</h2>
                         <div class="row g-0 pb-3 horizontal-scrolling">
                             @foreach ($otherProducts as $key => $product_item)
                                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 pb-3 px-3"
@@ -207,14 +213,15 @@
                                                     </ul>
                                                     <h6 class="p-1 text-center my-auto" style="color: var(--dark-blue);">
                                                         (378)
-                                                        sold</h6>
+                                                        {{ $translation['sold'] }}</h6>
                                                 </div>
 
-                                                <h6 class="m-0" style="color: var(--dark-blue);">From</h6>
+                                                <h6 class="m-0" style="color: var(--dark-blue);">
+                                                    {{ $translation['from'] }}</h6>
                                                 <div class="d-flex align-items-end">
                                                     <h4 class ="text-pink fw-bold m-0 pe-1">KRW
                                                         {{ number_format($product_item->productPrice, 2) }}</h4>
-                                                    <h6 class ="text-pink">/Unit</h6>
+                                                    <h6 class ="text-pink">{{ $translation['Unit'] }}</h6>
                                                 </div>
                                             </div>
                                         </a>
@@ -228,7 +235,7 @@
 
             <div class="p-4"></div>
 
-            <div class="card card-bordered">
+            {{-- <div class="card card-bordered">
                 <div class="p-lg-5 p-4" style="background: var(--white);">
                     <div class="py-3" style="background: var(--pure-white);">
                         <h2 class="fw-bold" style="color: var(--dark-blue);">Similar Products</h2>
@@ -242,9 +249,9 @@
                                             <div class="pt-2 px-3">
                                                 <h4 class="text-nowrap text-truncate m-auto"
                                                     style="color: var(--dark-blue);">
-                                                    {{ $product_item->productName }}</h4>
-                                                {{-- display rating --}}
-                                                <div class="d-flex flex-wrap align-items-center py-1">
+                                                    {{ $product_item->productName }}</h4> --}}
+            {{-- display rating --}}
+            {{-- <div class="d-flex flex-wrap align-items-center py-1">
                                                     <ul class="rating" style="display: table;">
                                                         <li><em class="icon ni ni-star-fill"></em></li>
                                                         <li><em class="icon ni ni-star-fill"></em></li>
@@ -271,13 +278,23 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 @endsection
 
 @section('scripts')
     <script>
+        function formatCurrency(amount) {
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'KRW',
+                minimumFractionDigits: 2,
+            });
+            const formattedAmount = formatter.format(amount);
+            return formattedAmount.replace('₩', 'KRW ');
+        }
+
         function calculatePrice() {
             const quantity = document.getElementById('quantity').value;
             const unitPrice = "{{ $productInfo->productPrice }}";
@@ -285,8 +302,8 @@
 
             const totalPrice = quantity * unitPrice;
             const totalOriginalPrice = quantity * originalPrice;
-            document.getElementById('currentPrice').textContent = 'KRW ' + totalPrice.toFixed(2);
-            document.getElementById('originalPrice').textContent = 'KRW ' + totalOriginalPrice.toFixed(2);
+            document.getElementById('currentPrice').textContent = formatCurrency(totalPrice);
+            document.getElementById('originalPrice').textContent = formatCurrency(totalOriginalPrice);
         }
 
         const quantityInput = document.getElementById('quantity');

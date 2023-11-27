@@ -9,17 +9,17 @@
                 <div class="hstack px-2">
                     <ul class="nav">
                         <li class='nav-item'><a href='#' class='nav-link pe-3 fs-22px'
-                                style='color:var(--dark-blue);'>About</a></li>
+                                style='color:var(--dark-blue);'>{{ $translation['about_us'] }}</a></li>
                         <div class="px-2"></div>
                         <div class="vr" style="color:var(--dark-blue); width:2px; opacity:1;"></div>
                         <div class="px-2"></div>
                         <li class='nav-item'><a href='#' class='nav-link px-3 fs-22px'
-                                style='color:var(--dark-blue);'>Contact</a></li>
+                                style='color:var(--dark-blue);'>{{ $translation['contact'] }}</a></li>
                         <div class="px-2"></div>
                         <div class="vr" style="color:var(--dark-blue); width:2px; opacity:1;"></div>
                         <div class="px-2"></div>
                         <li class='nav-item'><a href='#' class='nav-link px-3 fs-22px'
-                                style='color:var(--dark-blue);'>Help</a></li>
+                                style='color:var(--dark-blue);'>{{ $translation['help'] }}</a></li>
                     </ul>
                 </div>
                 <div class="p-2"></div>

@@ -7,13 +7,13 @@
                 <button type="button" class="btn fs-22px dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
                     aria-expanded="false" style="color: var(--dark-blue)">
                     <img class="icon-size me-1" src={{ asset('media\Asset_Nav_Language.svg') }}>
-                    Language
+                    {{ $language->short }}
                     <img class="icon-size ms-1" src={{ asset('media\Asset_Control_SmallDropdown.svg') }}>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <ul class="link-list-opt no-bdr">
-                        <li><a href="#"><span>English</span></a></li>
-                        <li><a href="#"><span>Korea</span></a></li>
+                        <li><a href="{{ url('lang/1') }}"><span>English</span></a></li>
+                        <li><a href="{{ url('lang/2') }}"><span>Korea</span></a></li>
                     </ul>
                 </div>
             </div>
@@ -26,36 +26,35 @@
                         <ul class="nav">
                             <li class="nav-item">
                                 <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                    href={{ route('admin.dashboard') }}>공급사 페이지</a>
+                                    href={{ route('admin.dashboard') }}>{{ $translation['supplier_page'] }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                    href="#">About</a>
+                                    href="#">{{ $translation['about_us'] }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                    href="#">Contact</a>
+                                    href="#">{{ $translation['contact'] }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                    href="#">Help</a>
+                                    href="#">{{ $translation['help'] }}</a>
                             </li>
 
 
                             @if (Auth::guard('member')->check())
                                 <li class="nav-item">
                                     <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                        href="/domewing/auth/logout">Logout</a>
+                                        href="/domewing/auth/logout">{{ $translation['logout'] }}</a>
                                 </li>
                             @else
                                 <li class="nav-item">
                                     <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                        href="/domewing/auth/register">Sign
-                                        Up</a>
+                                        href="/domewing/auth/register">{{ $translation['signup'] }}</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
-                                        href="/domewing/auth/login">Login</a>
+                                        href="/domewing/auth/login">{{ $translation['login'] }}</a>
                                 </li>
                             @endif
                         </ul>
