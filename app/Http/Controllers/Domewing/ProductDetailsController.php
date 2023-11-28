@@ -13,19 +13,19 @@ class ProductDetailsController extends Controller
     public function loadProductDetail(Request $request, $id){
 
         //Load all the product details here
-        $productInfo = DB::table('uploaded_products_test')
-                        ->join('collected_products', 'uploaded_products_test.productId', '=', 'collected_products.id')
-                        ->where('uploaded_products_test.id', $id)
-                        ->where('uploaded_products_test.isActive', 'Y')
-                        ->select('collected_products.*', 'uploaded_products_test.id as uploadedId')
+        $productInfo = DB::table('uploaded_products')
+                        ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
+                        ->where('uploaded_products.id', $id)
+                        ->where('uploaded_products.isActive', 'Y')
+                        ->select('collected_products.*', 'uploaded_products.id as uploadedId')
                         ->first();
 
         if($productInfo == null){
             return redirect('/domewing')->with('error', 'Product not found');
         }
 
-        $otherProducts = $this->getOtherProducts($productInfo->userId, $productInfo->id);
-        $similarProducts = $this->getSimilarProducts($productInfo->userId, $productInfo->id);
+        $otherProducts = $this->getOtherProducts($productInfo->userId, $productInfo->uploadedId);
+        $similarProducts = $this->getSimilarProducts($productInfo->userId, $productInfo->uploadedId);
 
         return view('domewing.product_detail', [
             'productInfo' => $productInfo,
@@ -37,12 +37,12 @@ class ProductDetailsController extends Controller
     public function getOtherProducts($seller_id, $product_id){
 
         //Getting top 10 item from the same seller
-        $otherProducts = DB::table('uploaded_products_test')
-                        ->join('collected_products', 'uploaded_products_test.productId', '=', 'collected_products.id')
+        $otherProducts = DB::table('uploaded_products')
+                        ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
                         ->where('collected_products.userId', $seller_id)
-                        ->where('collected_products.id', '!=', $product_id)
-                        ->where('uploaded_products_test.isActive', 'Y')
-                        ->select('collected_products.*', 'uploaded_products_test.id as upload_id')
+                        ->where('uploaded_products.id', '!=', $product_id)
+                        ->where('uploaded_products.isActive', 'Y')
+                        ->select('collected_products.*', 'uploaded_products.id as upload_id')
                         ->limit(10)
                         ->get();
 
@@ -52,12 +52,12 @@ class ProductDetailsController extends Controller
     public function getSimilarProducts($seller_id, $product_id){
 
         //for testing purpose, need to change this algorithm to fins similar products
-        $similarProducts = DB::table('uploaded_products_test')
-                        ->join('collected_products', 'uploaded_products_test.productId', '=', 'collected_products.id')
-                        ->where('collected_products.userId',"!=", $seller_id)
-                        ->where('collected_products.id', '!=', $product_id)
-                        ->where('uploaded_products_test.isActive', 'Y')
-                        ->select('collected_products.*', 'uploaded_products_test.id as upload_id')
+        $similarProducts = DB::table('uploaded_products')
+                        ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
+                        ->where('collected_products.userId', $seller_id)
+                        ->where('uploaded_products.id', '!=', $product_id)
+                        ->where('uploaded_products.isActive', 'Y')
+                        ->select('collected_products.*', 'uploaded_products.id as upload_id')
                         ->limit(10)
                         ->get();
 
@@ -70,10 +70,10 @@ class ProductDetailsController extends Controller
         $remember_token = $request->input('remember_token');
 
         $member = DB::table('members')->where('remember_token', $remember_token)->first();
-        $product = DB::table('uploaded_products_test')
-            ->join('collected_products', 'uploaded_products_test.productId', '=', 'collected_products.id')
-            ->where('uploaded_products_test.id', $productId)
-            ->where('uploaded_products_test.isActive', 'Y')
+        $product = DB::table('uploaded_products')
+            ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
+            ->where('uploaded_products.id', $productId)
+            ->where('uploaded_products.isActive', 'Y')
             ->where('collected_products.isActive', 'Y')
             ->select('collected_products.userId as seller_id')
             ->first();
@@ -120,11 +120,11 @@ class ProductDetailsController extends Controller
 
         // Remove all shopping cart items if user adds new item from a different supplier
         $removeCart = DB::table('shopping_cart')
-            ->join('uploaded_products_test', 'shopping_cart.product_id', '=', 'uploaded_products_test.id')
-            ->join('collected_products', 'uploaded_products_test.productId', '=', 'collected_products.id')
+            ->join('uploaded_products', 'shopping_cart.product_id', '=', 'uploaded_products.id')
+            ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
             ->where('shopping_cart.user_id', $member->id)
             ->where('shopping_cart.is_Active', 'ACTIVE')
-            ->where('uploaded_products_test.isActive', 'Y')
+            ->where('uploaded_products.isActive', 'Y')
             ->where('collected_products.isActive', 'Y')
             ->where('collected_products.userId', '!=', $product->seller_id)
             ->count();

@@ -50,10 +50,11 @@ class GeneralController extends Controller
     public function getProducts($id){
         $product_items = DB::table('cms_domain')
                             ->join('collected_products', 'cms_domain.user_id', '=', 'collected_products.userId')
-                            ->join('uploaded_products_test', 'collected_products.id', '=', 'uploaded_products_test.productId')
+                            ->join('uploaded_products', 'collected_products.id', '=', 'uploaded_products.productId')
                             ->where('cms_domain.domain_id', $id)
-                            ->where('uploaded_products_test.isActive', 'Y')
-                            ->select('uploaded_products_test.id as upload_id','collected_products.id', 'collected_products.productName as title', 'collected_products.productImage as image')
+                            ->where('uploaded_products.isActive', 'Y')
+                            ->select('uploaded_products.id as upload_id','collected_products.id', 'collected_products.productName as title', 'uploaded_products.newImageHref as image')
+                            ->limit(10)
                             ->get();
 
         return $product_items;

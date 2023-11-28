@@ -45,7 +45,7 @@ Route::get('lang/{languageId}', function ($languageId) {
     return redirect()->back(); // Redirect to the previous page or any specific page
 });
 
-Route::middleware('auth.members')->middleware('translation')->prefix('domewing')->group(function () {
+Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(function () {
     Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
     Route::get('/shopping-cart', [ShoppingCartController::class, 'showShoppingCart']);
 });
@@ -77,6 +77,7 @@ Route::prefix('auth')->group(function () {
     Route::get('logout', [LoginController::class, 'logout']);
 });
 
+//Index for Domewing
 Route::middleware('translation')->group(function(){
     Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('home');
 });

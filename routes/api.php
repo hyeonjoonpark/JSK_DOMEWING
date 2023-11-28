@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Domewing\ProductDetailsController;
+use App\Http\Controllers\Domewing\ShoppingCartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,4 +63,6 @@ Route::post('seller/change-theme-color', [CMSController::class, 'changeThemeColo
 
 Route::post('member/add-to-cart', [ProductDetailsController::class, 'addToCart']);
 Route::post('member/remove-all-cart', [ProductDetailsController::class, 'removeAllCartItem']);
+Route::post('member/remove-cart-item', [ShoppingCartController::class, 'removeCartItem']);
+
 

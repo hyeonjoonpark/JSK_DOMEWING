@@ -52,8 +52,6 @@ class Translation
                     ->first();
 
             view()->share(['translation'=> $translation, 'language' => $language]);
-
-            return $next($request);
         }
 
         return $next($request);
