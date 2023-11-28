@@ -60,19 +60,16 @@ class FormController extends Controller
             set_time_limit(0);
             ini_set('memory_limit', '-1');
             foreach ($collectedProducts as $collectedProduct) {
-                // $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
-                // if ($collectedProduct->newImageHref == false) {
-                //     DB::table('collected_products')->where('id', $collectedProduct->id)->update([
-                //         'isActive' => 'N',
-                //         'remark' => 'Fail to load image'
-                //     ]);
-                // } else {
-                //     $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
-                //     $processedProducts[] = $collectedProduct;
-                // }
-                $collectedProduct->newImageHref = 'sample.jpg';
-                $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
-                $processedProducts[] = $collectedProduct;
+                $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
+                if ($collectedProduct->newImageHref == false) {
+                    DB::table('collected_products')->where('id', $collectedProduct->id)->update([
+                        'isActive' => 'N',
+                        'remark' => 'Fail to load image'
+                    ]);
+                } else {
+                    $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
+                    $processedProducts[] = $collectedProduct;
+                }
             }
             $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
             $activedUploadVendors = DB::select("SELECT *
