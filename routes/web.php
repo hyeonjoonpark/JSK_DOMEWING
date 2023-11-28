@@ -38,6 +38,16 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cms/{id}',[CMSController::class, 'loadSellerCMS']);
 });
 
+//Set Default Language
+session(['languageId' => 2]);
+
+Route::get('lang/{languageId}', function ($languageId) {
+    // Store the selected language ID in the session or as needed
+    session(['languageId' => $languageId]);
+
+    return redirect()->back(); // Redirect to the previous page or any specific page
+});
+
 Route::middleware('auth.members')->middleware('translation')->prefix('domewing')->group(function () {
     Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
     Route::get('/shopping-cart', [ShoppingCartController::class, 'showShoppingCart']);
@@ -76,13 +86,3 @@ Route::middleware('translation')->group(function(){
 
 Route::get('/naver-shop/categories', [NaverShopController::class, 'getCategories']);
 Route::get('/test', [TestController::class, 'handle']);
-
-//Set Default Language
-session(['languageId' => 2]);
-
-Route::get('lang/{languageId}', function ($languageId) {
-    // Store the selected language ID in the session or as needed
-    session(['languageId' => $languageId]);
-
-    return redirect()->back(); // Redirect to the previous page or any specific page
-});

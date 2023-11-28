@@ -7,7 +7,7 @@
                 <button type="button" class="btn fs-22px dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
                     aria-expanded="false" style="color: var(--dark-blue)">
                     <img class="icon-size me-1" src={{ asset('media\Asset_Nav_Language.svg') }}>
-                    {{-- {{ $language->short }} --}}
+                    {{ $language->short }}
                     <img class="icon-size ms-1" src={{ asset('media\Asset_Control_SmallDropdown.svg') }}>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
