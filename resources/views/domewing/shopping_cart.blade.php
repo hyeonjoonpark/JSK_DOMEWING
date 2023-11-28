@@ -130,7 +130,7 @@
                 </ul>
                 <button class="btn btn-secondary justify-content-center py-2" type="button"
                     style="background: var(--dark-blue);">
-                    <a href="#">
+                    <a href="/domewing/checkout">
                         <p class="text-nowrap text-white px-1 fs-22px">Check Out</p>
                     </a>
                 </button>
