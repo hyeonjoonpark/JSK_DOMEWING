@@ -363,19 +363,19 @@ class FormController extends Controller
                     '상세정보별도표기',
                     '상세정보별도표기',
                     '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
-                    '상세정보별도표기',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
                     '상세정보별도표기',
                     '상세정보별도표기',
                     '상세정보별도표기',
@@ -394,7 +394,7 @@ class FormController extends Controller
                 ->join('accounts', 'accounts.user_id', '=', 'users.id')
                 ->where('vendor_id', 5)
                 ->value('accounts.username');
-            $fileName = 'domeggook_' . $username . '_' . now()->format('YmdHis') . '.xlsx';
+            $fileName = 'domeatoz_' . $username . '_' . now()->format('YmdHis') . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
@@ -420,7 +420,7 @@ class FormController extends Controller
             // 데이터 추가
             $rowIndex = 5;
             foreach ($products as $product) {
-                $product_price = $product->productPrice * $margin_rate;
+                $product_price = ceil($product->productPrice * $margin_rate);
                 $categoryId = $product->categoryId;
                 $categoryMappingController = new CategoryMappingController();
                 $categoryCode = $categoryMappingController->wsConvertCategoryCode($categoryId);
