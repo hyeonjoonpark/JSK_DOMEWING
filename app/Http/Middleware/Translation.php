@@ -16,7 +16,7 @@ class Translation
      */
     public function handle(Request $request, Closure $next)
     {
-        $languageId = session('languageId');
+        $languageId = 2;
         $translation = DB::table('translation')
             ->join('language', 'translation.languageId', '=', 'language.id')
             ->where('translation.languageId', $languageId)
