@@ -41,7 +41,7 @@
                             <td class="nk-tb-col col-4">
                                 <a href="{{ $uploadedProduct->productHref }}" target="_blank" class="user-card">
                                     <div class="user-avatar bg-dim-primary d-none d-sm-flex">
-                                        <img src="{{ $uploadedProduct->productImage }}" alt="상품 대표 이미지">
+                                        <img src="{{ $uploadedProduct->newImageHref }}" alt="상품 대표 이미지">
                                     </div>
                                     <div class="user-info">
                                         <span class="tb-lead">{{ $uploadedProduct->productName }} <span

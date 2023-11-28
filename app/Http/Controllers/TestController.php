@@ -13,15 +13,16 @@ class TestController extends Controller
     {
         $spreadsheet = IOFactory::load(public_path('assets/excel/domeatoz_2010022418_20231128103724.xlsx'));
         $sheet = $spreadsheet->getSheet(0);
-        $uploadedProducts = DB::table('collected_products')->where('isActive', 'Y')->where('id', '>=', '2')->where('id', '<=', '535')->get();
-        foreach ($uploadedProducts as $product) {
-            DB::table('uploaded_products')->insert([
-                'productId' => $product->id,
-                'userId' => 15,
-                'newImageHref' => 'sample'
+        $highestRow = $sheet->getHighestRow(); // 시트의 가장 높은 행 번호를 얻습니다.
+
+        for ($row = 3; $row <= $highestRow; $row++) {
+            $valueU = $sheet->getCellByColumnAndRow(21, $row)->getValue(); // 21번째 열(U열)의 값
+            $valueAD = $sheet->getCellByColumnAndRow(30, $row)->getValue(); // 30번째 열(AD열)의 값
+
+            DB::table('uploaded_products')->where('productId', $valueAD)->update([
+                'newImageHref' => $valueU
             ]);
         }
-        return $uploadedProducts;
     }
     public function index()
     {
