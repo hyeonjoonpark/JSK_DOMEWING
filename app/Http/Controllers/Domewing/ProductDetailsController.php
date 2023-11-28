@@ -200,5 +200,4 @@ class ProductDetailsController extends Controller
             ];
         }
     }
-
 }
