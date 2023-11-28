@@ -9,6 +9,20 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class TestController extends Controller
 {
+    public function uploadedProducts()
+    {
+        $spreadsheet = IOFactory::load(public_path('assets/excel/domeatoz_2010022418_20231128103724.xlsx'));
+        $sheet = $spreadsheet->getSheet(0);
+        $uploadedProducts = DB::table('collected_products')->where('isActive', 'Y')->where('id', '>=', '2')->where('id', '<=', '535')->get();
+        foreach ($uploadedProducts as $product) {
+            DB::table('uploaded_products')->insert([
+                'productId' => $product->id,
+                'userId' => 15,
+                'newImageHref' => 'sample'
+            ]);
+        }
+        return $uploadedProducts;
+    }
     public function index()
     {
         $products = DB::table('collected_products')
