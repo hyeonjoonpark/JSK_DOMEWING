@@ -38,9 +38,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cms/{id}',[CMSController::class, 'loadSellerCMS']);
 });
 
-//Set Default Language
-session(['languageId' => 2]);
-
 Route::get('lang/{languageId}', function ($languageId) {
     // Store the selected language ID in the session or as needed
     session(['languageId' => $languageId]);

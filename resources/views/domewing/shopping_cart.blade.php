@@ -7,7 +7,8 @@
                     <div class="p-md-2 p-1">
                         <div class="row">
                             <div class="col-10">
-                                <h3 class="fw-bold text-break text-truncate" style="color: var(--dark-blue);">Supplier 1</h3>
+                                <h3 class="fw-bold text-break text-truncate" style="color: var(--dark-blue);">
+                                    {{ $remember_token }}</h3>
                             </div>
                             <div class="col-2 text-end">
                                 <a class="px-lg-0 px-md-2" href="#">
