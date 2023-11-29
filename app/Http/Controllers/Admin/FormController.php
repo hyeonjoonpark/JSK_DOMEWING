@@ -61,7 +61,7 @@ class FormController extends Controller
             ini_set('memory_limit', '-1');
             foreach ($collectedProducts as $collectedProduct) {
                 $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
-                $preprocessProductDetail = $pIC->preprocessProductDetail($collectedProduct->productDetail);
+                $preprocessProductDetail = $pIC->preprocessProductDetail($collectedProduct);
                 if ($collectedProduct->newImageHref == false) {
                     DB::table('collected_products')->where('id', $collectedProduct->id)->update([
                         'isActive' => 'N',

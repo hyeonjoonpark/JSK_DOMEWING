@@ -15,66 +15,26 @@ class TestController extends Controller
 {
     public function index()
     {
-        $uploadedProducts = $this->getUploadedProducts();
-        $fc = new FormController();
-        $response = $fc->domeggook($uploadedProducts, 15);
-        return $response;
-    }
+        $url = "https://api-gateway.coupang.com/v2/providers/openapi/apis/api/v1/categorization/predict"; // API URL
+        $data = array('productName' => '닥터락 삶는 고급형 방수시트 노랑 병원 요양원 침대반시트'); // 보낼 데이터
 
-    private function getUploadedProducts()
-    {
-        return DB::table('uploaded_products')
-            ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
-            ->select('*', 'uploaded_products.id as uploadedProductID')
-            ->get();
-    }
+        // cURL 세션 초기화
+        $ch = curl_init();
 
-    private function processProductDetail($productDetail)
-    {
-        $doc = $this->loadHtmlDocument($productDetail);
-        $images = $this->extractImages($doc);
+        // cURL 옵션 설정
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data)); // 데이터를 URL-인코딩 형식으로 변환
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        return $this->createImageHtml($images);
-    }
+        // 요청 실행 및 응답 받기
+        $response = curl_exec($ch);
 
-    private function loadHtmlDocument($htmlContent)
-    {
-        $doc = new DOMDocument();
-        libxml_use_internal_errors(true);
-        $doc->loadHTML($htmlContent);
-        libxml_clear_errors();
+        // cURL 세션 종료
+        curl_close($ch);
 
-        return $doc;
-    }
-
-    private function extractImages(DOMDocument $doc)
-    {
-        $xpath = new DOMXPath($doc);
-        return $xpath->query("//img");
-    }
-
-    private function createImageHtml($images)
-    {
-        $html = '<center>';
-        foreach ($images as $img) {
-            $html .= $this->getImageHtml($img);
-        }
-        $html .= '</center>';
-
-        return $html;
-    }
-
-    private function getImageHtml($img)
-    {
-        $src = $img->getAttribute('src');
-        $imageContent = file_get_contents($src);
-        $imageExtension = pathinfo($src, PATHINFO_EXTENSION);
-        $imageName = uniqid() . '.' . $imageExtension;
-        $savePath = public_path('images/product/details') . '/' . $imageName;
-        file_put_contents($savePath, $imageContent);
-        $tmpSrc = "https://www.sellwing.kr/images/product/" . $imageName;
-
-        return '<img src="' . $tmpSrc . '" alt="">';
+        // 응답 출력
+        echo $response;
     }
     // public function index()
     // {
