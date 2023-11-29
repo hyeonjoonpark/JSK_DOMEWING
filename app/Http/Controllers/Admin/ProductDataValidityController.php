@@ -45,6 +45,13 @@ class ProductDataValidityController extends Controller
             }
         }
 
+        $bannedWords = ['최고', '숙취', '치매', '무좀', '품절', '교정', '발모', '환자', '탄력', '이벤트'];
+        foreach ($bannedWords as $bannedWord) {
+            if (strpos($keyword, $bannedWord) !== false) {
+                return $bannedWord . '(은)는 금지된 키워드입니다.';
+            }
+        }
+
         return true;
     }
 }
