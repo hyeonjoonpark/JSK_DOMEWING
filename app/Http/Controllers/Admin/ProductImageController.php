@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
+use Exception;
+use DOMDocument;
+use DOMXPath;
 
 class ProductImageController extends Controller
 {
@@ -34,5 +37,67 @@ class ProductImageController extends Controller
             error_log("Error processing image: " . $e->getMessage());
             return false;
         }
+    }
+    public function preprocessProductDetail($product)
+    {
+        try {
+            $newProductDetail = $this->processProductDetail($product->productDetail);
+            return [
+                'status' => true,
+                'return' => $newProductDetail
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+    private function processProductDetail($productDetail)
+    {
+        $doc = $this->loadHtmlDocument($productDetail);
+        $images = $this->extractImages($doc);
+
+        return $this->createImageHtml($images);
+    }
+
+    private function loadHtmlDocument($htmlContent)
+    {
+        $doc = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $doc->loadHTML($htmlContent);
+        libxml_clear_errors();
+
+        return $doc;
+    }
+
+    private function extractImages(DOMDocument $doc)
+    {
+        $xpath = new DOMXPath($doc);
+        return $xpath->query("//img");
+    }
+
+    private function createImageHtml($images)
+    {
+        $html = '<center>';
+        foreach ($images as $img) {
+            $html .= $this->getImageHtml($img);
+        }
+        $html .= '</center>';
+
+        return $html;
+    }
+
+    private function getImageHtml($img)
+    {
+        $src = $img->getAttribute('src');
+        $imageContent = file_get_contents($src);
+        $imageExtension = pathinfo($src, PATHINFO_EXTENSION);
+        $imageName = uniqid() . '.' . $imageExtension;
+        $savePath = public_path('images/product/details') . '/' . $imageName;
+        file_put_contents($savePath, $imageContent);
+        $tmpSrc = "https://www.sellwing.kr/images/product/detail/" . $imageName;
+
+        return '<img src="' . $tmpSrc . '" alt="">';
     }
 }

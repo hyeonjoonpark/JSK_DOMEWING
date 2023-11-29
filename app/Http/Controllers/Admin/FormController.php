@@ -42,37 +42,6 @@ class FormController extends Controller
             return $data;
         }
     }
-    public function selectProducts($fromID, $toID)
-    {
-        $selectedProducts = DB::table('uploaded_products')
-            ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
-            ->where('collected_products.isActive', 'Y')
-            ->where('uploaded_products.isActive', 'Y')
-            ->where('collected_products.productId', '>=', $fromID)
-            ->where('collected_products.productId', '<=', $toID)
-            ->get();
-        return $selectedProducts;
-    }
-    public function selectVendors($fromID, $toID)
-    {
-        $selectedVendors = DB::table('product_register')
-            ->join('vendors', 'vendors.id', '=', 'product_register.vendorId')
-            ->where('product_register.is_active', 'Y')
-            ->where('vendors.is_active', 'ACTIVE')
-            ->where('product_register.id', '>=', $fromID)
-            ->where('product_register.id', '<=', $toID);
-        return $selectedVendors;
-    }
-    public function backUpUpload()
-    {
-        $fromID = 2;
-        $toID = 535;
-        $products = $this->selectProducts($fromID, $toID);
-        $fromID = 8;
-        $toID = 8;
-        $vendors = $this->selectVendors($fromID, $toID);
-        print_r($vendors);
-    }
     public function index(Request $request)
     {
         try {
@@ -92,12 +61,16 @@ class FormController extends Controller
             ini_set('memory_limit', '-1');
             foreach ($collectedProducts as $collectedProduct) {
                 $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
+                $preprocessProductDetail = $pIC->preprocessProductDetail($collectedProduct->productDetail);
                 if ($collectedProduct->newImageHref == false) {
                     DB::table('collected_products')->where('id', $collectedProduct->id)->update([
                         'isActive' => 'N',
                         'remark' => 'Fail to load image'
                     ]);
                 } else {
+                    if ($preprocessProductDetail) {
+                        $collectedProduct->newProductDetail = $preprocessProductDetail['return'];
+                    }
                     $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
                     $processedProducts[] = $collectedProduct;
                 }
