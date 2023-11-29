@@ -52,6 +52,7 @@ class ShoppingCartController extends Controller
         $member = DB::table('members')->where('remember_token', $remember_token)->first();
 
         if(!$member){
+            Auth::logout();
             return [
                 'status' => -2,
                 'icon' => 'warning',
@@ -90,5 +91,15 @@ class ShoppingCartController extends Controller
                 'return' => 'Error Occured. Please Try Again Later.'
             ];
         }
+    }
+
+    public function updateQuantity(Request $request){
+        $cartId = $request->input('cartId');
+        $newQuantity = $request->input('newQuantity');
+
+        $update= DB::table('shopping_cart')
+                    ->where('id', $cartId)
+                    ->where('is_Active', 'ACTIVE')
+                    ->update(['quantity' => $newQuantity,'updated_at' => now()]);
     }
 }
