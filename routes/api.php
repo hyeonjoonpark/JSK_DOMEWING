@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Admin\FormController;
 use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Admin\ProductCollectController;
+use App\Http\Controllers\Admin\ProductDataValidityController;
 use App\Http\Controllers\Admin\ProductDetailController;
 use App\Http\Controllers\Admin\ProductKeywordController;
 use App\Http\Controllers\Admin\ProductRegisterController;
@@ -40,6 +41,7 @@ Route::post('/product/category', [ProductRegisterController::class, 'categorySea
 Route::post('/product/register', [ProductRegisterController::class, 'handle']);
 Route::post('/product/upload', [FormController::class, 'index']);
 Route::post('/product/keywords', [ProductKeywordController::class, 'index']);
+Route::post('/product/data-validity', [ProductDataValidityController::class, 'index']);
 // account-setting
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 // Load product details
