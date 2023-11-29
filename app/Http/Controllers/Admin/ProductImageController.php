@@ -94,7 +94,7 @@ class ProductImageController extends Controller
         $imageContent = file_get_contents($src);
         $imageExtension = pathinfo($src, PATHINFO_EXTENSION);
         $imageName = uniqid() . '.' . $imageExtension;
-        $savePath = public_path('images/product/details') . '/' . $imageName;
+        $savePath = public_path('images/product/detail') . '/' . $imageName;
         file_put_contents($savePath, $imageContent);
         $tmpSrc = "https://www.sellwing.kr/images/product/detail/" . $imageName;
 
