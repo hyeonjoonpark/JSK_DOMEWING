@@ -267,14 +267,14 @@
                 }
             }
         });
-        const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}';
-        // 이미지를 미리 로딩
-        const image = new Image();
-        image.src = loadingGifSrc;
+        // const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}';
+        // // 이미지를 미리 로딩
+        // const image = new Image();
+        // image.src = loadingGifSrc;
 
         function collectInit() {
-            const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}'
-            let html = '<img src="' + image.src + '" class="w-75" />'
+            const loadingGifSrc = "{{ public_path('assets/images/search-loader.gif') }}";
+            let html = '<img src="' + loadingGifSrc + '" class="w-75" />'
             html += '<h2 class="swal2-title mt-5">상품 데이터를 수집 중입니다</h2>'
             Swal.fire({
                 html: html,
