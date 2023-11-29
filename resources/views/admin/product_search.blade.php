@@ -34,8 +34,8 @@
                         <label class="form-label">상품 키워드</label>
                         <div class="row g-0">
                             <div class="col">
-                                <input type="text" class="form-control" id="productUrl"
-                                    placeholder="상품 키워드 기입해주세요."onkeydown="handleEnter(event)" />
+                                <input type="text" class="form-control" id="productUrl" placeholder="상품 키워드 기입해주세요."
+                                    onkeydown="handleEnter(event)" />
                             </div>
                             <div class="col-auto">
                                 <button class="btn btn-primary" id="searchBtn" onclick="collectInit();">상품 검색</button>
@@ -199,7 +199,7 @@
                             <label class="form-label" for="pBCDCategoryId">상품 카테고리</label>
                             <div class="form-control-wrap d-flex text-nowrap mb-3">
                                 <input type="text" class="form-control" placeholder="카테고리 검색 키워드를 입력해주세요."
-                                    id="pBCDCategoryKeyword">
+                                    id="pBCDCategoryKeyword" onkeydown="initPBCDCategorySearch(event)">
                                 <button class="btn btn-primary" onclick="pBCDCategroySearch();"
                                     id="pBCDCategorySearchBtn">검색</button>
                             </div>
@@ -215,7 +215,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-lg btn-primary" onclick="saveBulkProducts();">가공
+                            <button type="submit" class="btn btn-lg btn-primary" onclick="initCollectProducts();">가공
                                 완료</button>
                         </div>
                     </div>
@@ -233,6 +233,9 @@
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
         var productHref;
+        var loadingGifSrc = "{{ asset('assets/images/search-loader.gif') }}";
+        var image = new Image();
+        image.src = loadingGifSrc;
         $('#summernote').summernote({
             height: 300,
             callbacks: {
@@ -267,13 +270,8 @@
                 }
             }
         });
-        const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}';
-        // 이미지를 미리 로딩
-        const image = new Image();
-        image.src = loadingGifSrc;
 
         function collectInit() {
-            const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}'
             let html = '<img src="' + image.src + '" class="w-75" />'
             html += '<h2 class="swal2-title mt-5">상품 데이터를 수집 중입니다</h2>'
             Swal.fire({
@@ -282,8 +280,7 @@
                 showConfirmButton: false
             });
             const keyword = $("#productUrl").val();
-            let vendorIds = []; // 선택된 값들을 저장할 배열
-            // 클래스가 'vendor-checkbox'인 체크박스들을 선택
+            let vendorIds = [];
             $('input[name="vendors[]"]:checked').each(function() {
                 vendorIds.push($(this).val()); // 선택된 체크박스의 값(value)를 배열에 추가
             });
@@ -296,15 +293,16 @@
                     vendorIds: vendorIds
                 },
                 success: function(response) {
-                    if (response.status == 1) {
+                    const status = parseInt(response.status);
+                    if (status === 1) {
+                        updateDataTable(response.return);
+                        $('#numResult').html(response.return.length);
+                        Swal.close();
                         Swal.fire({
                             icon: "success",
                             title: "진행 성공",
                             text: "데이터를 성공적으로 불러왔습니다."
                         });
-                        console.log(response.return);
-                        updateDataTable(response.return);
-                        $('#numResult').html(response.return.length);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -314,12 +312,6 @@
                     }
                 },
                 error: function(response) {
-                    $("#loadingImg").addClass("d-none");
-                    Swal.fire({
-                        icon: "error",
-                        title: "진행 실패",
-                        text: response.message
-                    });
                     console.log(response);
                 }
             });
@@ -568,7 +560,6 @@
 
         function loadProductDetail(platform, href) {
             $('.btn').prop('disabled', true);
-            const loadingGifSrc = '{{ asset('assets/images/loading.gif') }}'
             let html = '<img src="' + image.src + '" class="w-75" />'
             html += '<h2 class="swal2-title mt-5">상품 정보를 추출 중입니다<br>잠시만 기다려주세요</h2>'
             Swal.fire({
@@ -631,8 +622,6 @@
                     selectedProducts.push(tmpProduct);
                 }
             }
-            console.log(collectedProducts);
-            console.log(selectedProducts);
             $('#productBulkCollectWizard').modal('show');
         }
 
@@ -761,6 +750,45 @@
                 event.preventDefault(); // 엔터키의 기본 동작(새 줄 삽입)을 방지
                 document.getElementById('searchBtn').click(); // 버튼 클릭 이벤트 실행
             }
+        }
+
+        function initPBCDCategorySearch(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // 엔터키의 기본 동작(새 줄 삽입)을 방지
+                document.getElementById('pBCDCategorySearchBtn').click(); // 버튼 클릭 이벤트 실행
+            }
+        }
+
+        function initCollectProducts() {
+            $('.btn').prop('disabled', true);
+            const categoryID = $('#pBCDCategoryId').val();
+            const keywords = $('#pBCDKeywords').val();
+            $.ajax({
+                url: '/api/product/data-validity',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    categoryID: categoryID,
+                    keywords: keywords
+                },
+                success: function(response) {
+                    $('.btn').prop('disabled', false);
+                    const status = response.status;
+                    if (status) {
+                        loadBulkDetails(selectedProducts);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '진행 실패',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(response) {
+                    $('.btn').prop('disabled', false);
+                    console.log(response);
+                }
+            });
         }
     </script>
 @endsection

@@ -61,12 +61,16 @@ class FormController extends Controller
             ini_set('memory_limit', '-1');
             foreach ($collectedProducts as $collectedProduct) {
                 $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
+                $preprocessProductDetail = $pIC->preprocessProductDetail($collectedProduct->productDetail);
                 if ($collectedProduct->newImageHref == false) {
                     DB::table('collected_products')->where('id', $collectedProduct->id)->update([
                         'isActive' => 'N',
                         'remark' => 'Fail to load image'
                     ]);
                 } else {
+                    if ($preprocessProductDetail['status']) {
+                        $collectedProduct->newProductDetail = $preprocessProductDetail['return'];
+                    }
                     $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
                     $processedProducts[] = $collectedProduct;
                 }
@@ -132,7 +136,7 @@ class FormController extends Controller
                     '1',
                     $product->id,
                     $product->newImageHref,
-                    $product->productDetail,
+                    $product->newProductDetail,
                     '',
                     '',
                     '',
@@ -349,7 +353,7 @@ class FormController extends Controller
                     $product->newImageHref,
                     768,
                     'Y',
-                    $product->productDetail,
+                    $product->newProductDetail,
                     '',
                     '',
                     0,
@@ -442,7 +446,7 @@ class FormController extends Controller
                     '',
                     0,
                     0,
-                    $product->productDetail,
+                    $product->newProductDetail,
                     $product->newImageHref,
                     '',
                     '',
@@ -550,7 +554,7 @@ class FormController extends Controller
                     $product_price,
                     '',
                     '',
-                    $product->productDetail,
+                    $product->newProductDetail,
                     $product->newImageHref,
                     '',
                     '',
@@ -657,7 +661,7 @@ class FormController extends Controller
                     'N,LADAM,' . $product->id,
                     $product->newImageHref,
                     '',
-                    $product->productDetail,
+                    $product->newProductDetail,
                     '가능',
                     '선불',
                     $product->shippingCost,
