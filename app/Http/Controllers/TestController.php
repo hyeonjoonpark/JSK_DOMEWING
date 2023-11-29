@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Admin\ProductImageController;
+use App\Http\Controllers\Admin\FormController;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -15,18 +16,9 @@ class TestController extends Controller
     public function index()
     {
         $uploadedProducts = $this->getUploadedProducts();
-        $pIC = new ProductImageController();
-        foreach ($uploadedProducts as $product) {
-            $newProductDetail = $pIC->preprocessProductDetail($product);
-            if ($newProductDetail) {
-                $newProductDetail = $newProductDetail['return'];
-            }
-            DB::table('uploaded_products')
-                ->where('id', $product->uploadedProductID)
-                ->update([
-                    'newProductDetail' => $newProductDetail
-                ]);
-        }
+        $fc = new FormController();
+        $response = $fc->domeggook($uploadedProducts, 15);
+        return $response;
     }
 
     private function getUploadedProducts()
