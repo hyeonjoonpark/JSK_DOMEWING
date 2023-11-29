@@ -2,147 +2,225 @@
 @section('content')
     <div class="px-lg-5 px-2" style="background: var(--thin-blue); padding-top: 30px; padding-bottom:50px;">
         <div class="px-lg-5 px-md-2 px-0">
-            <div class="p-4 rounded"style="background: var(--white);">
-                <div class="d-block">
-                    <div class="p-md-2 p-1">
-                        <div class="row">
-                            <div class="col-10">
-                                <a href="/domewing/{{ $shopping_cart->first()->domain_name }}">
-                                    <h3 class="fw-bold text-break text-truncate" style="color: var(--dark-blue);">
-                                        {{ $shopping_cart->first()->supplier_name }}</h3>
-                                </a>
-                            </div>
-                            <div class="col-2 text-end">
-                                <a class="px-lg-0 px-md-2" href="/domewing/{{ $shopping_cart->first()->domain_name }}">
-                                    <img src={{ asset('media\Asset_Control_Next.svg') }} alt="Next Page"
-                                        style="width:20px; height:20px;">
-                                </a>
-                            </div>
+            @if ($shopping_cart->isEmpty())
+                <div class="card card-bordered p-4 h-100"style="background: var(--white);">
+                    <div class="d-block">
+                        <div class="p-md-2 p-1">
+                            <h4 class="fw-bold text-center" style="color: var(--dark-blue);">Your Current
+                                Shopping Cart is Empty</h4>
                         </div>
-                        <div class="py-1" style="border-bottom: 1px solid var(--dark-blue)"></div>
+                    </div>
+                </div>
+            @else
+                <div class="card card-bordered p-4 h-100"style="background: var(--white);">
+                    <div class="d-block">
+                        <div class="p-md-2 p-1">
+                            <div class="row">
+                                <div class="col-10">
+                                    <a href="/domewing/{{ $shopping_cart->first()->domain_name }}">
+                                        <h3 class="fw-bold text-break text-truncate" style="color: var(--dark-blue);">
+                                            {{ $shopping_cart->first()->supplier_name }}</h3>
+                                    </a>
+                                </div>
+                                <div class="col-2 text-end">
+                                    <a class="px-lg-0 px-md-2" href="/domewing/{{ $shopping_cart->first()->domain_name }}">
+                                        <img src={{ asset('media\Asset_Control_Next.svg') }} alt="Next Page"
+                                            style="width:20px; height:20px;">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="py-1" style="border-bottom: 1px solid var(--dark-blue)"></div>
 
-                        <div class="product-list">
-                            @foreach ($shopping_cart as $item)
-                                <div class="product">
-                                    <div class="row py-2 align-items-center">
-                                        <div class="col-1 text-end">
-                                            <div class="custom-control custom-checkbox rounded-checkbox">
-                                                <input type="checkbox" class="custom-control-input selectable-item"
-                                                    id="item{{ $item->id }}" data-price="{{ $item->price }}"
-                                                    data-shipping="{{ $item->shippingCost }}">
-                                                <label class="custom-control-label" style="padding:0%;"
-                                                    for="item{{ $item->id }}"></label>
+                            <div class="product-list">
+                                @foreach ($shopping_cart as $item)
+                                    <div class="product">
+                                        <div class="row py-2 align-items-center">
+                                            <div class="col-1 text-end">
+                                                <div class="custom-control custom-checkbox rounded-checkbox">
+                                                    <input type="checkbox" class="custom-control-input selectable-item"
+                                                        id="item{{ $item->id }}" data-price="{{ $item->price }}"
+                                                        data-shipping="{{ $item->shippingCost }}"
+                                                        data-cart-id="{{ $item->id }}">
+                                                    <label class="custom-control-label" style="padding:0%;"
+                                                        for="item{{ $item->id }}"></label>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-lg-3 col-md-4 col-6">
-                                            <img src="{{ $item->image }}" class="border border-secondary" />
-                                        </div>
-                                        <div class="col-lg-8 col-md-7 col-12 p-lg-1 p-2">
-                                            <div class="d-flex">
-                                                <div class="flex-grow-1">
-                                                    <h3 class="fw-bold pb-3 text-elipsis" style="color: var(--dark-blue);">
-                                                        {{ $item->productName }}
-                                                    </h3>
-                                                    <ul class="pricing-features pb-3 fs-18px"
-                                                        style="color: var(--dark-blue);">
-                                                        <li><span class="w-50 align-self-center">Delivery Fees</span><span
-                                                                class="ms-auto text-end">KRW
-                                                                {{ number_format($item->shippingCost, 2) }}</span></li>
-                                                        <li><span class="w-50 align-self-center">Promotions
-                                                                Applied</span><span class="ms-auto text-end">Wholesales
-                                                                Discount</span>
-                                                        </li>
-                                                    </ul>
+                                            <div class="col-lg-3 col-md-4 col-6">
+                                                <img src="{{ $item->image }}" class="border border-secondary" />
+                                            </div>
+                                            <div class="col-lg-8 col-md-7 col-12 p-lg-1 p-2">
+                                                <div class="d-flex">
+                                                    <div class="flex-grow-1">
+                                                        <h3 class="fw-bold pb-3 text-elipsis"
+                                                            style="color: var(--dark-blue);">
+                                                            {{ $item->productName }}
+                                                        </h3>
+                                                        <ul class="pricing-features pb-3 fs-18px"
+                                                            style="color: var(--dark-blue);">
+                                                            <li><span class="w-50 align-self-center">Delivery
+                                                                    Fees</span><span class="ms-auto text-end">KRW
+                                                                    {{ number_format($item->shippingCost, 2) }}</span></li>
+                                                            <li><span class="w-50 align-self-center">Promotions
+                                                                    Applied</span><span class="ms-auto text-end">Wholesales
+                                                                    Discount</span>
+                                                            </li>
+                                                        </ul>
 
-                                                    <div class="d-flex">
-                                                        <div class="form-group">
-                                                            <div class="form-control-wrap number-spinner-wrap">
-                                                                <button
-                                                                    class="btn btn-icon btn-primary number-spinner-btn number-minus">
-                                                                    <em class="icon ni ni-minus"></em>
-                                                                </button>
-                                                                <input type="number" class="form-control number-spinner"
-                                                                    id="quantity{{ $item->id }}" placeholder="1"
-                                                                    value="{{ $item->quantity }}" min="1"
-                                                                    style="color: var(--dark-blue);">
-                                                                <button
-                                                                    class="btn btn-icon btn-primary number-spinner-btn number-plus">
-                                                                    <em class="icon ni ni-plus"></em>
-                                                                </button>
+                                                        <div class="d-flex">
+                                                            <div class="form-group">
+                                                                <div class="form-control-wrap number-spinner-wrap">
+                                                                    <button
+                                                                        class="btn btn-icon btn-primary number-spinner-btn number-minus">
+                                                                        <em class="icon ni ni-minus"></em>
+                                                                    </button>
+                                                                    <input type="number"
+                                                                        class="form-control number-spinner"
+                                                                        id="quantity{{ $item->id }}" placeholder="1"
+                                                                        value="{{ $item->quantity }}" min="1"
+                                                                        onchange="updateQuantity({{ $item->id }}, this.value)"
+                                                                        style="color: var(--dark-blue);">
+                                                                    <button
+                                                                        class="btn btn-icon btn-primary number-spinner-btn number-plus">
+                                                                        <em class="icon ni ni-plus"></em>
+                                                                    </button>
+                                                                </div>
                                                             </div>
+                                                        </div>
+
+                                                        <div class="d-flex pb-2 pt-2">
+                                                            @php
+                                                                $adjustedPrice = $item->price + 500;
+                                                            @endphp
+                                                            <h3 class="fw-bold" style="color: var(--pink);">
+                                                                KRW {{ number_format($item->price, 2) }} <span
+                                                                    class="fs-18px text-decoration-line-through"
+                                                                    style="color: var(--pink);">
+                                                                    KRW {{ number_format($adjustedPrice, 2) }}</span>
+                                                            </h3>
+
                                                         </div>
                                                     </div>
 
-                                                    <div class="d-flex pb-2 pt-2">
-                                                        @php
-                                                            $adjustedPrice = $item->price + 500;
-                                                        @endphp
-                                                        <h3 class="fw-bold" style="color: var(--pink);">
-                                                            KRW {{ number_format($item->price, 2) }} <span
-                                                                class="fs-18px text-decoration-line-through"
-                                                                style="color: var(--pink);">
-                                                                KRW {{ number_format($adjustedPrice, 2) }}</span>
-                                                        </h3>
-
-                                                    </div>
+                                                    <a class="flex-grow-1 ms-auto text-end align-self-top px-3"
+                                                        href="#" onclick="removeInit({{ $item->id }})">
+                                                        <em class="icon fa-solid fa-trash fa-2x"></em>
+                                                    </a>
                                                 </div>
-
-                                                <a class="flex-grow-1 ms-auto text-end align-self-top px-3" href="#"
-                                                    onclick="removeInit({{ $item->id }})">
-                                                    <em class="icon fa-solid fa-trash fa-2x"></em>
-                                                </a>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Grand Total --}}
-            <div class="pt-5" style="border-bottom: 2px solid var(--dark-blue)"></div>
+                {{-- Grand Total --}}
+                <div class="pt-5" style="border-bottom: 2px solid var(--dark-blue)"></div>
 
-            <div class="d-flex flex-wrap align-items-center justify-content-center">
-                <div class="px-md-2 p-1 py-2 me-auto flex-grow-1">
-                    <div class="custom-control custom-checkbox rounded-checkbox">
-                        <input type="checkbox" class="custom-control-input mt-3" id="selectAll">
-                        <label class="custom-control-label" for="selectAll">
-                            <h3 style="color: var(--dark-blue);">All</h3>
-                        </label>
+                <div class="d-flex flex-wrap align-items-center justify-content-center">
+                    <div class="px-md-2 p-1 py-2 me-auto flex-grow-1">
+                        <div class="custom-control custom-checkbox rounded-checkbox">
+                            <input type="checkbox" class="custom-control-input mt-3" id="selectAll">
+                            <label class="custom-control-label" for="selectAll">
+                                <h3 style="color: var(--dark-blue);">All</h3>
+                            </label>
+                        </div>
                     </div>
+                    <ul class="pricing-features fs-18px px-4 flex-grow-1 text-nowrap text-lg-end text-md-start py-2"
+                        style="color: var(--dark-blue);">
+                        <li><span class="w-50 align-self-center">Total</span>
+                            <h4 id="grandTotal" class="ms-auto fw-bold" style="color: var(--dark-blue);">KRW 0.00</h4>
+                        </li>
+                        <li><span class="w-50 align-self-center">Product Price</span>
+                            <span id="totalProductPrice" class="ms-auto" style="color: var(--dark-blue);">KRW 0.00</span>
+                        </li>
+                        <li><span class="w-50 align-self-center">Shipping Cost</span>
+                            <span id="totalShippingCost" class="ms-auto" style="color: var(--dark-blue);">KRW 0.00</span>
+                        </li>
+                        <li><span class="w-50 align-self-center">Saved</span><span id="totalSaved" class="ms-auto">KRW
+                                0.00</span>
+                        </li>
+                    </ul>
+                    <button class="btn btn-secondary justify-content-center py-2" type="button"
+                        style="background: var(--dark-blue);">
+                        <a onclick="createOrder()">
+                            <p class="text-nowrap text-white px-1 fs-22px">Check Out</p>
+                        </a>
+                    </button>
                 </div>
-                <ul class="pricing-features fs-18px px-4 flex-grow-1 text-nowrap text-lg-end text-md-start py-2"
-                    style="color: var(--dark-blue);">
-                    <li><span class="w-50 align-self-center">Total</span>
-                        <h4 id="grandTotal" class="ms-auto fw-bold" style="color: var(--dark-blue);">KRW 0.00</h4>
-                    </li>
-                    <li><span class="w-50 align-self-center">Product Price</span>
-                        <span id="totalProductPrice" class="ms-auto" style="color: var(--dark-blue);">KRW 0.00</span>
-                    </li>
-                    <li><span class="w-50 align-self-center">Shipping Cost</span>
-                        <span id="totalShippingCost" class="ms-auto" style="color: var(--dark-blue);">KRW 0.00</span>
-                    </li>
-                    <li><span class="w-50 align-self-center">Saved</span><span id="totalSaved" class="ms-auto">KRW
-                            0.00</span>
-                    </li>
-                </ul>
-                <button class="btn btn-secondary justify-content-center py-2" type="button"
-                    style="background: var(--dark-blue);">
-                    <a href="/domewing/checkout">
-                        <p class="text-nowrap text-white px-1 fs-22px">Check Out</p>
-                    </a>
-                </button>
-            </div>
 
-            {{-- Grand Total End --}}
+                {{-- Grand Total End --}}
+            @endif
+
+
         </div>
     </div>
 @endsection
 
 @section('scripts')
     <script>
+        function createOrder() {
+            const selectedItems = $('.selectable-item:checked');
+            const selectedIds = [];
+            const remember_token = '{{ Auth::guard('member')->user()->remember_token }}';
+
+            selectedItems.each(function() {
+                selectedIds.push($(this).data('cart-id'));
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '/api/member/create-order',
+                dataType: 'json',
+                data: {
+                    selectedIds: selectedIds,
+                    remember_token: remember_token,
+                },
+                success: function(response) {
+                    const status = parseInt(response.status);
+
+                    if (status == 1) {
+                        location.href = '/domewing/checkout/' + response.checkout_id;
+                    } else if (status == -2) {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: response.title,
+                            text: response.return
+                        }).then((result) => {
+                            location.href = '/domewing/auth/login';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: response.title,
+                            text: response.return
+                        });
+                    }
+                },
+                error: function(error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unable to process',
+                        text: response,
+                    });
+                }
+            });
+        }
+
+
+        function updateQuantity(cartId, newQuantity) {
+            $.ajax({
+                type: 'POST',
+                url: '/api/member/update-quantity',
+                dataType: 'json',
+                data: {
+                    cartId: cartId,
+                    newQuantity: newQuantity
+                }
+            });
+        }
+
         function removeInit(id) {
             const cart_id = id;
 
@@ -207,7 +285,6 @@
                 }
             });
         }
-
 
         function addQuantity(itemId) {
             let quantity = parseInt(document.getElementById(`quantity${itemId}`).value);

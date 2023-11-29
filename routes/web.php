@@ -49,7 +49,7 @@ Route::get('lang/{languageId}', function ($languageId) {
 Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(function () {
     Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
     Route::get('/shopping-cart', [ShoppingCartController::class, 'showShoppingCart']);
-    Route::get('/checkout', [CheckoutController::class, 'showCheckoutPage']);
+    Route::get('/checkout/{id}', [CheckoutController::class, 'showCheckoutPage']);
 });
 
 //ving kong

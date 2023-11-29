@@ -80,6 +80,7 @@ class ProductDetailsController extends Controller
 
         // Validations
         if (!$member) {
+            Auth::logout();
             return [
                 'status' => -2,
                 'icon' => 'warning',
@@ -179,6 +180,7 @@ class ProductDetailsController extends Controller
         $member = DB::table('members')->where('remember_token', $remember_token)->first();
 
         if(!$member){
+            Auth::logout();
             return [
                 'status' => -2,
                 'icon' => 'warning',

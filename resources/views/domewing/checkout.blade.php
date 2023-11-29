@@ -3,10 +3,10 @@
     <div class="px-lg-5 px-2" style="background: var(--thin-blue); padding-top: 30px; padding-bottom:50px;">
         <div class="px-lg-5 px-md-2 px-0">
             {{-- Delivery Details --}}
-            <div class="p-4 rounded"style="background: var(--white);">
+            <div class="card card-bordered p-5 h-100"style="background: var(--white);">
                 <div class="d-block">
                     <h3 class="fw-bold" style="color: var(--dark-blue);">Delivery Details</h3>
-                    <div class="row pt-5">
+                    <div class="row pt-4">
                         <div class="col-lg-6 col-md-12">
                             <div class="form-group">
                                 <label class="form-label" style="color:var(--dark-blue);" for="contactName">Contact
@@ -14,7 +14,8 @@
                                 <div class="form-control-wrap">
                                     <input type="text" class="form-control fs-18px"
                                         style="height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
-                                        id="contactName" placeholder="Jane Doe" value="{{ old('contact_number') }}"
+                                        id="contactName" placeholder="Jane Doe"
+                                        value="{{ $getUserDetails->first_name }} {{ $getUserDetails->last_name }}"
                                         name="contactName">
                                     @error('contactName')
                                         <span id="contactNameError" class="invalid"
@@ -29,11 +30,11 @@
                                 <div class="form-control-wrap">
                                     <div class="input-group">
                                         <input type="hidden" id="phoneCodeHidden" name="phoneCodeHidden"
-                                            value="{{ old('phoneCode') }}">
+                                            value="{{ $getUserDetails->phone_code }}">
                                         <button id="phoneCodeButton" class="input-group-text fs-18px" type="button"
                                             data-bs-toggle="dropdown" aria-expanded="false" name="phoneCode"
                                             style="border-right: none; height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)">
-                                            {{ old('phoneCodeHidden') ? old('phoneCodeHidden') : 'Select' }}</button>
+                                            {{ $getUserDetails->phone_code ? $getUserDetails->phone_code : 'Select' }}</button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item" onclick="changePhoneCode('+60')">+60</a>
                                             </li>
@@ -46,7 +47,7 @@
                                         </ul>
 
                                         <div class="vr my-2" style="color:var(--dark-blue); width:2px; opacity:1;"></div>
-                                        <input type="number" value="{{ old('phoneNumber') }}" name="phoneNumber"
+                                        <input type="number" value="{{ $getUserDetails->phone_number }}" name="phoneNumber"
                                             style="border-left:none; height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
                                             class="form-control fs-18px" placeholder="0123456789">
 
@@ -67,7 +68,7 @@
                                 <div class="form-control-wrap">
                                     <input type="text" class="form-control fs-18px"
                                         style="height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
-                                        id="email" placeholder="example@gmail.com" value="{{ old('email') }}"
+                                        id="email" placeholder="example@gmail.com" value="{{ $getUserDetails->email }}"
                                         name="email">
                                     @error('email')
                                         <span id="emailError" class="invalid"
@@ -172,126 +173,189 @@
             <div class="row">
                 {{-- Checkout Item --}}
                 <div class="col-xl-8 col-lg-12 pb-3">
-                    <div class="rounded p-5" style="background: var(--white);">
+                    <div class="card-bordered p-5 h-100" style="background: var(--white);">
 
                         <div>
-                            <h4 class="fw-bold" style="color: var(--dark-blue);">Supplier 1</h4>
+                            <h4 class="fw-bold" style="color: var(--dark-blue);">{{ $getOrder->first()->supplier_name }}
+                            </h4>
                             <div class="p-1" style="border-bottom: 2px solid var(--cyan-blue)"></div>
 
-                            {{-- Example 1 --}}
-                            <div class="row pt-3">
-                                <div class="col-lg-4 col-md-4">
-                                    <div class="d-block">
-                                        <img src="https://image.invaluable.com/housePhotos/clars/88/752188/H0054-L341207066.jpg"
-                                            class="img" />
-                                    </div>
+                            @foreach ($getOrder as $item)
+                                {{-- Item --}}
+                                <div class="row pt-3">
+                                    <div class="col-lg-4 col-md-4">
+                                        <div class="d-block">
+                                            <img src="{{ $item->image }}" class="img" />
+                                        </div>
 
-                                </div>
-                                <div class="col-lg-8 col-md-12 my-auto">
-                                    <div class="">
-                                        <h4 class="fw-bold py-3 text-truncate" style="color: var(--dark-blue);">
-                                            Product Name
-                                        </h4>
-                                        <ul class="pricing-features pb-3 fs-18px" style="color: var(--dark-blue);">
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    {{ $translation['shipping_cost'] }}</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    3000
-                                                </h6>
-                                            </li>
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Promotion Applied</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Wholesale Discount
-                                                </h6>
-                                            </li>
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Units</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    200
-                                                </h6>
-                                            </li>
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Product Payment</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    MYR 2340.00</h6>
-                                            </li>
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Shipping Method</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Sea</h6>
-                                            </li>
-                                        </ul>
+                                    </div>
+                                    <div class="col-lg-8 col-md-12 my-auto">
+                                        <div>
+                                            <h4 class="fw-bold py-3 text-truncate" style="color: var(--dark-blue);">
+                                                {{ $item->productName }}
+                                            </h4>
+                                            <ul class="pricing-features pb-3 fs-18px" style="color: var(--dark-blue);">
+                                                <li>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        {{ $translation['shipping_cost'] }}</h6>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        KRW {{ number_format($item->shippingCost, 2) }}
+                                                    </h6>
+                                                </li>
+                                                <li>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        Promotion Applied</h6>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        Wholesale Discount
+                                                    </h6>
+                                                </li>
+                                                <li>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        Units</h6>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        {{ $item->quantity }}
+                                                    </h6>
+                                                </li>
+                                                <li>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        Product Payment</h6>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        KRW {{ number_format($item->price * $item->quantity, 2) }}</h6>
+                                                </li>
+                                                <li>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        Shipping Method</h6>
+                                                    <h6 class="w-50 align-self-center m-0"
+                                                        style="color: var(--dark-blue);">
+                                                        Sea</h6>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            {{-- Example 1 End --}}
-
-                            {{-- Example 2 --}}
-                            <div class="row pt-3">
-                                <div class="col-lg-4 col-md-4">
-                                    <div class="d-block">
-                                        <img src="https://image.invaluable.com/housePhotos/clars/88/752188/H0054-L341207066.jpg"
-                                            class="img" />
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-8 col-md-12 my-auto">
-                                    <div class="">
-                                        <h4 class="fw-bold py-3 text-truncate" style="color: var(--dark-blue);">
-                                            Product Name
-                                        </h4>
-                                        <ul class="pricing-features pb-3 fs-18px" style="color: var(--dark-blue);">
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    {{ $translation['shipping_cost'] }}</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    3000
-                                                </h6>
-                                            </li>
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Promotion Applied</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Wholesale Discount
-                                                </h6>
-                                            </li>
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Units</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    200
-                                                </h6>
-                                            </li>
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Product Payment</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    MYR 2340.00</h6>
-                                            </li>
-                                            <li>
-                                                <h6 class="w-40 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Shipping Method</h6>
-                                                <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
-                                                    Sea</h6>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- Example 2 End --}}
+                                {{-- Item End --}}
+                            @endforeach
                         </div>
-
-
-
                     </div>
                 </div>
                 {{-- Checkout Item End --}}
+
+                <div class="col-xl-4 col-lg-12">
+                    <div class="row g-gs">
+
+                        @php
+                            $totalProductPrice = 0;
+                            $totalShippingCost = 0;
+                        @endphp
+
+                        @foreach ($getOrder as $item)
+                            {{-- Calculate total product price --}}
+                            @php
+                                $totalProductPrice += $item->price * $item->quantity; // Assuming price is the unit price of each product
+                            @endphp
+
+                            {{-- Calculate total shipping cost --}}
+                            @php
+                                $totalShippingCost += $item->shippingCost;
+                            @endphp
+                        @endforeach
+
+                        {{-- Total Payment --}}
+                        <div class="col-xl-12 col-lg-6 pb-3">
+                            <div class="card-bordered p-5 h-100" style="background: var(--white);">
+                                <h4 class="d-inline-block" style="color: var(--dark-blue);">Total Payment</h4>
+                                <div class="p-1" style="border-bottom: 2px solid var(--cyan-blue)"></div>
+                                <ul class="pricing-features pt-4 fs-18px " style="color: var(--dark-blue);">
+                                    <li>
+                                        <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                            Product Subtotal</h6>
+                                        <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                            KRW {{ number_format($totalProductPrice, 2) }}
+                                        </h6>
+                                    </li>
+                                    <li>
+                                        <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                            Delivery Subtotal</h6>
+                                        <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                            KRW {{ number_format($totalShippingCost, 2) }}
+                                        </h6>
+                                    </li>
+                                    <li>
+                                        <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                            Total Payable</h6>
+                                        <h4 class="w-50 fw-bold align-self-center m-0" style="color: var(--dark-blue);">
+                                            KRW {{ number_format($totalProductPrice + $totalShippingCost, 2) }}
+                                        </h4>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                        {{-- Total Payment End --}}
+
+                        {{-- Payment Method --}}
+                        <div class="col-xl-12 col-lg-6 pb-3">
+                            <div class="card-bordered p-5 h-100" style="background: var(--white);">
+                                <h4 class="d-inline-block" style="color: var(--dark-blue);">Payment Method</h4>
+                                <div class="p-1" style="border-bottom: 2px solid var(--cyan-blue)"></div>
+                                <ul class="custom-control-group d-block pt-4">
+                                    <li>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" checked
+                                                name="payment-method" id="payment1">
+                                            <label class="custom-control-label" for="payment1">
+                                                <h5 style="color: var(--dark-blue);">Credit Card / Debit Card</h5>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" name="payment-method"
+                                                id="payment2">
+                                            <label class="custom-control-label" for="payment2">
+                                                <h5 style="color: var(--dark-blue);">Apple Pay</h5>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" name="payment-method"
+                                                id="payment3">
+                                            <label class="custom-control-label" for="payment3">
+                                                <h5 style="color: var(--dark-blue);">Google Pay</h5>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" name="payment-method"
+                                                id="payment4">
+                                            <label class="custom-control-label" for="payment4">
+                                                <h5 style="color: var(--dark-blue);">Ali Pay</h5>
+                                            </label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        {{-- Payment Method End --}}
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <button class="btn" style="background: var(--dark-blue);">
+                            <h4 class="text-white p-2">Proceed to Payment</h4>
+                        </button>
+                    </div>
+
+                </div>
             </div>
         </div>
     @endsection
