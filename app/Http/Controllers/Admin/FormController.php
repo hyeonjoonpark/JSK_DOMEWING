@@ -68,7 +68,7 @@ class FormController extends Controller
                         'remark' => 'Fail to load image'
                     ]);
                 } else {
-                    if ($preprocessProductDetail) {
+                    if ($preprocessProductDetail['status']) {
                         $collectedProduct->newProductDetail = $preprocessProductDetail['return'];
                     }
                     $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);

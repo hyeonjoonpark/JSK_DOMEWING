@@ -49,7 +49,7 @@ class ProductImageController extends Controller
         } catch (Exception $e) {
             return [
                 'status' => false,
-                'message' => $e->getMessage()
+                'return' => $e->getMessage()
             ];
         }
     }
