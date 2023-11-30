@@ -24,6 +24,10 @@ class ProductDetailsController extends Controller
             return redirect('/domewing')->with('error', 'Product not found');
         }
 
+        $margin = $this->getMargin();
+
+        $productInfo->productPrice = $productInfo->productPrice * ($margin / 100 + 1);
+
         $otherProducts = $this->getOtherProducts($productInfo->userId, $productInfo->uploadedId);
         $similarProducts = $this->getSimilarProducts($productInfo->userId, $productInfo->uploadedId);
 
@@ -32,6 +36,15 @@ class ProductDetailsController extends Controller
             'otherProducts' => $otherProducts,
             'similarProducts' => $similarProducts,
         ]);
+    }
+
+    public function getMargin(){
+        $margin = DB::table('domewing_margin_rate')
+                    ->where('id', 1)
+                    ->first()
+                    ->rate;
+
+        return $margin;
     }
 
     public function getOtherProducts($seller_id, $product_id){
@@ -45,6 +58,16 @@ class ProductDetailsController extends Controller
                         ->select('collected_products.*', 'uploaded_products.id as upload_id')
                         ->limit(10)
                         ->get();
+
+        $margin = $this->getMargin();
+
+        foreach ($otherProducts as $item) {
+            // Calculate the new price by multiplying productPrice with margin
+            $newPrice = $item->productPrice * ($margin / 100 + 1);
+
+            // Update the price in the shopping cart item
+            $item->productPrice = $newPrice;
+        }
 
         return $otherProducts;
     }
@@ -60,6 +83,16 @@ class ProductDetailsController extends Controller
                         ->select('collected_products.*', 'uploaded_products.id as upload_id')
                         ->limit(10)
                         ->get();
+
+        $margin = $this->getMargin();
+
+        foreach ($similarProducts as $item) {
+            // Calculate the new price by multiplying productPrice with margin
+            $newPrice = $item->productPrice * ($margin / 100 + 1);
+
+            // Update the price in the shopping cart item
+            $item->productPrice = $newPrice;
+        }
 
         return $similarProducts;
     }

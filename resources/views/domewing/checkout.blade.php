@@ -17,10 +17,9 @@
                                         id="contactName" placeholder="Jane Doe"
                                         value="{{ $getUserDetails->first_name }} {{ $getUserDetails->last_name }}"
                                         name="contactName">
-                                    @error('contactName')
-                                        <span id="contactNameError" class="invalid"
-                                            style="display: inline-block;">{{ $message }}</span>
-                                    @enderror
+
+                                    <span id="contactNameError" class="invalid" style="display: inline-block;"></span>
+
                                 </div>
                             </div>
 
@@ -52,13 +51,9 @@
                                             class="form-control fs-18px" placeholder="0123456789">
 
                                     </div>
-                                    @if ($errors->has('phoneCodeHidden'))
-                                        <span id="phoneCodeError" class="invalid"
-                                            style="display: inline-block;">{{ $errors->first('phoneCodeHidden') }}</span>
-                                    @elseif ($errors->has('phoneNumber'))
-                                        <span id="phoneNumberError" class="invalid"
-                                            style="display: inline-block;">{{ $errors->first('phoneNumber') }}</span>
-                                    @endif
+
+                                    <span id="phoneNumberError" class="invalid" style="display: inline-block;"></span>
+
                                 </div>
                             </div>
 
@@ -70,10 +65,9 @@
                                         style="height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
                                         id="email" placeholder="example@gmail.com" value="{{ $getUserDetails->email }}"
                                         name="email">
-                                    @error('email')
-                                        <span id="emailError" class="invalid"
-                                            style="display: inline-block;">{{ $message }}</span>
-                                    @enderror
+
+                                    <span id="emailError" class="invalid" style="display: inline-block;"></span>
+
                                 </div>
                             </div>
                         </div>
@@ -86,10 +80,9 @@
                                         style="height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
                                         id="street" placeholder="1 Pusat Sumber 1 Jln Bukit Jalil Taman Teknologi 5"
                                         value="{{ old('street') }}" name="street">
-                                    @error('street')
-                                        <span id="streetError" class="invalid"
-                                            style="display: inline-block;">{{ $message }}</span>
-                                    @enderror
+
+                                    <span id="streetError" class="invalid" style="display: inline-block;"></span>
+
                                 </div>
                             </div>
 
@@ -103,10 +96,9 @@
                                                 style="height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
                                                 id="city" placeholder="Kuala Lumpur" value="{{ old('city') }}"
                                                 name="city">
-                                            @error('city')
-                                                <span id="cityError" class="invalid"
-                                                    style="display: inline-block;">{{ $message }}</span>
-                                            @enderror
+
+                                            <span id="cityError" class="invalid" style="display: inline-block;"></span>
+
                                         </div>
                                     </div>
                                 </div>
@@ -119,10 +111,9 @@
                                                 style="height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
                                                 id="state" placeholder="Kuala Lumpur" value="{{ old('state') }}"
                                                 name="state">
-                                            @error('state')
-                                                <span id="stateError" class="invalid"
-                                                    style="display: inline-block;">{{ $message }}</span>
-                                            @enderror
+
+                                            <span id="stateError" class="invalid" style="display: inline-block;"></span>
+
                                         </div>
                                     </div>
                                 </div>
@@ -138,10 +129,10 @@
                                                 style="height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
                                                 id="zipCode" placeholder="57100" value="{{ old('zipCode') }}"
                                                 name="zipCode">
-                                            @error('zipCode')
-                                                <span id="zipCodeError" class="invalid"
-                                                    style="display: inline-block;">{{ $message }}</span>
-                                            @enderror
+
+                                            <span id="zipCodeError" class="invalid"
+                                                style="display: inline-block;"></span>
+
                                         </div>
                                     </div>
                                 </div>
@@ -154,10 +145,10 @@
                                                 style="height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
                                                 id="country" placeholder="Korea" value="{{ old('country') }}"
                                                 name="country">
-                                            @error('country')
-                                                <span id="countryError" class="invalid"
-                                                    style="display: inline-block;">{{ $message }}</span>
-                                            @enderror
+
+                                            <span id="countryError" class="invalid"
+                                                style="display: inline-block;"></span>
+
                                         </div>
                                     </div>
                                 </div>
@@ -376,6 +367,24 @@
                 const zipCode = document.getElementById('zipCode').value;
                 const country = document.getElementById('country').value;
 
+                const errorIds = [
+                    'contactNameError',
+                    'phoneNumberError',
+                    'emailError',
+                    'streetError',
+                    'cityError',
+                    'stateError',
+                    'zipCodeError',
+                    'countryError'
+                ];
+
+                // Clear all validation
+                errorIds.forEach((errorId) => {
+                    const errorElement = document.getElementById(errorId);
+                    if (errorElement) {
+                        errorElement.textContent = ''; // Clear the error message text content
+                    }
+                });
 
                 const requestData = {
                     orderId: orderId,
@@ -392,7 +401,52 @@
                     country: country,
                 };
 
-                console.log(requestData);
+
+                $.ajax({
+                    url: '/api/member/checkout-order',
+                    type: 'post',
+                    dataType: 'json',
+                    data: requestData,
+                    success: function(response) {
+                        const status = parseInt(response.status);
+
+                        if (status == 1) {
+                            Swal.fire({
+                                icon: response.icon,
+                                title: response.return,
+                            }).then((result) => {
+                                location.href = '/domewing';
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: response.icon,
+                                title: response.title,
+                                text: response.return
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        if (response.status === 422) {
+                            // Validation failed, handle the errors
+                            const errors = response.responseJSON.errors;
+
+                            // Display errors to the user
+                            for (let fieldName in errors) {
+                                if (errors.hasOwnProperty(fieldName)) {
+                                    const errorMessage = errors[fieldName][0];
+                                    const errorElement = document.getElementById(`${fieldName}Error`);
+
+                                    if (errorElement) {
+                                        errorElement.textContent = errorMessage;
+                                    }
+                                }
+                            }
+                        } else {
+                            // Other error handling logic
+                            console.log(response);
+                        }
+                    }
+                });
 
             }
 

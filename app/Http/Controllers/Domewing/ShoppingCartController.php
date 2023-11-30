@@ -19,6 +19,11 @@ class ShoppingCartController extends Controller
     public function getShoppingCart(){
         $user = Auth::guard('member')->user();
 
+        $margin = DB::table('domewing_margin_rate')
+                    ->where('id', 1)
+                    ->first()
+                    ->rate;
+
         $shopping_cart = DB::table('members')
                         ->join('shopping_cart', 'members.id', '=', 'shopping_cart.user_id')
                         ->join('uploaded_products', 'shopping_cart.product_id', '=', 'uploaded_products.id')
@@ -42,6 +47,14 @@ class ShoppingCartController extends Controller
                                 'shopping_cart.*')
                         ->get();
 
+        foreach ($shopping_cart as $item) {
+            // Calculate the new price by multiplying productPrice with margin
+            $newPrice = $item->price * ($margin / 100 + 1);
+
+            // Update the price in the shopping cart item
+            $item->price = $newPrice;
+        }
+
         return $shopping_cart;
     }
 
@@ -52,7 +65,7 @@ class ShoppingCartController extends Controller
         $member = DB::table('members')->where('remember_token', $remember_token)->first();
 
         if(!$member){
-            Auth::logout();
+            Auth::guard('member')->logout();
             return [
                 'status' => -2,
                 'icon' => 'warning',

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Domewing\ProductDetailsController;
 use App\Http\Controllers\Domewing\ShoppingCartController;
 use App\Http\Controllers\Domewing\OrderController;
+use App\Http\Controllers\Domewing\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,5 +70,4 @@ Route::post('member/remove-all-cart', [ProductDetailsController::class, 'removeA
 Route::post('member/remove-cart-item', [ShoppingCartController::class, 'removeCartItem']);
 Route::post('member/update-quantity', [ShoppingCartController::class, 'updateQuantity']);
 Route::post('member/create-order', [OrderController::class, 'createOrder']);
-
-
+Route::post('member/checkout-order', [CheckoutController::class, 'checkoutOrder']);

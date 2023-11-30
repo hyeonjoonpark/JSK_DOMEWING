@@ -72,10 +72,6 @@ class OrderController extends Controller
                     'quantity' => $item->quantity,
                     'created_at' => now(),
                 ]);
-
-                DB::table('shopping_cart')
-                    ->where('id', $item->id)
-                    ->update(['is_Active' => 'INACTIVE','updated_at' => now()]);
             }
 
             $data = [
