@@ -45,16 +45,12 @@ class FormController extends Controller
     public function index(Request $request)
     {
         try {
-            $ppd = $this->preprocessProductDataset();
-            if ($ppd['status'] === -1) {
-                return $ppd;
-            }
             $remember_token = $request->remember_token;
             $userId = DB::table('users')
                 ->where('remember_token', $remember_token)
                 ->first()
                 ->id;
-            $processedProducts = $this->preprocessProducts($userId);
+            $processedProducts = $this->preprocessedProducts(890);
             $activedUploadVendors = DB::table('product_register')
                 ->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')
                 ->where('product_register.is_active', 'Y')
@@ -82,38 +78,65 @@ class FormController extends Controller
     }
     public function preprocessProducts($userId)
     {
+        $ppd = $this->preprocessProductDataset();
+        if ($ppd['status'] === -1) {
+            return $ppd;
+        }
         $targetProducts = DB::select("SELECT cp.*
             FROM collected_products cp
             LEFT JOIN uploaded_products up ON up.productId = cp.id
             WHERE up.productId IS NULL
-            AND cp.isActive = 'Y'
-            LIMIT 500;");
+            AND cp.isActive='Y'
+            LIMIT 100;");
         $pIC = new ProductImageController();
         set_time_limit(0);
         ini_set('memory_limit', '-1');
-        $productIDs = [];
+        $startProductID = 1;
+        $cnt = 0;
         foreach ($targetProducts as $product) {
-            $product->newImageHref = $pIC->index($product->productImage);
-            $preprocessProductDetail = $pIC->preprocessProductDetail($product);
-            if (!$product->newImageHref || !$preprocessProductDetail['status']) {
+            $preprocessProductImage = $pIC->index($product->productImage);
+            if (!$preprocessProductImage['status']) {
                 DB::table('collected_products')->where('id', $product->id)->update([
                     'isActive' => 'N',
-                    'remark' => 'Fail to load image'
+                    'remark' => 'Fail to load image',
+                    'updatedAt' => now()
                 ]);
-            } else {
-                DB::table('uploaded_products')
-                    ->insert([
-                        'productId' => $product->id,
-                        'userId' => $userId,
-                        'newImageHref' => $product->newImageHref,
-                        'newProductDetail' => $preprocessProductDetail['return']
-                    ]);
-                $productIDs[] = DB::getPdo()->lastInsertId();
+                continue;
+            }
+            $newImageHref = $preprocessProductImage['return'];
+            $preprocessProductDetail = $pIC->preprocessProductDetail($product);
+            if (!$preprocessProductDetail['status']) {
+                DB::table('collected_products')->where('id', $product->id)->update([
+                    'isActive' => 'N',
+                    'remark' => 'Fail to load image',
+                    'updatedAt' => now()
+                ]);
+                continue;
+            }
+            $newProductDetail = $preprocessProductDetail['return'];
+            DB::table('uploaded_products')
+                ->insert([
+                    'productId' => $product->id,
+                    'userId' => $userId,
+                    'newImageHref' => $newImageHref,
+                    'newProductDetail' => $newProductDetail,
+                    'newProductName' => $this->editProductName($product->productName)
+                ]);
+            if ($cnt == 0) {
+                $startProductID = DB::getPdo()->lastInsertId();
+                $cnt++;
             }
         }
+        $preprocessedProducts = $this->preprocessedProducts($startProductID);
+        return $preprocessedProducts;
+    }
+    public function preprocessedProducts($fromID)
+    {
         $preprocessedProducts = DB::table('uploaded_products')
             ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
-            ->whereIn('uploaded_products.productId', $productIDs)
+            ->where('uploaded_products.productId', '>=', $fromID)
+            ->where('uploaded_products.isActive', 'Y')
+            ->limit(500)
             ->get();
         return $preprocessedProducts;
     }
@@ -129,6 +152,7 @@ class FormController extends Controller
             $minAmount = 5000;
             $categoryMappingController = new CategoryMappingController();
             foreach ($products as $product) {
+                $product->newProductName = $this->editProductName($product->productName);
                 $product_price = ceil($product->productPrice * $margin_rate);
                 $minQuantity = ceil($minAmount / $product->productPrice);
                 $categoryId = $product->categoryId;
@@ -339,6 +363,7 @@ class FormController extends Controller
             $minAmount = 5000;
             $categoryMappingController = new CategoryMappingController();
             foreach ($products as $product) {
+                $product->newProductName = $this->editProductName($product->productName);
                 $product_price = ceil($product->productPrice * $margin_rate);
                 $minQuantity = ceil($minAmount / $product->productPrice);
                 $categoryId = $product->categoryId;
@@ -438,6 +463,7 @@ class FormController extends Controller
             // 데이터 추가
             $rowIndex = 5;
             foreach ($products as $product) {
+                $product->newProductName = $this->editProductName($product->productName);
                 $product_price = ceil($product->productPrice * $margin_rate);
                 $categoryId = $product->categoryId;
                 $categoryMappingController = new CategoryMappingController();
@@ -544,6 +570,7 @@ class FormController extends Controller
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
+                $product->newProductName = $this->editProductName($product->productName);
                 $product_price = ceil($product->productPrice * $margin_rate);
                 $categoryId = $product->categoryId;
                 $categoryCode = DB::table('category')->where('id', $categoryId)->select('domesinCode')->first()->domesinCode;
