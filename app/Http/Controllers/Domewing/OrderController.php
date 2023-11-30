@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -51,17 +52,22 @@ class OrderController extends Controller
             return $data;
         }
 
-        //create order
-        $newOrderId = DB::table('order')->insertGetId([
-                        'user_id' => $member->id,
-                        'created_at' => now()
-                    ]);
+        $prefix = 'DWO'; // Prefix for your order ID
+        $timestamp = Carbon::now()->format('YmdHis'); // Current timestamp formatted as 'YmdHis'
 
+        $orderId = $prefix . $timestamp;
+
+        //create orders
+        $newOrderId = DB::table('order')->insert([
+                        'user_id' => $member->id,
+                        'created_at' => now(),
+                        'order_id' => $orderId,
+                    ]);
 
         try{
             foreach ($selectedItems as $item) {
                 DB::table('order_items')->insert([
-                    'order_id' => $newOrderId,
+                    'order_id' => $orderId,
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
                     'created_at' => now(),
@@ -76,7 +82,7 @@ class OrderController extends Controller
                 'status' => 1,
                 'icon' => 'success',
                 'return' => 'Order done',
-                'checkout_id' => $newOrderId
+                'checkout_id' => $orderId
             ];
         }catch(Exception $e){
             $data = [

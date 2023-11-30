@@ -260,7 +260,7 @@
                         @foreach ($getOrder as $item)
                             {{-- Calculate total product price --}}
                             @php
-                                $totalProductPrice += $item->price * $item->quantity; // Assuming price is the unit price of each product
+                                $totalProductPrice += $item->price * $item->quantity;
                             @endphp
 
                             {{-- Calculate total shipping cost --}}
@@ -311,7 +311,7 @@
                                     <li>
                                         <div class="custom-control custom-radio">
                                             <input type="radio" class="custom-control-input" checked
-                                                name="payment-method" id="payment1">
+                                                name="payment-method" id="payment1" value="Credit Card / Debit Card">
                                             <label class="custom-control-label" for="payment1">
                                                 <h5 style="color: var(--dark-blue);">Credit Card / Debit Card</h5>
                                             </label>
@@ -320,7 +320,7 @@
                                     <li>
                                         <div class="custom-control custom-radio">
                                             <input type="radio" class="custom-control-input" name="payment-method"
-                                                id="payment2">
+                                                id="payment2" value="Apple Pay">
                                             <label class="custom-control-label" for="payment2">
                                                 <h5 style="color: var(--dark-blue);">Apple Pay</h5>
                                             </label>
@@ -329,7 +329,7 @@
                                     <li>
                                         <div class="custom-control custom-radio">
                                             <input type="radio" class="custom-control-input" name="payment-method"
-                                                id="payment3">
+                                                id="payment3" value="Google Pay">
                                             <label class="custom-control-label" for="payment3">
                                                 <h5 style="color: var(--dark-blue);">Google Pay</h5>
                                             </label>
@@ -338,7 +338,7 @@
                                     <li>
                                         <div class="custom-control custom-radio">
                                             <input type="radio" class="custom-control-input" name="payment-method"
-                                                id="payment4">
+                                                id="payment4" value="Ali Pay">
                                             <label class="custom-control-label" for="payment4">
                                                 <h5 style="color: var(--dark-blue);">Ali Pay</h5>
                                             </label>
@@ -350,11 +350,10 @@
                         {{-- Payment Method End --}}
                     </div>
                     <div class="d-flex justify-content-center align-items-center">
-                        <button class="btn" style="background: var(--dark-blue);">
+                        <button class="btn" style="background: var(--dark-blue);" onclick="confirmPayment()">
                             <h4 class="text-white p-2">Proceed to Payment</h4>
                         </button>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -362,6 +361,41 @@
 
     @section('scripts')
         <script>
+            function confirmPayment() {
+
+                const orderId = '{{ $getOrder->first()->order_id }}';
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+                const remember_token = '{{ Auth::guard('member')->user()->remember_token }}';
+                const contactName = document.getElementById('contactName').value;
+                const phoneCodeHidden = document.getElementById('phoneCodeHidden').value;
+                const phoneNumber = document.getElementsByName('phoneNumber')[0].value; // Assuming only one element is present
+                const email = document.getElementById('email').value;
+                const street = document.getElementById('street').value;
+                const city = document.getElementById('city').value;
+                const state = document.getElementById('state').value;
+                const zipCode = document.getElementById('zipCode').value;
+                const country = document.getElementById('country').value;
+
+
+                const requestData = {
+                    orderId: orderId,
+                    paymentMethod: paymentMethod,
+                    remember_token: remember_token,
+                    contactName: contactName,
+                    phoneCodeHidden: phoneCodeHidden,
+                    phoneNumber: phoneNumber,
+                    email: email,
+                    street: street,
+                    city: city,
+                    state: state,
+                    zipCode: zipCode,
+                    country: country,
+                };
+
+                console.log(requestData);
+
+            }
+
             function changePhoneCode(code) {
                 document.getElementById('phoneCodeHidden').value = code;
                 document.getElementById('phoneCodeButton').textContent = code;
