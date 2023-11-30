@@ -52,7 +52,7 @@ class ShoppingCartController extends Controller
         $member = DB::table('members')->where('remember_token', $remember_token)->first();
 
         if(!$member){
-            Auth::logout();
+            Auth::guard('member')->logout();
             return [
                 'status' => -2,
                 'icon' => 'warning',
