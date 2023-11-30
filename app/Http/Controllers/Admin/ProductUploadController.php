@@ -14,15 +14,12 @@ class ProductUploadController extends Controller
         try {
             $fc = new FormController();
             $fc->preprocessProductDataset();
-            $fromProductID = 1224;
             $userID = 15;
-            $products = DB::table('collected_products')
-                ->where('id', '>=', $fromProductID)
-                ->where('isActive', 'Y')
-                ->limit(100)
-                ->get();
+            $products = $this->preprocessedProducts();
             $successProductIDs = [];
             $failedProductIDs = [];
+            set_time_limit(0);
+            ini_set('memory_limit', '-1');
             foreach ($products as $product) {
                 if ($this->preprocessProduct($product->id, $userID)) {
                     $successProductIDs[] = $product->id;
@@ -37,6 +34,16 @@ class ProductUploadController extends Controller
         } catch (Exception $e) {
             return $e->getMessage();
         }
+    }
+    public function preprocessedProducts()
+    {
+        $preprocessedProducts = DB::table('collected_products as cp')
+            ->leftJoin('uploaded_products as up', 'up.productId', '=', 'cp.id')
+            ->whereNull('up.productId')
+            ->where('cp.isActive', 'Y')
+            ->select('cp.*')
+            ->get();
+        return $preprocessedProducts;
     }
     public function preprocessProduct($productID, $userID)
     {
