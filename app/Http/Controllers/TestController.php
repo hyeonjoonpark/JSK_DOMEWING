@@ -15,26 +15,28 @@ class TestController extends Controller
 {
     public function index()
     {
-        $url = "https://api-gateway.coupang.com/v2/providers/openapi/apis/api/v1/categorization/predict"; // API URL
-        $data = array('productName' => '닥터락 삶는 고급형 방수시트 노랑 병원 요양원 침대반시트'); // 보낼 데이터
-
-        // cURL 세션 초기화
-        $ch = curl_init();
-
-        // cURL 옵션 설정
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data)); // 데이터를 URL-인코딩 형식으로 변환
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        // 요청 실행 및 응답 받기
-        $response = curl_exec($ch);
-
-        // cURL 세션 종료
-        curl_close($ch);
-
-        // 응답 출력
-        echo $response;
+        $activedUploadVendors = DB::table('product_register')
+            ->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')
+            ->where('product_register.is_active', 'Y')
+            ->where('vendors.is_active', 'ACTIVE')
+            ->get();
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        $fc = new FormController();
+        $preprocessedProducts = DB::table('uploaded_products')
+            ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
+            ->whereBetween('uploaded_products.productId', [502, 974])
+            ->get();
+        foreach ($activedUploadVendors as $vendor) {
+            $vendorEngName = $vendor->name_eng;
+            $response = $fc->$vendorEngName($preprocessedProducts, 15);
+            if ($response['status'] == 1) {
+                $data['return']['successVendors'][] = $vendor->name;
+                $data['return']['successVendorsNameEng'][] = $vendorEngName;
+                $data['return']['formedExcelFiles'][] = $response['return'];
+            }
+        }
+        return $data;
     }
     // public function index()
     // {
