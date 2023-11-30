@@ -49,40 +49,17 @@ class FormController extends Controller
             if ($ppd['status'] === -1) {
                 return $ppd;
             }
-            $collectedProducts = DB::select("SELECT cp.*
-            FROM collected_products cp
-            LEFT JOIN uploaded_products up ON up.productId = cp.id
-            WHERE up.productId IS NULL
-            AND cp.isActive = 'Y'
-            LIMIT 500;");
-            $pIC = new ProductImageController();
-            $processedProducts = [];
-            set_time_limit(0);
-            ini_set('memory_limit', '-1');
-            foreach ($collectedProducts as $collectedProduct) {
-                $collectedProduct->newImageHref = $pIC->index($collectedProduct->productImage);
-                $preprocessProductDetail = $pIC->preprocessProductDetail($collectedProduct);
-                if ($collectedProduct->newImageHref == false) {
-                    DB::table('collected_products')->where('id', $collectedProduct->id)->update([
-                        'isActive' => 'N',
-                        'remark' => 'Fail to load image'
-                    ]);
-                } else {
-                    if ($preprocessProductDetail['status']) {
-                        $collectedProduct->newProductDetail = $preprocessProductDetail['return'];
-                    }
-                    $collectedProduct->newProductName = $this->editProductName($collectedProduct->productName);
-                    $processedProducts[] = $collectedProduct;
-                }
-            }
-            $userId = DB::table('users')->where('remember_token', $request->remember_token)->first()->id;
-            $activedUploadVendors = DB::select("SELECT *
-            FROM product_register pr
-            INNER JOIN vendors v
-            ON v.id=pr.vendor_id
-            WHERE pr.is_active='Y';");
-            $data['return']['successVendors'] = [];
-            $data['return']['formedExcelFiles'] = [];
+            $remember_token = $request->remember_token;
+            $userId = DB::table('users')
+                ->where('remember_token', $remember_token)
+                ->first()
+                ->id;
+            $processedProducts = $this->preprocessProducts($userId);
+            $activedUploadVendors = DB::table('product_register')
+                ->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')
+                ->where('product_register.is_active', 'Y')
+                ->where('vendors.is_active', 'ACTIVE')
+                ->get();
             set_time_limit(0);
             ini_set('memory_limit', '-1');
             foreach ($activedUploadVendors as $vendor) {
@@ -102,6 +79,43 @@ class FormController extends Controller
                 'return' => $e->getMessage()
             ];
         }
+    }
+    public function preprocessProducts($userId)
+    {
+        $targetProducts = DB::select("SELECT cp.*
+            FROM collected_products cp
+            LEFT JOIN uploaded_products up ON up.productId = cp.id
+            WHERE up.productId IS NULL
+            AND cp.isActive = 'Y'
+            LIMIT 500;");
+        $pIC = new ProductImageController();
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        $productIDs = [];
+        foreach ($targetProducts as $product) {
+            $product->newImageHref = $pIC->index($product->productImage);
+            $preprocessProductDetail = $pIC->preprocessProductDetail($product);
+            if (!$product->newImageHref || !$preprocessProductDetail['status']) {
+                DB::table('collected_products')->where('id', $product->id)->update([
+                    'isActive' => 'N',
+                    'remark' => 'Fail to load image'
+                ]);
+            } else {
+                DB::table('uploaded_products')
+                    ->insert([
+                        'productId' => $product->id,
+                        'userId' => $userId,
+                        'newImageHref' => $product->newImageHref,
+                        'newProductDetail' => $preprocessProductDetail['return']
+                    ]);
+                $productIDs[] = DB::getPdo()->lastInsertId();
+            }
+        }
+        $preprocessedProducts = DB::table('uploaded_products')
+            ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
+            ->whereIn('uploaded_products.productId', $productIDs)
+            ->get();
+        return $preprocessedProducts;
     }
     public function domeggook($products, $userId)
     {
@@ -639,6 +653,7 @@ class FormController extends Controller
                 $product_price = ceil($product->productPrice * $margin_rate);
                 $categoryId = $product->categoryId;
                 $ownerclanCategoryCode = DB::table('category')->where('id', $categoryId)->select('code')->first()->code;
+                $product->newProductName = $this->editProductName($product->productName);
                 $data = [
                     '',
                     $ownerclanCategoryCode,
