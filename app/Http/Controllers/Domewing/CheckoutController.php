@@ -28,6 +28,15 @@ class CheckoutController extends Controller
         }
     }
 
+    public function getMargin(){
+        $margin = DB::table('domewing_margin_rate')
+                    ->where('id', 1)
+                    ->first()
+                    ->rate;
+
+        return $margin;
+    }
+
     //verify existing order
     public function verifyOrder($id){
         $verifyOrder = DB::table('order')
@@ -76,6 +85,16 @@ class CheckoutController extends Controller
                                 'collected_products.productPrice as price',
                                 'collected_products.shippingCost as shippingCost')
                     ->get();
+
+        $margin = $this->getMargin();
+
+        foreach ($getOrder as $item) {
+            // Calculate the new price by multiplying productPrice with margin
+            $newPrice = $item->price * ($margin / 100 + 1);
+
+            // Update the price in the shopping cart item
+            $item->price = $newPrice;
+        }
 
         return $getOrder;
     }
@@ -156,6 +175,16 @@ class CheckoutController extends Controller
                             ->select('order_items.product_id', 'collected_products.productPrice', 'collected_products.shippingCost')
                             ->get();
 
+            $margin = $this->getMargin();
+
+            foreach ($getAllItems as $item) {
+                // Calculate the new price by multiplying productPrice with margin
+                $newPrice = $item->productPrice * ($margin / 100 + 1);
+
+                // Update the price in the shopping cart item
+                $item->productPrice = $newPrice;
+            }
+
             foreach ($getAllItems as $item) {
                 DB::table('order_items')
                     ->where('product_id', $item->product_id)
@@ -218,8 +247,6 @@ class CheckoutController extends Controller
                 'return' => 'Something Went Wrong. Please Try Again Later.'
             ];
         }
-
-
 
         return $data;
     }

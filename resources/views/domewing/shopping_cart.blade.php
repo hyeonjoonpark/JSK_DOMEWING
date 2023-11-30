@@ -208,7 +208,6 @@
             });
         }
 
-
         function updateQuantity(cartId, newQuantity) {
             $.ajax({
                 type: 'POST',
