@@ -9,16 +9,48 @@ use Exception;
 
 class UploadedProductController extends Controller
 {
+    public function index($uploadedProductID)
+    {
+        try {
+            $product = $this->getProduct($uploadedProductID);
+            $newProductDetail = $this->getNewProductDetail($uploadedProductID);
+            if (!$newProductDetail['status']) {
+                $this->deactiveProduct($product->productId);
+            }
+            $newImageHref = $this->getNewImageHref($uploadedProductID);
+            if (!$newImageHref['status']) {
+                $this->deactiveProduct($product->productId);
+            }
+            $newProductName = $this->editProductName($product->productName);
+            $this->updateUploadedProduct($uploadedProductID, $newProductName, $newProductDetail, $newImageHref);
+            return true;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    public function updateUploadedProduct($uploadedProductID, $newProductName, $newProductDetail, $newImageHref)
+    {
+        DB::table('uploaded_products')
+            ->where('id', $uploadedProductID)
+            ->update([
+                'newImageHref' => $newImageHref,
+                'newProductDetail' => $newProductDetail,
+                'newProductName' => $newProductName
+            ]);
+    }
     public function getNewProductDetail($uploadedProductID)
     {
         $product = $this->getProduct($uploadedProductID);
         $pIC = new ProductImageController();
         $preprocessProductDetail = $pIC->preprocessProductDetail($product);
-        if ($preprocessProductDetail['status']) {
-            return $preprocessProductDetail['return'];
-        } else {
-            $deactiveProduct = $this->deactiveProduct($product->id);
-        }
+        return $preprocessProductDetail;
+    }
+    public function getNewImageHref($uploadedProductID)
+    {
+        $product = $this->getProduct($uploadedProductID);
+        $pIC = new ProductImageController();
+        $newImageHrefResponse = $pIC->index($product->productImage);
+        return $newImageHrefResponse;
     }
     public function getNewProductName($uploadedProductID)
     {
@@ -28,24 +60,13 @@ class UploadedProductController extends Controller
     }
     public function deactiveProduct($productID)
     {
-        try {
-            DB::table('collected_products')
-                ->where('id', $productID)
-                ->update([
-                    'isActive' => 'N',
-                    'updatedAt' => now(),
-                    'remark' => '이미지 추출에 실패했습니다.'
-                ]);
-            return [
-                'status' => true,
-                'return' => 'success'
-            ];
-        } catch (Exception $e) {
-            return [
-                'status' => true,
-                'return' => $e->getMessage()
-            ];
-        }
+        DB::table('collected_products')
+            ->where('id', $productID)
+            ->update([
+                'isActive' => 'N',
+                'updatedAt' => now(),
+                'remark' => '이미지 추출에 실패했습니다.'
+            ]);
     }
     public function getProduct($uploadedProductID)
     {
