@@ -15,28 +15,21 @@ class TestController extends Controller
 {
     public function index()
     {
-        $activedUploadVendors = DB::table('product_register')
-            ->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')
-            ->where('product_register.is_active', 'Y')
-            ->where('vendors.is_active', 'ACTIVE')
+        $targetProducts = DB::table('uploaded_products as up')
+            ->join('collected_products as cp', 'cp.id', '=', 'up.productId')
+            ->whereBetween('up.id', [1002, 1074])
+            ->select('*', 'up.id as up_id')
             ->get();
-        set_time_limit(0);
-        ini_set('memory_limit', '-1');
-        $fc = new FormController();
-        $preprocessedProducts = DB::table('uploaded_products')
-            ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
-            ->whereBetween('uploaded_products.productId', [502, 974])
-            ->get();
-        foreach ($activedUploadVendors as $vendor) {
-            $vendorEngName = $vendor->name_eng;
-            $response = $fc->$vendorEngName($preprocessedProducts, 15);
-            if ($response['status'] == 1) {
-                $data['return']['successVendors'][] = $vendor->name;
-                $data['return']['successVendorsNameEng'][] = $vendorEngName;
-                $data['return']['formedExcelFiles'][] = $response['return'];
-            }
+        foreach ($targetProducts as $product) {
+            $fc = new FormController();
+            $newProductName = $fc->editProductName($product->productName);
+            DB::table('uploaded_products as up')
+                ->where('up.id', $product->up_id)
+                ->update([
+                    'up.newProductName' => $newProductName
+                ]);
         }
-        return $data;
+        return $targetProducts;
     }
     // public function index()
     // {
