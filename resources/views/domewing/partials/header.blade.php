@@ -1,13 +1,13 @@
 {{-- header content put here --}}
 
 <div class="nk-header is-light" style="padding:0%">
-    <div class="container-fluid px-4">
-        <div class="nk-header-wrap pt-3 pb-1">
-            <div class="btn-group">
+    <div class="container-fluid px-3">
+        <div class="nk-header-wrap pt-3 pb-1 ">
+            <div class="btn-group pe-5">
                 <button type="button" class="btn fs-22px dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
-                    aria-expanded="false" style="color: var(--dark-blue)">
+                    style="color: transparent;">
                     <img class="icon-size me-1" src={{ asset('media\Asset_Nav_Language.svg') }}>
-                    {{ $language->short }}
+                    <h4 class="my-auto" style="color: var(--dark-blue)">{{ $language->short }}</h4>
                     <img class="icon-size ms-1" src={{ asset('media\Asset_Control_SmallDropdown.svg') }}>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
@@ -21,43 +21,43 @@
             <div class="nk-header-tools">
                 <div class="toggle-wrap nk-block-tools-toggle">
                     <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu"><em
-                            class="icon ni ni-more-v"></em></a>
+                            class="icon fa-solid fa-bars fa-2xl"></em></a>
                     <div class="toggle-expand-content" data-content="pageMenu">
                         <ul class="nav">
                             <li class="nav-item">
-                                <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                <a class="nav-link fs-22px" style="color: var(--dark-blue)"
                                     href={{ route('admin.dashboard') }}>{{ $translation['supplier_page'] }}</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                <a class="nav-link fs-22px" style="color: var(--dark-blue)"
                                     href="#">{{ $translation['about_us'] }}</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                <a class="nav-link fs-22px" style="color: var(--dark-blue)"
                                     href="#">{{ $translation['contact'] }}</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                <a class="nav-link fs-22px" style="color: var(--dark-blue)"
                                     href="#">{{ $translation['help'] }}</a>
                             </li>
 
 
                             @if (Auth::guard('member')->check())
                                 <li class="nav-item">
-                                    <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                    <a class="nav-link fs-22px" style="color: var(--dark-blue)"
                                         href="/domewing/account-settings">{{ $translation['profile'] }}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                    <a class="nav-link fs-22px" style="color: var(--dark-blue)"
                                         href="/domewing/auth/logout">{{ $translation['logout'] }}</a>
                                 </li>
                             @else
                                 <li class="nav-item">
-                                    <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                    <a class="nav-link fs-22px" style="color: var(--dark-blue)"
                                         href="/domewing/auth/register">{{ $translation['signup'] }}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                    <a class="nav-link fs-22px" style="color: var(--dark-blue)"
                                         href="/domewing/auth/login">{{ $translation['login'] }}</a>
                                 </li>
                             @endif

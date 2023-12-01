@@ -245,3 +245,8 @@
     max-height: 200px;
     object-fit: contain;
 }
+
+.member-nav .active {
+    background-color: var(--cyan-blue);
+    border-radius: 10px;
+}

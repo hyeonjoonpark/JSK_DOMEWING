@@ -47,24 +47,16 @@ Route::get('lang/{languageId}', function ($languageId) {
     return redirect()->back(); // Redirect to the previous page or any specific page
 });
 
-function set_active( $route ) {
-    if( is_array( $route ) ){
-        return in_array(Request::path(), $route) ? 'active' : '';
-    }
-    return Request::path() == $route ? 'active' : '';
-}
-
-function set_bold( $route ) {
-    if( is_array( $route ) ){
-        return in_array(Request::path(), $route) ? 'text-bold' : 'text-regular';
-    }
-    return Request::path() == $route ? 'text-bold' : 'text-regular';
-}
-
 Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(function () {
-    Route::get('/account-settings', [MemberController::class, 'loadAccountSettings']);
+
+    Route::get('account-settings', [MemberController::class, 'loadAccountSettings'])->name('member_details');
     Route::get('/shopping-cart', [ShoppingCartController::class, 'showShoppingCart']);
     Route::get('/checkout/{id}', [CheckoutController::class, 'showCheckoutPage']);
+    Route::get('to-ship',[MemberController::class, 'showToShip'])->name('to_ship');
+    Route::get('to-receive',[MemberController::class, 'showToReceive'])->name('to_receive');
+    Route::get('to-rate',[MemberController::class, 'showToRate'])->name('to_rate');
+    Route::get('purchase-history',[MemberController::class, 'showPurchaseHistory'])->name('purchase_history');
+    Route::get('wishlist',[MemberController::class, 'showWishlist'])->name('wishlist');
 });
 
 //ving kong
