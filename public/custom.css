@@ -237,3 +237,11 @@
     height: 300px;
     object-fit: contain;
 }
+
+.user-profile-card img {
+    min-width: 10%;
+    min-height: 10%;
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+}

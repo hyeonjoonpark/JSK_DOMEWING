@@ -18,6 +18,7 @@ use App\Http\Controllers\Domewing\Auth\RegisterMemberController;
 use App\Http\Controllers\Domewing\ShoppingCartController;
 use App\Http\Controllers\Domewing\ProductDetailsController;
 use App\Http\Controllers\Domewing\CheckoutController;
+use App\Http\Controllers\Domewing\MemberController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -46,8 +47,22 @@ Route::get('lang/{languageId}', function ($languageId) {
     return redirect()->back(); // Redirect to the previous page or any specific page
 });
 
+function set_active( $route ) {
+    if( is_array( $route ) ){
+        return in_array(Request::path(), $route) ? 'active' : '';
+    }
+    return Request::path() == $route ? 'active' : '';
+}
+
+function set_bold( $route ) {
+    if( is_array( $route ) ){
+        return in_array(Request::path(), $route) ? 'text-bold' : 'text-regular';
+    }
+    return Request::path() == $route ? 'text-bold' : 'text-regular';
+}
+
 Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(function () {
-    Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
+    Route::get('/account-settings', [MemberController::class, 'loadAccountSettings']);
     Route::get('/shopping-cart', [ShoppingCartController::class, 'showShoppingCart']);
     Route::get('/checkout/{id}', [CheckoutController::class, 'showCheckoutPage']);
 });

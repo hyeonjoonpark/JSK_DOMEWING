@@ -45,6 +45,10 @@
                             @if (Auth::guard('member')->check())
                                 <li class="nav-item">
                                     <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
+                                        href="/domewing/account-settings">{{ $translation['profile'] }}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-custom fs-22px" style="color: var(--dark-blue)"
                                         href="/domewing/auth/logout">{{ $translation['logout'] }}</a>
                                 </li>
                             @else

@@ -8,10 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class GeneralController extends Controller
 {
-    public function loadAccountSettings(Request $request){
-        return view('domewing.user_details');
-    }
-
     public function loadBusinessPage(Request $request){
         return view('domewing.welcome');
     }
