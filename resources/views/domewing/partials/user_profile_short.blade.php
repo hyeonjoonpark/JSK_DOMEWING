@@ -11,13 +11,6 @@
                 <ul class="pricing-features pt-4 fs-18px " style="color: var(--dark-blue);">
                     <li>
                         <h6 class="w-30 align-self-center m-0" style="color: var(--cyan-blue);">
-                            User ID</h6>
-                        <h6 class="w-70 align-self-center m-0" style="color: var(--dark-blue);">
-                            janedoetest
-                        </h6>
-                    </li>
-                    <li>
-                        <h6 class="w-30 align-self-center m-0" style="color: var(--cyan-blue);">
                             Location</h6>
                         <h6 class="w-70 align-self-center m-0" style="color: var(--dark-blue);">
                             Kuala Lumpur, Malaysia
@@ -34,7 +27,7 @@
             </div>
             <div class="col-md-3 d-md-grid d-none">
                 <button class="btn ms-auto my-auto" style="background: var(--dark-blue);">
-                    <a href="#">
+                    <a href={{ route('member_details') }}>
                         <h6 class="text-white">Edit Profile</h6>
                     </a>
                 </button>
