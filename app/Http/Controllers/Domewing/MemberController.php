@@ -91,15 +91,6 @@ class MemberController extends Controller
         return $data;
     }
 
-
-    public function showToShip() {
-        return view('domewing.to_ship');
-    }
-
-    public function showToReceive() {
-        return view('domewing.to_receive');
-    }
-
     public function showToRate() {
         return view('domewing.to_rate');
     }

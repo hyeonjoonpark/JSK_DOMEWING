@@ -250,3 +250,9 @@
     background-color: var(--cyan-blue);
     border-radius: 10px;
 }
+
+.tracking-img {
+    max-width: 245px;
+    max-height: 245px;
+    object-fit: contain;
+}

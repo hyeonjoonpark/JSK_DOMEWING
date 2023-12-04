@@ -7,113 +7,85 @@
             <div class="col-md-4 col-12">
                 @include('domewing.partials.user_navbar')
             </div>
-            {{-- <div class="col-md-8 col-12">
-                <div class="user-details-padding">
-                    <div class="row">
-                        <div class="col-lg-4 col-md-12">
-                            <label for="title" class="form-label text-regular text-md text-light-blue">Title</label>
-                            <input type="text"
-                                class="form-control custom-user-textbox text-regular text-xl text-dark-blue" id="title"
-                                placeholder="Ms">
-                            <div style="padding-bottom: 20px;"></div>
+            <div class="col-md-8 col-12">
+                @foreach ($groupedOrders as $orderId => $orders)
+                    <div class="card-bordered p-4 mb-4" style="background: var(--thin-blue);">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="text-wrap text-truncate" style="color: var(--light-blue);">
+                                {{ $orders->first()->supplierName }}</h6>
+                            <a href="#" onclick="showDetails({{ $orders->first()->transaction_id }})">
+                                <h6 class="text-end" style="color: var(--light-blue);">
+                                    More Details</h6>
+                            </a>
                         </div>
-                        <div class="col-lg-4 col-md-12">
-                            <label for="fname" class="form-label text-regular text-md text-light-blue">First Name</label>
-                            <input type="text"
-                                class="form-control custom-user-textbox text-regular text-xl text-dark-blue" id="fname"
-                                placeholder="Jane">
-                            <div style="padding-bottom: 20px;"></div>
+                        <div class="p-1" style="border-bottom: 2px solid var(--dark-blue)"></div>
+                        <div class="hstack g-gs horizontal-scrolling pt-1">
+                            @foreach ($orders as $order)
+                                <div>
+                                    <img src="{{ $order->newImageHref }}" class="img-fluid tracking-img" />
+                                    <h6 class="text-truncate py-3" style="color: var(--dark-blue); width:230px;">
+                                        {{ $order->productName }}
+                                    </h6>
+                                </div>
+                            @endforeach
                         </div>
-                        <div class="col-lg-4 col-md-12">
-                            <label for="lname" class="form-label text-regular text-md text-light-blue">Last Name</label>
-                            <input type="text"
-                                class="form-control custom-user-textbox text-regular text-xl text-dark-blue" id="lname"
-                                placeholder="Doe">
-                            <div style="padding-bottom: 20px;"></div>
-                        </div>
-                    </div>
+                        <div class="p-2" style="border-bottom: 2px solid var(--cyan-blue)"></div>
+                        <div class="d-flex flex-wrap justify-content-between">
+                            <ul class="pricing-features fs-18px col-lg-7 col-12 pt-3" style="color: var(--dark-blue);">
+                                <li>
+                                    @php
+                                        $grandTotal = 0;
+                                        foreach ($orders as $order) {
+                                            $grandTotal += $order->total_price;
+                                        }
+                                    @endphp
+                                    <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                        Total Payment</h6>
+                                    <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                        KRW {{ number_format($grandTotal, 2) }}
+                                    </h6>
+                                </li>
+                                <li>
+                                    <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                        Shipping Method</h6>
+                                    <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                        Land
+                                    </h6>
+                                </li>
+                                <li>
+                                    <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                        Ship By</h6>
+                                    <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                        01/01/2024
+                                    </h6>
+                                </li>
+                                <li>
+                                    <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                        Receive By</h6>
+                                    <h6 class="w-50 align-self-center m-0" style="color: var(--dark-blue);">
+                                        06/01/2024</h6>
+                                </li>
+                            </ul>
 
-                    <label for="userId" class="form-label text-regular text-md text-light-blue">User ID</label>
-                    <input type="text" class="form-control custom-user-textbox text-regular text-xl text-dark-blue"
-                        id="userId" placeholder="janedoetesting" disabled>
-                    <div style="padding-bottom: 20px;"></div>
-
-                    <label for="phoneNumber" class="form-label text-regular text-md text-light-blue">Phone Number</label>
-                    <div class="input-group">
-                        <button class="input-group-text custom-user-textbox text-xl text-dark-blue text-regular"
-                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                            style="border-right: none;">+60</button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">+60</a></li>
-                            <li><a class="dropdown-item" href="#">+85</a></li>
-                            <li><a class="dropdown-item" href="#">+65</a></li>
-                        </ul>
-                        <div class="vr vr-dark my-2" style="color:var(--dark-blue); width:2px;"></div>
-                        <input type="text" style="border-left:none;"
-                            class="form-control custom-user-textbox text-xl text-dark-blue text-regular"
-                            placeholder="0123456789" id="phoneNumber">
-                    </div>
-                    <div style="padding-bottom: 20px;"></div>
-
-                    <label for="email" class="form-label text-regular text-md text-light-blue">Email Address</label>
-                    <input type="text" class="form-control custom-user-textbox text-regular text-xl text-dark-blue"
-                        id="email" placeholder="janedoe@gmail.com">
-
-                    <div style="padding-bottom: 50px;"></div>
-
-                    <p class="text-regular text-xl text-dark-blue">Default Shipping Address</p>
-                    <div style="padding-bottom: 20px;"></div>
-
-                    <label for="street" class="form-label text-regular text-md text-light-blue">Street</label>
-                    <input type="text" class="form-control custom-user-textbox text-regular text-xl text-dark-blue"
-                        id="street" placeholder="1 Pusat Sumber 1 Jln Bukit Jalil Taman Teknologi 5">
-
-                    <div style="padding-bottom: 20px;"></div>
-
-                    <div class="row">
-                        <div class="col-lg-6 col-md-12">
-                            <label for="city" class="form-label text-regular text-md text-light-blue">City</label>
-                            <input type="text"
-                                class="form-control custom-user-textbox text-regular text-xl text-dark-blue" id="city"
-                                placeholder="Kuala Lumpur">
-                            <div style="padding-bottom: 20px;"></div>
-                        </div>
-                        <div class="col-lg-6 col-md-12">
-                            <label for="state" class="form-label text-regular text-md text-light-blue">State</label>
-                            <input type="text"
-                                class="form-control custom-user-textbox text-regular text-xl text-dark-blue" id="state"
-                                placeholder="Wilayah Persekutuan">
-                            <div style="padding-bottom: 20px;"></div>
+                            <button class="btn mt-lg-auto justify-content-center col-lg-5 col-12 mt-3"
+                                style="background: var(--pink);" onclick="notifySupplier()">
+                                <h5 class="text-white p-1 text-wrap">Remind Supplier to Ship</h5>
+                            </button>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-lg-6 col-md-12">
-                            <label for="zipCode" class="form-label text-regular text-md text-light-blue">Zip Code</label>
-                            <input type="text"
-                                class="form-control custom-user-textbox text-regular text-xl text-dark-blue" id="zipCode"
-                                placeholder="57100">
-                            <div style="padding-bottom: 20px;"></div>
-                        </div>
-                        <div class="col-lg-6 col-md-12">
-                            <label for="Country" class="form-label text-regular text-md text-light-blue">Country</label>
-                            <input type="text"
-                                class="form-control custom-user-textbox text-regular text-xl text-dark-blue"
-                                id="Country" placeholder="Malaysia">
-                            <div style="padding-bottom: 20px;"></div>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn d-inline-flex align-items-center">
-                        <img src="media\Asset_Control_Add.svg" class="icon-size">
-                        <p class="text-regular text-dark-blue text-xl px-3">Add Another Address</p>
-                    </button>
-
-                </div>
-            </div> --}}
+                @endforeach
+            </div>
         </div>
     </div>
 @endsection
 
 @section('scripts')
+    <script>
+        function notifySupplier() {
+            swal.fire({
+                icon: 'success',
+                title: 'Notified Supplier'
+            })
+        }
+    </script>
 @endsection
