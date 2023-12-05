@@ -91,6 +91,43 @@ class MemberController extends Controller
         return $data;
     }
 
+    public function getTransactionDetails(Request $request, $id){
+        $transaction = DB::table('transaction_order')
+                        ->join('delivery_details', 'transaction_order.transaction_id', "=", 'delivery_details.transaction_id')
+                        ->where('transaction_order.transaction_id', $id)
+                        ->first();
+
+        $transaction->location = implode(', ', array_filter([
+            $transaction->street,
+            $transaction->city,
+            $transaction->state,
+            $transaction->zipcode,
+            $transaction->country,
+        ]));
+
+        $transaction->contact_number = implode(' ', array_filter([
+            $transaction->phone_code,
+            $transaction->phone_number,
+        ]));
+
+        $items = DB::table('order_items')
+                    ->join('uploaded_products','order_items.product_id','=','uploaded_products.id')
+                    ->join('collected_products','uploaded_products.productId','=','collected_products.id')
+                    ->where('order_id', $transaction->order_id)
+                    ->select('order_items.*', 'collected_products.productName')
+                    ->get();
+
+        $total = 0;
+
+        foreach ($items as $item){
+            $total += $item->price_at * $item->quantity + $item->shipping_at;
+            $item->price_at = "KRW " . number_format($item->price_at,2);
+            $item->shipping_at = "KRW " . number_format($item->shipping_at,2);
+        };
+
+        return ['transaction' => $transaction, 'items' => $items, 'total'=>"KRW " . number_format($total,2)];
+    }
+
     public function showToRate() {
         return view('domewing.to_rate');
     }

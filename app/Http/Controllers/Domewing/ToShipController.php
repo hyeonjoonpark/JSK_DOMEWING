@@ -31,6 +31,7 @@ class ToShipController extends Controller
                         'collected_products.productName',
                         'uploaded_products.newImageHref',
                         'transaction_order.transaction_id',
+                        'order.order_id',
                         DB::raw('(order_items.price_at * order_items.quantity + order_items.shipping_at) as total_price'))
                     ->where('delivery_details.delivery_status', '1')
                     ->where('transaction_order.status', 'PAID')

@@ -21,6 +21,8 @@ use App\Http\Controllers\Domewing\ShoppingCartController;
 use App\Http\Controllers\Domewing\OrderController;
 use App\Http\Controllers\Domewing\CheckoutController;
 use App\Http\Controllers\Domewing\MemberController;
+use App\Http\Controllers\Domewing\ToShipController;
+use App\Http\Controllers\Domewing\ToReceiveController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,3 +76,4 @@ Route::post('member/create-order', [OrderController::class, 'createOrder']);
 Route::post('member/checkout-order', [CheckoutController::class, 'checkoutOrder']);
 
 Route::post('member/update-profile', [MemberController::class, 'updateProfile']);
+Route::get('member/get-transaction-details/{id}', [MemberController::class, 'getTransactionDetails']);
