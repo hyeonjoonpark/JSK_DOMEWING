@@ -76,15 +76,14 @@ class MemberController extends Controller
         if ($update) {
             $data = [
                 'status' => 1,
-                'icon' => 'success',
-                'return' => 'Information Updated.',
+                'title' => 'SUCCESS',
+                'return' => 'Profile Updated Successfully.',
             ];
         } else {
             $data = [
                 'status' => -1,
-                'icon' => 'error',
-                'title' => 'Opps',
-                'return' => 'Failed to update information.',
+                'title' => 'ERROR',
+                'return' => 'Failed to Update Information. Please Try Again Later.',
             ];
         }
 

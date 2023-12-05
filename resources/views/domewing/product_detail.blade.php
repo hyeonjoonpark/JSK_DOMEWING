@@ -139,14 +139,20 @@
                                             {{ $translation['add_to_cart'] }}</p>
                                     </button>
                                     <button class="btn btn-secondary me-3 my-1"
-                                        style="padding: 10px 15px; background: var(--pure-white); border: 1px solid var(--dark-blue)">
+                                        style="padding: 10px 15px; background: var(--pure-white); border: 1px solid var(--dark-blue)"
+                                        onclick='checkUser(2)'>
                                         <p class="text-regular text-md" style="color: var(--dark-blue)">
                                             {{ $translation['purchase_now'] }}</p>
                                     </button>
                                     <button class="btn btn-secondary me-3 my-1"
-                                        style="padding: 10px 15px; background: var(--pink); border: none">
+                                        style="padding: 10px 15px; background: var(--pink); border: none"
+                                        onclick='checkUser(3)'>
                                         <p class="text-regular text-white text-md">
-                                            {{ $translation['add_to_wishlist'] }}
+                                            @if (Auth::guard('member')->check())
+                                                {{ $translation[$wishlist] }}
+                                            @else
+                                                {{ $translation['add_to_wishlist'] }}
+                                            @endif
                                         </p>
                                     </button>
                                 </div>
@@ -220,10 +226,151 @@
             </div>
         </div>
     </div>
+
+    @include('domewing.partials.modal')
 @endsection
 
 @section('scripts')
     <script>
+        function addToWishlist() {
+            const productId = '{{ $productInfo->uploadedId }}';
+            let remember_token = '{{ Auth::guard('member')->user()->remember_token ?? '' }}';
+
+            if (!remember_token) {
+                remember_token = '';
+            }
+
+            //to ensure loading modal doesnot interrupt
+            $('#modalLoading').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modalLoading').modal('show');
+
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    url: '/api/member/add-to-wishlist',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        productId: productId,
+                        remember_token: remember_token,
+                    },
+                    success: function(response) {
+                        $('#modalLoading').modal('hide');
+                        const status = parseInt(response.status);
+
+                        if (status == 1) {
+                            $('#modalSuccessTitle').text(response.title);
+                            $('#modalSuccessMessage').text(response.return);
+                            $('#modalSuccess').modal('show');
+                            $('#modalSuccess').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        } else if (status == -2) {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.href = '/domewing/auth/login';
+                            });
+                        } else {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        $('#modalFailTitle').text('ERROR');
+                        $('#modalFailMessage').text(
+                            'Unexpected Error Occured. Please Try Again Later.');
+                        $('#modalFail').modal('show');
+                        $('#modalFail').on('hidden.bs.modal', function(e) {
+                            location.reload();
+                        });
+                    }
+                });
+            });
+        }
+
+        function purchaseNow() {
+            const productId = '{{ $productInfo->uploadedId }}';
+            const quantity = document.getElementById('quantity').value;
+            let remember_token = '{{ Auth::guard('member')->user()->remember_token ?? '' }}';
+
+            console.log(productId);
+            if (!remember_token) {
+                remember_token = '';
+            }
+
+            //to ensure loading modal doesnot interrupt
+            $('#modalLoading').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modalLoading').modal('show');
+
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    url: '/api/member/create-single-order',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        productId: productId,
+                        quantity: quantity,
+                        remember_token: remember_token,
+                    },
+                    success: function(response) {
+                        $('#modalLoading').modal('hide');
+                        const status = parseInt(response.status);
+
+                        if (status == 1) {
+                            location.href = '/domewing/checkout/' + response.checkout_id;
+                        } else if (status == -2) {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.href = '/domewing/auth/login';
+                            });
+                        } else if (status == -3) {
+                            Swal.fire({
+                                icon: response.icon,
+                                title: response.title,
+                                text: response.return,
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes, proceed!',
+                                cancelButtonText: 'No, cancel!',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    removeCartItem();
+                                }
+                            });
+                        } else {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        $('#modalFailTitle').text('ERROR');
+                        $('#modalFailMessage').text(
+                            'Unexpected Error Occured. Please Try Again Later.');
+                        $('#modalFail').modal('show');
+                        $('#modalFail').on('hidden.bs.modal', function(e) {
+                            location.reload();
+                        });
+                    }
+                });
+            });
+        }
+
         function checkUser($option) {
             try {
                 const userId = '{{ Auth::guard('member')->id() }}';
@@ -231,22 +378,24 @@
                 if (userId !== '') {
                     if ($option == 1) {
                         addToCart();
+                    } else if ($option == 2) {
+                        purchaseNow();
+                    } else if ($option == 3) {
+                        addToWishlist();
                     }
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops',
-                        text: 'User must log in to access this feature'
-                    }).then((result) => {
+                    $('#modalFailTitle').text('ERROR');
+                    $('#modalFailMessage').text('User Must Login to Access.');
+                    $('#modalFail').modal('show');
+                    $('#modalFail').on('hidden.bs.modal', function(e) {
                         location.href = '/domewing/auth/login';
                     });
                 }
             } catch (err) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops',
-                    text: 'User must log in to access this feature'
-                }).then((result) => {
+                $('#modalFailTitle').text('ERROR');
+                $('#modalFailMessage').text('User Must Login to Access.');
+                $('#modalFail').modal('show');
+                $('#modalFail').on('hidden.bs.modal', function(e) {
                     location.href = '/domewing/auth/login';
                 });
             }
@@ -261,61 +410,74 @@
                 remember_token = '';
             }
 
-            $.ajax({
-                url: '/api/member/add-to-cart',
-                type: 'post',
-                dataType: 'json',
-                data: {
-                    productId: productId,
-                    quantity: quantity,
-                    remember_token: remember_token,
-                },
-                success: function(response) {
-                    const status = parseInt(response.status);
+            //to ensure loading modal doesnot interrupt
+            $('#modalLoading').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modalLoading').modal('show');
 
-                    if (status == 1) {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.return,
-                        })
-                    } else if (status == -2) {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.title,
-                            text: response.return
-                        }).then((result) => {
-                            location.href = '/domewing/auth/login';
-                        });
-                    } else if (status == -3) {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.title,
-                            text: response.return,
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes, proceed!',
-                            cancelButtonText: 'No, cancel!',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                removeCartItem();
-                            }
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.title,
-                            text: response.return
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    url: '/api/member/add-to-cart',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        productId: productId,
+                        quantity: quantity,
+                        remember_token: remember_token,
+                    },
+                    success: function(response) {
+                        $('#modalLoading').modal('hide');
+                        const status = parseInt(response.status);
+
+                        if (status == 1) {
+                            $('#modalSuccessTitle').text(response.title);
+                            $('#modalSuccessMessage').text(response.return);
+                            $('#modalSuccess').modal('show');
+                            $('#modalSuccess').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        } else if (status == -2) {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.href = '/domewing/auth/login';
+                            });
+                        } else if (status == -3) {
+                            Swal.fire({
+                                icon: response.icon,
+                                title: response.title,
+                                text: response.return,
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes, proceed!',
+                                cancelButtonText: 'No, cancel!',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    removeCartItem();
+                                }
+                            });
+                        } else {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        $('#modalFailTitle').text('ERROR');
+                        $('#modalFailMessage').text(
+                            'Unexpected Error Occured. Please Try Again Later.');
+                        $('#modalFail').modal('show');
+                        $('#modalFail').on('hidden.bs.modal', function(e) {
+                            location.reload();
                         });
                     }
-                },
-                error: function(response) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Unable to process',
-                        text: response,
-                    });
-                }
+                });
             });
-
         }
 
         function removeCartItem() {
@@ -333,26 +495,31 @@
                     remember_token: remember_token,
                 },
                 success: function(response) {
+                    $('#modalLoading').modal('hide');
                     const status = parseInt(response.status);
 
                     if (status == 1) {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.return,
-                        })
+                        $('#modalSuccessTitle').text(response.title);
+                        $('#modalSuccessMessage').text(response.return);
+                        $('#modalSuccess').modal('show');
+                        $('#modalSuccess').on('hidden.bs.modal', function(e) {
+                            location.reload();
+                        });
                     } else {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.title,
-                            text: response.return
+                        $('#modalFailTitle').text(response.title);
+                        $('#modalFailMessage').text(response.return);
+                        $('#modalFail').modal('show');
+                        $('#modalFail').on('hidden.bs.modal', function(e) {
+                            location.reload();
                         });
                     }
                 },
                 error: function(response) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Unable to process',
-                        text: response,
+                    $('#modalFailTitle').text('ERROR');
+                    $('#modalFailMessage').text('Unexpected Error Occured. Please Try Again Later.');
+                    $('#modalFail').modal('show');
+                    $('#modalFail').on('hidden.bs.modal', function(e) {
+                        location.reload();
                     });
                 }
             });

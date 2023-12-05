@@ -7,7 +7,7 @@
             </div>
             <div class="col-md-7 col-10 my-auto">
                 <h6 style="color: var(--cyan-blue);">Username</h6>
-                <h2 style="color: var(--dark-blue);">Jane Doe</h2>
+                <h2 style="color: var(--dark-blue);">{{ Auth::guard('member')->user()->username }}</h2>
                 <ul class="pricing-features pt-4 fs-18px " style="color: var(--dark-blue);">
                     <li>
                         <h6 class="w-30 align-self-center m-0" style="color: var(--cyan-blue);">
@@ -33,6 +33,5 @@
                 </button>
             </div>
         </div>
-
     </div>
 </div>

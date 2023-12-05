@@ -30,12 +30,30 @@ class ProductDetailsController extends Controller
 
         $otherProducts = $this->getOtherProducts($productInfo->userId, $productInfo->uploadedId);
         $similarProducts = $this->getSimilarProducts($productInfo->userId, $productInfo->uploadedId);
+        $wishlist = $this->checkWishlist($productInfo->uploadedId);
 
         return view('domewing.product_detail', [
             'productInfo' => $productInfo,
             'otherProducts' => $otherProducts,
             'similarProducts' => $similarProducts,
+            'wishlist' => $wishlist,
         ]);
+    }
+
+    public function checkWishlist($productId){
+        if(!Auth::guard('member')->check()){
+            return null;
+        }
+
+        $member = Auth::guard('member')->user();
+
+        $wishlist = DB::table('wishlist')->where('product_id', $productId)->where('user_id', $member->id)->where('is_Active', 'Y')->first();
+
+        if (!$wishlist){
+            return "add_to_wishlist";
+        }else{
+            return "remove_from_wishlist";
+        }
     }
 
     public function getMargin(){
@@ -116,22 +134,19 @@ class ProductDetailsController extends Controller
             Auth::logout();
             return [
                 'status' => -2,
-                'icon' => 'warning',
-                'title' => 'Opps',
-                'return' => 'User Must Login to Access This Feature'
+                'title' => 'ERROR',
+                'return' => 'User Must Login To Access.'
             ];
-        } elseif (!$product) {
+        } else if (!$product) {
             return [
                 'status' => -1,
-                'icon' => 'error',
-                'title' => 'Opps',
+                'title' => 'ERROR',
                 'return' => 'Product Not Found'
             ];
-        } elseif ($quantity < 1) {
+        } else if ($quantity < 1) {
             return [
                 'status' => -1,
-                'icon' => 'error',
-                'title' => 'Opps',
+                'title' => 'ERROR',
                 'return' => 'Quantity Invalid'
             ];
         }
@@ -146,8 +161,7 @@ class ProductDetailsController extends Controller
         if ($checkCart) {
             return [
                 'status' => -1,
-                'icon' => 'warning',
-                'title' => 'Info',
+                'title' => 'INFO',
                 'return' => 'Item Already Added into Your Cart'
             ];
         }
@@ -186,23 +200,21 @@ class ProductDetailsController extends Controller
             if ($addToCart) {
                 return [
                     'status' => 1,
-                    'icon' => 'success',
-                    'return' => 'Item Added to Shopping Cart'
+                    'title' => 'SUCCESS',
+                    'return' => 'Item Added to Shopping Cart.'
                 ];
             } else {
                 return [
                     'status' => -1,
-                    'icon' => 'error',
-                    'title' => 'Opps',
-                    'return' => 'Failed'
+                    'title' => 'ERROR',
+                    'return' => 'Failed to Add Item to Shopping Cart.'
                 ];
             }
         } catch (Exception $e) {
             return [
                 'status' => -1,
-                'icon' => 'error',
-                'title' => 'Opps',
-                'return' => 'Failed to Add Item'
+                'title' => 'ERROR',
+                'return' => 'Failed to Add Item to Shopping Cart.'
             ];
         }
     }
@@ -216,8 +228,7 @@ class ProductDetailsController extends Controller
             Auth::logout();
             return [
                 'status' => -2,
-                'icon' => 'warning',
-                'title' => 'Opps',
+                'title' => 'ERROR',
                 'return' => 'Session Invalid. Please Login Again.'
             ];
         }
@@ -230,8 +241,95 @@ class ProductDetailsController extends Controller
         if($update){
             return [
                 'status' => 1,
-                'icon' => 'success',
+                'title' => 'SUCCESS',
                 'return' => 'Items Removed Successfully From Shopping Cart.'
+            ];
+        }
+    }
+
+    public function removeWishlist($wishlist_id){
+
+    }
+
+    public function addToWishlist(Request $request){
+        $productId = $request->input('productId');
+        $remember_token = $request->input('remember_token');
+
+        $member = DB::table('members')->where('remember_token', $remember_token)->first();
+        $product = DB::table('uploaded_products')
+            ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
+            ->where('uploaded_products.id', $productId)
+            ->where('uploaded_products.isActive', 'Y')
+            ->where('collected_products.isActive', 'Y')
+            ->select('collected_products.userId as seller_id')
+            ->first();
+
+        $wishlist = DB::table('wishlist')->where('product_id', $productId)->where('user_id', $member->id)->where('is_Active', 'Y')->first();
+
+        // Validations
+        if (!$member) {
+            Auth::logout();
+            return [
+                'status' => -2,
+                'title' => 'ERROR',
+                'return' => 'User Must Login To Access.'
+            ];
+        } else if (!$product) {
+            return [
+                'status' => -1,
+                'title' => 'ERROR',
+                'return' => 'Product Not Found'
+            ];
+        }else if($wishlist){
+            $update = DB::table('wishlist')
+                ->where('id', $wishlist->id)
+                ->update([
+                    'is_Active' => 'N',
+                    'updated_at' => now(),
+                ]);
+
+            if ($update) {
+                return [
+                    'status' => 1,
+                    'title' => 'SUCCESS',
+                    'return' => 'Item Removed From Wishlist.'
+                ];
+            } else {
+                return [
+                    'status' => -1,
+                    'title' => 'ERROR',
+                    'return' => 'Failed to Add Item to Wishlist.'
+                ];
+            }
+        }
+
+        try {
+            $wishlist = [
+                'product_id' => $productId,
+                'user_id' => $member->id,
+                'created_at' => now(),
+            ];
+
+            $addToWishlist = DB::table('wishlist')->insert($wishlist);
+
+            if ($addToWishlist) {
+                return [
+                    'status' => 1,
+                    'title' => 'SUCCESS',
+                    'return' => 'Item Added to Wishlist.'
+                ];
+            } else {
+                return [
+                    'status' => -1,
+                    'title' => 'ERROR',
+                    'return' => 'Failed to Add Item to Wishlist.'
+                ];
+            }
+        } catch (Exception $e) {
+            return [
+                'status' => -1,
+                'title' => 'ERROR',
+                'return' => 'Failed to Add Item to Wishlist.'
             ];
         }
     }

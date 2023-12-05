@@ -264,56 +264,64 @@
             const errorElement = document.getElementById(`ratingError_${transaction_id}`);
             errorElement.textContent = '';
 
-            $.ajax({
-                url: '/api/member/submit-review',
-                type: 'post',
-                dataType: 'json',
-                data: requestData,
-                success: function(response) {
-                    $('#modalLoading').modal('hide');
-                    const status = parseInt(response.status);
-
-                    if (status == 1) {
-                        $('#modalSuccessTitle').text(response.title);
-                        $('#modalSuccessMessage').text(response.return);
-                        $('#modalSuccess').modal('show');
-                        $('#modalSuccess').on('hidden.bs.modal', function(e) {
-                            location.reload();
-                        });
-                    } else if (status == -2) {
-                        $('#modalFailTitle').text(response.title);
-                        $('#modalFailMessage').text(response.return);
-                        $('#modalFail').modal('show');
-                        $('#modalFail').on('hidden.bs.modal', function(e) {
-                            location.href = '/domewing/auth/login';
-                        });
-                    } else {
-                        $('#modalFailTitle').text(response.title);
-                        $('#modalFailMessage').text(response.return);
-                        $('#modalFail').modal('show');
-                        $('#modalFail').on('hidden.bs.modal', function(e) {
-                            location.reload();
-                        });
-                    }
-                },
-                error: function(response) {
-                    if (response.status === 422) {
-                        // Validation failed, handle the errors
-                        const rating = response.responseJSON.rating;
-                        errorElement.textContent = rating;
-                    } else {
-                        $('#modalLoading').modal('hide');
-                        $('#modalFailTitle').text('ERROR');
-                        $('#modalFailMessage').text(
-                            'Unexpected Error Occured. Please Try Again Later.');
-                        $('#modalFail').modal('show');
-                        $('#modalFail').on('hidden.bs.modal', function(e) {
-                            location.reload();
-                        });
-                    }
-                }
+            //to ensure loading modal doesnot interrupt
+            $('#modalLoading').modal({
+                backdrop: 'static',
+                keyboard: false
             });
+            $('#modalLoading').modal('show');
 
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    url: '/api/member/submit-review',
+                    type: 'post',
+                    dataType: 'json',
+                    data: requestData,
+                    success: function(response) {
+                        $('#modalLoading').modal('hide');
+                        const status = parseInt(response.status);
+
+                        if (status == 1) {
+                            $('#modalSuccessTitle').text(response.title);
+                            $('#modalSuccessMessage').text(response.return);
+                            $('#modalSuccess').modal('show');
+                            $('#modalSuccess').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        } else if (status == -2) {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.href = '/domewing/auth/login';
+                            });
+                        } else {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        if (response.status === 422) {
+                            // Validation failed, handle the errors
+                            const rating = response.responseJSON.rating;
+                            errorElement.textContent = rating;
+                        } else {
+                            $('#modalLoading').modal('hide');
+                            $('#modalFailTitle').text('ERROR');
+                            $('#modalFailMessage').text(
+                                'Unexpected Error Occured. Please Try Again Later.');
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        }
+                    }
+                });
+            });
         }
 
         function editReview(id) {
@@ -336,54 +344,63 @@
             const errorElement = document.getElementById(`ratingError_${transaction_id}`);
             errorElement.textContent = '';
 
-            $.ajax({
-                url: '/api/member/edit-review',
-                type: 'post',
-                dataType: 'json',
-                data: requestData,
-                success: function(response) {
-                    $('#modalLoading').modal('hide');
-                    const status = parseInt(response.status);
+            //to ensure loading modal doesnot interrupt
+            $('#modalLoading').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modalLoading').modal('show');
 
-                    if (status == 1) {
-                        $('#modalSuccessTitle').text(response.title);
-                        $('#modalSuccessMessage').text(response.return);
-                        $('#modalSuccess').modal('show');
-                        $('#modalSuccess').on('hidden.bs.modal', function(e) {
-                            location.reload();
-                        });
-                    } else if (status == -2) {
-                        $('#modalFailTitle').text(response.title);
-                        $('#modalFailMessage').text(response.return);
-                        $('#modalFail').modal('show');
-                        $('#modalFail').on('hidden.bs.modal', function(e) {
-                            location.href = '/domewing/auth/login';
-                        });
-                    } else {
-                        $('#modalFailTitle').text(response.title);
-                        $('#modalFailMessage').text(response.return);
-                        $('#modalFail').modal('show');
-                        $('#modalFail').on('hidden.bs.modal', function(e) {
-                            location.reload();
-                        });
-                    }
-                },
-                error: function(response) {
-                    if (response.status === 422) {
-                        // Validation failed, handle the errors
-                        const rating = response.responseJSON.rating;
-                        errorElement.textContent = rating;
-                    } else {
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    url: '/api/member/edit-review',
+                    type: 'post',
+                    dataType: 'json',
+                    data: requestData,
+                    success: function(response) {
                         $('#modalLoading').modal('hide');
-                        $('#modalFailTitle').text('ERROR');
-                        $('#modalFailMessage').text(
-                            'Unexpected Error Occured. Please Try Again Later.');
-                        $('#modalFail').modal('show');
-                        $('#modalFail').on('hidden.bs.modal', function(e) {
-                            location.reload();
-                        });
+                        const status = parseInt(response.status);
+
+                        if (status == 1) {
+                            $('#modalSuccessTitle').text(response.title);
+                            $('#modalSuccessMessage').text(response.return);
+                            $('#modalSuccess').modal('show');
+                            $('#modalSuccess').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        } else if (status == -2) {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.href = '/domewing/auth/login';
+                            });
+                        } else {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        $('#modalLoading').modal('hide');
+                        if (response.status === 422) {
+                            // Validation failed, handle the errors
+                            const rating = response.responseJSON.rating;
+                            errorElement.textContent = rating;
+                        } else {
+                            $('#modalFailTitle').text('ERROR');
+                            $('#modalFailMessage').text(
+                                'Unexpected Error Occured. Please Try Again Later.');
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        }
                     }
-                }
+                });
             });
         }
 

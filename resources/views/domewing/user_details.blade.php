@@ -8,7 +8,6 @@
                 @include('domewing.partials.user_navbar')
             </div>
             <div class="col-md-8 col-12">
-
                 <div class="row g-gs px-2">
                     <div class="col-md-4 col-sm-12">
                         <div class="form-group">
@@ -229,6 +228,8 @@
             </div>
         </div>
     </div>
+
+    @include('domewing.partials.modal')
 @endsection
 
 @section('scripts')
@@ -278,50 +279,66 @@
                 remember_token: remember_token,
             };
 
-            $.ajax({
-                type: 'POST',
-                url: '/api/member/update-profile',
-                dataType: 'json',
-                data: requestData,
-                success: function(response) {
-                    const status = parseInt(response.status);
+            $('#modalLoading').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modalLoading').modal('show');
 
-                    if (status == 1) {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.return,
-                        }).then((result) => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.title,
-                            text: response.return
-                        });
-                    }
-                },
-                error: function(response) {
-                    if (response.status === 422) {
-                        // Validation failed, handle the errors
-                        const errors = response.responseJSON.errors;
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/member/update-profile',
+                    dataType: 'json',
+                    data: requestData,
+                    success: function(response) {
+                        $('#modalLoading').modal('hide');
+                        const status = parseInt(response.status);
 
-                        // Display errors to the user
-                        for (let fieldName in errors) {
-                            if (errors.hasOwnProperty(fieldName)) {
-                                const errorMessage = errors[fieldName][0];
-                                const errorElement = document.getElementById(`${fieldName}Error`);
+                        if (status == 1) {
+                            $('#modalSuccessTitle').text(response.title);
+                            $('#modalSuccessMessage').text(response.return);
+                            $('#modalSuccess').modal('show');
+                            $('#modalSuccess').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        } else {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        $('#modalLoading').modal('hide');
+                        if (response.status === 422) {
+                            // Validation failed, handle the errors
+                            const errors = response.responseJSON.errors;
 
-                                if (errorElement) {
-                                    errorElement.textContent = errorMessage;
+                            // Display errors to the user
+                            for (let fieldName in errors) {
+                                if (errors.hasOwnProperty(fieldName)) {
+                                    const errorMessage = errors[fieldName][0];
+                                    const errorElement = document.getElementById(`${fieldName}Error`);
+
+                                    if (errorElement) {
+                                        errorElement.textContent = errorMessage;
+                                    }
                                 }
                             }
+                        } else {
+                            $('#modalFailTitle').text('ERROR');
+                            $('#modalFailMessage').text(
+                                'Unexpected Error Occured. Please Try Again Later.');
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
                         }
-                    } else {
-                        // Other error handling logic
-                        console.log(response);
                     }
-                }
+                });
             });
         }
     </script>

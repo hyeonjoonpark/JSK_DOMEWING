@@ -71,9 +71,11 @@ Route::post('seller/change-theme-color', [CMSController::class, 'changeThemeColo
 
 Route::post('member/add-to-cart', [ProductDetailsController::class, 'addToCart']);
 Route::post('member/remove-all-cart', [ProductDetailsController::class, 'removeAllCartItem']);
+Route::post('member/add-to-wishlist', [ProductDetailsController::class, 'addToWishlist']);
 Route::post('member/remove-cart-item', [ShoppingCartController::class, 'removeCartItem']);
 Route::post('member/update-quantity', [ShoppingCartController::class, 'updateQuantity']);
 Route::post('member/create-order', [OrderController::class, 'createOrder']);
+Route::post('member/create-single-order', [OrderController::class, 'createSingleOrder']);
 Route::post('member/checkout-order', [CheckoutController::class, 'checkoutOrder']);
 
 Route::post('member/update-profile', [MemberController::class, 'updateProfile']);
