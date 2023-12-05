@@ -58,7 +58,7 @@
         </a>
     </li>
     <li class="nav-item member-nav">
-        <a class="d-flex align-items-center py-3 nav-link {{ Request::is('domewing/wishlist') ? 'active' : '' }}"
+        <a class="d-flex align-items-center py-3 nav-link {{ Request::is('domewing/wishlist*') ? 'active' : '' }}"
             href={{ route('wishlist') }}>
             @if (Request::is('domewing/wishlist'))
                 <img src="{{ asset('media/Asset_Section_Selected_Wishlist.svg') }}" class="icon-size">
