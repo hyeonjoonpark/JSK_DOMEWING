@@ -182,6 +182,10 @@
             });
         }
 
+        $("#modalDetail").on("hidden.bs.modal", function() {
+            location.reload();
+        });
+
         function populateItems(items) {
             const itemList = $('.invoice-desc ul:last-child');
             itemList.empty();

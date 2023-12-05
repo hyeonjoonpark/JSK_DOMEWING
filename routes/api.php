@@ -23,6 +23,7 @@ use App\Http\Controllers\Domewing\CheckoutController;
 use App\Http\Controllers\Domewing\MemberController;
 use App\Http\Controllers\Domewing\ToShipController;
 use App\Http\Controllers\Domewing\ToReceiveController;
+use App\Http\Controllers\Domewing\ToRateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,3 +79,5 @@ Route::post('member/checkout-order', [CheckoutController::class, 'checkoutOrder'
 Route::post('member/update-profile', [MemberController::class, 'updateProfile']);
 Route::get('member/get-transaction-details/{id}', [MemberController::class, 'getTransactionDetails']);
 Route::post('member/order-received', [ToReceiveController::class, 'confirmReceived']);
+Route::post('member/submit-review', [ToRateController::class, 'submitReview']);
+Route::post('member/edit-review', [ToRateController::class, 'editReview']);

@@ -210,6 +210,10 @@
             });
         }
 
+        $("#modalDetail").on("hidden.bs.modal", function() {
+            location.reload();
+        });
+
         function showDetails(id) {
             //to ensure loading modal doesnot interrupt
             $('#modalLoading').modal({
