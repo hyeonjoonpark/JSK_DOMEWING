@@ -128,10 +128,6 @@ class MemberController extends Controller
         return ['transaction' => $transaction, 'items' => $items, 'total'=>"KRW " . number_format($total,2)];
     }
 
-    public function showPurchaseHistory() {
-        return view('domewing.purchase_history');
-    }
-
     public function showWishlist() {
         return view('domewing.wishlist');
     }

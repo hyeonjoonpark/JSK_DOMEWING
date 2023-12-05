@@ -76,7 +76,7 @@
                                 @endfor
                             </form>
                         </div>
-                        <div class="form-group py-2">
+                        <div class="form-group pt-2 m-0">
                             <textarea id="review_{{ $orders->first()->transaction_id }}" type="text" class="form-control fs-18px"
                                 style="color: var(--dark-blue)" placeholder="Type a message (Optional)"></textarea>
                             <span id="ratingError_{{ $orders->first()->transaction_id }}" class="invalid"
@@ -166,7 +166,7 @@
                                 @endfor
                             </form>
                         </div>
-                        <div class="form-group py-2">
+                        <div class="form-group pt-2 m-0">
                             <textarea id="review_{{ $orders->first()->transaction_id }}" type="text" class="form-control fs-18px"
                                 style="color: var(--dark-blue)" placeholder="Type a message (Optional)">{{ $orders->first()->review }}</textarea>
                             <span id="ratingError_{{ $orders->first()->transaction_id }}" class="invalid"

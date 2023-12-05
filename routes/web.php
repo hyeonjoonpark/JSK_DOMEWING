@@ -22,6 +22,7 @@ use App\Http\Controllers\Domewing\MemberController;
 use App\Http\Controllers\Domewing\ToShipController;
 use App\Http\Controllers\Domewing\ToReceiveController;
 use App\Http\Controllers\Domewing\ToRateController;
+use App\Http\Controllers\Domewing\PurchaseHistoryController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -58,7 +59,7 @@ Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(fu
     Route::get('to-ship',[ToShipController::class, 'showToShip'])->name('to_ship');
     Route::get('to-receive',[ToReceiveController::class, 'showToReceive'])->name('to_receive');
     Route::get('to-rate',[ToRateController::class, 'showToRate'])->name('to_rate');
-    Route::get('purchase-history',[MemberController::class, 'showPurchaseHistory'])->name('purchase_history');
+    Route::get('purchase-history',[PurchaseHistoryController::class, 'showPurchaseHistory'])->name('purchase_history');
     Route::get('wishlist',[MemberController::class, 'showWishlist'])->name('wishlist');
 });
 
