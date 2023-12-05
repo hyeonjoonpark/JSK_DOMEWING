@@ -147,11 +147,13 @@
             });
             $('#modalLoading').modal('show');
 
-            $.ajax({
-                url: '/api/member/get-transaction-details/' + id, // Replace with your endpoint to fetch details
-                type: 'GET',
-                success: function(response) {
-                    $('#modalLoading').on('shown.bs.modal', function(e) {
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    url: '/api/member/get-transaction-details/' +
+                        id, // Replace with your endpoint to fetch details
+                    type: 'GET',
+                    success: function(response) {
+
                         $('#transaction_id').text(response.transaction.transaction_id);
                         const datePurchased = new Date(response.transaction.created_at);
                         const formattedDate = formatDate(datePurchased); // Function to format date
@@ -168,16 +170,15 @@
 
                         $('#modalLoading').modal('hide');
                         $('#modalDetail').modal('show');
-                    })
-                },
-                error: function(xhr, status, error) {
-                    $('#modalLoading').on('shown.bs.modal', function(e) {
+
+                    },
+                    error: function(xhr, status, error) {
                         $('#modalLoading').modal('hide');
                         $('#modalFailTitle').text('ERROR');
                         $('#modalFailMessage').text('Transaction Not Found');
                         $('#modalFail').modal('show');
-                    });
-                }
+                    }
+                });
             });
         }
 

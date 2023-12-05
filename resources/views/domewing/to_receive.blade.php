@@ -67,10 +67,11 @@
                                 </li>
                             </ul>
 
-                            {{-- <button class="btn mt-lg-auto justify-content-center col-lg-5 col-12 mt-3"
-                                style="background: var(--pink);" onclick="showDelivery()">
-                                <h5 class="text-white p-1 text-wrap">Check Delivery Status</h5>
-                            </button> --}}
+                            <button class="btn mt-lg-auto justify-content-center col-lg-5 col-12 mt-3"
+                                style="background: var(--pink);"
+                                onclick="receiveInit('{{ $orders->first()->transaction_id }}')">
+                                <h5 class="text-white p-1 text-wrap">Order Collected</h5>
+                            </button>
                         </div>
                     </div>
                 @endforeach
@@ -132,11 +133,81 @@
 
 @section('scripts')
     <script>
-        function showDelivery() {
-            swal.fire({
-                icon: 'success',
-                title: 'Delivery Detail Here'
-            })
+        function receiveInit(id) {
+            const transaction_id = id;
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Collection Confirmation',
+                text: 'Are you sure you had collected this order?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    confirmReceived(transaction_id);
+                }
+            });
+        }
+
+        function confirmReceived(id) {
+            const remember_token = '{{ Auth::guard('member')->user()->remember_token }}';
+            const transaction_id = id;
+
+            $('#modalLoading').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#modalLoading').modal('show');
+
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    url: '/api/member/order-received',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        remember_token: remember_token,
+                        transaction_id: transaction_id,
+                    },
+                    success: function(response) {
+                        $('#modalLoading').modal('hide');
+                        const status = parseInt(response.status);
+
+                        if (status == 1) {
+                            $('#modalSuccessTitle').text(response.title);
+                            $('#modalSuccessMessage').text(response.return);
+                            $('#modalSuccess').modal('show');
+                            $('#modalSuccess').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        } else if (status == -2) {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.href = '/domewing/auth/login';
+                            });
+                        } else {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        $('#modalLoading').modal('hide');
+                        $('#modalFailTitle').text('ERROR');
+                        $('#modalFailMessage').text(
+                            'Unexpected Error Occured. Please Try Again Later.');
+                        $('#modalFail').modal('show');
+                        $('#modalFail').on('hidden.bs.modal', function(e) {
+                            location.reload();
+                        });
+                    }
+                });
+            });
         }
 
         function showDetails(id) {
@@ -147,11 +218,13 @@
             });
             $('#modalLoading').modal('show');
 
-            $.ajax({
-                url: '/api/member/get-transaction-details/' + id, // Replace with your endpoint to fetch details
-                type: 'GET',
-                success: function(response) {
-                    $('#modalLoading').on('shown.bs.modal', function(e) {
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    url: '/api/member/get-transaction-details/' +
+                        id, // Replace with your endpoint to fetch details
+                    type: 'GET',
+                    success: function(response) {
+
                         $('#transaction_id').text(response.transaction.transaction_id);
                         const datePurchased = new Date(response.transaction.created_at);
                         const formattedDate = formatDate(datePurchased); // Function to format date
@@ -168,16 +241,15 @@
 
                         $('#modalLoading').modal('hide');
                         $('#modalDetail').modal('show');
-                    })
-                },
-                error: function(xhr, status, error) {
-                    $('#modalLoading').on('shown.bs.modal', function(e) {
+
+                    },
+                    error: function(xhr, status, error) {
                         $('#modalLoading').modal('hide');
                         $('#modalFailTitle').text('ERROR');
                         $('#modalFailMessage').text('Transaction Not Found');
                         $('#modalFail').modal('show');
-                    });
-                }
+                    }
+                });
             });
         }
 

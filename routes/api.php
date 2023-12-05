@@ -77,3 +77,4 @@ Route::post('member/checkout-order', [CheckoutController::class, 'checkoutOrder'
 
 Route::post('member/update-profile', [MemberController::class, 'updateProfile']);
 Route::get('member/get-transaction-details/{id}', [MemberController::class, 'getTransactionDetails']);
+Route::post('member/order-received', [ToReceiveController::class, 'confirmReceived']);

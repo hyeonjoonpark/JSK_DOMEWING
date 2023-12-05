@@ -43,5 +43,47 @@ class ToReceiveController extends Controller
         return $groupedOrders;
     }
 
+    public function confirmReceived(Request $request){
+        $remember_token = $request->input('remember_token');
+        $transaction_id = $request->input('transaction_id');
 
+        $member = DB::table('members')->where('remember_token', $remember_token)->first();
+
+        if(!$member){
+            Auth::guard('member')->logout();
+            return [
+                'status' => -2,
+                'title' => 'OPPS',
+                'return' => 'Session Expired. Please Login Again.',
+            ];
+        }
+
+        $transaction = DB::table('transaction_order')->where('transaction_id', $transaction_id)->where('user_id', $member->id)->first();
+
+        if(!$transaction){
+            return [
+                'status' => -1,
+                'title' => 'ERROR',
+                'return' => 'Order Not Found. Please Refresh Page',
+            ];
+        }
+
+        $update= DB::table('delivery_details')
+                    ->where('transaction_id', $transaction_id)
+                    ->update(['delivery_status' => '3','updated_at' => now()]);
+
+        if($update){
+            return [
+                'status' => 1,
+                'title' => 'SUCCESS',
+                'return' => 'Order Collected Successfully.',
+            ];
+        }else{
+            return [
+                'status' => -1,
+                'title' => 'ERROR',
+                'return' => 'Unexpected Error Occured. Please Try Again Later.',
+            ];
+        }
+    }
 }
