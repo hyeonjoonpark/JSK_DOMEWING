@@ -10,26 +10,96 @@ use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DOMDocument;
 use DOMXPath;
+use Exception;
 
 class TestController extends Controller
 {
     public function index()
     {
-        $targetProducts = DB::table('uploaded_products as up')
-            ->join('collected_products as cp', 'cp.id', '=', 'up.productId')
-            ->whereBetween('up.id', [1002, 1074])
-            ->select('*', 'up.id as up_id')
-            ->get();
-        foreach ($targetProducts as $product) {
-            $fc = new FormController();
-            $newProductName = $fc->editProductName($product->productName);
-            DB::table('uploaded_products as up')
-                ->where('up.id', $product->up_id)
-                ->update([
-                    'up.newProductName' => $newProductName
-                ]);
+        $products = $this->getProducts();
+        foreach ($products as $product) {
+            $productName = $this->preprocessProductName($product->productName);
+            $upID = $product->upID;
+            $this->updateUP($upID, $productName);
         }
-        return $targetProducts;
+    }
+    public function updateUP($upID, $productName)
+    {
+        try {
+            DB::table('uploaded_products')
+                ->where('id', $upID)
+                ->update([
+                    'newProductName' => $productName,
+                    'updatedAt' => now()
+                ]);
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    public function getProducts()
+    {
+        $products = DB::table('collected_products AS cp')
+            ->join('uploaded_products AS up', 'cp.id', '=', 'up.productId')
+            ->where('cp.isActive', 'Y')
+            ->where('up.isActive', 'Y')
+            ->select('*', 'up.id AS upID')
+            ->get();
+        return $products;
+    }
+    public function preprocessProductName($productName)
+    {
+        $productName = $this->replaceForbiddenWords($productName);
+        $productName = $this->regexProductName($productName);
+        return $productName;
+    }
+    public function replaceForbiddenWords($productName)
+    {
+        // Define the array of forbidden words
+        $forbiddenWords = [
+            '/',
+            'CB',
+            'EB',
+            '옵션선택',
+            '색상선택',
+            '규격선택',
+            '오피스넥스',
+            '최고',
+            '기미',
+            '양모',
+            '숙취',
+            '치매',
+            '무좀',
+            '교정',
+            '발모',
+            '환자',
+            '탄력',
+            '벨크로',
+            '이벤트',
+            '염산',
+            '스노우볼',
+            '슬라이락',
+            '오랄비',
+            '기미',
+            '보약',
+            '존슨',
+            '성기'
+        ];
+
+        // Replace each forbidden word in the product name with a space
+        foreach ($forbiddenWords as $word) {
+            $productName = str_replace($word, ' ', $productName);
+        }
+
+        // Return the sanitized product name
+        return $productName;
+    }
+
+    public function regexProductName($productName)
+    {
+        $productName = preg_replace('/[^가-힣a-zA-Z0-9\s]/u', '', $productName);
+        $productName = preg_replace('/\s+/', ' ', $productName);
+        $productName = trim($productName);
+        return $productName;
     }
     // public function index()
     // {

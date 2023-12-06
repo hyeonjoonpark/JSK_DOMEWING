@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/webhook', [WebhookController::class, 'webhook']);
 Route::post('/set-post-confirmed', [DashboardController::class, 'setPostConfirmed']);
 Route::post('/delete-post', [DashboardController::class, 'deletePost']);
-Route::post('/product/search', [ProductSearchController::class, 'productSearch']);
+Route::post('/product/search', [ProductSearchController::class, 'index']);
 Route::post('/product/category', [ProductRegisterController::class, 'categorySearch']);
 Route::post('/product/register', [ProductRegisterController::class, 'handle']);
 Route::post('/product/upload', [FormController::class, 'index']);
