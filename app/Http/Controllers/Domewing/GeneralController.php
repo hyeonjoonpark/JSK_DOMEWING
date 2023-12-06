@@ -217,4 +217,8 @@ class GeneralController extends Controller
         }
 
     }
+
+    public function searchProducts(Request $request){
+        return view('domewing.search_result');
+    }
 }
