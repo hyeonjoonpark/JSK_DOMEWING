@@ -11,11 +11,13 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use DOMDocument;
 use DOMXPath;
 use Exception;
+use Str;
 
 class TestController extends Controller
 {
     public function index()
     {
+        $this->deactiveProduct();
         $products = $this->getProducts();
         foreach ($products as $product) {
             $productName = $this->preprocessProductName($product->productName);
@@ -31,6 +33,18 @@ class TestController extends Controller
                 ->update([
                     'newProductName' => $productName,
                     'updatedAt' => now()
+                ]);
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    public function deactiveProduct()
+    {
+        try {
+            DB::table('collected_products')
+                ->where('productName', 'LIKE', '%품절%')
+                ->update([
+                    'isActive' => 'N'
                 ]);
         } catch (Exception $e) {
             return $e->getMessage();
@@ -99,6 +113,7 @@ class TestController extends Controller
         $productName = preg_replace('/[^가-힣a-zA-Z0-9\s]/u', '', $productName);
         $productName = preg_replace('/\s+/', ' ', $productName);
         $productName = trim($productName);
+        $productName = mb_substr($productName, 0, 25, 'UTF-8');
         return $productName;
     }
     // public function index()

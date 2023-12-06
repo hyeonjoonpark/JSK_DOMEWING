@@ -105,6 +105,7 @@ class AdminController extends Controller
                 'uploaded_products.createdAt as uploadedCreatedAt',
                 'collected_products.createdAt as collectedCreatedAt'
             )
+            ->orderBy('uploaded_products.createdAt', 'desc')
             ->get();
         return view('admin/product_uploaded', [
             'uploadedProducts' => $uploadedProducts

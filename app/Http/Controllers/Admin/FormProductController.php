@@ -19,6 +19,7 @@ class FormProductController extends Controller
         $products = DB::table('uploaded_products')
             ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
             ->where('uploaded_products.id', '>=', $fromUPID)
+            ->where('collected_products.sellerID', '!=', '3')
             ->limit(500)
             ->get();
         $vendors = DB::table('product_register')
