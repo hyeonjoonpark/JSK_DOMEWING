@@ -30,11 +30,11 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-22px" style="color: var(--dark-blue)"
-                                    href="#">{{ $translation['about_us'] }}</a>
+                                    href={{ route('domewing.home') }}>{{ $translation['about_us'] }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-22px" style="color: var(--dark-blue)"
-                                    href="#">{{ $translation['contact'] }}</a>
+                                    href="/domewing/#contactUsSection">{{ $translation['contact'] }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-22px" style="color: var(--dark-blue)"
@@ -72,22 +72,37 @@
         style="background-color: {{ $theme_color->color_code ?? 'var(--dark-blue)' }} !important;">
         <div class="row py-3">
             <div class="col-3 m-auto d-none d-lg-block">
-                <img class="img-fluid" src="{{ asset('media/Asset_Logo_Darkbg.svg') }}" alt="Logo">
+                <a href={{ route('domewing.home') }}>
+                    <img class="img-fluid" src="{{ asset('media/Asset_Logo_Darkbg.svg') }}" alt="Logo">
+                </a>
             </div>
-            <div class="col-lg-8 col-md-12">
-                <div class="form-control-wrap">
-                    <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" style="background-color: var(--white);">
-                                <img class="icon-size" src={{ asset('media\Asset_Nav_Search.svg') }}>
-                            </span>
+            <div class="col-lg-9 col-md-12 px-lg-5 px-2">
+                <div class="d-flex justify-content-between">
+                    <form class="col-xl-11 col-lg-10 col-9" action="{{ route('domewing.search') }}" method="POST">
+                        @csrf
+                        <div class="form-control-wrap">
+                            <div class="input-group input-group-lg">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" style="background-color: var(--white);">
+                                        <img class="icon-size" src={{ asset('media\Asset_Nav_Search.svg') }}>
+                                    </span>
+                                </div>
+                                <input type="text" style="background-color: var(--white); border-left:none;"
+                                    class="form-control" placeholder="Product Name" id="search" name="search_keyword"
+                                    value="{{ request('search_keyword') }}">
+                            </div>
                         </div>
-                        <input type="text" style="background-color: var(--white); border-left:none;"
-                            class="form-control" placeholder="Product Name" required>
-                    </div>
+                    </form>
+
+                    <button type="button" class="btn col-md-1 col-2 p-1 px-3 justify-content-center w-auto"
+                        style="background-color: var(--white);">
+                        <a href="/domewing/shopping-cart">
+                            <img class="icon-size clickable" src={{ asset('media\Asset_Nav_Cart.svg') }}>
+                        </a>
+                    </button>
                 </div>
 
-                <div class="hstack pt-3">
+                <div class="hstack pt-3 w-95">
                     <div class="px-2 fs-22px" style="color:var(--cyan-blue)">Category</div>
                     <div class="px-2"></div>
                     <div class="vr" style="color:var(--cyan-blue); width:2px; opacity:1;"></div>
@@ -137,9 +152,7 @@
                 </div>
             </div>
             <div class="col-1 d-none d-lg-block">
-                <button type="button" class="btn" style="background-color: var(--white);"><a
-                        href="/domewing/shopping-cart"><img class="icon-size clickable"
-                            src={{ asset('media\Asset_Nav_Cart.svg') }}></a></button>
+
             </div>
         </div>
     </div>

@@ -68,9 +68,10 @@ Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(fu
 //ving kong
 Route::prefix('domewing')->middleware('translation')->group( function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
-    Route::get('/', [GeneralController::class, 'loadBusinessPage']);
+    Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('domewing.home');
     Route::get('/product/{id}', [ProductDetailsController::class, 'loadProductDetail']);
     Route::post('contact-us', [GeneralController::class, 'contactUs']);
+    Route::post('/search', [GeneralController::class, 'searchProducts'])->name('domewing.search');
 });
 
 Route::prefix('domewing/auth')->middleware('translation')->group(function () {

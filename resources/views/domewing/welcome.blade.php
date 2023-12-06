@@ -15,7 +15,7 @@
                     </div>
                 </div>
                 <div class="pb-4" style="padding-top:200px;">
-                    <a class="d-xl-block d-none" href="#">
+                    <a class="d-xl-block d-none" href="#aboutEngine">
                         <div class="d-flex text-nowrap align-item-center">
                             <em class="icon fa-solid fa-arrow-down-long fa-2x pe-2 " style="color: var(--cyan-blue);"></em>
                             <h4 style="color: var(--cyan-blue);">
@@ -28,7 +28,7 @@
             <img class="about-img" src={{ asset('media\Asset_About_Whale.svg') }} alt="Logo">
         </div>
         <div class="pt-5"></div>
-        <div class="px-md-5 px-2 py-5">
+        <div class="px-md-5 px-2 py-5" id="aboutEngine">
             <h2 style="color: var(--dark-blue);">About Domewing Engine</h2>
             <div class="row m-0 g-gs">
                 @foreach ($about_items as $about_item)
@@ -118,7 +118,7 @@
         </div>
 
         <div class="pt-5"></div>
-        <div class="px-md-5 px-2 py-5">
+        <div class="px-md-5 px-2 py-5" id="contactUsSection">
             <h2 class="pb-4" style="color: var(--dark-blue);">Contact Us</h2>
             <form action="domewing/contact-us" method="post" id="contactForm">
                 @csrf
@@ -264,6 +264,21 @@
 
 @section('scripts')
     <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
         function expandTextarea(id) {
             document.getElementById(id).addEventListener('keyup', function() {
                 this.style.overflow = 'hidden';
