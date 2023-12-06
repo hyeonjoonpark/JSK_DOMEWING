@@ -44,7 +44,7 @@
                                         <img src="{{ $uploadedProduct->newImageHref }}" alt="상품 대표 이미지">
                                     </div>
                                     <div class="user-info">
-                                        <span class="tb-lead">{{ $uploadedProduct->productName }} <span
+                                        <span class="tb-lead">{{ $uploadedProduct->newProductName }} <span
                                                 class="dot dot-success d-md-none ms-1"></span></span>
                                         <span>{{ $uploadedProduct->keywords }}</span>
                                     </div>

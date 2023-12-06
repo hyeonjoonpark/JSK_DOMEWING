@@ -22,16 +22,17 @@ class AdminController extends Controller
     }
     public function productSearch()
     {
-        $vendors = DB::table('product_search')->join('vendors', 'vendors.id', '=', 'product_search.vendor_id')->where('product_search.is_active', 'Y')->get();
-        $productRegisterVendors = DB::table('product_register')->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')->where('product_register.is_active', 'Y')->get();
-        $marginRate = DB::table('margin_rate')->where('userId', Auth::user()->id)->select('rate')->first()->rate;
-        $marginRate = (100 + $marginRate) / 100;
-        $productInformation = DB::table('product_information')->get();
+        $searchVendors = DB::table('product_search')
+            ->join('vendors', 'vendors.id', '=', 'product_search.vendor_id')
+            ->where('product_search.is_active', 'Y')
+            ->get();
+        $uploadVendors = DB::table('product_register')
+            ->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')
+            ->where('product_register.is_active', 'Y')
+            ->get();
         return view('admin/product_search', [
-            'vendors' => $vendors,
-            'productRegisterVendors' => $productRegisterVendors,
-            'marginRate' => $marginRate,
-            'productInformation' => $productInformation
+            'searchVendors' => $searchVendors,
+            'uploadVendors' => $uploadVendors
         ]);
     }
     public function productRegister()
