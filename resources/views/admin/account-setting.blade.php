@@ -10,19 +10,22 @@
         <div class="col-6">
             <div class="card card-bordered">
                 <div class="card-inner">
-                    <div class="form-group">
-                        <label for="" class="form-label">마진율</label>
-                        <div class="d-flex text-nowrap">
-                            <div class="form-control-wrap w-100">
-                                <div class="form-text-hint">
-                                    <span class="overline-title">%</span>
+                    @foreach ($marginRates as $marginRate)
+                        <div class="form-group">
+                            <label for="" class="form-label">{{ $marginRate->name }}</label>
+                            <div class="d-flex text-nowrap">
+                                <div class="form-control-wrap w-100">
+                                    <div class="form-text-hint">
+                                        <span class="overline-title">%</span>
+                                    </div>
+                                    <input type="number" class="form-control" id="marginRate{{ $marginRate->mrID }}"
+                                        value="{{ $marginRate->rate }}" placeholder="마진율(%)를 기입해주세요.">
                                 </div>
-                                <input type="text" class="form-control" id="marginRate" value="{{ $marginRate }}"
-                                    placeholder="마진율(%)를 기입해주세요.">
+                                <button class="btn btn-primary"
+                                    onclick="changeMarginRate({{ $marginRate->mrID }});">변경</button>
                             </div>
-                            <button class="btn btn-primary" onclick="changeMarginRate();">변경</button>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -32,18 +35,21 @@
     <script>
         var csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
 
-        function changeMarginRate() {
-            const marginRate = $('#marginRate').val();
+        function changeMarginRate(mrID) {
+            $('.btn').prop('disabled', true);
+            const marginRate = $('#marginRate' + mrID).val();
             $.ajax({
                 url: "/api/account-setting/margin-rate",
                 type: "POST",
                 dataType: "JSON",
                 data: {
                     marginRate: marginRate,
-                    remember_token: '{{ Auth::user()->remember_token }}'
+                    remember_token: '{{ Auth::user()->remember_token }}',
+                    mrID: mrID
                 },
                 success: function(response) {
-                    if (response.status == 1) {
+                    $('.btn').prop('disabled', false);
+                    if (response.status) {
                         Swal.fire({
                             icon: "success",
                             title: "진행 성공",
@@ -60,6 +66,7 @@
                     }
                 },
                 error: function(response) {
+                    $('.btn').prop('disabled', false);
                     console.log(response);
                 }
             });
