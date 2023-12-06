@@ -324,3 +324,82 @@
     text-shadow: 0 0 5px #ffa904;
 }
 /* rating function end */
+
+.about-img {
+    position: absolute;
+    width: 75%;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    max-height: -webkit-fill-available;
+    object-fit: cover;
+}
+
+.custom-contact-textbox {
+    height: auto;
+    margin: auto;
+    background-color: var(--white);
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.partnership-padding {
+    background-color: var(--white);
+    background: linear-gradient(
+        to right,
+        transparent 1.5%,
+        var(--white) 1.5%,
+        var(--white) 98.5%,
+        transparent 98.5%
+    );
+}
+
+.partnership-left-button {
+    width: 45px;
+    height: 45px;
+    transform: rotate(90deg);
+    background-color: var(--thin-blue);
+    border: 3px solid var(--dark-blue); /* Added border */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.partnership-right-button {
+    width: 45px;
+    height: 45px;
+    transform: rotate(270deg);
+    background-color: var(--thin-blue);
+    border: 3px solid var(--dark-blue); /* Added border */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-carousel-indicators button {
+    width: 12px !important; /* Adjust size as needed */
+    height: 12px !important; /* Adjust size as needed */
+    border-radius: 50% !important;
+    background-color: rgba(
+        255,
+        255,
+        255,
+        0.5
+    ) !important; /* Adjust color and opacity */
+    border: 2px solid var(--pure-white) !important;
+    margin: 0 5px !important; /* Adjust spacing as needed */
+    cursor: pointer;
+    transition: background-color 0.3s !important;
+}
+
+.custom-carousel-indicators button.active {
+    background-color: var(--pure-white) !important; /* Adjust active color */
+}
+
+.partnership-image {
+    width: 300px !important;
+    height: 300px !important;
+    object-fit: cover;
+}

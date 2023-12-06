@@ -70,6 +70,7 @@ Route::prefix('domewing')->middleware('translation')->group( function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage']);
     Route::get('/product/{id}', [ProductDetailsController::class, 'loadProductDetail']);
+    Route::post('contact-us', [GeneralController::class, 'contactUs']);
 });
 
 Route::prefix('domewing/auth')->middleware('translation')->group(function () {
