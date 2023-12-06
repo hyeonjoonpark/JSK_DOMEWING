@@ -18,6 +18,12 @@ use App\Http\Controllers\Domewing\Auth\RegisterMemberController;
 use App\Http\Controllers\Domewing\ShoppingCartController;
 use App\Http\Controllers\Domewing\ProductDetailsController;
 use App\Http\Controllers\Domewing\CheckoutController;
+use App\Http\Controllers\Domewing\MemberController;
+use App\Http\Controllers\Domewing\ToShipController;
+use App\Http\Controllers\Domewing\ToReceiveController;
+use App\Http\Controllers\Domewing\ToRateController;
+use App\Http\Controllers\Domewing\PurchaseHistoryController;
+use App\Http\Controllers\Domewing\WishlistController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -47,9 +53,16 @@ Route::get('lang/{languageId}', function ($languageId) {
 });
 
 Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(function () {
-    Route::get('/account-settings', [GeneralController::class, 'loadAccountSettings']);
+
+    Route::get('account-settings', [MemberController::class, 'loadAccountSettings'])->name('member_details');
     Route::get('/shopping-cart', [ShoppingCartController::class, 'showShoppingCart']);
     Route::get('/checkout/{id}', [CheckoutController::class, 'showCheckoutPage']);
+    Route::get('to-ship',[ToShipController::class, 'showToShip'])->name('to_ship');
+    Route::get('to-receive',[ToReceiveController::class, 'showToReceive'])->name('to_receive');
+    Route::get('to-rate',[ToRateController::class, 'showToRate'])->name('to_rate');
+    Route::get('purchase-history',[PurchaseHistoryController::class, 'showPurchaseHistory'])->name('purchase_history');
+    Route::get('wishlist',[WishlistController::class, 'showWishlist'])->name('wishlist');
+    Route::get('/wishlist/search', [WishlistController::class,'searchWishlist'])->name('search.wishlist');
 });
 
 //ving kong

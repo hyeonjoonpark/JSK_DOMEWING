@@ -20,6 +20,10 @@ use App\Http\Controllers\Domewing\ProductDetailsController;
 use App\Http\Controllers\Domewing\ShoppingCartController;
 use App\Http\Controllers\Domewing\OrderController;
 use App\Http\Controllers\Domewing\CheckoutController;
+use App\Http\Controllers\Domewing\MemberController;
+use App\Http\Controllers\Domewing\ToShipController;
+use App\Http\Controllers\Domewing\ToReceiveController;
+use App\Http\Controllers\Domewing\ToRateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,7 +71,15 @@ Route::post('seller/change-theme-color', [CMSController::class, 'changeThemeColo
 
 Route::post('member/add-to-cart', [ProductDetailsController::class, 'addToCart']);
 Route::post('member/remove-all-cart', [ProductDetailsController::class, 'removeAllCartItem']);
+Route::post('member/add-to-wishlist', [ProductDetailsController::class, 'addToWishlist']);
 Route::post('member/remove-cart-item', [ShoppingCartController::class, 'removeCartItem']);
 Route::post('member/update-quantity', [ShoppingCartController::class, 'updateQuantity']);
 Route::post('member/create-order', [OrderController::class, 'createOrder']);
+Route::post('member/create-single-order', [OrderController::class, 'createSingleOrder']);
 Route::post('member/checkout-order', [CheckoutController::class, 'checkoutOrder']);
+
+Route::post('member/update-profile', [MemberController::class, 'updateProfile']);
+Route::get('member/get-transaction-details/{id}', [MemberController::class, 'getTransactionDetails']);
+Route::post('member/order-received', [ToReceiveController::class, 'confirmReceived']);
+Route::post('member/submit-review', [ToRateController::class, 'submitReview']);
+Route::post('member/edit-review', [ToRateController::class, 'editReview']);

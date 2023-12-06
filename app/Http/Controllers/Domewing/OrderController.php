@@ -92,5 +92,71 @@ class OrderController extends Controller
         return $data;
     }
 
+    public function createSingleOrder(Request $request){
+        $product_id = $request->input('productId');
+        $quantity = $request->input('quantity');
+        $remember_token = $request->input('remember_token');
 
+        $member = DB::table('members')->where('remember_token', $remember_token)->first();
+        $product = DB::table('uploaded_products')
+                    ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
+                    ->where('uploaded_products.id', $product_id)
+                    ->where('uploaded_products.isActive', 'Y')
+                    ->where('collected_products.isActive', 'Y')
+                    ->first();
+
+        //authentication check
+        if(!$member){
+            Auth::logout();
+            $data = [
+                'status' => -2,
+                'title' => 'ERROR',
+                'return' => 'User Must Login to Access This Feature.'
+            ];
+
+            return $data;
+        }else if (!$product) {
+            return [
+                'status' => -1,
+                'title' => 'ERROR',
+                'return' => 'Product Not Found'
+            ];
+        }
+
+        $prefix = 'DWO'; // Prefix for your order ID
+        $timestamp = Carbon::now()->format('YmdHis'); // Current timestamp formatted as 'YmdHis'
+
+        $orderId = $prefix . $timestamp;
+
+        try{
+            //create orders
+            $newOrderId = DB::table('order')->insert([
+                'user_id' => $member->id,
+                'created_at' => now(),
+                'order_id' => $orderId,
+            ]);
+
+            DB::table('order_items')->insert([
+                'order_id' => $orderId,
+                'product_id' => $product_id,
+                'quantity' => $quantity,
+                'created_at' => now(),
+            ]);
+
+            $data = [
+                'status' => 1,
+                'checkout_id' => $orderId
+            ];
+
+            return $data;
+        }catch (Exception $e){
+            return [
+                'status' => -1,
+                'title' => 'ERROR',
+                'return' => 'Unexpected Error Occurred. Please Again Later.'
+            ];
+        }
+
+
+    }
 }
