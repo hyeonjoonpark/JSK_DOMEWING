@@ -348,112 +348,113 @@
                 </div>
             </div>
         </div>
-    @endsection
+    </div>
+@endsection
 
-    @section('scripts')
-        <script>
-            function confirmPayment() {
+@section('scripts')
+    <script>
+        function confirmPayment() {
 
-                const orderId = '{{ $getOrder->first()->order_id }}';
-                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
-                const remember_token = '{{ Auth::guard('member')->user()->remember_token }}';
-                const contactName = document.getElementById('contactName').value;
-                const phoneCodeHidden = document.getElementById('phoneCodeHidden').value;
-                const phoneNumber = document.getElementsByName('phoneNumber')[0].value; // Assuming only one element is present
-                const email = document.getElementById('email').value;
-                const street = document.getElementById('street').value;
-                const city = document.getElementById('city').value;
-                const state = document.getElementById('state').value;
-                const zipCode = document.getElementById('zipCode').value;
-                const country = document.getElementById('country').value;
+            const orderId = '{{ $getOrder->first()->order_id }}';
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const remember_token = '{{ Auth::guard('member')->user()->remember_token }}';
+            const contactName = document.getElementById('contactName').value;
+            const phoneCodeHidden = document.getElementById('phoneCodeHidden').value;
+            const phoneNumber = document.getElementsByName('phoneNumber')[0].value; // Assuming only one element is present
+            const email = document.getElementById('email').value;
+            const street = document.getElementById('street').value;
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
+            const zipCode = document.getElementById('zipCode').value;
+            const country = document.getElementById('country').value;
 
-                const errorIds = [
-                    'contactNameError',
-                    'phoneNumberError',
-                    'emailError',
-                    'streetError',
-                    'cityError',
-                    'stateError',
-                    'zipCodeError',
-                    'countryError'
-                ];
+            const errorIds = [
+                'contactNameError',
+                'phoneNumberError',
+                'emailError',
+                'streetError',
+                'cityError',
+                'stateError',
+                'zipCodeError',
+                'countryError'
+            ];
 
-                // Clear all validation
-                errorIds.forEach((errorId) => {
-                    const errorElement = document.getElementById(errorId);
-                    if (errorElement) {
-                        errorElement.textContent = ''; // Clear the error message text content
+            // Clear all validation
+            errorIds.forEach((errorId) => {
+                const errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.textContent = ''; // Clear the error message text content
+                }
+            });
+
+            const requestData = {
+                orderId: orderId,
+                paymentMethod: paymentMethod,
+                remember_token: remember_token,
+                contactName: contactName,
+                phoneCodeHidden: phoneCodeHidden,
+                phoneNumber: phoneNumber,
+                email: email,
+                street: street,
+                city: city,
+                state: state,
+                zipCode: zipCode,
+                country: country,
+            };
+
+
+            $.ajax({
+                url: '/api/member/checkout-order',
+                type: 'post',
+                dataType: 'json',
+                data: requestData,
+                success: function(response) {
+                    const status = parseInt(response.status);
+
+                    if (status == 1) {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: response.return,
+                        }).then((result) => {
+                            location.href = '/domewing';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: response.icon,
+                            title: response.title,
+                            text: response.return
+                        });
                     }
-                });
+                },
+                error: function(response) {
+                    if (response.status === 422) {
+                        // Validation failed, handle the errors
+                        const errors = response.responseJSON.errors;
 
-                const requestData = {
-                    orderId: orderId,
-                    paymentMethod: paymentMethod,
-                    remember_token: remember_token,
-                    contactName: contactName,
-                    phoneCodeHidden: phoneCodeHidden,
-                    phoneNumber: phoneNumber,
-                    email: email,
-                    street: street,
-                    city: city,
-                    state: state,
-                    zipCode: zipCode,
-                    country: country,
-                };
+                        // Display errors to the user
+                        for (let fieldName in errors) {
+                            if (errors.hasOwnProperty(fieldName)) {
+                                const errorMessage = errors[fieldName][0];
+                                const errorElement = document.getElementById(`${fieldName}Error`);
 
-
-                $.ajax({
-                    url: '/api/member/checkout-order',
-                    type: 'post',
-                    dataType: 'json',
-                    data: requestData,
-                    success: function(response) {
-                        const status = parseInt(response.status);
-
-                        if (status == 1) {
-                            Swal.fire({
-                                icon: response.icon,
-                                title: response.return,
-                            }).then((result) => {
-                                location.href = '/domewing';
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: response.icon,
-                                title: response.title,
-                                text: response.return
-                            });
-                        }
-                    },
-                    error: function(response) {
-                        if (response.status === 422) {
-                            // Validation failed, handle the errors
-                            const errors = response.responseJSON.errors;
-
-                            // Display errors to the user
-                            for (let fieldName in errors) {
-                                if (errors.hasOwnProperty(fieldName)) {
-                                    const errorMessage = errors[fieldName][0];
-                                    const errorElement = document.getElementById(`${fieldName}Error`);
-
-                                    if (errorElement) {
-                                        errorElement.textContent = errorMessage;
-                                    }
+                                if (errorElement) {
+                                    errorElement.textContent = errorMessage;
                                 }
                             }
-                        } else {
-                            // Other error handling logic
-                            console.log(response);
                         }
+                    } else {
+                        // Other error handling logic
+                        console.log(response);
                     }
-                });
+                }
+            });
 
-            }
+        }
 
-            function changePhoneCode(code) {
-                document.getElementById('phoneCodeHidden').value = code;
-                document.getElementById('phoneCodeButton').textContent = code;
-                console.log(document.getElementById('phoneCodeHidden').value);
-            }
-        </script>
-    @endsection
+        function changePhoneCode(code) {
+            document.getElementById('phoneCodeHidden').value = code;
+            document.getElementById('phoneCodeButton').textContent = code;
+            console.log(document.getElementById('phoneCodeHidden').value);
+        }
+    </script>
+@endsection

@@ -17,7 +17,7 @@
                     <div class="d-flex justify-content-between">
                         <input type="text"
                             style="height: 45px; background-color: var(--thin-blue); color: var(--dark-blue)"
-                            class="form-control" id="search" name="search_keyword" placeholder="Search Keyword"
+                            class="form-control fs-18px" id="search" name="search_keyword" placeholder="Search Keyword"
                             value="{{ request('search_keyword') }}">
                         <button type="submit" class="btn">
                             <img src={{ asset('media\Asset_Nav_Search.svg') }} class="icon-size">

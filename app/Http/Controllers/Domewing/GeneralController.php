@@ -5,11 +5,19 @@ namespace App\Http\Controllers\Domewing;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class GeneralController extends Controller
 {
     public function loadBusinessPage(Request $request){
-        return view('domewing.welcome');
+
+        $about_items = $this->getAboutItem();
+        $partnerships = $this->getPartnership();
+
+        return view('domewing.welcome', [
+            'about_items'=>$about_items,
+            'partnerships'=>$partnerships
+        ]);
     }
 
     public function loadDomain(Request $request, $domain_name){
@@ -101,5 +109,112 @@ class GeneralController extends Controller
         ];
 
         return $categoriesTop;
+    }
+
+    public function getAboutItem(){
+        $about_items = [
+            [
+                'image' => 'media\Asset_About_Product_Search.svg',
+                'title' => 'Comprehensive Product Search',
+                'description' => 'Presenting users the best registered suppliers through keyword search results in the search engine.'
+            ],
+            [
+                'image' => 'media\Asset_About_Tracking.svg',
+                'title' => 'Order Tracking and Management',
+                'description' => 'Manage and track orders by monitoring the order status of products listed by multiple wholesale businesses.'
+            ],
+            [
+                'image' => 'media\Asset_About_Product_Listing.svg',
+                'title' => 'Individual Product Listing',
+                'description' => 'Listing and showcasing individual products to all wholesale businesses within the platform.'
+            ],
+            [
+                'image' => 'media\Asset_About_Dashboard.svg',
+                'title' => 'Dashboard with Analytical Charts',
+                'description' => 'Get access to various analytical charts that offer insights into key business metrics, helping users make informed decisions'
+            ],
+            [
+                'image' => 'media\Asset_About_Bulk_Listing.svg',
+                'title' => 'Bulk Product Listing',
+                'description' => 'Suppliers can efficiently upload and publish multiple products to all wholesale businesses     within the platform'
+            ],
+        ];
+
+        return $about_items;
+    }
+
+    public function getPartnership(){
+        $partnerships = [
+            'https://images.pexels.com/photos/2235130/pexels-photo-2235130.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/430205/pexels-photo-430205.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/1162361/pexels-photo-1162361.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/176837/pexels-photo-176837.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/1365795/pexels-photo-1365795.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/351263/pexels-photo-351263.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/3081173/pexels-photo-3081173.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/4480519/pexels-photo-4480519.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/1031955/pexels-photo-1031955.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/5359802/pexels-photo-5359802.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/4389665/pexels-photo-4389665.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/9978709/pexels-photo-9978709.jpeg?auto=compress&cs=tinysrgb&w=1600',
+            'https://images.pexels.com/photos/18868628/pexels-photo-18868628/free-photo-of-mugs-with-logo.jpeg?auto=compress&cs=tinysrgb&w=1600',
+
+        ];
+
+        return $partnerships;
+    }
+
+    public function contactUs(Request $request){
+        $validator = Validator::make($request->all(),[
+            'title' => 'required|min:2',
+            'fname' => 'required',
+            'lname' => 'required',
+            'email' => 'required|email',
+            'phoneCodeHidden' => 'required',
+            'phoneNumber' => 'required|min:6',
+            'textMessage' => 'required',
+        ], [
+            'required' => 'This field is required.',
+            'title.min' => 'Title must have at least 2 characters.',
+            'email.email' => 'Please provide a valid email address.',
+            'phoneCodeHidden.required' => 'Please Select a Phone Code.',
+            'phoneNumber.min' => 'Phone number must have at least 6 numbers.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput()->with('errorsOccurred', true);
+        }
+
+        $title = $request->input('title');
+        $fname = $request->input('fname');
+        $lname = $request->input('lname');
+        $email = $request->input('email');
+        $phoneCodeHidden = $request->input('phoneCodeHidden');
+        $phoneNumber = $request->input('phoneNumber');
+        $text = $request->input('textMessage');
+
+        $requestData = [
+            'title' => $title,
+            'first_name' => $fname,
+            'last_name' => $lname,
+            'email' => $email,
+            'phone_code' => $phoneCodeHidden,
+            'phone_number' => $phoneNumber,
+            'message'=>$text,
+            'created_at'=>now(),
+        ];
+
+        try{
+            $submit = DB::table('contact-us')->insert($requestData);
+
+            if($submit){
+                return redirect()->back()->with('success', 'Message Sent Successfully!');
+            }else{
+                return redirect()->back()->with('error', 'Submission Failed. Please Try Again Later.');
+            }
+        }catch (Exception $e){
+            return redirect()->back()->with('error', 'Submission Failed. Please Try Again Later.');
+        }
+
     }
 }
