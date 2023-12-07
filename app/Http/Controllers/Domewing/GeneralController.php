@@ -219,6 +219,7 @@ class GeneralController extends Controller
     }
 
     public function searchProducts(Request $request){
-        return view('domewing.search_result');
+
+        return redirect()->route('search.results')->with('search_keyword', $request->input('search_keyword'));
     }
 }
