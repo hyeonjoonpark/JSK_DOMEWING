@@ -79,10 +79,13 @@ class AdminController extends Controller
 
     public function accountSetting(Request $request)
     {
-        $userId = Auth::user()->id;
-        $marginRate = DB::table('margin_rate')->where('userId', $userId)->first()->rate;
+        $marginRates = DB::table('margin_rate AS mr')
+            ->join('vendors AS v', 'mr.vendorID', '=', 'v.id')
+            ->where('v.is_active', 'ACTIVE')
+            ->select('*', 'mr.id AS mrID')
+            ->get();
         return view('admin/account-setting', [
-            'marginRate' => $marginRate
+            'marginRates' => $marginRates
         ]);
     }
 

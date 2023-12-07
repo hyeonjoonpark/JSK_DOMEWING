@@ -15,15 +15,47 @@ use Str;
 
 class TestController extends Controller
 {
+    // public function index()
+    // {
+    //     $this->deactiveProduct();
+    //     $products = $this->getProducts();
+    //     foreach ($products as $product) {
+    //         $productName = $this->preprocessProductName($product->productName);
+    //         $upID = $product->upID;
+    //         $this->updateUP($upID, $productName);
+    //     }
+    // }
     public function index()
     {
         $this->deactiveProduct();
         $products = $this->getProducts();
         foreach ($products as $product) {
-            $productName = $this->preprocessProductName($product->productName);
-            $upID = $product->upID;
-            $this->updateUP($upID, $productName);
+            $newProductPrice = $this->newProductPrice($product->sellerID, $product->productPrice);
+            $this->updatePrice($newProductPrice, $product->cpID);
         }
+    }
+    public function updatePrice($newProductPrice, $productID)
+    {
+        try {
+            DB::table('collected_products')
+                ->where('id', $productID)
+                ->update([
+                    'productPrice' => $newProductPrice
+                ]);
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    public function newProductPrice($sellerID, $price)
+    {
+        $vATSellers = [3, 13, 14]; // 도매토피아, 비츠온, 씨오코리아
+        foreach ($vATSellers as $vATSeller) {
+            if ($sellerID === $vATSeller) {
+                $price += $price * 0.1;
+                $price = (int) round($price, 0);
+            }
+        }
+        return $price;
     }
     public function updateUP($upID, $productName)
     {
@@ -56,7 +88,7 @@ class TestController extends Controller
             ->join('uploaded_products AS up', 'cp.id', '=', 'up.productId')
             ->where('cp.isActive', 'Y')
             ->where('up.isActive', 'Y')
-            ->select('*', 'up.id AS upID')
+            ->select('*', 'up.id AS upID', 'cp.id AS cpID')
             ->get();
         return $products;
     }

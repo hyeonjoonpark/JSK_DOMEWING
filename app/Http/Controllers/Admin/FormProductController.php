@@ -32,10 +32,10 @@ class FormProductController extends Controller
         ini_set('memory_limit', '-1');
         foreach ($vendors as $vendor) {
             $vendorEngName = $vendor->name_eng;
-            $margin_rate = 1.15;
-            if ($vendor->vendor_id == 10 || $vendor->vendor_id == 4) {
-                $margin_rate = 1.25;
-            }
+            $margin_rate = DB::table('margin_rate')
+                ->where('vendorID', $vendor->id)
+                ->first()
+                ->rate;
             $response = $this->$vendorEngName($products, $userID, $margin_rate);
             if ($response['status'] == 1) {
                 $data['return']['successVendors'][] = $vendor->name;
