@@ -79,7 +79,6 @@
             <div class="col-lg-9 col-md-12 px-lg-5 px-2">
                 <div class="d-flex justify-content-between">
                     <form class="col-xl-11 col-lg-10 col-9" action="{{ route('domewing.search') }}" method="GET">
-                        @csrf
                         <div class="form-control-wrap">
                             <div class="input-group input-group-lg">
                                 <div class="input-group-prepend">

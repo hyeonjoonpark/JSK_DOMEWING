@@ -220,6 +220,105 @@ class GeneralController extends Controller
 
     public function searchProducts(Request $request){
 
-        return redirect()->route('search.results')->with('search_keyword', $request->input('search_keyword'));
+        $searchKeyword = $request->input('search_keyword');
+        $selectedSort = $request->input('sortBy');
+        $selectedCategory = $request->input('category');
+
+        $product_items = $this->getAllProducts($searchKeyword, $selectedSort);
+        $sortBy = $this->getSortBy();
+        $categoriesTop = $this->getCategory();
+
+        if($selectedSort == null){
+            $displaySort = reset($sortBy)['title'];
+        }else{
+            $displaySort = $selectedSort;
+        }
+
+        if($selectedCategory == null){
+            $displayCategory = reset($categoriesTop)['title'];
+        }else{
+            $displayCategory = $selectedCategory;
+        }
+
+        return view('domewing.search_result', [
+            'product_items' => $product_items,
+            'keyword' => $searchKeyword,
+            'sortBy'=>$sortBy,
+            'displaySort'=>$displaySort,
+            'displayCategory'=>$displayCategory,
+            'categoriesTop'=>$categoriesTop,
+        ]);
+    }
+
+    public function getSortBy(){
+        $sortBy = [
+            [
+                'title' => 'Relevance',
+            ],
+            [
+                'title' => 'Price Up',
+            ],
+            [
+                'title' => 'Price Down',
+            ],
+        ];
+
+        return $sortBy;
+    }
+
+    public function getAllProducts($searchKeyword, $selectedSort = null){
+
+        $query = DB::table('uploaded_products')
+                ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
+                ->where('uploaded_products.isActive', 'Y')
+                ->where(function($query) use ($searchKeyword) {
+                    $query->where('collected_products.productName', 'like', '%'.$searchKeyword.'%');
+                });
+
+        if ($selectedSort !== null) {
+            switch ($selectedSort) {
+                case 'Relevance':
+                    // Apply relevance-based sorting logic
+                    break;
+                case 'Price Up':
+                    $query->orderBy('collected_products.productPrice', 'ASC');
+                    break;
+                case 'Price Down':
+                    $query->orderBy('collected_products.productPrice', 'DESC');
+                    break;
+                default:
+                    // Handle default sorting or additional cases if needed
+                    break;
+            }
+        }
+
+        $product_items = $query->select(
+            'uploaded_products.id as id',
+            'collected_products.productImage as image',
+            'collected_products.productName as name',
+            'collected_products.productPrice as price'
+        )
+        ->paginate(40);
+
+        $margin = $this->getMargin();
+
+        foreach ($product_items as $item) {
+            // Calculate the new price by multiplying productPrice with margin
+            $newPrice = $item->price * ($margin / 100 + 1);
+
+            // Update the price in the shopping cart item
+            $item->price = $newPrice;
+        }
+
+        return $product_items;
+    }
+
+    public function getMargin(){
+        $margin = DB::table('domewing_margin_rate')
+                    ->where('id', 1)
+                    ->first()
+                    ->rate;
+
+        return $margin;
     }
 }

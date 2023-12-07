@@ -71,7 +71,7 @@ Route::prefix('domewing')->middleware('translation')->group( function () {
     Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('domewing.home');
     Route::get('/product/{id}', [ProductDetailsController::class, 'loadProductDetail']);
     Route::post('contact-us', [GeneralController::class, 'contactUs']);
-    Route::get('/search/result', [GeneralController::class, 'searchProducts'])->name('domewing.search');
+    Route::get('/products/search', [GeneralController::class, 'searchProducts'])->name('domewing.search');
 });
 
 Route::prefix('domewing/auth')->middleware('translation')->group(function () {
