@@ -15,11 +15,10 @@ class FormProductController extends Controller
     public function index()
     {
         $data = [];
-        $fromUPID = 3898;
+        $fromUPID = 4398;
         $products = DB::table('uploaded_products')
             ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
             ->where('uploaded_products.id', '>=', $fromUPID)
-            ->where('collected_products.sellerID', '!=', '3')
             ->limit(500)
             ->get();
         $vendors = DB::table('product_register')
@@ -36,7 +35,8 @@ class FormProductController extends Controller
                 ->where('vendorID', $vendor->id)
                 ->first()
                 ->rate;
-            $response = $this->$vendorEngName($products, $userID, $margin_rate);
+            $margin_rate = (100 + $margin_rate) / 100;
+            $response = $this->$vendorEngName($products, $userID, $margin_rate, $vendor->id);
             if ($response['status'] == 1) {
                 $data['return']['successVendors'][] = $vendor->name;
                 $data['return']['successVendorsNameEng'][] = $vendorEngName;
@@ -353,7 +353,7 @@ class FormProductController extends Controller
         }
     }
 
-    public function domesin($products, $userId, $margin_rate)
+    public function domesin($products, $userId, $margin_rate, $vendorID)
     {
         try {
             // 엑셀 파일 로드
@@ -362,6 +362,9 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
+                if ($vendorID === 6 && $product->sellerID === 3) {
+                    continue;
+                }
                 $product_price = ceil($product->productPrice * $margin_rate);
                 $categoryId = $product->categoryId;
                 $categoryCode = DB::table('category')->where('id', $categoryId)->select('domesinCode')->first()->domesinCode;
