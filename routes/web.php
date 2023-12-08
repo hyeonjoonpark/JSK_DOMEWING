@@ -69,7 +69,7 @@ Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(fu
 });
 
 //ving kong
-Route::prefix('domewing')->middleware('translation')->group( function () {
+Route::prefix('domewing')->middleware(['translation'])->group( function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('domewing.home');
     Route::get('/product/{id}', [ProductDetailsController::class, 'loadProductDetail']);
@@ -77,7 +77,7 @@ Route::prefix('domewing')->middleware('translation')->group( function () {
     Route::get('/products/search', [GeneralController::class, 'searchProducts'])->name('domewing.search');
 });
 
-Route::prefix('domewing/auth')->middleware('translation')->group(function () {
+Route::prefix('domewing/auth')->middleware(['translation'])->group(function () {
     Route::get('/login', [LoginMemberController::class, 'showLoginForm'])->name('domewing.auth.login');
     Route::get('/register', [RegisterMemberController::class, 'showRegisterForm']);
     Route::post('login', [LoginMemberController::class, 'login']);
@@ -102,7 +102,7 @@ Route::prefix('auth')->group(function () {
 });
 
 //Index for Domewing
-Route::middleware('translation')->group(function(){
+Route::middleware(['category', 'translation'])->group(function(){
     Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('home');
 });
 

@@ -107,51 +107,13 @@
                     <div class="vr" style="color:var(--cyan-blue); width:2px; opacity:1;"></div>
                     <div class="px-2"></div>
                     <ul class="nav horizontal-scrolling">
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
+                        @foreach ($headerCategory as $item)
+                            <li class='nav-item'><a href='/domewing/products/search?category={{ $item['title'] }}'
+                                    class='nav-link px-3 fs-15px' style='color:var(--white);'>{{ $item['title'] }}</a>
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
-            </div>
-            <div class="col-1 d-none d-lg-block">
-
             </div>
         </div>
     </div>

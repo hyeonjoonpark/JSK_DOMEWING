@@ -56,7 +56,7 @@
 
 
                     <div class="d-grid col-12 py-1">
-                        <div class="form-group mx-auto">
+                        <div type="submit" class="form-group mx-auto">
                             <button class="btn btn-lg btn-primary">Confirm</button>
                         </div>
                     </div>
@@ -92,11 +92,12 @@
                 $('#modalSuccessTitle').text("SUCCESS");
                 $('#modalSuccessMessage').text(text);
                 jQuery(document).ready(function($) {
+
+                    $('#modalSuccess').modal('show');
                     $('#modalSuccess').on('hidden.bs.modal', function() {
                         location.href = '/domewing/auth/login';
                     });
 
-                    $('#modalSuccess').modal('show');
                 });
             } else if (option == 2) {
                 $('#modalFailTitle').text("ERROR");

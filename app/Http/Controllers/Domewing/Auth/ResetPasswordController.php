@@ -12,14 +12,6 @@ class ResetPasswordController extends Controller
 {
     public function showResetPasswordPage(Request $request){
 
-        $reset_key = $request->input('remember_token');
-
-        $member = DB::table('members')->where('reset_key', $reset_key)->where('reset_status', 'ACTIVE')->first();
-
-        if(!$member){
-            return redirect('/domewing')->with('error', 'This Link is Invalid or Expired.');
-        }
-
         return view('domewing.auth.reset_password');
     }
 
@@ -50,11 +42,11 @@ class ResetPasswordController extends Controller
 
         try{
             $update = DB::table('members')->where('id', $member->id)
-            ->update([
-                'password' => bcrypt($newPassword),
-                'reset_status'=> 'INACTIVE',
-                'reset_at' => now(),
-            ]);
+                        ->update([
+                            'password' => bcrypt($newPassword),
+                            'reset_status'=> 'INACTIVE',
+                            'reset_at' => now(),
+                        ]);
 
             if($update){
                 return redirect()->back()->with('success', 'New Password Had Been Set!');
