@@ -200,7 +200,7 @@ class GeneralController extends Controller
             'email' => $email,
             'phone_code' => $phoneCodeHidden,
             'phone_number' => $phoneNumber,
-            'message'=>$text,
+            'text'=>$text,
             'created_at'=>now(),
         ];
 
@@ -294,7 +294,7 @@ class GeneralController extends Controller
 
         $product_items = $query->select(
             'uploaded_products.id as id',
-            'collected_products.productImage as image',
+            'uploaded_products.newImageHref as image',
             'collected_products.productName as name',
             'collected_products.productPrice as price'
         )

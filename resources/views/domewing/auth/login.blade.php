@@ -56,8 +56,6 @@
             </form>
         </div>
     </div>
-
-    @include('domewing.partials.modal')
 @endsection
 
 @section('scripts')

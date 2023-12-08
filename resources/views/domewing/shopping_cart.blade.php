@@ -152,10 +152,10 @@
 
                 {{-- Grand Total End --}}
             @endif
-
-
         </div>
     </div>
+
+    @include('domewing.partials.modal')
 @endsection
 
 @section('scripts')
@@ -169,43 +169,51 @@
                 selectedIds.push($(this).data('cart-id'));
             });
 
-            $.ajax({
-                type: 'POST',
-                url: '/api/member/create-order',
-                dataType: 'json',
-                data: {
-                    selectedIds: selectedIds,
-                    remember_token: remember_token,
-                },
-                success: function(response) {
-                    const status = parseInt(response.status);
-
-                    if (status == 1) {
-                        location.href = '/domewing/checkout/' + response.checkout_id;
-                    } else if (status == -2) {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.title,
-                            text: response.return
-                        }).then((result) => {
-                            location.href = '/domewing/auth/login';
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.title,
-                            text: response.return
-                        });
-                    }
-                },
-                error: function(error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Unable to process',
-                        text: response,
-                    });
-                }
+            $('#modalLoading').modal({
+                backdrop: 'static',
+                keyboard: false
             });
+            $('#modalLoading').modal('show');
+
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/member/create-order',
+                    dataType: 'json',
+                    data: {
+                        selectedIds: selectedIds,
+                        remember_token: remember_token,
+                    },
+                    success: function(response) {
+                        $('#modalLoading').modal('hide');
+                        const status = parseInt(response.status);
+
+                        if (status == 1) {
+                            location.href = '/domewing/checkout/' + response.checkout_id;
+                        } else if (status == -2) {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.href = '/domewing/auth/login';
+                            });
+                        } else {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                        }
+                    },
+                    error: function(error) {
+                        $('#modalLoading').modal('hide');
+                        $('#modalFailTitle').text('ERROR');
+                        $('#modalFailMessage').text(
+                            'Unexpected Error Occured. Please Try Again Later.');
+                        $('#modalFail').modal('show');
+                    }
+                });
+            });
+
+
         }
 
         function updateQuantity(cartId, newQuantity) {
@@ -241,48 +249,56 @@
             const remember_token = '{{ Auth::guard('member')->user()->remember_token }}';
             const cart_id = id;
 
-            $.ajax({
-                url: '/api/member/remove-cart-item',
-                type: 'post',
-                dataType: 'json',
-                data: {
-                    remember_token: remember_token,
-                    cart_id: cart_id,
-                },
-                success: function(response) {
-                    const status = parseInt(response.status);
-
-                    if (status == 1) {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.return,
-                        }).then((result) => {
-                            location.reload();
-                        });
-                    } else if (status == -2) {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.title,
-                            text: response.return
-                        }).then((result) => {
-                            location.href = '/domewing/auth/login';
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: response.icon,
-                            title: response.title,
-                            text: response.return
-                        });
-                    }
-                },
-                error: function(response) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Unable to process',
-                        text: response,
-                    });
-                }
+            $('#modalLoading').modal({
+                backdrop: 'static',
+                keyboard: false
             });
+            $('#modalLoading').modal('show');
+
+            $('#modalLoading').on('shown.bs.modal', function(e) {
+                $.ajax({
+                    url: '/api/member/remove-cart-item',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        remember_token: remember_token,
+                        cart_id: cart_id,
+                    },
+                    success: function(response) {
+                        $('#modalLoading').modal('hide');
+                        const status = parseInt(response.status);
+
+                        if (status == 1) {
+                            $('#modalSuccessTitle').text(response.title);
+                            $('#modalSuccessMessage').text(response.return);
+                            $('#modalSuccess').modal('show');
+                            $('#modalSuccess').on('hidden.bs.modal', function(e) {
+                                location.reload();
+                            });
+                        } else if (status == -2) {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                            $('#modalFail').on('hidden.bs.modal', function(e) {
+                                location.href = '/domewing/auth/login';
+                            });
+                        } else {
+                            $('#modalFailTitle').text(response.title);
+                            $('#modalFailMessage').text(response.return);
+                            $('#modalFail').modal('show');
+                        }
+                    },
+                    error: function(response) {
+                        $('#modalLoading').modal('hide');
+                        $('#modalFailTitle').text('ERROR');
+                        $('#modalFailMessage').text(
+                            'Unexpected Error Occured. Please Try Again Later.');
+                        $('#modalFail').modal('show');
+                    }
+                });
+            });
+
+
         }
 
         function addQuantity(itemId) {

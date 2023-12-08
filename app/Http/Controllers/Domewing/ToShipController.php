@@ -28,7 +28,7 @@ class ToShipController extends Controller
                     ->join('users', 'collected_products.userId', '=','users.id')
                     ->select(
                         'users.company as supplierName',
-                        'collected_products.productName',
+                        'uploaded_products.newProductName as productName',
                         'uploaded_products.newImageHref',
                         'transaction_order.transaction_id',
                         'order.order_id',

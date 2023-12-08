@@ -45,7 +45,7 @@ class WishlistController extends Controller
             ->where('collected_products.productName', 'like', '%'.$searchKeyword.'%')
             ->select(
                 'uploaded_products.newImageHref as image',
-                'collected_products.productName',
+                'uploaded_products.newProductName as productName',
                 'uploaded_products.id'
             )
             ->get();

@@ -17,7 +17,14 @@ class ProductDetailsController extends Controller
                         ->join('collected_products', 'uploaded_products.productId', '=', 'collected_products.id')
                         ->where('uploaded_products.id', $id)
                         ->where('uploaded_products.isActive', 'Y')
-                        ->select('collected_products.*', 'uploaded_products.id as uploadedId')
+                        ->select(
+                            'collected_products.productPrice',
+                            'collected_products.shippingCost',
+                            'collected_products.userId',
+                            'uploaded_products.id as uploadedId',
+                            'uploaded_products.newImageHref as image',
+                            'uploaded_products.newProductName as productName',
+                            'uploaded_products.newProductDetail as productDetail')
                         ->first();
 
         if($productInfo == null){
@@ -73,7 +80,11 @@ class ProductDetailsController extends Controller
                         ->where('collected_products.userId', $seller_id)
                         ->where('uploaded_products.id', '!=', $product_id)
                         ->where('uploaded_products.isActive', 'Y')
-                        ->select('collected_products.*', 'uploaded_products.id as upload_id')
+                        ->select(
+                            'collected_products.productPrice',
+                            'uploaded_products.id as upload_id',
+                            'uploaded_products.newImageHref as image',
+                            'uploaded_products.newProductName as productName',)
                         ->limit(10)
                         ->get();
 
@@ -98,7 +109,11 @@ class ProductDetailsController extends Controller
                         ->where('collected_products.userId', $seller_id)
                         ->where('uploaded_products.id', '!=', $product_id)
                         ->where('uploaded_products.isActive', 'Y')
-                        ->select('collected_products.*', 'uploaded_products.id as upload_id')
+                        ->select(
+                            'collected_products.productPrice',
+                            'uploaded_products.id as upload_id',
+                            'uploaded_products.newImageHref as image',
+                            'uploaded_products.newProductName as productName',)
                         ->limit(10)
                         ->get();
 
@@ -245,10 +260,6 @@ class ProductDetailsController extends Controller
                 'return' => 'Items Removed Successfully From Shopping Cart.'
             ];
         }
-    }
-
-    public function removeWishlist($wishlist_id){
-
     }
 
     public function addToWishlist(Request $request){
