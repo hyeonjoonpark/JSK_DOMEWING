@@ -200,7 +200,7 @@ class GeneralController extends Controller
             'email' => $email,
             'phone_code' => $phoneCodeHidden,
             'phone_number' => $phoneNumber,
-            'message'=>$text,
+            'text'=>$text,
             'created_at'=>now(),
         ];
 
