@@ -38,7 +38,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-22px" style="color: var(--dark-blue)"
-                                    href="#">{{ $translation['help'] }}</a>
+                                    href={{ route('domewing.FAQ') }}>{{ $translation['help'] }}</a>
                             </li>
 
 
@@ -78,8 +78,7 @@
             </div>
             <div class="col-lg-9 col-md-12 px-lg-5 px-2">
                 <div class="d-flex justify-content-between">
-                    <form class="col-xl-11 col-lg-10 col-9" action="{{ route('domewing.search') }}" method="POST">
-                        @csrf
+                    <form class="col-xl-11 col-lg-10 col-9" action="{{ route('domewing.search') }}" method="GET">
                         <div class="form-control-wrap">
                             <div class="input-group input-group-lg">
                                 <div class="input-group-prepend">
@@ -108,51 +107,13 @@
                     <div class="vr" style="color:var(--cyan-blue); width:2px; opacity:1;"></div>
                     <div class="px-2"></div>
                     <ul class="nav horizontal-scrolling">
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Electronics</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Furniture</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Foods</a></li>
-                        <li class='nav-item'><a href='#' class='nav-link px-3 fs-15px'
-                                style='color:var(--white);'>Beverages</a></li>
+                        @foreach ($headerCategory as $item)
+                            <li class='nav-item'><a href='/domewing/products/search?category={{ $item['title'] }}'
+                                    class='nav-link px-3 fs-15px' style='color:var(--white);'>{{ $item['title'] }}</a>
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
-            </div>
-            <div class="col-1 d-none d-lg-block">
-
             </div>
         </div>
     </div>

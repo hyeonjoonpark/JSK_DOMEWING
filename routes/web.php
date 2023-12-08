@@ -24,6 +24,10 @@ use App\Http\Controllers\Domewing\ToReceiveController;
 use App\Http\Controllers\Domewing\ToRateController;
 use App\Http\Controllers\Domewing\PurchaseHistoryController;
 use App\Http\Controllers\Domewing\WishlistController;
+use App\Http\Controllers\Domewing\Auth\ForgetPasswordController;
+use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
+use App\Http\Controllers\Domewing\FAQController;
+
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -66,21 +70,26 @@ Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(fu
 });
 
 //ving kong
-Route::prefix('domewing')->middleware('translation')->group( function () {
+Route::prefix('domewing')->middleware(['translation'])->group( function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('domewing.home');
     Route::get('/product/{id}', [ProductDetailsController::class, 'loadProductDetail']);
     Route::post('contact-us', [GeneralController::class, 'contactUs']);
-    Route::post('/search', [GeneralController::class, 'searchProducts'])->name('domewing.search');
+    Route::get('/products/search', [GeneralController::class, 'searchProducts'])->name('domewing.search');
+    Route::get('/section/faq', [FAQController::class, 'showFAQ'])->name('domewing.FAQ');
 });
 
-Route::prefix('domewing/auth')->middleware('translation')->group(function () {
+Route::prefix('domewing/auth')->middleware(['translation'])->group(function () {
     Route::get('/login', [LoginMemberController::class, 'showLoginForm'])->name('domewing.auth.login');
     Route::get('/register', [RegisterMemberController::class, 'showRegisterForm']);
     Route::post('login', [LoginMemberController::class, 'login']);
     Route::get('logout', [LoginMemberController::class, 'logout']);
     Route::post('register', [RegisterMemberController::class, 'register']);
     Route::get('verify-email', [RegisterMemberController::class, 'verifyEmail'])->name('domewing.auth.verifyEmail');
+    Route::get('forget-password', [ForgetPasswordController::class, 'showForgetPasswordPage'])->name('forget.password');
+    Route::get('reset-password', [ResetPasswordController::class, 'showResetPasswordPage']);
+    Route::post('forget-password', [ForgetPasswordController::class, 'submitRequest']);
+    Route::post('reset-password', [ResetPasswordController::class, 'resetPassword']);
 });
 
 // 로그인 및 등록 라우트
@@ -95,7 +104,7 @@ Route::prefix('auth')->group(function () {
 });
 
 //Index for Domewing
-Route::middleware('translation')->group(function(){
+Route::middleware(['category', 'translation'])->group(function(){
     Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('home');
 });
 
