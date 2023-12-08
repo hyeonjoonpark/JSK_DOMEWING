@@ -38,7 +38,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-22px" style="color: var(--dark-blue)"
-                                    href="#">{{ $translation['help'] }}</a>
+                                    href={{ route('domewing.FAQ') }}>{{ $translation['help'] }}</a>
                             </li>
 
 

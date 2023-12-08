@@ -26,6 +26,7 @@ use App\Http\Controllers\Domewing\PurchaseHistoryController;
 use App\Http\Controllers\Domewing\WishlistController;
 use App\Http\Controllers\Domewing\Auth\ForgetPasswordController;
 use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
+use App\Http\Controllers\Domewing\FAQController;
 
 
 // 관리자 콘솔 라우트 그룹 설정
@@ -75,6 +76,7 @@ Route::prefix('domewing')->middleware(['translation'])->group( function () {
     Route::get('/product/{id}', [ProductDetailsController::class, 'loadProductDetail']);
     Route::post('contact-us', [GeneralController::class, 'contactUs']);
     Route::get('/products/search', [GeneralController::class, 'searchProducts'])->name('domewing.search');
+    Route::get('/section/faq', [FAQController::class, 'showFAQ'])->name('domewing.FAQ');
 });
 
 Route::prefix('domewing/auth')->middleware(['translation'])->group(function () {
