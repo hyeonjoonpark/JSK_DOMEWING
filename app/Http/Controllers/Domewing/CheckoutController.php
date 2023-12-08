@@ -80,7 +80,7 @@ class CheckoutController extends Controller
                     ->where('order_items.status', 'Y')
                     ->select('order_items.*',
                                 'users.company as supplier_name',
-                                'collected_products.productName',
+                                'uploaded_products.newProductName as productName',
                                 'uploaded_products.newImageHref as image',
                                 'collected_products.productPrice as price',
                                 'collected_products.shippingCost as shippingCost')

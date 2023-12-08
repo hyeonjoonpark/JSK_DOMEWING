@@ -113,7 +113,7 @@ class MemberController extends Controller
                     ->join('uploaded_products','order_items.product_id','=','uploaded_products.id')
                     ->join('collected_products','uploaded_products.productId','=','collected_products.id')
                     ->where('order_id', $transaction->order_id)
-                    ->select('order_items.*', 'collected_products.productName')
+                    ->select('order_items.*', 'uploaded_products.newProductName')
                     ->get();
 
         $total = 0;

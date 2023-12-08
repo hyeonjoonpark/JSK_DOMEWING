@@ -41,7 +41,7 @@ class ShoppingCartController extends Controller
                                 'users.company as supplier_name',
                                 'uploaded_products.newImageHref as image',
                                 'collected_products.productPrice as price',
-                                'collected_products.productName',
+                                'uploaded_products.newProductName sa productName',
                                 'collected_products.shippingCost as shippingCost',
                                 'cms_domain.domain_name as domain_name',
                                 'shopping_cart.*')

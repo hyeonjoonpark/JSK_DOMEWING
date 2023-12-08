@@ -8,13 +8,13 @@
                         <div class="row ">
                             {{-- Image Slider --}}
                             <div class="col-xl-4 col-lg-12 pb-4">
-                                <img id=featured src="{{ $productInfo->productImage }}">
+                                <img id=featured src="{{ $productInfo->image }}">
 
                                 <div id="slide-wrapper">
                                     <img id="slideLeft" class="arrow" src={{ asset('media/Asset_Control_Back.svg') }}>
 
                                     <div id="slider">
-                                        <img class="thumbnail active" src="{{ $productInfo->productImage }}">
+                                        <img class="thumbnail active" src="{{ $productInfo->image }}">
                                         {{-- <img class="thumbnail"
                                             src="https://cdn1.npcdn.net/image/1668578748821c8af71ec3b8f7d3b415bbad340051.jpg?md5id=9866b8a83d35abdd89ed76d565d71f75&new_width=1150&new_height=2500&w=-62170009200"> --}}
                                     </div>
@@ -188,7 +188,7 @@
                                     style="display: inline-block;">
                                     <div style="background-color: var(--pure-white)">
                                         <a href="/domewing/product/{{ $product_item->upload_id }}">
-                                            <img class="product-image" src="{{ $product_item->productImage }}" />
+                                            <img class="product-image" src="{{ $product_item->image }}" />
                                             <div class="pt-2 px-3">
                                                 <h4 class="text-nowrap text-truncate m-auto"
                                                     style="color: var(--dark-blue);">
