@@ -227,14 +227,13 @@ class CheckoutController extends Controller
             if($transaction && $delivery){
                 $data = [
                     'status' => 1,
-                    'icon' => 'success',
+                    'title' => 'SUCCESS',
                     'return' => 'Thank You for Your Order.'
                 ];
             }else{
                 $data = [
                     'status' => -1,
-                    'icon' => 'danger',
-                    'title' => 'Opps',
+                    'title' => 'ERROR',
                     'return' => 'Something Went Wrong. Please Try Again Later.'
                 ];
             }
@@ -242,8 +241,7 @@ class CheckoutController extends Controller
         }catch(Exception $e){
             $data = [
                 'status' => -1,
-                'icon' => 'danger',
-                'title' => 'Error Occured',
+                'title' => 'ERROR',
                 'return' => 'Something Went Wrong. Please Try Again Later.'
             ];
         }

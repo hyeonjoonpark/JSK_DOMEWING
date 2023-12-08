@@ -41,7 +41,7 @@ class ShoppingCartController extends Controller
                                 'users.company as supplier_name',
                                 'uploaded_products.newImageHref as image',
                                 'collected_products.productPrice as price',
-                                'uploaded_products.newProductName sa productName',
+                                'uploaded_products.newProductName as productName',
                                 'collected_products.shippingCost as shippingCost',
                                 'cms_domain.domain_name as domain_name',
                                 'shopping_cart.*')
@@ -68,8 +68,7 @@ class ShoppingCartController extends Controller
             Auth::guard('member')->logout();
             return [
                 'status' => -2,
-                'icon' => 'warning',
-                'title' => 'Opps',
+                'title' => 'ERROR',
                 'return' => 'User Must Login to Access This Feature'
             ];
         }
@@ -79,8 +78,7 @@ class ShoppingCartController extends Controller
         if(!$cart){
             return [
                 'status' => -1,
-                'icon' => 'warning',
-                'title' => 'Opps',
+                'title' => 'ERROR',
                 'return' => 'Item Not Found. Please Refresh Page.'
             ];
         }
@@ -93,14 +91,13 @@ class ShoppingCartController extends Controller
         if($update){
             return [
                 'status' => 1,
-                'icon' => 'success',
+                'title' => 'SUCCESS',
                 'return' => 'Item Removed',
             ];
         }else{
             return [
                 'status' => -1,
-                'icon' => 'warning',
-                'title' => 'Opps',
+                'title' => 'ERROR',
                 'return' => 'Error Occured. Please Try Again Later.'
             ];
         }

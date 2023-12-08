@@ -177,6 +177,8 @@
             </form>
         </div>
     </div>
+
+    @include('domewing.partials.modal')
 @endsection
 
 @section('scripts')
@@ -200,25 +202,38 @@
                 showHidePasswordIcon.src = '{{ asset('media/Asset_Control_Hide.svg') }}';
             }
         }
+
+        function showModal(option, text) {
+            if (option == 1) {
+                $('#modalSuccessTitle').text("SUCCESS");
+                $('#modalSuccessMessage').text(text);
+                jQuery(document).ready(function($) {
+
+                    $('#modalSuccess').modal('show');
+                    $('#modalSuccess').on('hidden.bs.modal', function() {
+                        location.href = '/domewing/auth/login';
+                    });
+
+                });
+            } else if (option == 2) {
+                $('#modalFailTitle').text("ERROR");
+                $('#modalFailMessage').text(text);
+                jQuery(document).ready(function($) {
+                    $('#modalFail').modal('show');
+                });
+            }
+        }
     </script>
 
     @if (session('success'))
         <script>
-            Swal.fire({
-                icon: 'success',
-                title: '{{ session('success') }}',
-            }).then((result) => {
-                window.location.href = 'login';
-            });
+            showModal(1, '{{ session('success') }}');
         </script>
     @endif
 
     @if (session('error'))
         <script>
-            Swal.fire({
-                icon: 'error',
-                title: '{{ session('error') }}',
-            });
+            showModal(2, '{{ session('error') }}');
         </script>
     @endif
 @endsection
