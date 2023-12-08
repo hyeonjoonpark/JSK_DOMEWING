@@ -43,6 +43,10 @@
                         </div>
                     </div>
 
+                    <a href="{{ route('forget.password') }}" class="d-inline-block">
+                        <p class="pb-3" style="color: var(--pink)">Forget Password?</p>
+                    </a>
+
                     <div class="d-grid col-12 py-1">
                         <div class="form-group mx-auto">
                             <button class="btn btn-lg btn-primary">Log In</button>
@@ -52,6 +56,8 @@
             </form>
         </div>
     </div>
+
+    @include('domewing.partials.modal')
 @endsection
 
 @section('scripts')
