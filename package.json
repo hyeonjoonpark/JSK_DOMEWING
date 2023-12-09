@@ -1,0 +1,17 @@
+{
+    "private": true,
+    "type": "commonjs",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "axios": "^1.1.2",
+        "laravel-vite-plugin": "^0.8.0",
+        "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "mysql2": "^3.6.1",
+        "puppeteer": "^21.1.1"
+    }
+}
