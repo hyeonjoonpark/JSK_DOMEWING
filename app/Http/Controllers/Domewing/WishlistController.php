@@ -53,4 +53,8 @@ class WishlistController extends Controller
         return view('domewing.wishlist', ['wishlist' => $wishlist, 'search_keyword' => $searchKeyword,]);
     }
 
+    public function test(){
+
+    }
+
 }
