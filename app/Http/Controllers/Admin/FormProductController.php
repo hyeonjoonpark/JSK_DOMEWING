@@ -15,7 +15,7 @@ class FormProductController extends Controller
     public function index()
     {
         $data = [];
-        $fromUPID = 4398;
+        $fromUPID = 1;
         $products = DB::table('uploaded_products')
             ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
             ->where('uploaded_products.id', '>=', $fromUPID)

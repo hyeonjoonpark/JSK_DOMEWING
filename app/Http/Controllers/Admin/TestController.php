@@ -15,7 +15,7 @@ class TestController extends Controller
 {
     public function index()
     {
-        for ($i = 1; $i <= 9; $i++) {
+        for ($i = 1; $i <= 8; $i++) {
             $oldProducts = $this->extractOldData($i);
             $productIDs = array_column($oldProducts, 'productID');
             $dBProducts = $this->getdBProducts($productIDs);
