@@ -67,102 +67,108 @@
                 </div>
                 {{-- Filtering End --}}
 
-                {{-- Product Listing Here --}}
-                <div class="row g-0 pb-3 pt-5">
-                    @foreach ($product_items as $key => $product_item)
-                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-3" style="display: inline-block;">
-                            <div style="background-color: var(--white)">
-                                <a href="/domewing/product/{{ $product_item->id }}">
-                                    <img class="product-image" src="{{ $product_item->image }}" />
-                                    <div class="pt-2 px-3">
-                                        <h4 class="text-nowrap text-truncate m-auto" style="color: var(--dark-blue);">
-                                            {{ $product_item->name }}</h4>
-                                        {{-- display rating --}}
-                                        <div class="d-flex flex-wrap align-items-center py-1">
-                                            <ul class="rating" style="display: table;">
-                                                <li><em class="icon ni ni-star-fill"></em></li>
-                                                <li><em class="icon ni ni-star-fill"></em></li>
-                                                <li><em class="icon ni ni-star-fill"></em></li>
-                                                <li><em class="icon ni ni-star-half-fill"></em></li>
-                                                <li><em class="icon ni ni-star"></em></li>
-                                            </ul>
-                                            <h6 class="p-1 text-center my-auto" style="color: var(--dark-blue);">
-                                                (378)
-                                                {{ $translation['sold'] }}</h6>
-                                        </div>
+                @if (count($product_items) < 1)
+                    <img class="mx-lg-5 px-lg-5 mx-0 px-o" src="{{ asset('media/Asset_Notif_Error.svg') }}">
+                    <h5 class="text-center py-5" style="color: var(--dark-blue);">
+                        No Item Found</h5>
+                @else
+                    {{-- Product Listing Here --}}
+                    <div class="row g-0 pb-3 pt-5">
+                        @foreach ($product_items as $key => $product_item)
+                            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 p-3" style="display: inline-block;">
+                                <div style="background-color: var(--white)">
+                                    <a href="/domewing/product/{{ $product_item->id }}">
+                                        <img class="product-image" src="{{ $product_item->image }}" />
+                                        <div class="pt-2 px-3">
+                                            <h4 class="text-nowrap text-truncate m-auto" style="color: var(--dark-blue);">
+                                                {{ $product_item->name }}</h4>
+                                            {{-- display rating --}}
+                                            <div class="d-flex flex-wrap align-items-center py-1">
+                                                <ul class="rating" style="display: table;">
+                                                    <li><i class="icon ni ni-star-fill"></i></li>
+                                                    <li><i class="icon ni ni-star-fill"></i></li>
+                                                    <li><i class="icon ni ni-star-fill"></i></li>
+                                                    <li><i class="icon ni ni-star-half-fill"></i></li>
+                                                    <li><i class="icon ni ni-star"></i></li>
+                                                </ul>
+                                                <h6 class="p-1 text-center my-auto" style="color: var(--dark-blue);">
+                                                    (378)
+                                                    {{ $translation['sold'] }}</h6>
+                                            </div>
 
-                                        <h6 class="m-0" style="color: var(--dark-blue);">
-                                            {{ $translation['from'] }}</h6>
-                                        <div class="d-flex align-items-end">
-                                            <h4 class ="text-pink fw-bold m-0 pe-1">KRW
-                                                {{ number_format($product_item->price, 2) }}
-                                            </h4>
-                                            <h6 class ="text-pink">{{ $translation['Unit'] }}</h6>
+                                            <h6 class="m-0" style="color: var(--dark-blue);">
+                                                {{ $translation['from'] }}</h6>
+                                            <div class="d-flex align-items-end">
+                                                <h4 class ="text-pink fw-bold m-0 pe-1">KRW
+                                                    {{ number_format($product_item->price, 2) }}
+                                                </h4>
+                                                <h6 class ="text-pink">{{ $translation['Unit'] }}</h6>
+                                            </div>
                                         </div>
-                                    </div>
-                                </a>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
 
-                    <div class="d-flex justify-content-end py-5">
-                        <ul class="pagination">
-                            <!-- Previous Page Link -->
-                            @if ($product_items->onFirstPage())
-                                <li class="page-item disabled" aria-disabled="true">
-                                    <span class="page-link">Prev</span>
-                                </li>
-                            @else
-                                <li class="page-item">
-                                    <a class="page-link"
-                                        href="{{ $product_items->appends(['search_keyword' => request('search_keyword'), 'sortBy' => request('sortBy'), 'category' => request('category')])->previousPageUrl() }}"
-                                        rel="prev">Prev</a>
-                                </li>
-                            @endif
-
-                            <!-- Pagination Elements -->
-                            @php
-                                $lastPage = $product_items->lastPage();
-                                $currentPage = $product_items->currentPage();
-                            @endphp
-
-                            @foreach ($product_items->appends(['search_keyword' => request('search_keyword'), 'sortBy' => request('sortBy'), 'category' => request('category')])->getUrlRange(1, $lastPage) as $page => $url)
-                                @if (
-                                    $page === 1 ||
-                                        $page === $lastPage ||
-                                        abs($page - $currentPage) <= 1 ||
-                                        (abs($page - $currentPage) <= 2 && ($page !== 2 && $page !== $lastPage - 1)))
-                                    <li class="page-item {{ $page == $currentPage ? 'active' : '' }}">
-                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        <div class="d-flex justify-content-end py-5">
+                            <ul class="pagination">
+                                <!-- Previous Page Link -->
+                                @if ($product_items->onFirstPage())
+                                    <li class="page-item disabled" aria-disabled="true">
+                                        <span class="page-link">Prev</span>
                                     </li>
-                                @elseif ($page === 2 && $currentPage > 3)
-                                    <!-- Display ellipsis after 1 if current page is greater than 4 -->
-                                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                                @elseif ($page === $lastPage - 1 && $currentPage < $lastPage - 2)
-                                    <!-- Display ellipsis before last page if current page is lesser than (lastPage - 3) -->
-                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                            href="{{ $product_items->appends(['search_keyword' => request('search_keyword'), 'sortBy' => request('sortBy'), 'category' => request('category')])->previousPageUrl() }}"
+                                            rel="prev">Prev</a>
+                                    </li>
                                 @endif
-                            @endforeach
+
+                                <!-- Pagination Elements -->
+                                @php
+                                    $lastPage = $product_items->lastPage();
+                                    $currentPage = $product_items->currentPage();
+                                @endphp
+
+                                @foreach ($product_items->appends(['search_keyword' => request('search_keyword'), 'sortBy' => request('sortBy'), 'category' => request('category')])->getUrlRange(1, $lastPage) as $page => $url)
+                                    @if (
+                                        $page === 1 ||
+                                            $page === $lastPage ||
+                                            abs($page - $currentPage) <= 1 ||
+                                            (abs($page - $currentPage) <= 2 && ($page !== 2 && $page !== $lastPage - 1)))
+                                        <li class="page-item {{ $page == $currentPage ? 'active' : '' }}">
+                                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                        </li>
+                                    @elseif ($page === 2 && $currentPage > 3)
+                                        <!-- Display ellipsis after 1 if current page is greater than 4 -->
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    @elseif ($page === $lastPage - 1 && $currentPage < $lastPage - 2)
+                                        <!-- Display ellipsis before last page if current page is lesser than (lastPage - 3) -->
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    @endif
+                                @endforeach
 
 
 
-                            <!-- Next Page Link -->
-                            @if ($product_items->hasMorePages())
-                                <li class="page-item">
-                                    <a class="page-link"
-                                        href="{{ $product_items->appends(['search_keyword' => request('search_keyword'), 'sortBy' => request('sortBy'), 'category' => request('category')])->nextPageUrl() }}"
-                                        rel="next">Next</a>
-                                </li>
-                            @else
-                                <li class="page-item disabled" aria-disabled="true">
-                                    <span class="page-link">Next</span>
-                                </li>
-                            @endif
-                        </ul>
+                                <!-- Next Page Link -->
+                                @if ($product_items->hasMorePages())
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                            href="{{ $product_items->appends(['search_keyword' => request('search_keyword'), 'sortBy' => request('sortBy'), 'category' => request('category')])->nextPageUrl() }}"
+                                            rel="next">Next</a>
+                                    </li>
+                                @else
+                                    <li class="page-item disabled" aria-disabled="true">
+                                        <span class="page-link">Next</span>
+                                    </li>
+                                @endif
+                            </ul>
+                        </div>
+
                     </div>
-
-                </div>
-                {{-- Product Listing End --}}
+                    {{-- Product Listing End --}}
+                @endif
             </div>
         </div>
     </div>
