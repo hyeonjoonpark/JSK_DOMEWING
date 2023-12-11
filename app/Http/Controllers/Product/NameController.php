@@ -17,6 +17,7 @@ class NameController extends Controller
     {
         // Define the array of forbidden words
         $forbiddenWords = [
+            'Ⅲ',
             '×',
             '※',
             '/',
