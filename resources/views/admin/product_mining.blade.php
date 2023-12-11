@@ -119,6 +119,7 @@
                         Swal.fire({
                             icon: 'success',
                             title: '진행 성공',
+                            html: '<img src="{{ asset('media/Asset_Notif_Success.svg') }}">',
                             text: '고르미가 상품셋을 성공적으로 가져왔습니다!'
                         });
                     } else {
