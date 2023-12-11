@@ -28,9 +28,9 @@
                             </a>
                         </li>
                         <li class="nk-menu-item">
-                            <a href="/admin/product/search" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-magnifying-glass"></em></span>
-                                <span class="nk-menu-text">상품 수집</span>
+                            <a href="/admin/product/mining" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
+                                <span class="nk-menu-text">상품 데이터 마이닝</span>
                             </a>
                         </li>
                         <li class="nk-menu-item">

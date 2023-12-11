@@ -42,11 +42,12 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/keywords', [AdminController::class, 'productKeywords']);
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
     Route::get('account-setting', [AdminController::class, 'accountSetting']);
+    Route::get('product/mining', [AdminController::class, 'productMining']);
 
     //ving kong
     Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');
     Route::get('/cms_dashboard/content_management_system/{id}', [DomainController::class, 'loadCMS']);
-    Route::get('/cms/{id}',[CMSController::class, 'loadSellerCMS']);
+    Route::get('/cms/{id}', [CMSController::class, 'loadSellerCMS']);
 });
 
 Route::get('lang/{languageId}', function ($languageId) {
@@ -61,16 +62,16 @@ Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(fu
     Route::get('account-settings', [MemberController::class, 'loadAccountSettings'])->name('member_details');
     Route::get('/shopping-cart', [ShoppingCartController::class, 'showShoppingCart']);
     Route::get('/checkout/{id}', [CheckoutController::class, 'showCheckoutPage']);
-    Route::get('to-ship',[ToShipController::class, 'showToShip'])->name('to_ship');
-    Route::get('to-receive',[ToReceiveController::class, 'showToReceive'])->name('to_receive');
-    Route::get('to-rate',[ToRateController::class, 'showToRate'])->name('to_rate');
-    Route::get('purchase-history',[PurchaseHistoryController::class, 'showPurchaseHistory'])->name('purchase_history');
-    Route::get('wishlist',[WishlistController::class, 'showWishlist'])->name('wishlist');
-    Route::get('/wishlist/search', [WishlistController::class,'searchWishlist'])->name('search.wishlist');
+    Route::get('to-ship', [ToShipController::class, 'showToShip'])->name('to_ship');
+    Route::get('to-receive', [ToReceiveController::class, 'showToReceive'])->name('to_receive');
+    Route::get('to-rate', [ToRateController::class, 'showToRate'])->name('to_rate');
+    Route::get('purchase-history', [PurchaseHistoryController::class, 'showPurchaseHistory'])->name('purchase_history');
+    Route::get('wishlist', [WishlistController::class, 'showWishlist'])->name('wishlist');
+    Route::get('/wishlist/search', [WishlistController::class, 'searchWishlist'])->name('search.wishlist');
 });
 
 //ving kong
-Route::prefix('domewing')->middleware(['translation'])->group( function () {
+Route::prefix('domewing')->middleware(['translation'])->group(function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
     Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('domewing.home');
     Route::get('/product/{id}', [ProductDetailsController::class, 'loadProductDetail']);
@@ -104,7 +105,7 @@ Route::prefix('auth')->group(function () {
 });
 
 //Index for Domewing
-Route::middleware(['category', 'translation'])->group(function(){
+Route::middleware(['category', 'translation'])->group(function () {
     Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('home');
 });
 

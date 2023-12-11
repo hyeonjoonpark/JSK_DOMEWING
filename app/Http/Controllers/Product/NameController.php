@@ -16,42 +16,7 @@ class NameController extends Controller
     public function replaceForbiddenWords($productName)
     {
         // Define the array of forbidden words
-        $forbiddenWords = [
-            'Ⅲ',
-            '×',
-            '※',
-            '/',
-            'CB',
-            'EB',
-            '옵션선택',
-            '색상선택',
-            '규격선택',
-            '타입선택',
-            '사이즈선택',
-            '오피스넥스',
-            '최고',
-            '기미',
-            '양모',
-            '숙취',
-            '치매',
-            '무좀',
-            '교정',
-            '발모',
-            '환자',
-            '탄력',
-            '벨크로',
-            '이벤트',
-            '염산',
-            '스노우볼',
-            '슬라이락',
-            '오랄비',
-            '기미',
-            '보약',
-            '존슨',
-            '성기',
-            '할인'
-        ];
-
+        $forbiddenWords = config('forbidden_words');
         // Replace each forbidden word in the product name with a space
         foreach ($forbiddenWords as $word) {
             $productName = str_replace($word, ' ', $productName);

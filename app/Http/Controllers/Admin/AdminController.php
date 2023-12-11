@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
@@ -118,5 +119,16 @@ class AdminController extends Controller
     public function productKeywords(Request $request)
     {
         return view('admin/product_keywords');
+    }
+    public function productMining(Request $request)
+    {
+        $sellers = DB::table('product_search AS ps')
+            ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('ps.is_active', 'Y')
+            ->get();
+        return view('admin/product_mining', [
+            'sellers' => $sellers
+        ]);
     }
 }

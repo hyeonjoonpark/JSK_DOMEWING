@@ -24,6 +24,7 @@ use App\Http\Controllers\Domewing\MemberController;
 use App\Http\Controllers\Domewing\ToShipController;
 use App\Http\Controllers\Domewing\ToReceiveController;
 use App\Http\Controllers\Domewing\ToRateController;
+use App\Http\Controllers\Product\MiningController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,7 @@ Route::post('/product/register', [ProductRegisterController::class, 'handle']);
 Route::post('/product/upload', [FormController::class, 'index']);
 Route::post('/product/keywords', [ProductKeywordController::class, 'index']);
 Route::post('/product/data-validity', [ProductDataValidityController::class, 'index']);
+Route::post('/product/mining', [MiningController::class, 'index']);
 // account-setting
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 // Load product details
