@@ -118,9 +118,8 @@
                         closePopup();
                         Swal.fire({
                             icon: 'success',
-                            title: '진행 성공',
-                            html: '<img src="{{ asset('media/Asset_Notif_Success.svg') }}">',
-                            text: '고르미가 상품셋을 성공적으로 가져왔습니다!'
+                            html: true,
+                            text: '<img class="w-100" src="{{ asset(assets / media / Asset_Notif_Success) }}"><h2>고르미가 성공적으로 상품셋을 가져왔습니다.</h2>'
                         });
                     } else {
                         Swal.fire({
