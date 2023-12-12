@@ -24,7 +24,7 @@ async function extractProductsOnPage(page) {
     });
 }
 (async () => {
-    const browser = await puppeteer.launch({ headless: false, ignoreDefaultArgs: ['--enable-automation'] });
+    const browser = await puppeteer.launch({ headless: true, ignoreDefaultArgs: ['--enable-automation'] });
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(0);
     try {
@@ -44,20 +44,20 @@ async function extractProductsOnPage(page) {
         const numProducts = await page.evaluate(() => {
             return document.querySelector('#container > div.container.wrapper_fix > div.goods_list_contents > h3 > strong').textContent;
         });
-        // const allProducts = await extractProductsOnPage(page);
-        const numProductsPerPage = 60;
-        const numPages = Math.ceil(numProducts / numProductsPerPage);
-        const allProducts = [];
-        for (let i = 1; i <= numPages; i++) {
-            if (i > 1 || i < numPages) {
-                // 다음 페이지로 이동
-                await page.click('#container > div.container.wrapper_fix > div.goods_list_contents > div.paging > span.nex > a > img');
-                await page.waitForNavigation();
-            }
-            // 현재 페이지의 상품 정보 추출
-            const products = await extractProductsOnPage(page);
-            allProducts.push(...products);
-        }
+        const allProducts = await extractProductsOnPage(page);
+        // const numProductsPerPage = 60;
+        // const numPages = Math.ceil(numProducts / numProductsPerPage);
+        // const allProducts = [];
+        // for (let i = 1; i <= numPages; i++) {
+        //     if (i > 1 || i < numPages) {
+        //         // 다음 페이지로 이동
+        //         await page.click('#container > div.container.wrapper_fix > div.goods_list_contents > div.paging > span.nex > a > img');
+        //         await page.waitForNavigation();
+        //     }
+        //     // 현재 페이지의 상품 정보 추출
+        //     const products = await extractProductsOnPage(page);
+        //     allProducts.push(...products);
+        // }
         // 상품 정보 출력
         console.log(JSON.stringify(allProducts));
     } catch (error) {
