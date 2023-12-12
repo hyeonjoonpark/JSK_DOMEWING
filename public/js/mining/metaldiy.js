@@ -53,7 +53,7 @@ async function extractProductsOnPage(page) {
                 // 다음 페이지로 이동
                 await page.waitForSelector('#container > div.container.wrapper_fix > div.goods_list_contents > div.paging > span.nex > a > img');
                 await page.click('#container > div.container.wrapper_fix > div.goods_list_contents > div.paging > span.nex > a > img');
-                await page.waitForSelector('#container > div.container.wrapper_fix > div.goods_list_contents > div.paging > span.nex > a > img');
+                await page.waitForSelector('#container > div.container.wrapper_fix > div.goods_list_contents > h3 > strong');
             }
             // 현재 페이지의 상품 정보 추출
             const products = await extractProductsOnPage(page);
