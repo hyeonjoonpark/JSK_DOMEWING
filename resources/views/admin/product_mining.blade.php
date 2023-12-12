@@ -112,10 +112,10 @@
                     listURL: listURL
                 },
                 success: function(response) {
+                    closePopup();
                     if (response.status) {
                         updateDataTable(response.return);
                         $('#numResult').html(response.return.length);
-                        closePopup();
                         Swal.fire({
                             icon: 'success',
                             html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Success.svg') }}"><h4 class="swal2-title mt-5">구르미가 무사히 돌아왔어요!</h4>'
@@ -128,6 +128,7 @@
                     }
                 },
                 error: function(response) {
+                    closePopup();
                     Swal.fire({
                         icon: 'error',
                         html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">구르미를 올바른 주소로 보내주세요.</h4>'
