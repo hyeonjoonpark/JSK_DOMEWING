@@ -42,6 +42,7 @@ async function extractProductsOnPage(page) {
         await page.waitForNavigation();
         // 웹 페이지로 이동
         await page.goto(fullURL);
+        await page.waitForSelector('#container > div.container.wrapper_fix > div.goods_list_contents > h3 > strong');
         const allProducts = await extractProductsOnPage(page);
         // 상품 정보 출력
         console.log(JSON.stringify(allProducts));
