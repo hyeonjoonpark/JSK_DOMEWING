@@ -101,7 +101,7 @@
         }
 
         function requestExtract(sellerID, listURL) {
-            popupLoader(0);
+            popupLoader(0, '구르미가 상품셋을 가지러 떠납니다.');
             $.ajax({
                 url: '/api/product/mining',
                 type: 'POST',
@@ -139,13 +139,13 @@
             });
         }
 
-        function popupLoader(index) {
+        function popupLoader(index, text) {
             const loaders = ["{{ asset('assets/images/loading.gif') }}",
                 "{{ asset('assets/images/search-loader.gif') }}"
             ];
             $('.btn').prop('disabled', true);
             let html = '<img src="' + loaders[index] + '" class="w-75" />'
-            html += '<h2 class="swal2-title mt-5">구르미가 상품셋을 가지러 떠납니다.</h2>'
+            html += '<h2 class="swal2-title mt-5">' + text + '</h2>'
             Swal.fire({
                 html: html,
                 allowOutsideClick: false,
@@ -172,42 +172,59 @@
         }
 
         function requestUnique(products) {
+            popupLoader(1, '중복 상품들을 검열 중이에요.');
             const productHrefs = [];
             for (product of products) {
-                productHrefs.push($('productHref' + product).href);
+                productHrefs.push($('#productHref' + product).attr('href'));
             }
-            console.log(productHrefs);
-            // $.ajax({
-            //     url: "/api/product/unique",
-            //     type: 'POST',
-            //     dataType: 'JSON',
-            //     data: {
-            //         remember_token: '{{ Auth::user()->remember_token }}',
-            //         products: products
-            //     },
-            //     success: function(response) {
-            //         requestProcess(products);
-            //         console.log(response);
-            //     },
-            //     error: function(response) {
-            //         console.log(response);
-            //     }
-            // });
+            $.ajax({
+                url: "/api/product/unique",
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    remember_token: '{{ Auth::user()->remember_token }}',
+                    productHrefs: productHrefs
+                },
+                success: function(response) {
+                    closePopup();
+                    if (response.status) {
+                        const uniqueProductHrefs = response.return.uniqueProductHrefs;
+                        const returnMsg = response.return.message;
+                        popupLoader(1, returnMsg);
+                        requestProcess(uniqueProductHrefs);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">Oops! 에러가 발생했습니다. 다시 시도해주십시오.</h4>'
+                        });
+                    }
+                },
+                error: function(response) {
+                    console.log(response);
+                    closePopup();
+                    Swal.fire({
+                        icon: 'error',
+                        html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">Oops! 에러가 발생했습니다. 다시 시도해주십시오.</h4>'
+                    });
+                }
+            });
         }
 
-        function requestProcess(products) {
+        function requestProcess(productHrefs) {
             $.ajax({
                 url: "/api/product/process",
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
                     remember_token: '{{ Auth::user()->remember_token }}',
-                    products: products
+                    productHrefs: productHrefs
                 },
                 success: function(response) {
+                    closePopup();
                     console.log(response);
                 },
                 error: function(response) {
+                    closePopup();
                     console.log(response);
                 }
             });

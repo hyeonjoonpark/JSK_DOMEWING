@@ -26,7 +26,8 @@
                         <ul class="nav">
                             <li class="nav-item">
                                 <a class="nav-link fs-22px" style="color: var(--dark-blue)"
-                                    href={{ route('admin.dashboard') }}>{{ $translation['supplier_page'] }}</a>
+                                    href={{ route('admin.dashboard') }}
+                                    target="_blank">{{ $translation['supplier_page'] }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-22px" style="color: var(--dark-blue)"
