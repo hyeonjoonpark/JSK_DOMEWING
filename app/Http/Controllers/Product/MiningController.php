@@ -95,7 +95,7 @@ class MiningController extends Controller
                 escapeshellarg($listURL),
                 escapeshellarg($account->username),
                 $account->password,
-                $i
+                escapeshellarg($i)
             );
             try {
                 // Consider limiting the execution time to a reasonable amount
