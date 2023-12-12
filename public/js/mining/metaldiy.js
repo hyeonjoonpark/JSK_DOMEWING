@@ -29,7 +29,9 @@ async function extractProductsOnPage(page) {
     // page.setDefaultNavigationTimeout(0);
     try {
         const args = process.argv.slice(2);
-        const [listURL, username, password] = args;
+        const [listURL, username, password, curPage] = args;
+        const pageURL = '&currentPageNo=' + curPage;
+        const fullURL = listURL + pageURL;
         await page.goto('https://www.metaldiy.com/login/popupLogin.do?popupYn=Y');
         await page.waitForSelector('#loginId');
         await page.waitForSelector('#loginPw');
@@ -39,26 +41,8 @@ async function extractProductsOnPage(page) {
         await page.click('input[title="로그인"]');
         await page.waitForNavigation();
         // 웹 페이지로 이동
-        await page.goto(listURL);
-        await page.waitForSelector('#container > div.container.wrapper_fix > div.goods_list_contents > h3 > strong');
-        const numProducts = await page.evaluate(() => {
-            return document.querySelector('#container > div.container.wrapper_fix > div.goods_list_contents > h3 > strong').textContent;
-        });
-        // const allProducts = await extractProductsOnPage(page);
-        const numProductsPerPage = 60;
-        const numPages = Math.ceil(numProducts / numProductsPerPage);
-        const allProducts = [];
-        for (let i = 1; i < numPages; i++) {
-            if (i > 1 || i < numPages) {
-                // 다음 페이지로 이동
-                await page.waitForSelector('#container > div.container.wrapper_fix > div.goods_list_contents > div.paging > span.nex > a > img');
-                await page.click('#container > div.container.wrapper_fix > div.goods_list_contents > div.paging > span.nex > a > img');
-                await page.waitForSelector('#container > div.container.wrapper_fix > div.goods_list_contents > h3 > strong');
-            }
-            // 현재 페이지의 상품 정보 추출
-            const products = await extractProductsOnPage(page);
-            allProducts.push(...products);
-        }
+        await page.goto(fullURL);
+        const allProducts = await extractProductsOnPage(page);
         // 상품 정보 출력
         console.log(JSON.stringify(allProducts));
     } catch (error) {

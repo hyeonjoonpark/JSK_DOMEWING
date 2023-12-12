@@ -112,6 +112,7 @@
                     listURL: listURL
                 },
                 success: function(response) {
+                    console.log(response);
                     closePopup();
                     if (response.status) {
                         updateDataTable(response.return);

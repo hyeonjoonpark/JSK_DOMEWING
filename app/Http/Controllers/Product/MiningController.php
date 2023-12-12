@@ -14,6 +14,7 @@ class MiningController extends Controller
         $sellerID = $request->sellerID;
         $seller = $this->getVendor($sellerID);
         $listURL = $request->listURL;
+        $numPages = $this->getNumPage($listURL, $seller);
         $account = $this->getAccount($remember_token, $sellerID);
         if (!$account) {
             return [
@@ -21,7 +22,7 @@ class MiningController extends Controller
                 'return' => '잘못된 접근입니다.'
             ];
         }
-        $response = $this->getProductsList($seller, $listURL, $account);
+        $response = $this->getProductsList($seller, $listURL, $account, $numPages);
         return $response;
     }
     public function getVendor($vendorID)
@@ -45,19 +46,20 @@ class MiningController extends Controller
             ->first();
         return $account;
     }
-    public function getProductsList($seller, $listURL, $account)
+    public function getNumPage($listURL)
     {
-        $scriptPath = public_path('js/mining/' . $seller->name_eng . '.js');
-        $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($listURL) . " " . escapeshellarg($account->username) . " " . $account->password;
+        $scriptPath = public_path('js/pagination/metaldiy.js');
+        $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($listURL);
         try {
             set_time_limit(0);
             exec($command, $output, $returnCode);
 
-            if ($returnCode === 0) {
-                $products = json_decode($output[0], true);
+            if ($returnCode === 0 && isset($output[0])) {
+                $numProducts = (int) $output[0];
+                $numPages = (int)ceil($numProducts / 60);
                 return [
                     'status' => true,
-                    'return' => $products
+                    'return' => $numPages
                 ];
             } else {
                 return [
@@ -71,5 +73,62 @@ class MiningController extends Controller
                 'return' => $e->getMessage()
             ];
         }
+    }
+    public function getProductsList($seller, $listURL, $account, $numPages)
+    {
+        $scriptPath = public_path('js/mining/' . $seller->name_eng . '.js');
+
+        // Validate input
+        if (!file_exists($scriptPath)) {
+            return [
+                'status' => false,
+                'return' => 'Script file not found.'
+            ];
+        }
+
+        $allProducts = [];
+        $numPages = (int)$numPages;
+        for ($i = 1; $i <= $numPages; $i++) {
+            $command = sprintf(
+                'node %s %s %s %s %d',
+                escapeshellarg($scriptPath),
+                escapeshellarg($listURL),
+                escapeshellarg($account->username),
+                $account->password,
+                $i
+            );
+            try {
+                // Consider limiting the execution time to a reasonable amount
+                set_time_limit(0); // Example: 60 seconds
+                exec($command, $output, $returnCode);
+                if ($returnCode === 0 && isset($output[0])) {
+                    $products = json_decode($output[0], true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $allProducts = array_merge($allProducts, $products);
+                    } else {
+                        // Handle JSON decoding error
+                        return [
+                            'status' => false,
+                            'return' => 'JSON decoding error.'
+                        ];
+                    }
+                } else {
+                    // Handle command execution error
+                    return [
+                        'status' => false,
+                        'return' => "Error executing command, return code: $returnCode."
+                    ];
+                }
+            } catch (\Exception $e) {
+                return [
+                    'status' => false,
+                    'return' => $e->getMessage()
+                ];
+            }
+        }
+        return [
+            'status' => true,
+            'return' => $allProducts
+        ];
     }
 }
