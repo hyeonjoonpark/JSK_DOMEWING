@@ -123,13 +123,15 @@
                     } else {
                         Swal.fire({
                             icon: 'error',
-                            title: '진행 실패',
-                            text: response.return
+                            html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">구르미를 올바른 주소로 보내주세요.</h4>'
                         });
                     }
                 },
                 error: function(response) {
-                    console.log(response);
+                    Swal.fire({
+                        icon: 'error',
+                        html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">구르미를 올바른 주소로 보내주세요.</h4>'
+                    });
                 }
             });
         }
