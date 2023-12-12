@@ -14,7 +14,6 @@ class MiningController extends Controller
         $sellerID = $request->sellerID;
         $seller = $this->getVendor($sellerID);
         $listURL = $request->listURL;
-        $numPages = $this->getNumPage($listURL, $seller);
         $account = $this->getAccount($remember_token, $sellerID);
         if (!$account) {
             return [
@@ -22,6 +21,7 @@ class MiningController extends Controller
                 'return' => '잘못된 접근입니다.'
             ];
         }
+        $numPages = (int)$this->getNumPage($listURL, $seller)['return'];
         $response = $this->getProductsList($seller, $listURL, $account, $numPages);
         return $response;
     }
@@ -50,27 +50,19 @@ class MiningController extends Controller
     {
         $scriptPath = public_path('js/pagination/metaldiy.js');
         $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($listURL);
-        try {
-            set_time_limit(0);
-            exec($command, $output, $returnCode);
-
-            if ($returnCode === 0 && isset($output[0])) {
-                $numProducts = (int) $output[0];
-                $numPages = (int)ceil($numProducts / 60);
-                return [
-                    'status' => true,
-                    'return' => $numPages
-                ];
-            } else {
-                return [
-                    'status' => false,
-                    'return' => '상품 데이터 추출에 실패했습니다.'
-                ];
-            }
-        } catch (\Exception $e) {
+        set_time_limit(0);
+        exec($command, $output, $returnCode);
+        if ($returnCode === 0 && isset($output[0])) {
+            $numProducts = (int) $output[0];
+            $numPages = (int)ceil($numProducts / 60);
+            return [
+                'status' => true,
+                'return' => (int)$numPages
+            ];
+        } else {
             return [
                 'status' => false,
-                'return' => $e->getMessage()
+                'return' => '상품 데이터 추출에 실패했습니다.'
             ];
         }
     }
@@ -78,28 +70,22 @@ class MiningController extends Controller
     {
         $scriptPath = public_path('js/mining/' . $seller->name_eng . '.js');
         $allProducts = [];
-        for ($i = 1; $i <= $numPages; $i++) {
+        set_time_limit(0);
+        for ($i = $numPages; $i > 0; $i--) {
             $output = [];
+            $returnCode = null;
             $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($listURL) . " " . escapeshellarg($account->username) . " " . $account->password . " " . escapeshellarg($i);
-            try {
-                set_time_limit(0);
-                exec($command, $output, $returnCode);
-
-                if ($returnCode === 0) {
-                    $products = json_decode($output[0], true);
-                    $allProducts = array_merge($allProducts, $products);
-                } else {
-                    return [
-                        'status' => false,
-                        'return' => '상품 데이터 추출에 실패했습니다.'
-                    ];
-                }
-            } catch (\Exception $e) {
+            exec($command, $output, $returnCode);
+            if ($returnCode === 0) {
+                $products = json_decode($output[0], true);
+                $allProducts = array_merge($allProducts, $products);
+            } else {
                 return [
                     'status' => false,
-                    'return' => $e->getMessage()
+                    'return' => '상품 데이터 추출에 실패했습니다.'
                 ];
             }
         }
+        return $allProducts;
     }
 }

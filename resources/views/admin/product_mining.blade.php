@@ -129,6 +129,7 @@
                     }
                 },
                 error: function(response) {
+                    console.log(response);
                     closePopup();
                     Swal.fire({
                         icon: 'error',

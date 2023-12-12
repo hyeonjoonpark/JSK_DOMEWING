@@ -12,7 +12,7 @@ const puppeteer = require('puppeteer');
             const numProducts = document.querySelector('#container > div.container.wrapper_fix > div.goods_list_contents > h3 > strong').textContent;
             return parseInt(numProducts);
         });
-        console.log(numProducts);
+        console.log(parseInt(numProducts));
     } catch (error) {
         console.error(error);
     } finally {
