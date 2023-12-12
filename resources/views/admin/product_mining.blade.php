@@ -118,7 +118,7 @@
                         closePopup();
                         Swal.fire({
                             icon: 'success',
-                            html: '<img class="w-100" src="{{ public_path('assets/media/Asset_Notif_Success.svg') }}"><h2 class="swal2-title mt-5">구르미가 성공적으로 상품셋을 가져왔습니다.</h2>'
+                            html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Success.svg') }}"><h4 class="swal2-title mt-5">구르미가 무사히 돌아왔어요!</h4>'
                         });
                     } else {
                         Swal.fire({
@@ -140,7 +140,7 @@
             ];
             $('.btn').prop('disabled', true);
             let html = '<img src="' + loaders[index] + '" class="w-75" />'
-            html += '<h2 class="swal2-title mt-5">고르미가 상품셋을 가지러 떠납니다.</h2>'
+            html += '<h2 class="swal2-title mt-5">구르미가 상품셋을 가지러 떠납니다.</h2>'
             Swal.fire({
                 html: html,
                 allowOutsideClick: false,
