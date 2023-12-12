@@ -56,8 +56,8 @@
                     <h6 class="card-subtitle mb-2">검색 결과로부터 상품을 가공 및 수집합니다.</h6>
                     <p class="card-text">총 <span class="fw-bold" id="numResult"></span>건이 검색되었습니다</p>
                     <div class="w-100 d-flex justify-content-center">
-                        <button class="btn btn-warning" id="bulkCollectBtn" onclick="productBulkCollect();">상품 다중
-                            수집</button>
+                        <button class="btn btn-warning" id="bulkCollectBtn" onclick="initProcess();">가공 및
+                            수집하기</button>
                     </div>
                     <div id="collectResult">
                         <table id="productTable" class="datatable-init-export nowrap table" data-export-title="Export"
@@ -155,10 +155,66 @@
             Swal.close();
             $('.btn').prop('disabled', false);
         }
+        $('#selectAll').on('change', function() {
+            var dataTable = $('#productTable').DataTable();
+            var rows = dataTable.rows().nodes();
+            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+        });
+
+        function initProcess() {
+            const products = [];
+            $('input[name="selectedProducts"]:checked').each(function() {
+                products.push($(this).val());
+            });
+            requestUnique(products);
+        }
+
+        function requestUnique(products) {
+            const productHrefs = [];
+            for (product of products) {
+                productHrefs.push($('productHref' + product).href);
+            }
+            console.log(productHrefs);
+            // $.ajax({
+            //     url: "/api/product/unique",
+            //     type: 'POST',
+            //     dataType: 'JSON',
+            //     data: {
+            //         remember_token: '{{ Auth::user()->remember_token }}',
+            //         products: products
+            //     },
+            //     success: function(response) {
+            //         requestProcess(products);
+            //         console.log(response);
+            //     },
+            //     error: function(response) {
+            //         console.log(response);
+            //     }
+            // });
+        }
+
+        function requestProcess(products) {
+            $.ajax({
+                url: "/api/product/process",
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    remember_token: '{{ Auth::user()->remember_token }}',
+                    products: products
+                },
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
+        }
 
         function updateDataTable(products) {
             const dataTable = $('#productTable').DataTable();
             dataTable.clear().draw();
+            dataTable.page.len(100).draw(); // 페이지당 행 수를 100으로 설정
             collectedProducts = [];
             for (let i = 0; i < products.length; i++) {
                 const name = products[i].name;
@@ -175,12 +231,15 @@
                     href: href
                 };
                 collectedProducts.push(tmpProduct);
+                const inputValue = i;
                 const checkbox =
-                    '<div class="custom-control custom-control-sm custom-checkbox notext"><input type="checkbox" class="custom-control-input" id="uid' +
+                    '<div class="custom-control custom-control-sm custom-checkbox notext"><input type="checkbox" class="custom-control-input" value="' +
+                    inputValue + '" name="selectedProducts" id="uid' +
                     i + '"><label class="custom-control-label" for="uid' + i + '"></label></div>';
-                const imageHtml = '<a href="' + href + '" target="_blank"><img src="' + image +
-                    '" alt="Product" style="width:120px; height:120px;"></a>';
-                const nameHtml = '<a href="' + href + '" target="_blank" title="' + name + '">' + name +
+                const imageHtml = '<a id="productHref' + i + '" href="' + href + '" target="_blank"><img src="' + image +
+                    '" alt="Product" style="width:120px; height:120px;" id="productImage' + i + '"></a>';
+                const nameHtml = '<a href="' + href + '" target="_blank" title="' + name + '" id="productName' + i + '">' +
+                    name +
                     '</a>';
                 dataTable.row.add([
                     checkbox,
