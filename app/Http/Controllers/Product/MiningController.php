@@ -10,6 +10,7 @@ class MiningController extends Controller
 {
     public function index(Request $request)
     {
+        set_time_limit(0);
         $remember_token = $request->remember_token;
         $sellerID = $request->sellerID;
         $seller = $this->getVendor($sellerID);
@@ -50,7 +51,6 @@ class MiningController extends Controller
     {
         $scriptPath = public_path('js/pagination/metaldiy.js');
         $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($listURL);
-        set_time_limit(0);
         exec($command, $output, $returnCode);
         if ($returnCode === 0 && isset($output[0])) {
             $numProducts = (int) $output[0];
@@ -70,7 +70,6 @@ class MiningController extends Controller
     {
         $scriptPath = public_path('js/mining/' . $seller->name_eng . '.js');
         $allProducts = [];
-        set_time_limit(0);
         for ($i = $numPages; $i > 0; $i--) {
             $output = [];
             $returnCode = null;
@@ -86,6 +85,9 @@ class MiningController extends Controller
                 ];
             }
         }
-        return $allProducts;
+        return [
+            'status' => true,
+            'return' => $allProducts
+        ];
     }
 }

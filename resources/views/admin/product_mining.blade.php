@@ -217,26 +217,16 @@
             const dataTable = $('#productTable').DataTable();
             dataTable.clear().draw();
             dataTable.page.len(100).draw(); // 페이지당 행 수를 100으로 설정
-            collectedProducts = [];
             for (let i = 0; i < products.length; i++) {
                 const name = products[i].name;
                 const price = products[i].price;
                 const platform = products[i].platform;
                 const image = products[i].image;
                 const href = products[i].href;
-                const tmpProduct = {
-                    index: i,
-                    name: name,
-                    price: price,
-                    platform: platform,
-                    image: image,
-                    href: href
-                };
-                collectedProducts.push(tmpProduct);
                 const inputValue = i;
                 const checkbox =
-                    '<div class="custom-control custom-control-sm custom-checkbox notext"><input type="checkbox" class="custom-control-input" value="' +
-                    inputValue + '" name="selectedProducts" id="uid' +
+                    '<div class="custom-control custom-control-sm custom-checkbox notext"><input type="checkbox" class="custom-control-input" value=' +
+                    i + ' name="selectedProducts" id="uid' +
                     i + '"><label class="custom-control-label" for="uid' + i + '"></label></div>';
                 const imageHtml = '<a id="productHref' + i + '" href="' + href + '" target="_blank"><img src="' + image +
                     '" alt="Product" style="width:120px; height:120px;" id="productImage' + i + '"></a>';
