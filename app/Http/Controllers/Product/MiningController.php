@@ -77,46 +77,21 @@ class MiningController extends Controller
     public function getProductsList($seller, $listURL, $account, $numPages)
     {
         $scriptPath = public_path('js/mining/' . $seller->name_eng . '.js');
-
-        // Validate input
-        if (!file_exists($scriptPath)) {
-            return [
-                'status' => false,
-                'return' => 'Script file not found.'
-            ];
-        }
-
         $allProducts = [];
-        $numPages = (int)$numPages;
         for ($i = 1; $i <= $numPages; $i++) {
-            $command = sprintf(
-                'node %s %s %s %s %d',
-                escapeshellarg($scriptPath),
-                escapeshellarg($listURL),
-                escapeshellarg($account->username),
-                $account->password,
-                escapeshellarg($i)
-            );
+            $output = [];
+            $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($listURL) . " " . escapeshellarg($account->username) . " " . $account->password . " " . escapeshellarg($i);
             try {
-                // Consider limiting the execution time to a reasonable amount
-                set_time_limit(0); // Example: 60 seconds
+                set_time_limit(0);
                 exec($command, $output, $returnCode);
-                if ($returnCode === 0 && isset($output[0])) {
+
+                if ($returnCode === 0) {
                     $products = json_decode($output[0], true);
-                    if (json_last_error() === JSON_ERROR_NONE) {
-                        $allProducts = array_merge($allProducts, $products);
-                    } else {
-                        // Handle JSON decoding error
-                        return [
-                            'status' => false,
-                            'return' => 'JSON decoding error.'
-                        ];
-                    }
+                    $allProducts = array_merge($allProducts, $products);
                 } else {
-                    // Handle command execution error
                     return [
                         'status' => false,
-                        'return' => "Error executing command, return code: $returnCode."
+                        'return' => '상품 데이터 추출에 실패했습니다.'
                     ];
                 }
             } catch (\Exception $e) {
@@ -126,9 +101,5 @@ class MiningController extends Controller
                 ];
             }
         }
-        return [
-            'status' => true,
-            'return' => $allProducts
-        ];
     }
 }
