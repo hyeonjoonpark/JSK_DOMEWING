@@ -84,9 +84,94 @@
             </div>
         </div>
     </div>
+    <div class="modal" tabindex="-1" role="dialog" id="productSaveForm">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">상품 데이터 저장</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="form-label" for="categoryId">상품 카테고리</label>
+                                <div class="form-control-wrap d-flex text-nowrap mb-3">
+                                    <input type="text" class="form-control" placeholder="카테고리 검색 키워드를 입력해주세요."
+                                        id="categoryKeyword">
+                                    <button class="btn btn-primary" onclick="categorySearch();"
+                                        id="categorySearchBtn">검색</button>
+                                </div>
+                                <div class="form-control-wrap">
+                                    <select name="categoryId" id="categoryId" class="form-select"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="productKeywords">상품 검색 키워드</label>
+                                <div class="form-control-wrap">
+                                    <input type="text" class="form-control" id="productKeywords"
+                                        placeholder="상품 키워드를 , 단위로 구분하여 최소 5개를 기입해주세요.">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="initSave();">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>
+        function initSave() {
+            const categoryID = $('#categoryId').val();
+            const productKeywords = $('#productKeywords').val();
+        }
+
+        function categorySearch() {
+            const keyword = $("#categoryKeyword").val();
+            $("#categorySearchBtn").html("검색 중...");
+            $("#categorySearchBtn").prop("disabled", true);
+            $.ajax({
+                url: '/api/product/category',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    keyword: keyword
+                },
+                success: function(result) {
+                    console.log(result);
+                    $("#categorySearchBtn").html("검색");
+                    $("#categorySearchBtn").prop("disabled", false);
+                    if (result.status == 1) {
+                        let html = "";
+                        for (let i = 0; i < result.return.length; i++) {
+                            html += "<option value='" + result.return[i].id + "'>" + result.return[i]
+                                .wholeCategoryName + "</option>";
+                        }
+                        $("#categoryId").html(html);
+                        console.log(html);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '진행 실패',
+                            text: result.return
+                        });
+                    }
+                },
+                error: function(response) {
+                    $("#categorySearchBtn").html("검색");
+                    $("#categorySearchBtn").prop("disabled", false);
+                    console.log(response);
+                }
+            });
+        }
+
         function handleEnter(event, btnID) {
             if (event.key === 'Enter') {
                 event.preventDefault(); // 엔터키의 기본 동작(새 줄 삽입)을 방지
@@ -157,16 +242,33 @@
             Swal.close();
             $('.btn').prop('disabled', false);
         }
+        // 전역 변수로 선택된 항목들을 저장
+        var selectedProducts = {};
+
+        // 개별 체크박스 상태 업데이트
+        $('#productTable').on('change', 'input[name="selectedProducts"]', function() {
+            var value = $(this).val();
+            selectedProducts[value] = $(this).is(':checked');
+        });
+
+        // 전체 선택 처리
         $('#selectAll').on('change', function() {
             var dataTable = $('#productTable').DataTable();
-            var rows = dataTable.rows().nodes();
-            $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            var isChecked = this.checked;
+
+            // 모든 페이지의 체크박스 상태 업데이트
+            dataTable.rows().every(function() {
+                var row = this.node();
+                $('input[name="selectedProducts"]', row).prop('checked', isChecked).trigger('change');
+            });
         });
 
         function initProcess() {
             const products = [];
-            $('input[name="selectedProducts"]:checked').each(function() {
-                products.push($(this).val());
+            $.each(selectedProducts, function(key, value) {
+                if (value) { // 체크된 항목만 추가
+                    products.push(key);
+                }
             });
             requestUnique(products);
         }
@@ -190,7 +292,7 @@
                     if (response.status) {
                         const uniqueProductHrefs = response.return.uniqueProductHrefs;
                         const returnMsg = response.return.message;
-                        popupLoader(1, returnMsg);
+                        popupLoader(0, returnMsg);
                         requestProcess(uniqueProductHrefs);
                     } else {
                         Swal.fire({
@@ -211,17 +313,58 @@
         }
 
         function requestProcess(productHrefs) {
+            const sellerID = $('input[name="sellers"]:checked').val();
             $.ajax({
                 url: "/api/product/process",
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
                     remember_token: '{{ Auth::user()->remember_token }}',
-                    productHrefs: productHrefs
+                    productHrefs: productHrefs,
+                    sellerID: sellerID
+                },
+                success: function(response) {
+                    closePopup();
+                    console.log(response.return);
+                    if (response.status) {
+                        const productDetails = response.return;
+                        popupLoader(1, response.message);
+                        productManufacture(productDetails, sellerID);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">' +
+                                response.message + '</h4>'
+                        });
+                    }
+                },
+                error: function(response) {
+                    closePopup();
+                    console.log(response);
+                }
+            });
+        }
+
+        function productManufacture(productDetails, sellerID) {
+            $.ajax({
+                url: "/api/product/manufacture",
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    remember_token: '{{ Auth::user()->remember_token }}',
+                    productDetails: productDetails,
+                    sellerID: sellerID
                 },
                 success: function(response) {
                     closePopup();
                     console.log(response);
+                    if (response.status) {
+
+                    } else {
+                        // 상품명 중복시 시나리오
+                        const duplicates = response.duplicates;
+                        const newProducts = response.return;
+                    }
                 },
                 error: function(response) {
                     closePopup();

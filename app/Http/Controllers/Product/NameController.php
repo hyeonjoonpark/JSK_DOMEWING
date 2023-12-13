@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 
 class NameController extends Controller
 {
-    public function index($productName)
+    public function index($productName, $byte)
     {
         $productName = $this->replaceForbiddenWords($productName);
-        $productName = $this->filterString($productName);
+        $productName = $this->filterString($productName, $byte);
         return $productName;
     }
     public function replaceForbiddenWords($productName)
@@ -25,7 +25,7 @@ class NameController extends Controller
         // Return the sanitized product name
         return $productName;
     }
-    function filterString($str)
+    function filterString($str, $byte)
     {
         // 한글, 숫자, 영어, 공백만 허용
         $str = preg_replace('/[^a-zA-Z0-9\s가-힣]/', '', $str);
@@ -37,7 +37,7 @@ class NameController extends Controller
         $str = trim($str);
 
         // 문자열을 바이트 단위로 안전하게 자르기
-        $byteLimit = 50;
+        $byteLimit = $byte;
         $byteCount = 0;
         $resultStr = '';
 
