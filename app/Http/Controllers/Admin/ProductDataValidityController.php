@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -7,13 +8,13 @@ use Illuminate\Support\Facades\DB;
 
 class ProductDataValidityController extends Controller
 {
-    public function index(Request $request)
+    public function index($categoryID, $productKeywords)
     {
-        if (!$this->isCategoryValid($request->categoryID)) {
+        if (!$this->isCategoryValid($categoryID)) {
             return ['status' => false, 'message' => '잘못된 카테고리입니다.'];
         }
 
-        $validationResult = $this->validateKeywords($request->keywords);
+        $validationResult = $this->validateKeywords($productKeywords);
         return $validationResult === true
             ? ['status' => true]
             : ['status' => false, 'message' => $validationResult];
@@ -21,10 +22,10 @@ class ProductDataValidityController extends Controller
 
     private function isCategoryValid($categoryID)
     {
-        return DB::table('category')->where('id', $categoryID)->exists();
+        return DB::table('ownerclan_category')->where('id', $categoryID)->exists();
     }
 
-    private function validateKeywords($keywords)
+    public function validateKeywords($keywords)
     {
         $keywordsArray = explode(',', $keywords);
         $numKeywords = count($keywordsArray);
@@ -45,7 +46,7 @@ class ProductDataValidityController extends Controller
             }
         }
 
-        $bannedWords = ['최고', '숙취', '치매', '무좀', '품절', '교정', '발모', '환자', '탄력', '이벤트', '벨크로', '밸크로'];
+        $bannedWords = config('forbidden_words');
         foreach ($bannedWords as $bannedWord) {
             if (strpos($keyword, $bannedWord) !== false) {
                 return $bannedWord . '(은)는 금지된 키워드입니다.';
@@ -55,4 +56,3 @@ class ProductDataValidityController extends Controller
         return true;
     }
 }
-?>

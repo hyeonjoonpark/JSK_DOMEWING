@@ -16,11 +16,8 @@ class FormProductController extends Controller
     {
         $data = [];
         $fromUPID = 1;
-        $products = DB::table('uploaded_products')
-            ->join('collected_products', 'collected_products.id', '=', 'uploaded_products.productId')
-            ->where('uploaded_products.id', '>=', $fromUPID)
-            ->where('uploaded_products.isActive','Y')
-            ->where('collected_products.isActive','Y')
+        $products = DB::table('minewing_products')
+            ->where('isActive', 'Y')
             ->limit(500)
             ->get();
         $vendors = DB::table('product_register')
@@ -28,7 +25,6 @@ class FormProductController extends Controller
             ->where('vendors.is_active', 'ACTIVE')
             ->where('product_register.is_active', 'Y')
             ->get();
-        $userID = 15;
         set_time_limit(0);
         ini_set('memory_limit', '-1');
         foreach ($vendors as $vendor) {
@@ -38,7 +34,7 @@ class FormProductController extends Controller
                 ->first()
                 ->rate;
             $margin_rate = (100 + $margin_rate) / 100;
-            $response = $this->$vendorEngName($products, $userID, $margin_rate, $vendor->id);
+            $response = $this->$vendorEngName($products, $margin_rate, $vendor->id);
             if ($response['status'] == 1) {
                 $data['return']['successVendors'][] = $vendor->name;
                 $data['return']['successVendorsNameEng'][] = $vendorEngName;
@@ -47,7 +43,7 @@ class FormProductController extends Controller
         }
         return $data;
     }
-    public function domeggook($products, $userId, $margin_rate)
+    public function domeggook($products, $margin_rate)
     {
         try {
             // 엑셀 파일 로드
@@ -463,7 +459,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function ownerclan($products, $userId, $margin_rate)
+    public function ownerclan($products, $margin_rate)
     {
         try {
             // 엑셀 파일 로드

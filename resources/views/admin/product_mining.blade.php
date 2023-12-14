@@ -84,12 +84,13 @@
             </div>
         </div>
     </div>
-    <div class="modal" tabindex="-1" role="dialog" id="productSaveForm">
+    <div class="modal" tabindex="-1" role="dialog" id="productSaveForm" data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">상품 데이터 저장</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <h5 class="modal-title">가공된 상품셋 저장</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -100,7 +101,7 @@
                                 <label class="form-label" for="categoryId">상품 카테고리</label>
                                 <div class="form-control-wrap d-flex text-nowrap mb-3">
                                     <input type="text" class="form-control" placeholder="카테고리 검색 키워드를 입력해주세요."
-                                        id="categoryKeyword">
+                                        onkeydown="handleEnter(event, 'categorySearchBtn')" id="categoryKeyword">
                                     <button class="btn btn-primary" onclick="categorySearch();"
                                         id="categorySearchBtn">검색</button>
                                 </div>
@@ -119,8 +120,35 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="initSave();">Save changes</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="requestSave();">저장하기</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">종료하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" role="dialog" id="handleDupNamesModal" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">중복 상품명 검출</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="w-100 d-flex jusitfy-content-center">
+                                <img id="duProductImg" src="" alt="중복 상품명 이미지">
+                            </div>
+                            <input type="text" class="form-control" id="duProductName">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="initHandleDupName();">저장하기</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">종료하기</button>
                 </div>
             </div>
         </div>
@@ -128,10 +156,8 @@
 @endsection
 @section('scripts')
     <script>
-        function initSave() {
-            const categoryID = $('#categoryId').val();
-            const productKeywords = $('#productKeywords').val();
-        }
+        var varProducts;
+        var varProduct;
 
         function categorySearch() {
             const keyword = $("#categoryKeyword").val();
@@ -148,21 +174,13 @@
                     console.log(result);
                     $("#categorySearchBtn").html("검색");
                     $("#categorySearchBtn").prop("disabled", false);
-                    if (result.status == 1) {
-                        let html = "";
-                        for (let i = 0; i < result.return.length; i++) {
-                            html += "<option value='" + result.return[i].id + "'>" + result.return[i]
-                                .wholeCategoryName + "</option>";
-                        }
-                        $("#categoryId").html(html);
-                        console.log(html);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: '진행 실패',
-                            text: result.return
-                        });
+                    let html = "";
+                    for (let i = 0; i < result.return.length; i++) {
+                        html += "<option value='" + result.return[i].id + "'>" + result.return[i]
+                            .name + "</option>";
                     }
+                    $("#categoryId").html(html);
+                    console.log(html);
                 },
                 error: function(response) {
                     $("#categorySearchBtn").html("검색");
@@ -186,7 +204,7 @@
         }
 
         function requestExtract(sellerID, listURL) {
-            popupLoader(0, '구르미가 상품셋을 가지러 떠납니다.');
+            popupLoader(0, '"구르미가 상품셋을 가지러 떠납니다."');
             $.ajax({
                 url: '/api/product/mining',
                 type: 'POST',
@@ -240,6 +258,7 @@
 
         function closePopup() {
             Swal.close();
+            $('.modal').modal('hide');
             $('.btn').prop('disabled', false);
         }
         // 전역 변수로 선택된 항목들을 저장
@@ -358,12 +377,54 @@
                 success: function(response) {
                     closePopup();
                     console.log(response);
-                    if (response.status) {
-
+                    varProducts = response.return;
+                    if (!response.status) {
+                        varProduct = response.duplicates;
+                        handleDuplicatedNames();
                     } else {
-                        // 상품명 중복시 시나리오
-                        const duplicates = response.duplicates;
-                        const newProducts = response.return;
+                        initSave(varProducts);
+                    }
+                },
+                error: function(response) {
+                    closePopup();
+                    console.log(response);
+                }
+            });
+        }
+
+        function handleDuplicatedNames() {
+            //handleDupNamesModal
+            $('#duProductImg').attr('src', varProducts[varProduct.index].productImage);
+            $('#duProductName').val(varProduct.productName);
+            $('#handleDupNamesModal').modal('show');
+        }
+
+        function initHandleDupName() {
+            const newProductName = $('#duProductName').val();
+            validateProductNames(newProductName);
+        }
+
+        function validateProductNames(newProductName) {
+            closePopup();
+            popupLoader(1, '"새로운 상품명을 필터링하고, 중복 검사하는 중이에요."');
+            $.ajax({
+                url: '/api/product/validate-product-names',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    products: varProducts,
+                    newProductName: newProductName,
+                    index: varProduct.index
+                },
+                success: function(response) {
+                    closePopup();
+                    console.log(response);
+                    varProducts = response.return;
+                    if (!response.status) {
+                        varProduct = response.duplicates;
+                        handleDuplicatedNames();
+                    } else {
+                        initSave(varProducts);
                     }
                 },
                 error: function(response) {
@@ -403,6 +464,53 @@
             }
             // 각 컬럼의 너비 조정
             dataTable.columns.adjust().draw();
+        }
+
+        function initSave() {
+            $('#productSaveForm').modal('show');
+        }
+
+        function requestSave() {
+            const categoryID = $('#categoryId').val();
+            const productKeywords = $('#productKeywords').val();
+            closePopup();
+            popupLoader(0, '"가공된 상품셋을 저장소로 나르는 중이에요."');
+            $.ajax({
+                url: '/api/product/insert',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    products: varProducts,
+                    remember_token: '{{ Auth::user()->remember_token }}',
+                    categoryID: categoryID,
+                    productKeywords: productKeywords
+                },
+                success: function(response) {
+                    closePopup();
+                    if (response.status === true) {
+                        Swal.fire({
+                            icon: 'success',
+                            html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Success.svg') }}"><h4 class="swal2-title mt-5">' +
+                                response.return+'</h4>'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '진행 실패',
+                            text: response.return
+                        });
+                        initSave();
+                    }
+                },
+                error: function(response) {
+                    closePopup();
+                    console.log(response);
+                    Swal.fire({
+                        icon: 'error',
+                        html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">Oops! 에러가 발생했습니다. 다시 시도해주십시오.</h4>'
+                    });
+                }
+            });
         }
     </script>
 @endsection

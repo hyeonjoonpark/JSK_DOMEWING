@@ -63,7 +63,8 @@ const puppeteer = require('puppeteer');
                 productDetail: productDetail,
                 hasOption: hasOption,
                 productOptions: productOptions,
-                productHref: productHref
+                productHref: productHref,
+                sellerID: 2
             };
         }, productHref);
         console.log(JSON.stringify(productContents));

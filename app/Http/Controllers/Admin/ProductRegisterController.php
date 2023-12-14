@@ -29,7 +29,7 @@ class ProductRegisterController extends Controller
             return $this->getResponseData(-1, $validator->errors()->first()); // 유효성 검사 실패 시 오류 메시지 반환
         }
 
-        $categories = DB::table('category')->where('wholeCategoryName', 'LIKE', '%' . $keyword . '%')->get(); // 카테고리 테이블에서 키워드를 포함하는 카테고리 검색
+        $categories = DB::table('ownerclan_category')->where('name', 'LIKE', '%' . $keyword . '%')->get(); // 카테고리 테이블에서 키워드를 포함하는 카테고리 검색
         if (!empty($categories)) {
             return $this->getResponseData(1, $categories); // 검색 결과가 있을 경우 결과 반환
         } else {

@@ -59,7 +59,7 @@ class ManufactureController extends Controller
             }
         }
         $nameDuplicates = $this->groupDuplicateProductIndices($newProducts);
-        if (count($nameDuplicates) > 0) {
+        if ($nameDuplicates['status'] == true) {
             return [
                 'status' => false,
                 'return' => $newProducts,
@@ -71,38 +71,50 @@ class ManufactureController extends Controller
             'return' => $newProducts
         ];
     }
-    protected function groupDuplicateProductIndices($products)
+    public function groupDuplicateProductIndices($products)
     {
-        $indicesMap = []; // 각 productName에 대한 인덱스들을 저장할 배열
-
+        set_time_limit(0);
+        $names = [];
         foreach ($products as $index => $product) {
-            if (!isset($product['productName'])) {
-                continue; // productName 키가 없는 경우는 건너뛰기
-            }
-
             $name = $product['productName'];
-
-            // productName에 해당하는 인덱스들을 배열에 추가
-            $indicesMap[$name][] = $index;
+            $isDuplicated = $this->validateProductNameFromDB($name);
+            if ($isDuplicated['status']) {
+                $dupNameIndex[$name][] = $index;
+                return [
+                    'status' => true,
+                    'productName' => $name,
+                    'index' => $index
+                ];
+            }
+            if (in_array($name, $names)) {
+                $dupNameIndex[$name][] = $index;
+                return [
+                    'status' => true,
+                    'productName' => $name,
+                    'index' => $index
+                ];
+            }
+            $names[] = $name;
         }
-
-        // 중복된 productName만 필터링
-        $duplicateGroups = array_filter($indicesMap, function ($indices) {
-            return count($indices) > 1;
-        });
-
-        return $duplicateGroups; // 중복된 productName의 인덱스 그룹 반환
+        return [
+            'status' => false
+        ];
     }
-    protected function generateRandomProductCode($length = 5)
+    protected function validateProductNameFromDB($productName)
     {
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $charactersLength = strlen($characters);
-        $randomCode = '';
-
-        for ($i = 0; $i < $length; $i++) {
-            $randomCode .= $characters[rand(0, $charactersLength - 1)];
+        $isDuplicated = DB::table('minewing_products')
+            ->where('productName', $productName)
+            ->where('isActive', 'Y')
+            ->get();
+        if (count($isDuplicated) > 0) {
+            return [
+                'status' => true,
+                'return' => $productName
+            ];
+        } else {
+            return [
+                'status' => false
+            ];
         }
-
-        return $randomCode;
     }
 }
