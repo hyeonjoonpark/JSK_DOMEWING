@@ -61,7 +61,7 @@
                     </div>
                     <div id="collectResult">
                         <table id="productTable" class="datatable-init-export nowrap table" data-export-title="Export"
-                            data-order='[[3, "asc"]]'>
+                            data-order='false'>
                             <thead>
                                 <tr>
                                     <th class="nk-tb-col nk-tb-col-check">
