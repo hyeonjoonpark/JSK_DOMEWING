@@ -11,13 +11,13 @@ class ProductDataValidityController extends Controller
     public function index($categoryID, $productKeywords)
     {
         if (!$this->isCategoryValid($categoryID)) {
-            return ['status' => false, 'message' => '잘못된 카테고리입니다.'];
+            return ['status' => false, 'return' => '잘못된 카테고리입니다.'];
         }
 
         $validationResult = $this->validateKeywords($productKeywords);
         return $validationResult === true
             ? ['status' => true]
-            : ['status' => false, 'message' => $validationResult];
+            : ['status' => false, 'return' => $validationResult];
     }
 
     private function isCategoryValid($categoryID)
