@@ -12,6 +12,7 @@ class InsertController extends Controller
 {
     public function index(Request $request)
     {
+        set_time_limit(0);
         $remember_token = $request->remember_token;
         $products = $request->products;
         $categoryID = $request->categoryID;

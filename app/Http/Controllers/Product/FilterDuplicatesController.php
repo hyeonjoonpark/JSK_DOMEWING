@@ -10,6 +10,7 @@ class FilterDuplicatesController extends Controller
 {
     public function index(Request $request)
     {
+        set_time_limit(0);
         $productHrefs = $request->productHrefs;
         $duplicates = $this->getDuplicateHrefs($productHrefs);
 

@@ -37,7 +37,7 @@ class ProductImageController extends Controller
             $this->applyWatermark($originalImagePath, $watermarkImagePath);
             return [
                 'status' => true,
-                'return' => "https://www.sellwing.kr/images/product/" . $newImageName
+                'return' => "https://www.sellwing.kr/images/CDN/product/" . $newImageName
             ];
         } catch (Exception $e) {
             error_log("Error processing image: " . $e->getMessage());
