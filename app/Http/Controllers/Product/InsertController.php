@@ -24,7 +24,8 @@ class InsertController extends Controller
             ->where('remember_token', $remember_token)
             ->where('is_active', 'ACTIVE')
             ->select('id')
-            ->first();
+            ->first()
+            ->id;
         if ($userID === null) {
             return [
                 'status' => false,
@@ -48,40 +49,46 @@ class InsertController extends Controller
     }
     public function insertProducts($products, $userID, $categoryID, $productKeywords)
     {
-        foreach ($products as $product) {
-            $sellerID = $product['sellerID'];
-            $hasOption = false;
-            if ($product['hasOption'] === true) {
-                $hasOption = true;
-            }
-            try {
+        try {
+            foreach ($products as $product) {
+                $hasOption = 'N';
+                if ($product['hasOption'] === 'true') {
+                    $hasOption = 'Y';
+                }
+                $productCode = $this->generateRandomProductCode(5);
+                $productName = $product['productName'];
+                $productPrice = $product['productPrice'];
+                $productImage = $product['productImage'];
+                $productDetail = $product['productDetail'];
+                $productdHref = $product['productHref'];
+                $sellerID = $product['sellerID'];
                 DB::table('minewing_products')
                     ->insert([
                         'sellerID' => $sellerID,
                         'userID' => $userID,
                         'categoryID' => $categoryID,
-                        'productCode' => $this->generateRandomProductCode(),
-                        'productName' => $product['productName'],
+                        'productCode' => $productCode,
+                        'productName' => $productName,
                         'productKeywords' => $productKeywords,
-                        'productPrice' => $product['productPrice'],
-                        'productImage' => $product['productImage'],
-                        'productDetail' => $product['productDetail'],
-                        'productHref' => $product['productHref'],
+                        'productPrice' => $productPrice,
+                        'productImage' => $productImage,
+                        'productDetail' => $productDetail,
+                        'productHref' => $productdHref,
                         'hasOption' => $hasOption
                     ]);
-                return [
-                    'status' => true,
-                    'return' => '"상품셋을 성공적으로 저장했습니다."'
-                ];
-            } catch (\Exception $e) {
-                return [
-                    'status' => false,
-                    'return' => '"상품셋 저장에 실패했습니다. 기술자에게 문의해주세요."'
-                ];
             }
+            return [
+                'status' => true,
+                'return' => '"상품셋을 성공적으로 저장했습니다."'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'return' => '"상품셋 저장에 실패했습니다. 기술자에게 문의해주세요.<br>"' . $e->getMessage()
+            ];
         }
     }
-    protected function generateRandomProductCode($length = 5)
+    protected function generateRandomProductCode($length)
     {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         $charactersLength = strlen($characters);

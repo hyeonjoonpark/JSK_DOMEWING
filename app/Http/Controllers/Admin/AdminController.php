@@ -131,4 +131,13 @@ class AdminController extends Controller
             'sellers' => $sellers
         ]);
     }
+    public function minewing(Request $request)
+    {
+        $products = DB::table('minewing_products')
+            ->where('isActive', 'Y')
+            ->get();
+        return view('admin/product_minewing', [
+            'products' => $products
+        ]);
+    }
 }

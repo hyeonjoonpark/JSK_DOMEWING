@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('title')
-    상품 데이터 마이닝
+    상품 데이터 마인윙
 @endsection
 @section('subtitle')
     <p>
@@ -473,6 +473,8 @@
         function requestSave() {
             const categoryID = $('#categoryId').val();
             const productKeywords = $('#productKeywords').val();
+            const sellerID = $('input[name="sellers"]:checked').val();
+            console.log(sellerID);
             closePopup();
             popupLoader(0, '"가공된 상품셋을 저장소로 나르는 중이에요."');
             $.ajax({

@@ -133,99 +133,78 @@ class ProductImageController extends Controller
             ];
         }
     }
-    private function processProductDetail($productDetail)
+    // private function processProductDetail($productDetail)
+    // {
+    //     $doc = $this->loadHtmlDocument($productDetail);
+    //     $images = $this->extractImages($doc);
+
+    //     return $this->createImageHtml($images);
+    // }
+
+    // private function loadHtmlDocument($htmlContent)
+    // {
+    //     $doc = new DOMDocument();
+    //     libxml_use_internal_errors(true);
+    //     $doc->loadHTML($htmlContent);
+    //     libxml_clear_errors();
+
+    //     return $doc;
+    // }
+
+    // private function extractImages(DOMDocument $doc)
+    // {
+    //     $xpath = new DOMXPath($doc);
+    //     $imageNodes = $xpath->query("//img");
+    //     $images = [];
+
+    //     foreach ($imageNodes as $node) {
+    //         // 각 이미지 노드의 src 속성을 추출
+    //         $images[] = $node->getAttribute('src');
+    //     }
+
+    //     return $images;
+    // }
+    // HTML에서 이미지 URL 추출
+    // 이미지를 서버에 저장하고 새로운 URL 생성
+    public function hostImages($imageUrls)
     {
-        $doc = $this->loadHtmlDocument($productDetail);
-        $images = $this->extractImages($doc);
-
-        return $this->createImageHtml($images);
-    }
-
-    private function loadHtmlDocument($htmlContent)
-    {
-        $doc = new DOMDocument();
-        libxml_use_internal_errors(true);
-        $doc->loadHTML($htmlContent);
-        libxml_clear_errors();
-
-        return $doc;
-    }
-
-    private function extractImages(DOMDocument $doc)
-    {
-        $xpath = new DOMXPath($doc);
-        $imageNodes = $xpath->query("//img");
-        $images = [];
-
-        foreach ($imageNodes as $node) {
-            // 각 이미지 노드의 src 속성을 추출
-            $images[] = $node->getAttribute('src');
-        }
-
-        return $images;
-    }
-
-
-
-
-    private function getImageHtml($img)
-    {
-        $src = $img->getAttribute('src');
-        $imageContent = file_get_contents($src);
-        $imageExtension = pathinfo($src, PATHINFO_EXTENSION);
-        $imageName = uniqid() . '.' . $imageExtension;
-        $savePath = public_path('images/CDN/detail') . '/' . $imageName;
-        file_put_contents($savePath, $imageContent);
-        $tmpSrc = "https://www.sellwing.kr/images/CDN/detail/" . $imageName;
-
-        return '<img src="' . $tmpSrc . '" alt="">';
-    }
-    public function extractProductDetail($productDetails)
-    {
-        $hostedImages = [];
-        if (isset($productDetails)) {
-            $hostedImages = $this->downloadAndHostImages($productDetails);
-        }
-        $html = $this->createImageHtml($hostedImages);
-        return $html;
-    }
-    public function downloadAndHostImages($imageUrls)
-    {
-        $hostedImages = [];
-        foreach ($imageUrls as $url) {
-            // 이미지 데이터 가져오기
-            $imageData = file_get_contents($url);
-
-            // 파일 확장자 추출 및 해시코드 처리
-            $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
-            $filename = basename($url, '?' . parse_url($url, PHP_URL_QUERY)); // 해시코드 제거
-            if (!$extension) {
-                // 확장자가 없는 경우 처리
-                $extension = 'jpg'; // 기본 확장자 설정
-            }
-            $imageName = uniqid() . '.' . $extension;
-            // 이미지 저장 경로 설정
-            $savePath = public_path('images/CDN/detail/' . $imageName);
-
-            // 이미지 저장
-            file_put_contents($savePath, $imageData);
-
-            // 새로운 호스팅 URL 생성
-            $newUrl = 'https://www.sellwing.kr/images/CDN/detail/' . $imageName;
-            $hostedImages[] = $newUrl;
-        }
-
+        $hostedImages = array_map(fn ($url) => $this->saveImageAndGetNewUrl($url), $imageUrls);
         return $hostedImages;
     }
-    public function createImageHtml($images)
+
+    // 이미지를 서버에 저장하고 새로운 호스팅 URL 반환
+    private function saveImageAndGetNewUrl($url)
     {
-        $html = '<center>';
-        $html .= '<img src="https://www.sellwing.kr/images/CDN/ladam_header.jpg">';
+        $imageData = file_get_contents($url);
+        $extension = $this->getFileExtension($url);
+        $imageName = uniqid() . '.' . $extension;
+        $savePath = public_path('images/CDN/detail/' . $imageName);
+        file_put_contents($savePath, $imageData);
+        return 'https://www.sellwing.kr/images/CDN/detail/' . $imageName;
+    }
+
+    // 파일 확장자 추출
+    private function getFileExtension($url)
+    {
+        $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+        return $extension ?: 'jpg'; // 기본값 jpg
+    }
+
+    // 새로운 이미지 URL을 이용해 HTML 생성
+    public function createHtmlWithImages($images)
+    {
+        $html = '<center><img src="https://www.sellwing.kr/images/CDN/ladam_header.jpg">';
         foreach ($images as $img) {
             $html .= '<img src="' . $img . '" alt="">';
         }
         $html .= '</center>';
-
         return $html;
+    }
+
+    // 이미지 URL 배열을 처리하고 HTML 생성
+    public function processImages($imageUrls)
+    {
+        $hostedImages = $this->hostImages($imageUrls);
+        return $this->createHtmlWithImages($hostedImages);
     }
 }

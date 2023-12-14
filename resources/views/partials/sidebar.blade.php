@@ -30,13 +30,7 @@
                         <li class="nk-menu-item">
                             <a href="/admin/product/mining" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
-                                <span class="nk-menu-text">상품 데이터 마이닝</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/product/register" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
-                                <span class="nk-menu-text">신규 상품 생성</span>
+                                <span class="nk-menu-text">상품 데이터 마인윙</span>
                             </a>
                         </li>
                         <li class="nk-menu-item has-sub">
@@ -45,6 +39,11 @@
                                 <span class="nk-menu-text">상품 데이터 센터</span>
                             </a>
                             <ul class="nk-menu-sub">
+                                <li class="nk-menu-item">
+                                    <a href="/admin/product/minewing" class="nk-menu-link"><span
+                                            class="nk-menu-text">마인윙
+                                            데이터</span></a>
+                                </li>
                                 <li class="nk-menu-item">
                                     <a href="/admin/product/manage" class="nk-menu-link"><span class="nk-menu-text">수집된
                                             상품 데이터</span></a>
@@ -55,6 +54,12 @@
                                 </li>
                             </ul><!-- .nk-menu-sub -->
                         </li><!-- .nk-menu-item -->
+                        <li class="nk-menu-item">
+                            <a href="/admin/product/register" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
+                                <span class="nk-menu-text">신규 상품 생성</span>
+                            </a>
+                        </li>
                         <li class="nk-menu-item">
                             <a href="/admin/product/keywords" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>

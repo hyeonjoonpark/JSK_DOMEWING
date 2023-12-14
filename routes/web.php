@@ -43,6 +43,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('upload-image', [ImageUploadController::class, 'handle']);
     Route::get('account-setting', [AdminController::class, 'accountSetting']);
     Route::get('product/mining', [AdminController::class, 'productMining']);
+    Route::get('product/minewing', [AdminController::class, 'minewing']);
 
     //ving kong
     Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');

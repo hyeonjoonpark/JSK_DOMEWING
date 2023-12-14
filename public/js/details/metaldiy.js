@@ -39,9 +39,19 @@ const puppeteer = require('puppeteer');
             productPrice = productPrice.replace(/[^\d]/g, '');
             productPrice = parseInt(productPrice);
             const productImage = document.querySelector('#zoom_goods').src;
-            const images = Array.from(document.querySelectorAll('#detail > img'));
-            // const productDetail = images.map(img => img.src);
-            const productDetail = document.querySelector('#detail').innerHTML;
+            const baseUrl = window.location.origin;
+            // 'detail' 아이디를 가진 요소 내의 모든 <img> 태그를 선택합니다.
+            const images = document.querySelectorAll('#detail img');
+            // 각 이미지의 src 속성을 절대 경로로 변환합니다.
+            const productDetail = Array.from(images, img => {
+                let src = img.getAttribute('src');
+                // 상대 경로인 경우 baseUrl을 추가합니다.
+                if (src.startsWith('http://') || src.startsWith('https://')) {
+                    return src; // 이미 절대 경로인 경우
+                } else {
+                    return new URL(src, baseUrl).href; // 상대 경로를 절대 경로로 변환
+                }
+            });
             let productOptionEle = document.querySelector('#container > div.container.wrapper_fix > div > div.goods_info > div.right > ul > li:nth-child(5) > dl > dd > table > tbody');
             let hasOption = false;
             let productOptions = [];

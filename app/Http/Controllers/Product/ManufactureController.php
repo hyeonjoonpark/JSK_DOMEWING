@@ -27,9 +27,10 @@ class ManufactureController extends Controller
             }
             $productName = $nameController->index($product['productName'], $byte);
             $productImage = $productImageController->index($product['productImage'])['return'];
-            $productDetail = $productImageController->extractImageSrcFromHtml($product['productDetail']);
+            $productDetail = $productImageController->processImages($product['productDetail']);
             $productPrice = (int)$product['productPrice'];
             $productHref = $product['productHref'];
+            $sellerID = $product['sellerID'];
             if ($hasOption == true && isset($product['productOptions'])) {
                 $productOptions = $product['productOptions'];
                 $type = 'A';
@@ -43,7 +44,8 @@ class ManufactureController extends Controller
                         'productPrice' => $productPrice,
                         'productDetail' => $newProductDetail,
                         'productHref' => $productHref,
-                        'hasOption' => true
+                        'hasOption' => true,
+                        'sellerID' => $sellerID
                     ];
                     $type++;
                 }
@@ -54,7 +56,8 @@ class ManufactureController extends Controller
                     'productPrice' => $productPrice,
                     'productDetail' => $productDetail,
                     'productHref' => $productHref,
-                    'hasOption' => false
+                    'hasOption' => false,
+                    'sellerID' => $sellerID
                 ];
             }
         }
