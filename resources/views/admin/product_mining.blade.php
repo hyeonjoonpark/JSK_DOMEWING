@@ -59,14 +59,14 @@
                         <button class="btn btn-warning" id="bulkCollectBtn" onclick="initProcess();">가공 및
                             수집하기</button>
                     </div>
-                    <div id="collectResult">
-                        <table id="productTable" class="datatable-init-export nowrap table" data-export-title="Export"
-                            data-order='false'>
+                    <div id="collectResult" class="mt-5">
+                        <table id="productTable" class="nowrap table">
                             <thead>
                                 <tr>
                                     <th class="nk-tb-col nk-tb-col-check">
                                         <div class="custom-control custom-control-sm custom-checkbox notext">
-                                            <input type="checkbox" class="custom-control-input" id="selectAll">
+                                            <input type="checkbox" class="custom-control-input"
+                                                id="selectAll"onclick='selectAll(this)'>
                                             <label class="custom-control-label" for="selectAll"></label>
                                         </div>
                                     </th>
@@ -261,33 +261,18 @@
             $('.modal').modal('hide');
             $('.btn').prop('disabled', false);
         }
-        // 전역 변수로 선택된 항목들을 저장
-        var selectedProducts = {};
 
-        // 개별 체크박스 상태 업데이트
-        $('#productTable').on('change', 'input[name="selectedProducts"]', function() {
-            var value = $(this).val();
-            selectedProducts[value] = $(this).is(':checked');
-        });
-
-        // 전체 선택 처리
-        $('#selectAll').on('change', function() {
-            var dataTable = $('#productTable').DataTable();
-            var isChecked = this.checked;
-
-            // 모든 페이지의 체크박스 상태 업데이트
-            dataTable.rows().every(function() {
-                var row = this.node();
-                $('input[name="selectedProducts"]', row).prop('checked', isChecked).trigger('change');
+        function selectAll(selectAll) {
+            const checkboxes = document.querySelectorAll('input[name="selectedProducts"]');
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = selectAll.checked
             });
-        });
+        }
 
         function initProcess() {
             const products = [];
-            $.each(selectedProducts, function(key, value) {
-                if (value) { // 체크된 항목만 추가
-                    products.push(key);
-                }
+            $('input[name="selectedProducts"]:checked').each(function() {
+                products.push($(this).val());
             });
             requestUnique(products);
         }
@@ -436,34 +421,38 @@
 
         function updateDataTable(products) {
             const dataTable = $('#productTable').DataTable();
-            dataTable.clear().draw();
-            dataTable.page.len(100).draw(); // 페이지당 행 수를 100으로 설정
+            dataTable.clear(); // 기존 데이터를 청소합니다
+
+            let rowsToAdd = [];
             for (let i = 0; i < products.length; i++) {
                 const name = products[i].name;
                 const price = products[i].price;
                 const platform = products[i].platform;
                 const image = products[i].image;
                 const href = products[i].href;
-                const inputValue = i;
-                const checkbox =
-                    '<div class="custom-control custom-control-sm custom-checkbox notext"><input type="checkbox" class="custom-control-input" value=' +
-                    i + ' name="selectedProducts" id="uid' +
-                    i + '"><label class="custom-control-label" for="uid' + i + '"></label></div>';
-                const imageHtml = '<a id="productHref' + i + '" href="' + href + '" target="_blank"><img src="' + image +
-                    '" alt="Product" style="width:120px; height:120px;" id="productImage' + i + '"></a>';
-                const nameHtml = '<a href="' + href + '" target="_blank" title="' + name + '" id="productName' + i + '">' +
-                    name +
-                    '</a>';
-                dataTable.row.add([
-                    checkbox,
-                    imageHtml,
-                    nameHtml,
-                    price,
-                    platform
-                ]).draw(false);
+
+                const checkbox = `
+            <div class="custom-control custom-control-sm custom-checkbox notext">
+                <input type="checkbox" class="custom-control-input" value="${i}" name="selectedProducts" id="uid${i}">
+                <label class="custom-control-label" for="uid${i}"></label>
+            </div>`;
+
+                const imageHtml = `
+            <a id="productHref${i}" href="${href}" target="_blank">
+                <img src="${image}" alt="Product" style="width:120px; height:120px;" id="productImage${i}">
+            </a>`;
+
+                const nameHtml = `
+            <a href="${href}" target="_blank" title="${name}" id="productName${i}">
+                ${name}
+            </a>`;
+
+                rowsToAdd.push([checkbox, imageHtml, nameHtml, price, platform]);
             }
-            // 각 컬럼의 너비 조정
-            dataTable.columns.adjust().draw();
+
+            dataTable.rows.add(rowsToAdd).draw(); // 추가된 모든 행을 한 번에 그립니다
+            dataTable.page.len(100).draw(); // 페이지당 행 수를 100으로 설정
+            dataTable.columns.adjust(); // 컬럼 너비 조정
         }
 
         function initSave() {

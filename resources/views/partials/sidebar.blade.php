@@ -44,10 +44,10 @@
                                             class="nk-menu-text">마인윙
                                             데이터</span></a>
                                 </li>
-                                <li class="nk-menu-item">
+                                {{-- <li class="nk-menu-item">
                                     <a href="/admin/product/manage" class="nk-menu-link"><span class="nk-menu-text">수집된
                                             상품 데이터</span></a>
-                                </li>
+                                </li> --}}
                                 <li class="nk-menu-item">
                                     <a href="/admin/product/uploaded" class="nk-menu-link"><span
                                             class="nk-menu-text">업로드된 상품 데이터</span></a>
@@ -55,17 +55,23 @@
                             </ul><!-- .nk-menu-sub -->
                         </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item">
+                            <a href="/admin/product/excelwing" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-file-excel"></em></span>
+                                <span class="nk-menu-text">엑셀윙</span>
+                            </a>
+                        </li>
+                        {{-- <li class="nk-menu-item">
                             <a href="/admin/product/register" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
                                 <span class="nk-menu-text">신규 상품 생성</span>
                             </a>
-                        </li>
-                        <li class="nk-menu-item">
+                        </li> --}}
+                        {{-- <li class="nk-menu-item">
                             <a href="/admin/product/keywords" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
                                 <span class="nk-menu-text">상품 키워드 테스트</span>
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="nk-menu-item">
                             <a href="/admin/cms_dashboard" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>

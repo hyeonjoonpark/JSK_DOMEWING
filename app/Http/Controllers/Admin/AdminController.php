@@ -140,4 +140,24 @@ class AdminController extends Controller
             'products' => $products
         ]);
     }
+    public function excelwing(Request $request)
+    {
+        $ownerclanCategories = DB::table('minewing_products AS mp')
+            ->join('ownerclan_category AS oc', 'mp.categoryID', '=', 'oc.id')
+            ->groupBy('mp.categoryID', 'oc.id', 'oc.name')
+            ->select('oc.id', 'oc.name')
+            ->get();
+        $products = [];
+        if (isset($_GET['categoryID'])) {
+            $categoryID = $_GET['categoryID'];
+            $products = DB::table('minewing_products')
+                ->where('isActive', 'Y')
+                ->where('categoryID', $categoryID)
+                ->get();
+        }
+        return view('admin/excelwing', [
+            'ownerclanCategories' => $ownerclanCategories,
+            'products' => $products
+        ]);
+    }
 }

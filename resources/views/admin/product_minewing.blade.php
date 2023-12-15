@@ -1,10 +1,10 @@
 @extends('layouts.main')
 @section('title')
-    업로드된 상품 관리
+    마인윙 데이터셋
 @endsection
 @section('subtitle')
     <p>
-        이미 판매 중에 있는 상품 데이터를 관리합니다.
+        마인윙 데이터셋을 관리합니다.
     </p>
 @endsection
 @section('content')
