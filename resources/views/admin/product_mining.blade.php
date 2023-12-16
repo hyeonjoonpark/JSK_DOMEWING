@@ -183,13 +183,6 @@
             });
         }
 
-        function handleEnter(event, btnID) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // 엔터키의 기본 동작(새 줄 삽입)을 방지
-                document.getElementById(btnID).click(); // 버튼 클릭 이벤트 실행
-            }
-        }
-
         function initExtract() {
             const listURL = $('#listURL').val();
             const sellerID = $('input[name="sellers"]:checked').val();

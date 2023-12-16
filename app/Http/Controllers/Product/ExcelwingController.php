@@ -35,33 +35,9 @@ class ExcelwingController extends Controller
             return $response;
         }
         $products = $response['return'];
-        $categoryID = $request->categoryID;
-        $response = $this->getCategoryCode($categoryID, $vendorEngName);
-        if (!$response['status']) {
-            return $response;
-        }
-        $categoryCode = $response['return'];
+        $categoryCode = $request->categoryCode;
         $formProductController = new FormProductController();
         $response = $formProductController->$vendorEngName($products, $marginRate, $categoryCode);
-    }
-    protected function getCategoryCode($categoryID, $vendorEngName)
-    {
-        $categoryCode = DB::table($vendorEngName . "_category")
-            ->where("id", $categoryID)
-            ->select("code")
-            ->first();
-        if ($categoryCode) {
-            $categoryCode = $categoryCode->code;
-            return [
-                'status' => true,
-                'return' => $categoryCode
-            ];
-        } else {
-            return [
-                'status' => false,
-                'return' => "잘못된 카테고리 정보입니다."
-            ];
-        }
     }
     protected function getProducts($productIDs)
     {

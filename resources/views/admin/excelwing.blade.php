@@ -24,8 +24,8 @@
                                             <input type="radio" id="seller{{ $b2B->id }}" name="sellers"
                                                 value="{{ $b2B->id }}" class="custom-control-input"
                                                 {{ $loop->first ? 'checked' : '' }}>
-                                            <label class="custom-control-label"
-                                                for="seller{{ $b2B->id }}">{{ $b2B->name }}</label>
+                                            <label class="custom-control-label" for="seller{{ $b2B->id }}"
+                                                id="b2BName{{ $b2B->id }}">{{ $b2B->name }}</label>
                                         </div>
                                     </div>
                                 </div>
@@ -93,17 +93,98 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="categoryMapping" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        data-bs-backdrop="static" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">카테고리 매핑</h5>
+                </div>
+                <div class="modal-body">
+                    <img src="{{ asset('media/Asset_Notif_Success.svg') }}" alt="엑셀윙 헤더 이미지" class="w-100">
+                    <div class="form-group">
+                        <label for="categoryID">선택된 카테고리</label>
+                        <div class="form-control-wrap">
+                            <select class="form-select js-select2" disabled>
+                                @if (isset($selectedCategory))
+                                    <option>{{ $selectedCategory->name }}</option>
+                                @endif
+                            </select>
+                        </div>
+                    </div>
+                    <h6>
+                        선택하신 B2B 업체의 카테고리를 선택해주세요.
+                    </h6>
+                    <div class="form-group">
+                        <label class="form-label" for="categoryCode" id="selectedB2BName"></label>
+                        <div class="form-control-wrap d-flex text-nowrap mb-3">
+                            <input type="text" class="form-control" placeholder="카테고리 검색 키워드를 입력해주세요."
+                                id="categoryKeyword" onclick="handleEnter(event, 'categorySearchBtn')">
+                            <button class="btn btn-primary" onclick="categorySearch();"
+                                id="categorySearchBtn">검색</button>
+                        </div>
+                        <div class="form-control-wrap">
+                            <select name="categoryCode" id="categoryCode" class="form-select"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">종료하기</button>
+                    <button type="button" class="btn btn-success" onclick="requestExcelwing();">선택하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <link rel="stylesheet" href="{{ asset('assets/css/editors/summernote.css') }}">
     <script src="{{ asset('assets/js/editors.js') }}"></script>
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
+        var productIDs, vendorID;
         $(document).ready(function() {
             @if (!$selectedCategory)
                 $('#selectCategory').modal('show');
             @endif
         });
+
+        function categorySearch() {
+            const keyword = $("#categoryKeyword").val();
+            $("#categorySearchBtn").html("검색 중...");
+            $("#categorySearchBtn").prop("disabled", true);
+            $.ajax({
+                url: '/api/product/category-mapping',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    vendorID: vendorID,
+                    keyword: keyword
+                },
+                success: function(result) {
+                    $("#categorySearchBtn").html("검색");
+                    $("#categorySearchBtn").prop("disabled", false);
+                    if (result.status == 1) {
+                        let html = "";
+                        for (let i = 0; i < result.return.length; i++) {
+                            html += "<option value='" + result.return[i].code + "'>" + result.return[i]
+                                .name + "</option>";
+                        }
+                        $("#categoryCode").html(html);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '진행 실패',
+                            text: result.return
+                        });
+                    }
+                },
+                error: function(response) {
+                    $("#categorySearchBtn").html("검색");
+                    $("#categorySearchBtn").prop("disabled", false);
+                    console.log(response);
+                }
+            });
+        }
 
         function selectCategory(categoryID) {
             window.location.replace("?categoryID=" + categoryID);
@@ -113,13 +194,21 @@
             // 'selectedProducts'라는 이름을 가진 체크된 모든 체크박스를 가져옵니다.
             const selectedProducts = document.querySelectorAll('input[name="selectedProducts"]:checked');
             // 선택된 상품의 ID를 배열로 추출합니다.
-            const productIDs = Array.from(selectedProducts).map(product => product.value);
-            const vendorID = $("input[name='sellers']:checked").val();
-            requestExcelwing(productIDs, vendorID);
+            productIDs = Array.from(selectedProducts).map(product => product.value);
+            vendorID = $("input[name='sellers']:checked").val();
+            getB2BName(vendorID);
         }
 
-        function requestExcelwing(productIDs, vendorID) {
+        function getB2BName(b2BID) {
+            const b2BName = $("#b2BName" + b2BID).html();
+            $("#selectedB2BName").html(b2BName + " 카테고리 검색");
+            $("#categoryMapping").modal("show");
+        }
+
+        function requestExcelwing() {
+            closePopup();
             popupLoader(1, "선택하신 상품셋을 B2B 업체를 위한 대량 등록 양식에 맞추어 엑셀 파일로 작성 중입니다.");
+            const categoryCode = $("#categoryCode").val();
             $.ajax({
                 url: "/api/product/excelwing",
                 type: "POST",
@@ -128,7 +217,7 @@
                     remember_token: "{{ Auth::user()->remember_token }}",
                     productIDs: productIDs,
                     vendorID: vendorID,
-                    categoryID: categoryID
+                    categoryCode: categoryCode
                 },
                 success: function(response) {
                     closePopup();

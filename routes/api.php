@@ -24,6 +24,7 @@ use App\Http\Controllers\Domewing\MemberController;
 use App\Http\Controllers\Domewing\ToShipController;
 use App\Http\Controllers\Domewing\ToReceiveController;
 use App\Http\Controllers\Domewing\ToRateController;
+use App\Http\Controllers\Product\CategoryMappingController;
 use App\Http\Controllers\Product\ExcelwingController;
 use App\Http\Controllers\Product\FilterDuplicatesController;
 use App\Http\Controllers\Product\GetProductController;
@@ -64,6 +65,7 @@ Route::post('/product/validate-product-names', [ValidateProductNamesController::
 Route::post('/product/insert', [InsertController::class, 'index']);
 Route::post('/product/request-product-detail', [GetProductController::class, 'index']);
 Route::post('/product/excelwing', [ExcelwingController::class, 'index']);
+Route::post('/product/category-mapping', [CategoryMappingController::class, 'index']);
 // account-setting
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 // Load product details
