@@ -94,7 +94,7 @@
         </div>
     </div>
     <div class="modal fade" id="categoryMapping" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        data-bs-backdrop="static" aria-hidden="true">
+        data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -147,6 +147,13 @@
                 $('#selectCategory').modal('show');
             @endif
         });
+
+        function handleEnter(event, btnID) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // 엔터키의 기본 동작(새 줄 삽입)을 방지
+                document.getElementById(btnID).click(); // 버튼 클릭 이벤트 실행
+            }
+        }
 
         function categorySearch() {
             const keyword = $("#categoryKeyword").val();
