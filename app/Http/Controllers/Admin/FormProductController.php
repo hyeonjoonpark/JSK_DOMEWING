@@ -498,7 +498,6 @@ class FormProductController extends Controller
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
-
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return ['status' => false, 'return' => $e->getMessage()];
