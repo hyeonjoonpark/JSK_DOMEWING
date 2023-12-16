@@ -39,6 +39,7 @@ class ExcelwingController extends Controller
         $categoryCode = $request->categoryCode;
         $formProductController = new FormProductController();
         $response = $formProductController->$vendorEngName($products, $marginRate, $categoryCode);
+        return $response;
     }
     protected function getProducts($productIDs)
     {

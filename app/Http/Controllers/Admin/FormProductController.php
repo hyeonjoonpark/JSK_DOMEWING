@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class FormProductController extends Controller
 {
@@ -462,91 +463,45 @@ class FormProductController extends Controller
     public function ownerclan($products, $margin_rate, $categoryCode)
     {
         try {
+            $startRowIndex = 4;
+            $shippingCost = 3500;
+            $detailedDescription = str_repeat("상품 상세설명 참조\n", 6) . str_repeat("상품 상세정보에 별도 표기\n", 4);
+
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/ownerclan.xlsx'));
             $sheet = $spreadsheet->getSheet(0);
+
             // 데이터 추가
-            $rowIndex = 4;
+            $rowIndex = $startRowIndex;
             foreach ($products as $product) {
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
                 $data = [
-                    '',
-                    $categoryCode,
-                    '',
-                    '',
-                    '',
-                    $product->productName,
-                    $product->productName,
-                    $product->productKeywords,
-                    '기타',
-                    "LADAM",
-                    '',
-                    $marginedPrice,
-                    '자율',
-                    '',
-                    '과세',
-                    '',
-                    '',
-                    '',
-                    "N," . $product->productCode,
-                    $product->productImage,
-                    '',
-                    $product->productDetail,
-                    '가능',
-                    '선불',
-                    3500,
-                    3500,
-                    '',
-                    '',
-                    '',
-                    1,
-                    0,
-                    '',
-                    35,
-                    '상품 상세설명 참조
-                    상품 상세설명 참조
-                    상품 상세설명 참조
-                    상품 상세설명 참조
-                    상품 상세설명 참조
-                    상품 상세설명 참조
-                    상품 상세정보에 별도 표기
-                    상품 상세정보에 별도 표기
-                    상품 상세정보에 별도 표기
-                    상품 상세정보에 별도 표기',
-                    0,
-                    '',
-                    '',
-                    '',
-                    '',
-                    ''
+                    '', $categoryCode, '', '', '', $product->productName, $product->productName,
+                    $product->productKeywords, '기타', "LADAM", '', $marginedPrice, '자율', '',
+                    '과세', '', '', '', "N," . $product->productCode, $product->productImage, '',
+                    $product->productDetail, '가능', '선불', $shippingCost, $shippingCost, '', '', '', 1, 0, '',
+                    35, $detailedDescription, 0, '', '', '', '', ''
                 ];
-                // 엑셀에 데이터 추가
+
                 $colIndex = 1;
                 foreach ($data as $value) {
-                    $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex, $value);
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
                     $colIndex++;
                 }
                 $rowIndex++;
             }
+
             // 엑셀 파일 저장
-            $username = DB::table('users')
-                ->join('accounts', 'accounts.user_id', '=', 'users.id')
-                ->where('vendor_id', 5)
-                ->value('accounts.username');
             $fileName = 'ownerclan_' . now()->format('YmdHis') . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
-            // 응답 데이터 반환
-            return [
-                'status' => true,
-                'return' => $formedExcelFile,
-            ];
+            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+
+            return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
-            return [
-                'status' => false,
-                'return' => $e->getMessage(),
-            ];
+            return ['status' => false, 'return' => $e->getMessage()];
         }
     }
 }
