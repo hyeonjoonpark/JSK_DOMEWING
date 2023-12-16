@@ -459,7 +459,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function ownerclan($products, $margin_rate)
+    public function ownerclan($products, $margin_rate, $categoryCode, $username)
     {
         try {
             // 엑셀 파일 로드
@@ -468,36 +468,34 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
-                $product_price = ceil($product->productPrice * $margin_rate);
-                $categoryId = $product->categoryId;
-                $ownerclanCategoryCode = DB::table('category')->where('id', $categoryId)->select('code')->first()->code;
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
                 $data = [
                     '',
-                    $ownerclanCategoryCode,
+                    $categoryCode,
                     '',
                     '',
                     '',
-                    $product->newProductName,
-                    $product->newProductName,
-                    $product->keywords,
+                    $product->productName,
+                    $product->productName,
+                    $product->productKeywords,
                     '기타',
-                    $product->productVendor,
+                    "LADAM",
                     '',
-                    $product_price,
+                    $marginedPrice,
                     '자율',
                     '',
                     '과세',
                     '',
                     '',
                     '',
-                    'N,LADAM,' . $product->id,
-                    $product->newImageHref,
+                    "N," . $product->productCode,
+                    $product->productImage,
                     '',
-                    $product->newProductDetail,
+                    $product->productDetail,
                     '가능',
                     '선불',
-                    $product->shippingCost,
-                    $product->shippingCost,
+                    3500,
+                    3500,
                     '',
                     '',
                     '',
@@ -541,12 +539,12 @@ class FormProductController extends Controller
             $writer->save($formedExcelFile);
             // 응답 데이터 반환
             return [
-                'status' => 1,
-                'return' => $fileName,
+                'status' => true,
+                'return' => $formedExcelFile,
             ];
         } catch (Exception $e) {
             return [
-                'status' => -1,
+                'status' => false,
                 'return' => $e->getMessage(),
             ];
         }

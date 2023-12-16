@@ -60,23 +60,16 @@
                             수집하기</button>
                     </div>
                     <div id="collectResult" class="mt-5">
-                        <table id="productTable" class="nowrap table">
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th class="nk-tb-col nk-tb-col-check">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext">
-                                            <input type="checkbox" class="custom-control-input"
-                                                id="selectAll"onclick='selectAll(this)'>
-                                            <label class="custom-control-label" for="selectAll"></label>
-                                        </div>
-                                    </th>
-                                    <th>이미지</th>
-                                    <th>상품명</th>
-                                    <th>가격</th>
-                                    <th>플랫폼</th>
+                                    <th scope="col"><input type="checkbox" onclick="selectAll(this);"></th>
+                                    <th scope="col">상품 대표 이미지</th>
+                                    <th scope="col">상품명</th>
+                                    <th scope="col">가격</th>
                                 </tr>
                             </thead>
-                            <tbody id="productList">
+                            <tbody id="minewingResult">
                             </tbody>
                         </table>
                     </div>
@@ -241,33 +234,11 @@
                 }
             });
         }
-
-        function popupLoader(index, text) {
-            const loaders = ["{{ asset('assets/images/loading.gif') }}",
-                "{{ asset('assets/images/search-loader.gif') }}"
-            ];
-            $('.btn').prop('disabled', true);
-            let html = '<img src="' + loaders[index] + '" class="w-75" />'
-            html += '<h2 class="swal2-title mt-5">' + text + '</h2>'
-            Swal.fire({
-                html: html,
-                allowOutsideClick: false,
-                showConfirmButton: false
-            });
-        }
-
-        function closePopup() {
-            Swal.close();
-            $('.modal').modal('hide');
-            $('.btn').prop('disabled', false);
-        }
-
-        function selectAll(selectAll) {
-            const checkboxes = document.querySelectorAll('input[name="selectedProducts"]');
-            checkboxes.forEach((checkbox) => {
-                checkbox.checked = selectAll.checked
-            });
-        }
+        // 전체 선택/해제 체크박스 이벤트 리스너
+        $(document).on('click', '#selectAll', function() {
+            const isChecked = $(this).is(':checked');
+            $('input[name="selectedProducts"]').prop('checked', isChecked);
+        });
 
         function initProcess() {
             const products = [];
@@ -420,39 +391,22 @@
         }
 
         function updateDataTable(products) {
-            const dataTable = $('#productTable').DataTable();
-            dataTable.clear(); // 기존 데이터를 청소합니다
-
-            let rowsToAdd = [];
+            $('#minewingResult').html("");
+            let html = "";
             for (let i = 0; i < products.length; i++) {
                 const name = products[i].name;
                 const price = products[i].price;
-                const platform = products[i].platform;
                 const image = products[i].image;
                 const href = products[i].href;
-
-                const checkbox = `
-            <div class="custom-control custom-control-sm custom-checkbox notext">
-                <input type="checkbox" class="custom-control-input" value="${i}" name="selectedProducts" id="uid${i}">
-                <label class="custom-control-label" for="uid${i}"></label>
-            </div>`;
-
-                const imageHtml = `
-            <a id="productHref${i}" href="${href}" target="_blank">
-                <img src="${image}" alt="Product" style="width:120px; height:120px;" id="productImage${i}">
-            </a>`;
-
-                const nameHtml = `
-            <a href="${href}" target="_blank" title="${name}" id="productName${i}">
-                ${name}
-            </a>`;
-
-                rowsToAdd.push([checkbox, imageHtml, nameHtml, price, platform]);
+                html += "<tr>";
+                html += "<td><input type='checkbox' name='selectedProducts' value='" + i + "'></td>";
+                html += "<td><a href='" + href + "' target='_blank' id='productHref" + i + "'><img src='" + image +
+                    "' alt='상품 이미지' width='100' height='100'></a></td>";
+                html += "<td><a href='" + href + "' target='_blank'>" + name + "</a></td>";
+                html += "<td><a href='" + href + "' target='_blank'>" + numberFormat(price, 0) + "원</a></td>";
+                html += "</tr>";
             }
-
-            dataTable.rows.add(rowsToAdd).draw(); // 추가된 모든 행을 한 번에 그립니다
-            dataTable.page.len(100).draw(); // 페이지당 행 수를 100으로 설정
-            dataTable.columns.adjust(); // 컬럼 너비 조정
+            $('#minewingResult').html(html);
         }
 
         function initSave() {

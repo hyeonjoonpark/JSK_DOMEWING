@@ -10,11 +10,38 @@
 @section('content')
     <div class="row g-gs">
         <div class="col">
+            <div class="card card-bordered mb-3">
+                <div class="card-inner">
+                    <h5 class="card-title">자동 엑셀 폼</h5>
+                    <h6 class="card-subtitle mb-2">B2B 업체 및 등록을 위해 상품셋을 선택하신 후, 자동 엑셀 폼을 생성하기 위해 '엑셀 추출하기' 버튼을 클릭해 주세요.</h6>
+                    <div class="form-group">
+                        <label for="" class="form-label">B2B 업체</label>
+                        <div class="row">
+                            @foreach ($b2Bs as $b2B)
+                                <div class="col-3 mb-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" id="seller{{ $b2B->id }}" name="sellers"
+                                                value="{{ $b2B->id }}" class="custom-control-input"
+                                                {{ $loop->first ? 'checked' : '' }}>
+                                            <label class="custom-control-label"
+                                                for="seller{{ $b2B->id }}">{{ $b2B->name }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-warning" onclick="initExcelwing();">엑셀 추출하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <p>총 <b class="font-weight-bold">{{ number_format(count($products), 0) }}</b>개의 상품이 준비됐습니다.</p>
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col"><input type="checkbox"></th>
+                        <th scope="col"><input type="checkbox" onclick="selectAll(this);"></th>
                         <th scope="col">상품 대표 이미지</th>
                         <th scope="col">상품명</th>
                         <th scope="col">가격</th>
@@ -23,7 +50,7 @@
                 <tbody>
                     @foreach ($products as $product)
                         <tr>
-                            <td><input type="checkbox"></td>
+                            <td><input type="checkbox" name="selectedProducts" value="{{ $product->id }}"></td>
                             <td><a href="{{ $product->productHref }}" target="_blank"><img
                                         src="{{ $product->productImage }}" alt="상품 대표 이미지" width="100"
                                         height="100"></a>
@@ -73,13 +100,45 @@
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
         $(document).ready(function() {
-            @if (!isset($_GET['categoryID']))
+            @if (!$selectedCategory)
                 $('#selectCategory').modal('show');
             @endif
         });
 
         function selectCategory(categoryID) {
             window.location.replace("?categoryID=" + categoryID);
+        }
+
+        function initExcelwing() {
+            // 'selectedProducts'라는 이름을 가진 체크된 모든 체크박스를 가져옵니다.
+            const selectedProducts = document.querySelectorAll('input[name="selectedProducts"]:checked');
+            // 선택된 상품의 ID를 배열로 추출합니다.
+            const productIDs = Array.from(selectedProducts).map(product => product.value);
+            const vendorID = $("input[name='sellers']:checked").val();
+            requestExcelwing(productIDs, vendorID);
+        }
+
+        function requestExcelwing(productIDs, vendorID) {
+            popupLoader(1, "선택하신 상품셋을 B2B 업체를 위한 대량 등록 양식에 맞추어 엑셀 파일로 작성 중입니다.");
+            $.ajax({
+                url: "/api/product/excelwing",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    remember_token: "{{ Auth::user()->remember_token }}",
+                    productIDs: productIDs,
+                    vendorID: vendorID,
+                    categoryID: categoryID
+                },
+                success: function(response) {
+                    closePopup();
+                    console.log(response);
+                },
+                error: function(response) {
+                    closePopup();
+                    console.log(response);
+                }
+            });
         }
     </script>
 @endsection

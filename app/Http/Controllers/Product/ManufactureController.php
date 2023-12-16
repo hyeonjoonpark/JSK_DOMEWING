@@ -19,7 +19,12 @@ class ManufactureController extends Controller
         $nameController = new NameController();
         $productImageController = new ProductImageController();
         $newProducts = [];
-        foreach ($products as $product) {
+        $failed = [];
+        foreach ($products as $index => $product) {
+            if (!isset($product['hasOption'])) {
+                $failed[] = $index + 1;
+                continue;
+            }
             $hasOption = $product['hasOption'];
             $byte = 50;
             if ($hasOption == true && isset($product['productOptions'])) {

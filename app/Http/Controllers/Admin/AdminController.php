@@ -147,17 +147,33 @@ class AdminController extends Controller
             ->groupBy('mp.categoryID', 'oc.id', 'oc.name')
             ->select('oc.id', 'oc.name')
             ->get();
+
         $products = [];
-        if (isset($_GET['categoryID'])) {
-            $categoryID = $_GET['categoryID'];
+        $selectedCategory = null; // 초기화
+        $categoryID = $request->get('categoryID'); // Laravel Request 객체 사용
+
+        if ($categoryID) {
             $products = DB::table('minewing_products')
                 ->where('isActive', 'Y')
                 ->where('categoryID', $categoryID)
                 ->get();
+            $selectedCategory = DB::table("ownerclan_category")
+                ->where("id", $categoryID)
+                ->first();
         }
+
+        $b2Bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'pr.vendor_id', '=', 'v.id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('pr.is_active', 'Y')
+            ->select('v.id', 'v.name')
+            ->get();
+
         return view('admin/excelwing', [
             'ownerclanCategories' => $ownerclanCategories,
-            'products' => $products
+            'products' => $products,
+            'b2Bs' => $b2Bs,
+            'selectedCategory' => $selectedCategory
         ]);
     }
 }
