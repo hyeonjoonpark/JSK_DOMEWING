@@ -533,7 +533,7 @@ class FormProductController extends Controller
                 ->join('accounts', 'accounts.user_id', '=', 'users.id')
                 ->where('vendor_id', 5)
                 ->value('accounts.username');
-            $fileName = 'ownerclan_' . $username . '_' . now()->format('YmdHis') . '.xlsx';
+            $fileName = 'ownerclan_' . now()->format('YmdHis') . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
