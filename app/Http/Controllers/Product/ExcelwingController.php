@@ -18,7 +18,6 @@ class ExcelwingController extends Controller
         }
         $user = $response['return'];
         $userID = $user->id;
-        $username = $user->username;
         $productIDs = $request->productIDs;
         $vendorID = $request->vendorID;
         $response = $this->getVendor($vendorID);
@@ -39,7 +38,7 @@ class ExcelwingController extends Controller
         $products = $response['return'];
         $categoryCode = $request->categoryCode;
         $formProductController = new FormProductController();
-        $response = $formProductController->$vendorEngName($products, $marginRate, $categoryCode, $username);
+        $response = $formProductController->$vendorEngName($products, $marginRate, $categoryCode);
     }
     protected function getProducts($productIDs)
     {

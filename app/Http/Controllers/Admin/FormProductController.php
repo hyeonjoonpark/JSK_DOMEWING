@@ -459,7 +459,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function ownerclan($products, $margin_rate, $categoryCode, $username)
+    public function ownerclan($products, $margin_rate, $categoryCode)
     {
         try {
             // 엑셀 파일 로드
