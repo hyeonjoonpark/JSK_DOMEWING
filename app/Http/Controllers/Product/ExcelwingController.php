@@ -16,7 +16,9 @@ class ExcelwingController extends Controller
         if (!$response['status']) {
             return $response;
         }
-        $userID = $response['return'];
+        $user = $response['return'];
+        $userID = $user->id;
+        $username = $user->username;
         $productIDs = $request->productIDs;
         $vendorID = $request->vendorID;
         $response = $this->getVendor($vendorID);
@@ -37,7 +39,7 @@ class ExcelwingController extends Controller
         $products = $response['return'];
         $categoryCode = $request->categoryCode;
         $formProductController = new FormProductController();
-        $response = $formProductController->$vendorEngName($products, $marginRate, $categoryCode);
+        $response = $formProductController->$vendorEngName($products, $marginRate, $categoryCode, $username);
     }
     protected function getProducts($productIDs)
     {
@@ -83,11 +85,10 @@ class ExcelwingController extends Controller
             ->select("id")
             ->first();
         if ($user) {
-            $userID = $user->id;
             // userID가 검출되었을 때의 처리
             return [
                 'status' => true,
-                'return' => $userID
+                'return' => $user
             ];
         } else {
             // userID가 검출되지 않았을 때의 처리 (예: false 반환)
