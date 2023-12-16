@@ -12,7 +12,7 @@ class ExcelwingController extends Controller
     public function index(Request $request)
     {
         $remember_token = $request->remember_token;
-        $response = $this->getUserID($remember_token);
+        $response = $this->getUser($remember_token);
         if (!$response['status']) {
             return $response;
         }
@@ -78,11 +78,10 @@ class ExcelwingController extends Controller
             ];
         }
     }
-    protected function getUserID($remember_token)
+    protected function getUser($remember_token)
     {
         $user = DB::table("users")
             ->where("remember_token", $remember_token)
-            ->select("id")
             ->first();
         if ($user) {
             // userID가 검출되었을 때의 처리
