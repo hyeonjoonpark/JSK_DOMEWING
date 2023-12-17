@@ -169,20 +169,24 @@ class ProductImageController extends Controller
     public function hostImages($imageUrls)
     {
         $hostedImages = array_map(fn ($url) => $this->saveImageAndGetNewUrl($url), $imageUrls);
-        return $hostedImages;
+        // 에러가 발생한 이미지를 필터링하여 제거
+        return array_filter($hostedImages, fn ($url) => $url !== null);
     }
-
     // 이미지를 서버에 저장하고 새로운 호스팅 URL 반환
     private function saveImageAndGetNewUrl($url)
     {
-        $imageData = file_get_contents($url);
-        $extension = $this->getFileExtension($url);
-        $imageName = uniqid() . '.' . $extension;
-        $savePath = public_path('images/CDN/detail/' . $imageName);
-        file_put_contents($savePath, $imageData);
-        return 'https://www.sellwing.kr/images/CDN/detail/' . $imageName;
+        try {
+            $imageData = file_get_contents($url);
+            $extension = $this->getFileExtension($url);
+            $imageName = uniqid() . '.' . $extension;
+            $savePath = public_path('images/CDN/detail/' . $imageName);
+            file_put_contents($savePath, $imageData);
+            return 'https://www.sellwing.kr/images/CDN/detail/' . $imageName;
+        } catch (\Exception $e) {
+            // 예외 발생시 null 반환
+            return null;
+        }
     }
-
     // 파일 확장자 추출
     private function getFileExtension($url)
     {

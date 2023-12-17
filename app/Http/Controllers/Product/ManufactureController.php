@@ -41,7 +41,7 @@ class ManufactureController extends Controller
                 $type = 'A';
                 foreach ($productOptions as $productOption) {
                     $newProductName = $productName . ' TYPE ' . $type;
-                    $newProductDetail = '<h1>옵션명 : ' . $productOption['optionName'] . '</h1>' . $productDetail;
+                    $newProductDetail = '<h1 style="color:red; font-weight:bold; font-size:2rem;">옵션명 : ' . $productOption['optionName'] . '</h1>' . $productDetail;
                     $productPrice = (int)$productOption['optionPrice'];
                     $newProducts[] = [
                         'productName' => $newProductName,
