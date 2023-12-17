@@ -479,7 +479,7 @@ class FormProductController extends Controller
                     '', $categoryCode, '', '', '', $product->productName, $product->productName,
                     $product->productKeywords, '기타', "LADAM", '', $marginedPrice, '자율', '',
                     '과세', '', '', '', "N," . $product->productCode, $product->productImage, '',
-                    $product->productDetail, '가능', '선불', $shippingCost, $shippingCost, '', '', '', 1, 0, '',
+                    $product->productDetail, '가능', '선불', $shippingCost, $shippingCost, '', '', 14733, 1, 0, '',
                     35, $detailedDescription, 0, '', '', '', '', ''
                 ];
 
