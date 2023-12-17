@@ -176,4 +176,8 @@ class AdminController extends Controller
             'selectedCategory' => $selectedCategory
         ]);
     }
+    public function mappingwing(Request $request)
+    {
+        return view('admin/mappingwing');
+    }
 }

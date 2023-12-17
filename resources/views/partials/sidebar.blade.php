@@ -27,12 +27,6 @@
                                 <span class="nk-menu-text">대시보드</span>
                             </a>
                         </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/product/mining" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
-                                <span class="nk-menu-text">상품 데이터 마인윙</span>
-                            </a>
-                        </li>
                         <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-cloud-arrow-up"></em></span>
@@ -50,10 +44,22 @@
                                 </li> --}}
                                 <li class="nk-menu-item">
                                     <a href="/admin/product/uploaded" class="nk-menu-link"><span
-                                            class="nk-menu-text">업로드된 상품 데이터</span></a>
+                                            class="nk-menu-text">레거시 데이터</span></a>
                                 </li>
                             </ul><!-- .nk-menu-sub -->
                         </li><!-- .nk-menu-item -->
+                        <li class="nk-menu-item">
+                            <a href="/admin/product/mining" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
+                                <span class="nk-menu-text">마인윙</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
+                            <a href="/admin/product/mappingwing" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-circle-nodes"></em></span>
+                                <span class="nk-menu-text">매핑윙</span>
+                            </a>
+                        </li>
                         <li class="nk-menu-item">
                             <a href="/admin/product/excelwing" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-file-excel"></em></span>

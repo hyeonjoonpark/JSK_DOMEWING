@@ -195,7 +195,7 @@ class ProductImageController extends Controller
     {
         $html = '<center><img src="https://www.sellwing.kr/images/CDN/ladam_header.jpg">';
         foreach ($images as $img) {
-            $html .= '<img src="' . $img . '" alt="">';
+            $html .= '<br><img src="' . $img . '" alt="">';
         }
         $html .= '</center>';
         return $html;
