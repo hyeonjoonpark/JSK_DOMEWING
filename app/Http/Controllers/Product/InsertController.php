@@ -77,6 +77,13 @@ class InsertController extends Controller
                         'productHref' => $productdHref,
                         'hasOption' => $hasOption
                     ]);
+                $response = $this->insertMappingwing($categoryID);
+                if (!$response) {
+                    return [
+                        'status' => true,
+                        'return' => '"매핑윙 연동에 실패했습니다."'
+                    ];
+                }
             }
             return [
                 'status' => true,
@@ -87,6 +94,23 @@ class InsertController extends Controller
                 'status' => false,
                 'return' => '"상품셋 저장에 실패했습니다. 기술자에게 문의해주세요.<br>"' . $e->getMessage()
             ];
+        }
+    }
+    protected function insertMappingwing($ownerclanCategoryID)
+    {
+        try {
+            $isExist = DB::table('category_mapping')
+                ->where('ownerclan', $ownerclanCategoryID)
+                ->exists();
+            if (!$isExist) {
+                DB::table('category_mapping')
+                    ->insert([
+                        'ownerclan' => $ownerclanCategoryID
+                    ]);
+            }
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
         }
     }
     protected function generateRandomProductCode($length)

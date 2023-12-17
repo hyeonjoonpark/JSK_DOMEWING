@@ -178,6 +178,7 @@ class AdminController extends Controller
     }
     public function mappingwing(Request $request)
     {
+
         return view('admin/mappingwing');
     }
 }

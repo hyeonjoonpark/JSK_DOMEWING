@@ -12,7 +12,7 @@
         <div class="col">
             <div class="card card-bordered">
                 <div class="card-inner">
-                    Hello World!
+
                 </div>
             </div>
         </div>
