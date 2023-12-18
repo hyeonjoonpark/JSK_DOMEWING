@@ -7,8 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Schema;
 
 //vingkong - use this to format date
 use Carbon\Carbon;
@@ -178,7 +177,18 @@ class AdminController extends Controller
     }
     public function mappingwing(Request $request)
     {
-
-        return view('admin/mappingwing');
+        $categoryMapping = DB::table('category_mapping AS cm')
+            ->join('ownerclan_category AS oc', 'cm.ownerclan', '=', 'oc.id')
+            ->select('oc.id', 'oc.name')
+            ->get();
+        $b2Bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('pr.is_active', 'Y')
+            ->where('pr.vendor_id', '!=', 5)
+            ->get();
+        return view('admin/mappingwing', [
+            'categoryMapping' => $categoryMapping,
+            'b2Bs' => $b2Bs
+        ]);
     }
 }
