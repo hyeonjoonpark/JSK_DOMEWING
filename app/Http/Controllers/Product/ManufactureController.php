@@ -79,34 +79,28 @@ class ManufactureController extends Controller
             'return' => $newProducts
         ];
     }
-    public function groupDuplicateProductIndices($products)
+    public function findDuplicateProductName($products)
     {
         set_time_limit(0);
         $names = [];
+
         foreach ($products as $index => $product) {
             $name = $product['productName'];
-            $isDuplicated = $this->validateProductNameFromDB($name);
-            if ($isDuplicated['status']) {
-                $dupNameIndex[$name][] = $index;
+
+            // DB 검증 또는 배열 내 중복 검사
+            if ($this->validateProductNameFromDB($name)['status'] || in_array($name, $names)) {
                 return [
                     'status' => true,
                     'productName' => $name,
                     'index' => $index
                 ];
             }
-            if (in_array($name, $names)) {
-                $dupNameIndex[$name][] = $index;
-                return [
-                    'status' => true,
-                    'productName' => $name,
-                    'index' => $index
-                ];
-            }
+
             $names[] = $name;
         }
-        return [
-            'status' => false
-        ];
+
+        // 중복된 제품 이름이 없음
+        return ['status' => false];
     }
     protected function validateProductNameFromDB($productName)
     {
