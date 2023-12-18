@@ -12,16 +12,19 @@ class FilterDuplicatesController extends Controller
     {
         set_time_limit(0);
         $productHrefs = $request->productHrefs;
-        $duplicates = $this->getDuplicateHrefs($productHrefs);
+        $uniqueProductHrefs = array_unique($productHrefs);
+        $numDuplicates = count($productHrefs) - count($uniqueProductHrefs);
+        $duplicates = $this->getDuplicateHrefs($uniqueProductHrefs);
 
         // 중복 항목 제거
-        $uniqueProductHrefs = array_diff($productHrefs, $duplicates);
+        $finalProductHrefs = array_diff($uniqueProductHrefs, $duplicates);
+        $numDuplicates = $numDuplicates + (count($uniqueProductHrefs) - count($duplicates));
 
         return [
             'status' => true,
             'return' => [
-                'message' => '"총 ' . count($duplicates) . '개의 중복 상품들을 제외했어요.<br>상품 정보들을 수집해올게요."',
-                'uniqueProductHrefs' => $uniqueProductHrefs
+                'message' => '"총 ' . $numDuplicates . '개의 중복 상품들을 제외했어요.<br>상품 정보들을 수집해올게요."',
+                'uniqueProductHrefs' => $finalProductHrefs
             ]
         ];
     }
