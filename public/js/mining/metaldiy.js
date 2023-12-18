@@ -7,7 +7,7 @@ async function extractProductsOnPage(page) {
         for (const productElement of productElements) {
             const nameText = productElement.querySelector('ul > li.goods_md > a').textContent;
             const name = nameText;
-            if (name.includes(['품절', '쿠폰', '배송비'])) {
+            if (name.includes('품절') || name.includes('쿠폰') || name.includes('배송비')) {
                 continue;
             }
             const priceText = productElement.querySelector('ul > li.goods_bm > span.price > strong').textContent;
