@@ -79,7 +79,7 @@ class ManufactureController extends Controller
             'return' => $newProducts
         ];
     }
-    public function findDuplicateProductName($products)
+    public function groupDuplicateProductIndices($products)
     {
         set_time_limit(0);
         $names = [];
