@@ -177,18 +177,21 @@ class AdminController extends Controller
     }
     public function mappingwing(Request $request)
     {
-        $categoryMapping = DB::table('category_mapping AS cm')
-            ->join('ownerclan_category AS oc', 'cm.ownerclan', '=', 'oc.id')
-            ->select('oc.id', 'oc.name')
-            ->get();
         $b2Bs = DB::table('product_register AS pr')
-            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->join('vendors AS v', 'pr.vendor_id', '=', 'v.id')
             ->where('pr.is_active', 'Y')
-            ->where('pr.vendor_id', '!=', 5)
+            ->where('v.is_active', 'ACTIVE')
+            ->select('name_eng')
             ->get();
+        $categoryMapping = DB::table('category_mapping AS cm');
+        foreach ($b2Bs as $b2B) {
+            $engName = $b2B->name_eng;
+            $categoryMapping = $categoryMapping
+                ->join($engName . '_category', $engName . '_category.id', '=', 'cm.' . $engName);
+        }
         return view('admin/mappingwing', [
-            'categoryMapping' => $categoryMapping,
-            'b2Bs' => $b2Bs
+            'b2Bs' => $b2Bs,
+            'categoryMapping' => $categoryMapping
         ]);
     }
 }

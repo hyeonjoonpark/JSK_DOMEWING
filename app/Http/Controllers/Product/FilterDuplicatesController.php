@@ -13,12 +13,12 @@ class FilterDuplicatesController extends Controller
         set_time_limit(0);
         $productHrefs = $request->productHrefs;
         $uniqueProductHrefs = array_unique($productHrefs);
-        $numDuplicates = count($productHrefs) - count($uniqueProductHrefs);
+        $numDuplicates = (int)(count($productHrefs) - count($uniqueProductHrefs));
         $duplicates = $this->getDuplicateHrefs($uniqueProductHrefs);
 
         // 중복 항목 제거
         $finalProductHrefs = array_diff($uniqueProductHrefs, $duplicates);
-        $numDuplicates = $numDuplicates + (count($uniqueProductHrefs) - count($duplicates));
+        $numDuplicates = $numDuplicates + (int)(count($uniqueProductHrefs) - count($duplicates));
 
         return [
             'status' => true,
