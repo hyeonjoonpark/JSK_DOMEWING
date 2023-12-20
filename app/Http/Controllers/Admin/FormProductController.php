@@ -128,9 +128,9 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'domeggook_' . now()->format('YmdHis') . '.xlsx';
+            $fileName = 'domeggook_' . now()->format('YmdHis') . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
-            $writer = new Xlsx($spreadsheet);
+            $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
             return ['status' => true, 'return' => $downloadURL];
@@ -260,7 +260,7 @@ class FormProductController extends Controller
                     0,
                     '',
                     0,
-                    $product->keywords,
+                    $product->productKeywords,
                     $marginedPrice,
                     '',
                     0,
