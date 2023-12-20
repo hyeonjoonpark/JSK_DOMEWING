@@ -54,12 +54,22 @@
                                 <span class="nk-menu-text">마인윙</span>
                             </a>
                         </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/product/mappingwing" class="nk-menu-link">
+                        <li class="nk-menu-item has-sub">
+                            <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-circle-nodes"></em></span>
                                 <span class="nk-menu-text">매핑윙</span>
                             </a>
-                        </li>
+                            <ul class="nk-menu-sub">
+                                <li class="nk-menu-item">
+                                    <a href="/admin/mappingwing/unmapped" class="nk-menu-link"><span
+                                            class="nk-menu-text">매핑윙 업데이트</span></a>
+                                </li>
+                                <li class="nk-menu-item">
+                                    <a href="/admin/mappingwing/mapped" class="nk-menu-link"><span
+                                            class="nk-menu-text">매핑윙 관리</span></a>
+                                </li>
+                            </ul><!-- .nk-menu-sub -->
+                        </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item">
                             <a href="/admin/product/excelwing" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-file-excel"></em></span>

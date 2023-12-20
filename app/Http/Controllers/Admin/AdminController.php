@@ -175,23 +175,25 @@ class AdminController extends Controller
             'selectedCategory' => $selectedCategory
         ]);
     }
-    public function mappingwing(Request $request)
+    public function unmapped()
     {
         $b2Bs = DB::table('product_register AS pr')
             ->join('vendors AS v', 'pr.vendor_id', '=', 'v.id')
             ->where('pr.is_active', 'Y')
             ->where('v.is_active', 'ACTIVE')
-            ->select('name_eng')
             ->get();
-        $categoryMapping = DB::table('category_mapping AS cm');
-        foreach ($b2Bs as $b2B) {
-            $engName = $b2B->name_eng;
-            $categoryMapping = $categoryMapping
-                ->join($engName . '_category', $engName . '_category.id', '=', 'cm.' . $engName);
+        $unmappedCategories = DB::table('category_mapping')
+            ->join('ownerclan_category', 'category_mapping.ownerclan', '=', 'ownerclan_category.id')
+            ->where($b2Bs[0]->name_eng);
+        foreach ($b2Bs as $index => $b2B) {
+            if ($index != 0) {
+                $unmappedCategories = $unmappedCategories->orWhereNull($b2B->name_eng);
+            }
         }
+        $unmappedCategories = $unmappedCategories->get();
         return view('admin/mappingwing', [
             'b2Bs' => $b2Bs,
-            'categoryMapping' => $categoryMapping
+            'unmappedCategories' => $unmappedCategories
         ]);
     }
 }
