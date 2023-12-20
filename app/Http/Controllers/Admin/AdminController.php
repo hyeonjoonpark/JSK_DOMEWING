@@ -154,7 +154,7 @@ class AdminController extends Controller
         $response = $this->getUnmappedCategories();
         $unmappedCategories = $response['unmappedCategories'];
         if (count($unmappedCategories) > 0) {
-            return redirect('admin/mappingwing');
+            return redirect('admin/mappingwing/unmapped');
         }
         return view('admin/excelwing', [
             'b2Bs' => $b2Bs,
