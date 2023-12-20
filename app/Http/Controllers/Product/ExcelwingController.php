@@ -11,48 +11,35 @@ class ExcelwingController extends Controller
 {
     public function index(Request $request)
     {
-        $remember_token = $request->remember_token;
-        $response = $this->getUser($remember_token);
-        if (!$response['status']) {
-            return $response;
-        }
-        $user = $response['return'];
-        $userID = $user->id;
-        $productIDs = $request->productIDs;
-        $vendorID = $request->vendorID;
-        $response = $this->getVendor($vendorID);
-        if (!$response['status']) {
-            return $response;
-        }
-        $vendor = $response['return'];
-        $vendorEngName = $vendor->name_eng;
-        $response = $this->getMarginRate($vendorID);
-        if (!$response['status']) {
-            return $response;
-        }
-        $marginRate = $response['return'];
-        $response = $this->getProducts($productIDs);
+        set_time_limit(0);
+        $b2BID = $request->b2BID;
+        $sellerIDs = $request->sellerIDs;
+        $response = $this->getProducts($sellerIDs);
         if (!$response['status']) {
             return $response;
         }
         $products = $response['return'];
-        $categoryCode = $request->categoryCode;
+        $response = $this->getMarginRate($b2BID);
+        if (!$response['status']) {
+            return $response;
+        }
+        $marginRate = $response['return'];
+        $response = $this->getVendor($b2BID);
+        if (!$response['status']) {
+            return $response;
+        }
+        $b2B = $response['return'];
+        $vendorEngName = $b2B->name_eng;
         $formProductController = new FormProductController();
-        $response = $formProductController->$vendorEngName($products, $marginRate, $categoryCode);
+        $response = $formProductController->$vendorEngName($products, $marginRate, $vendorEngName);
         return $response;
     }
-    protected function getProducts($productIDs)
+    protected function getProducts($sellerIDs)
     {
         $products = DB::table("minewing_products")
             ->where("isActive", "Y")
-            ->whereIn("id", $productIDs)
+            ->whereIn("sellerID", $sellerIDs)
             ->get();
-        if ($products->isEmpty()) {
-            return [
-                'status' => false,
-                'return' => "해당 상품셋을 찾을 수 없습니다. 다른 상품셋을 선택하여 다시 시도해 주십시오."
-            ];
-        }
         return [
             "status" => true,
             "return" => $products

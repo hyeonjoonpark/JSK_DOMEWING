@@ -44,7 +44,7 @@ class FormProductController extends Controller
         }
         return $data;
     }
-    public function domeggook($products, $margin_rate)
+    public function domeggook($products, $margin_rate, $vendorEngName)
     {
         try {
             // 엑셀 파일 로드
@@ -52,31 +52,31 @@ class FormProductController extends Controller
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
             $rowIndex = 2;
+            $shippingCost = 3500;
             $minAmount = 5000;
-            $categoryMappingController = new CategoryMappingController();
             foreach ($products as $product) {
-                $product_price = ceil($product->productPrice * $margin_rate);
-                $minQuantity = ceil($minAmount / $product->productPrice);
-                $categoryId = $product->categoryId;
-                $categoryCode = $categoryMappingController->domeggookCategoryCode($categoryId);
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $minQuantity = ceil($minAmount / $marginedPrice);
                 $data = [
                     '',
                     '도매꾹,도매매',
                     '직접판매',
                     'N',
-                    $product->newProductName,
-                    $product->keywords,
+                    $product->productName,
+                    $product->productKeywords,
                     $categoryCode,
                     '상세정보별도표기',
                     '',
-                    $product->productVendor,
+                    'LADAM',
                     'N',
                     'N',
-                    '1',
-                    '1',
-                    $product->id,
-                    $product->newImageHref,
-                    $product->newProductDetail,
+                    '',
+                    '',
+                    $product->productCode,
+                    $product->productImage,
+                    $product->productDetail,
                     '',
                     '',
                     '',
@@ -86,11 +86,11 @@ class FormProductController extends Controller
                     '전체상세정보별도표시',
                     '전체상세정보별도표시',
                     'N',
-                    $minQuantity . ':' . $product_price,
+                    $minQuantity . ':' . $marginedPrice,
                     '',
                     'N',
                     'N',
-                    '1:' . $product_price,
+                    '1:' . $marginedPrice,
                     '',
                     '',
                     'N',
@@ -108,12 +108,12 @@ class FormProductController extends Controller
                     '',
                     0,
                     '선결제:고정배송비',
-                    $product->shippingCost,
+                    $shippingCost,
                     '선결제:고정배송비',
-                    $product->shippingCost,
+                    $shippingCost,
                     '',
                     'SA0058243',
-                    $product->shippingCost,
+                    $shippingCost,
                     'N',
                     365,
                     'Y'
@@ -121,25 +121,19 @@ class FormProductController extends Controller
                 // 엑셀에 데이터 추가
                 $colIndex = 1;
                 foreach ($data as $value) {
-                    $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex, $value);
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
                     $colIndex++;
                 }
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $username = DB::table('users')
-                ->join('accounts', 'accounts.user_id', '=', 'users.id')
-                ->where('vendor_id', 5)
-                ->value('accounts.username');
-            $fileName = 'domeggook_' . $username . '_' . now()->format('YmdHis') . '.xls';
+            $fileName = 'domeggook_' . now()->format('YmdHis') . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
-            $writer = new Xls($spreadsheet);
+            $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
-            // 응답 데이터 반환
-            return [
-                'status' => 1,
-                'return' => $fileName,
-            ];
+            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
                 'status' => -1,
@@ -147,52 +141,50 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function domeatoz($products, $userId, $margin_rate)
+    public function domeatoz($products, $margin_rate, $vendorEngName)
     {
         try {
+            $shippingCost = 3500;
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/domeatoz.xlsx'));
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
             $rowIndex = 3;
-            $minAmount = 5000;
-            $categoryMappingController = new CategoryMappingController();
             foreach ($products as $product) {
-                $product_price = ceil($product->productPrice * $margin_rate);
-                $minQuantity = ceil($minAmount / $product->productPrice);
-                $categoryId = $product->categoryId;
-                $categoryCode = $categoryMappingController->domeatozCategoryCode($categoryId);
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
                 $data = [
                     $categoryCode,
                     '',
                     '',
-                    $product->newProductName,
+                    $product->productName,
                     '',
-                    $product->newProductName,
-                    $product->keywords,
+                    $product->productName,
+                    $product->productKeywords,
                     '',
-                    $product_price,
+                    $marginedPrice,
                     '',
                     0,
                     '배송비선불',
                     '',
-                    $product->shippingCost,
-                    $product->shippingCost,
-                    0,
-                    0,
-                    $product->productVendor,
+                    $shippingCost,
+                    $shippingCost,
+                    5000,
+                    5000,
+                    'LADAM',
                     '기타',
                     '',
-                    $product->newImageHref,
+                    $product->productImage,
                     768,
                     'Y',
-                    $product->newProductDetail,
+                    $product->productDetail,
                     '',
                     '',
                     0,
                     '',
                     '',
-                    $product->id,
+                    $product->productCode,
                     '',
                     35,
                     '상세정보별도표기',
@@ -221,25 +213,19 @@ class FormProductController extends Controller
                 // 엑셀에 데이터 추가
                 $colIndex = 1;
                 foreach ($data as $value) {
-                    $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex, $value);
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
                     $colIndex++;
                 }
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $username = DB::table('users')
-                ->join('accounts', 'accounts.user_id', '=', 'users.id')
-                ->where('vendor_id', 5)
-                ->value('accounts.username');
-            $fileName = 'domeatoz_' . $username . '_' . now()->format('YmdHis') . '.xlsx';
+            $fileName = 'domeatoz_' . now()->format('YmdHis') . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
-            // 응답 데이터 반환
-            return [
-                'status' => 1,
-                'return' => $fileName,
-            ];
+            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
                 'status' => -1,
@@ -247,39 +233,40 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function wholesaledepot($products, $userId, $margin_rate)
+    public function wholesaledepot($products, $margin_rate, $vendorEngName)
     {
         try {
+            $shippingCost = 3500;
+            $fixedShippingCost = 2500;
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/wholesaledepot.xls'));
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
             $rowIndex = 5;
             foreach ($products as $product) {
-                $product_price = ceil($product->productPrice * $margin_rate);
-                $categoryId = $product->categoryId;
-                $categoryMappingController = new CategoryMappingController();
-                $categoryCode = $categoryMappingController->wsConvertCategoryCode($categoryId);
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + (int)($shippingCost - $fixedShippingCost);
                 $data = [
-                    $product->newProductName,
-                    $product->newProductName,
+                    $product->productName,
+                    $product->productName,
                     $categoryCode,
                     '',
-                    $product->id,
+                    $product->productCode,
                     '기타',
-                    $product->productVendor,
-                    $product->productVendor,
+                    'LADAM',
+                    'LADAM',
                     1,
                     0,
                     '',
                     0,
                     $product->keywords,
-                    $product_price,
+                    $marginedPrice,
                     '',
                     0,
                     0,
-                    $product->newProductDetail,
-                    $product->newImageHref,
+                    $product->productDetail,
+                    $product->productImage,
                     '',
                     '',
                     '',
@@ -325,25 +312,19 @@ class FormProductController extends Controller
                 // 엑셀에 데이터 추가
                 $colIndex = 1;
                 foreach ($data as $value) {
-                    $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex, $value);
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
                     $colIndex++;
                 }
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $username = DB::table('users')
-                ->join('accounts', 'accounts.user_id', '=', 'users.id')
-                ->where('vendor_id', 5)
-                ->value('accounts.username');
-            $fileName = 'wholesaledepot_' . $username . '_' . now()->format('YmdHis') . '.xls';
+            $fileName = 'wholesaledepot_' . now()->format('YmdHis') . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
-            // 응답 데이터 반환
-            return [
-                'status' => 1,
-                'return' => $fileName,
-            ];
+            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
                 'status' => -1,
@@ -352,44 +333,42 @@ class FormProductController extends Controller
         }
     }
 
-    public function domesin($products, $userId, $margin_rate, $vendorID)
+    public function domesin($products, $margin_rate, $vendorEngName)
     {
         try {
+            $shippingCost = 3500;
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/domesin.xls'));
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
-                if ($vendorID === 6 && $product->sellerID === 3) {
-                    continue;
-                }
-                $product_price = ceil($product->productPrice * $margin_rate);
-                $categoryId = $product->categoryId;
-                $categoryCode = DB::table('category')->where('id', $categoryId)->select('domesinCode')->first()->domesinCode;
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
                 $data = [
                     '',
-                    $product->newProductName,
+                    $product->productName,
                     $categoryCode,
-                    $product->newProductName,
-                    $product->id,
+                    $product->productName,
+                    $product->productCode,
                     '기타',
-                    $product->productVendor,
+                    'LADAM',
                     '',
                     '',
                     0,
                     0,
                     '',
                     'N',
-                    $product->shippingCost,
-                    $product->shippingCost,
+                    $shippingCost,
+                    $shippingCost,
                     '1508',
-                    $product->keywords,
-                    $product_price,
+                    $product->productKeywords,
+                    $marginedPrice,
                     '',
                     '',
-                    $product->newProductDetail,
-                    $product->newImageHref,
+                    $product->productDetail,
+                    $product->productImage,
                     '',
                     '',
                     '',
@@ -416,43 +395,37 @@ class FormProductController extends Controller
                     '상품 상세설명 참조',
                     '상품 상세설명 참조',
                     '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
-                    '상품 상세설명 참조',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    ''
                 ];
                 // 엑셀에 데이터 추가
                 $colIndex = 1;
                 foreach ($data as $value) {
-                    $sheet->setCellValueByColumnAndRow($colIndex, $rowIndex, $value);
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
                     $colIndex++;
                 }
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $username = DB::table('users')
-                ->join('accounts', 'accounts.user_id', '=', 'users.id')
-                ->where('vendor_id', 6)
-                ->value('accounts.username');
-            $fileName = 'domesin_' . $username . '_' . now()->format('YmdHis') . '.xls';
+            $fileName = 'domesin_' . now()->format('YmdHis') . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
-            // 응답 데이터 반환
-            return [
-                'status' => 1,
-                'return' => $fileName,
-            ];
+            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
                 'status' => -1,
@@ -460,7 +433,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function ownerclan($products, $margin_rate, $categoryCode)
+    public function ownerclan($products, $margin_rate, $vendorEngName)
     {
         try {
             $startRowIndex = 4;
@@ -474,6 +447,8 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = $startRowIndex;
             foreach ($products as $product) {
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
                 $data = [
                     '', $categoryCode, '', '', '', $product->productName, $product->productName,
@@ -502,5 +477,16 @@ class FormProductController extends Controller
         } catch (Exception $e) {
             return ['status' => false, 'return' => $e->getMessage()];
         }
+    }
+    public function getCategoryCode($vendorEngName, $ownerclanCategoryID)
+    {
+        $tableName = $vendorEngName . '_category';
+        $categoryCode = DB::table('category_mapping AS cm')
+            ->join($tableName, $tableName . 'id', '=', 'cm.' . $vendorEngName)
+            ->where('cm.ownerclan', $ownerclanCategoryID)
+            ->select('code')
+            ->first()
+            ->code;
+        return $categoryCode;
     }
 }

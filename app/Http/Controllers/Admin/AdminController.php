@@ -141,38 +141,19 @@ class AdminController extends Controller
     }
     public function excelwing(Request $request)
     {
-        $ownerclanCategories = DB::table('minewing_products AS mp')
-            ->join('ownerclan_category AS oc', 'mp.categoryID', '=', 'oc.id')
-            ->groupBy('mp.categoryID', 'oc.id', 'oc.name')
-            ->select('oc.id', 'oc.name')
-            ->get();
-
-        $products = [];
-        $selectedCategory = null; // 초기화
-        $categoryID = $request->get('categoryID'); // Laravel Request 객체 사용
-
-        if ($categoryID) {
-            $products = DB::table('minewing_products')
-                ->where('isActive', 'Y')
-                ->where('categoryID', $categoryID)
-                ->get();
-            $selectedCategory = DB::table("ownerclan_category")
-                ->where("id", $categoryID)
-                ->first();
-        }
-
         $b2Bs = DB::table('product_register AS pr')
             ->join('vendors AS v', 'pr.vendor_id', '=', 'v.id')
             ->where('v.is_active', 'ACTIVE')
             ->where('pr.is_active', 'Y')
             ->select('v.id', 'v.name')
             ->get();
-
+        $sellers = DB::table('product_search AS ps')
+            ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
+            ->where('ps.is_active', 'Y')
+            ->get();
         return view('admin/excelwing', [
-            'ownerclanCategories' => $ownerclanCategories,
-            'products' => $products,
             'b2Bs' => $b2Bs,
-            'selectedCategory' => $selectedCategory
+            'sellers' => $sellers
         ]);
     }
     public function unmapped()
