@@ -95,6 +95,10 @@
                 },
                 error: function(response) {
                     closePopup();
+                    Swal.fire({
+                        icon: 'error',
+                        html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">예기치 못한 오류가 발생했습니다. 다시 시도해 주십시오.</h4>'
+                    });
                     console.log(response);
                 }
             });

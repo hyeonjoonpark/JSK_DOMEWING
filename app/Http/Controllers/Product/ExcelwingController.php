@@ -12,6 +12,7 @@ class ExcelwingController extends Controller
     public function index(Request $request)
     {
         set_time_limit(0);
+        ini_set('memory_limit', -1);
         $b2BID = $request->b2BID;
         $sellerIDs = $request->sellerIDs;
         $response = $this->getProducts($sellerIDs);
