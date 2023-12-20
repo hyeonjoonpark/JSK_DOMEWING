@@ -482,7 +482,7 @@ class FormProductController extends Controller
     {
         $tableName = $vendorEngName . '_category';
         $categoryCode = DB::table('category_mapping AS cm')
-            ->join($tableName, $tableName . 'id', '=', 'cm.' . $vendorEngName)
+            ->join($tableName, $tableName . '.id', '=', 'cm.' . $vendorEngName)
             ->where('cm.ownerclan', $ownerclanCategoryID)
             ->select('code')
             ->first()
