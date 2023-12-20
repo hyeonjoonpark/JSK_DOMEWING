@@ -52,7 +52,7 @@
                 success: function(response) {
                     closePopup();
                     if (response.status) {
-                        updateUnmappedB2B(response.return);
+                        updateUnmappedB2B(response.return, ownerclanCategoryID);
                     } else {
                         $('#selectCategoryResult').html("");
                         Swal.fire({
@@ -69,7 +69,7 @@
             });
         }
 
-        function updateUnmappedB2B(unmappedB2Bs) {
+        function updateUnmappedB2B(unmappedB2Bs, ownerclanCategoryID) {
             let html = '';
             const vendorIDs = [];
             for (b2B of unmappedB2Bs) {
@@ -79,17 +79,17 @@
                     <div class="form-group">
                         <label for="" class="form-label">${b2BName}</label>
                         <div class="d-flex text-nowrap">
-                            <input type="text" class="form-control" id="categoryID${b2BVendorId}" placeholder="검색 키워드를 기입해주세요." onkeydown="handleEnter(event, 'searchBtn${b2BVendorId}')">
-                            <button class="btn btn-primary" id="searchBtn${b2BVendorId}">검색</button>
+                            <input type="text" class="form-control" id="searchKeyword${b2BVendorId}" placeholder="검색 키워드를 기입해주세요." onkeydown="handleEnter(event, 'searchBtn${b2BVendorId}')">
+                            <button class="btn btn-primary" id="searchBtn${b2BVendorId}" onclick="categorySearch(${b2BVendorId});">검색</button>
                         </div>
-                        <select name="${b2BVendorId}" id="${b2BVendorId}" class="form-select js-select2"></select>
+                        <select name="categoryID${b2BVendorId}" id="categoryID${b2BVendorId}" class="form-select js-select2"></select>
                     </div>
                 `;
-                vendorIDs.push(parseInt(b2BVendorId));
+                vendorIDs.push(b2BVendorId);
             }
             html += `
                 <div class="d-flex justify-content-center">
-                    <button class="btn btn-primary" onclick="initMapping(${vendorIDs});">저장하기</button>
+                    <button class="btn btn-primary" onclick="initMapping(${JSON.stringify(vendorIDs)}, ${ownerclanCategoryID});">저장하기</button>
                 </div>
             `;
             $('#selectCategoryResult').html(html);
@@ -102,9 +102,72 @@
             }
         }
 
-        function initMapping(vendorIDs) {
+        function initMapping(vendorIDs, ownerclanCategoryID) {
             const mappedCategory = [];
-            console.log(vendorIDs[1]);
+            for (vendorID of vendorIDs) {
+                const tmpData = {
+                    vendorID: vendorID,
+                    categoryID: $("#categoryID" + vendorID).val()
+                };
+                mappedCategory.push(tmpData);
+            }
+            requestMapping(ownerclanCategoryID, mappedCategory);
+        }
+
+        function requestMapping(ownerclanCategoryID, mappedCategory) {
+            console.log(mappedCategory);
+            popupLoader(0, "매핑된 카테고리를 저장소로 옮기는 중이에요.");
+            $.ajax({
+                url: "/api/mappingwing/request-mapping",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    ownerclanCategoryID: ownerclanCategoryID,
+                    mappedCategory: mappedCategory
+                },
+                success: function(response) {
+                    closePopup();
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Success.svg') }}"><h4 class="swal2-title mt-5">' +
+                                response.return+'</h4>'
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    }
+                },
+                error: function(response) {
+                    closePopup();
+                    console.log(response);
+                }
+            });
+        }
+
+        function categorySearch(vendorID) {
+            $('.btn').prop("disabled", true);
+            const keyword = $("#searchKeyword" + vendorID).val();
+            $.ajax({
+                url: "/api/mappingwing/category-search",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    vendorID: vendorID,
+                    keyword: keyword
+                },
+                success: function(response) {
+                    let options = '';
+                    for (category of response) {
+                        options += '<option value="' + category.id + '">' + category.name + '</option>';
+                    }
+                    $("#categoryID" + vendorID).html(options);
+                    $('.btn').prop("disabled", false);
+                },
+                error: function(response) {
+                    $('.btn').prop("disabled", false);
+                    console.log(response);
+                }
+            });
         }
     </script>
 @endsection

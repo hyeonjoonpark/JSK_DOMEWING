@@ -24,6 +24,8 @@ use App\Http\Controllers\Domewing\MemberController;
 use App\Http\Controllers\Domewing\ToShipController;
 use App\Http\Controllers\Domewing\ToReceiveController;
 use App\Http\Controllers\Domewing\ToRateController;
+use App\Http\Controllers\Mappingwing\CategorySearchController;
+use App\Http\Controllers\Mappingwing\RequestMappingController;
 use App\Http\Controllers\Mappingwing\SelectCategoryController;
 use App\Http\Controllers\Product\CategoryMappingController;
 use App\Http\Controllers\Product\ExcelwingController;
@@ -75,6 +77,8 @@ Route::post('/product/collect', [ProductCollectController::class, 'index']);
 Route::post('/product/load-bulk-details', [ProductDetailController::class, 'bulk']);
 Route::post('/product/insert-bulk-products', [ProductCollectController::class, 'bulk']);
 Route::post('/mappingwing/select-category', [SelectCategoryController::class, 'request']);
+Route::post('/mappingwing/category-search', [CategorySearchController::class, 'index']);
+Route::post('/mappingwing/request-mapping', [RequestMappingController::class, 'index']);
 
 Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
 Route::get('/admin/get-domain', [DomainController::class, 'getDomain']);
