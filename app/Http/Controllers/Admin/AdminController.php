@@ -156,7 +156,8 @@ class AdminController extends Controller
         if (count($unmappedCategories) > 0) {
             return view('admin/mappingwing', [
                 'b2Bs' => $response['b2Bs'],
-                'unmappedCategories' => $response['unmappedCategories']
+                'unmappedCategories' => $response['unmappedCategories'],
+                'warning' => true
             ]);
         }
         return view('admin/excelwing', [
