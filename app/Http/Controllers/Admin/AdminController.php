@@ -151,12 +151,20 @@ class AdminController extends Controller
             ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
             ->where('ps.is_active', 'Y')
             ->get();
+        $response = $this->getUnmappedCategories();
+        $unmappedCategories = $response['unmappedCategories'];
+        if (count($unmappedCategories) > 0) {
+            return view('admin/mappingwing', [
+                'b2Bs' => $response['b2Bs'],
+                'unmappedCategories' => $response['unmappedCategories']
+            ]);
+        }
         return view('admin/excelwing', [
             'b2Bs' => $b2Bs,
             'sellers' => $sellers
         ]);
     }
-    public function unmapped()
+    public function getUnmappedCategories()
     {
         $b2Bs = DB::table('product_register AS pr')
             ->join('vendors AS v', 'pr.vendor_id', '=', 'v.id')
@@ -172,9 +180,25 @@ class AdminController extends Controller
             }
         }
         $unmappedCategories = $unmappedCategories->get();
-        return view('admin/mappingwing', [
+        return [
             'b2Bs' => $b2Bs,
             'unmappedCategories' => $unmappedCategories
+        ];
+    }
+    public function unmapped()
+    {
+        $response = $this->getUnmappedCategories();
+        if (count($response['unmappedCategories']) > 0) {
+            return view('admin/mappingwing', [
+                'b2Bs' => $response['b2Bs'],
+                'unmappedCategories' => $response['unmappedCategories'],
+                'warning' => true
+            ]);
+        }
+        return view('admin/mappingwing', [
+            'b2Bs' => $response['b2Bs'],
+            'unmappedCategories' => $response['unmappedCategories'],
+            'warning' => false
         ]);
     }
 }

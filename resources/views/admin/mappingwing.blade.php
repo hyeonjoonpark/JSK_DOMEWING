@@ -39,6 +39,16 @@
     <script src="{{ asset('assets/js/editors.js') }}"></script>
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
+        $(document).ready(function() {
+            const warning = {{ $warning }};
+            if (warning) {
+                Swal.fire({
+                    icon: 'warning',
+                    text: '아직 매핑되지 않은 카테고리가 있습니다. 엑셀윙 엔진 가동을 위해 매핑윙을 선행해주세요.'
+                });
+            }
+        });
+
         function selectCategory(select) {
             popupLoader(1, '아직 매핑되지 않은 업체들을 추려내는 중입니다.');
             const ownerclanCategoryID = $(select).val();
