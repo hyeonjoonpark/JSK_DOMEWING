@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\FormProductController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\ToArray;
 
 class ExcelwingController extends Controller
 {
@@ -20,6 +21,8 @@ class ExcelwingController extends Controller
             return $response;
         }
         $products = $response['return'];
+        $products = $products->toArray();
+        $productsChunks = array_chunk($products, 1000);
         $response = $this->getMarginRate($b2BID);
         if (!$response['status']) {
             return $response;
@@ -32,8 +35,18 @@ class ExcelwingController extends Controller
         $b2B = $response['return'];
         $vendorEngName = $b2B->name_eng;
         $formProductController = new FormProductController();
-        $response = $formProductController->$vendorEngName($products, $marginRate, $vendorEngName);
-        return $response;
+        $downloadURLs = [];
+        foreach ($productsChunks as $products) {
+            $response = $formProductController->$vendorEngName($products, $marginRate, $vendorEngName);
+            if (!$response['status']) {
+                return $response;
+            }
+            $downloadURLs[] = $response['return'];
+        }
+        return [
+            'status' => true,
+            'return' => $downloadURLs
+        ];
     }
     protected function getProducts($sellerIDs)
     {

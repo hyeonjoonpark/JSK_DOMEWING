@@ -81,7 +81,12 @@
                     if (response.status) {
                         let html =
                             '<img class="w-100" src="{{ asset('media/Asset_Notif_Success.svg') }}"><h4 class="swal2-title mt-5">엑셀 파일을 성공적으로 추출했습니다.<br>아래 링크를 눌러 다운로드를 진행해주세요.</h4>';
-                        html += "<a href='" + response.return+"' target='_blank' download>다운로드</a>";
+                        let i = 1;
+                        for (downloadURL of response.return) {
+                            html += "<a href='" + response.return+"' target='_blank' download>다운로드 " + i +
+                                "</a>";
+                            i++;
+                        }
                         Swal.fire({
                             html: html
                         });
