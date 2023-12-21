@@ -40,6 +40,8 @@ class ExcelwingController extends Controller
         $products = DB::table("minewing_products")
             ->where("isActive", "Y")
             ->whereIn("sellerID", $sellerIDs)
+            ->whereNot('categoryID', 1336)
+            ->whereNot('categoryID', 1337)
             ->get();
         return [
             "status" => true,
