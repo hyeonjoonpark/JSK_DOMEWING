@@ -84,7 +84,7 @@
                         let i = 1;
                         for (downloadURL of response.return) {
                             html += "<a href='" + downloadURL + "' target='_blank' download>다운로드 " + i +
-                                "</a>";
+                                "</a> / ";
                             i++;
                         }
                         Swal.fire({
