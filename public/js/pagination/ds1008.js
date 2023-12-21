@@ -8,7 +8,7 @@ const puppeteer = require('puppeteer');
         const [listURL] = args;
         await page.goto(listURL, { waitUntil: 'networkidle2' });
         const numProducts = await page.evaluate(() => {
-            const numProducts = document.querySelector('#content > div > div > div.cg-main > div.goods-list > span > strong').textContent;
+            const numProducts = document.querySelector('#content > div > div > div.cg-main > div.goods-list > span > strong').textContent.trim();
             return parseInt(numProducts);
         });
         console.log(parseInt(numProducts));
