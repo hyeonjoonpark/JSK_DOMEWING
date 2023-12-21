@@ -56,6 +56,7 @@ class ManufactureController extends Controller
                         'productHref' => $productHref,
                         'hasOption' => true,
                         'sellerID' => $sellerID,
+                        'productNameOri' => $product['productName']
                     ];
                     $type++;
                 }
@@ -68,6 +69,7 @@ class ManufactureController extends Controller
                     'productHref' => $productHref,
                     'hasOption' => false,
                     'sellerID' => $sellerID,
+                    'productNameOri' => $product['productName']
                 ];
             }
         }
@@ -107,7 +109,7 @@ class ManufactureController extends Controller
                     'status' => true,
                     'productName' => $name,
                     'index' => $index,
-                    'productNameOri' => $product['productName']
+                    'productNameOri' => $product['productNameOri']
                 ];
             }
 
