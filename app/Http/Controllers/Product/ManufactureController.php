@@ -38,11 +38,16 @@ class ManufactureController extends Controller
             $sellerID = $product['sellerID'];
             if ($hasOption == true && isset($product['productOptions'])) {
                 $productOptions = $product['productOptions'];
-                $type = 'A';
+                $optionPriceType = $this->getOptionPriceType($sellerID);
+                $type = '1';
                 foreach ($productOptions as $productOption) {
                     $newProductName = $productName . ' TYPE ' . $type;
                     $newProductDetail = '<h1 style="color:red; font-weight:bold; font-size:2rem;">옵션명 : ' . $productOption['optionName'] . '</h1>' . $productDetail;
-                    $productPrice = (int)$productOption['optionPrice'];
+                    if ($optionPriceType == 'ADD') {
+                        $productPrice = (int)$productPrice + (int)$productOption['optionPrice'];
+                    } else {
+                        $productPrice = (int)$productOption['optionPrice'];
+                    }
                     $newProducts[] = [
                         'productName' => $newProductName,
                         'productImage' => $productImage,
@@ -78,6 +83,15 @@ class ManufactureController extends Controller
             'status' => true,
             'return' => $newProducts
         ];
+    }
+    public function getOptionPriceType($sellerID)
+    {
+        $optionPriceType = DB::table('product_search')
+            ->where('vendor_id', $sellerID)
+            ->select('optionPriceType')
+            ->first()
+            ->optionPriceType;
+        return $optionPriceType;
     }
     public function groupDuplicateProductIndices($products)
     {

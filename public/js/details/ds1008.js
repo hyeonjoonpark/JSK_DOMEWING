@@ -47,7 +47,10 @@ const puppeteer = require('puppeteer');
                     // Split text into optionName and optionPriceText using array destructuring
                     const [optionName, optionPriceText] = text.split(':').map(s => s.trim());
                     // Parse the price as an integer
-                    const optionPrice = parseInt(optionPriceText.replace(/[^\d]/g, ''), 10);
+                    let optionPrice = 0;
+                    if (optionPriceText) {
+                        optionPrice = parseInt(optionPriceText.replace(/[^\d]/g, ''), 10);
+                    }
                     // Push the object to productOptions
                     productOptions.push({ optionName, optionPrice });
                 });
