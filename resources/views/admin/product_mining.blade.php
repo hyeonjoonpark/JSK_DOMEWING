@@ -135,6 +135,7 @@
                             <div class="w-100 d-flex jusitfy-content-center">
                                 <img id="duProductImg" src="" alt="중복 상품명 이미지">
                             </div>
+                            <h6>원상품명: <span id="productNameOri"></span></h6>
                             <input type="text" class="form-control" id="duProductName">
                         </div>
                     </div>
@@ -352,6 +353,7 @@
             //handleDupNamesModal
             $('#duProductImg').attr('src', varProducts[varProduct.index].productImage);
             $('#duProductName').val(varProduct.productName);
+            $("#productNameOri").html(varProduct.productNameOri);
             $('#handleDupNamesModal').modal('show');
         }
 
