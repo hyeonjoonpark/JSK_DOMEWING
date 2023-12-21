@@ -40,7 +40,7 @@ class ExcelwingController extends Controller
         $products = DB::table("minewing_products")
             ->where("isActive", "Y")
             ->whereIn("sellerID", $sellerIDs)
-            ->limit(10000)
+            ->limit(10)
             ->get();
         return [
             "status" => true,
