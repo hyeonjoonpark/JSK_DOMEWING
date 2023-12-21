@@ -22,7 +22,11 @@ class MiningController extends Controller
                 'return' => '잘못된 접근입니다.'
             ];
         }
-        $numPages = (int)$this->getNumPage($listURL, $seller)['return'];
+        $response = $this->getNumPage($listURL, $seller);
+        if (!$response['status']) {
+            return $response;
+        }
+        $numPages = (int)$response['return'];
         $response = $this->getProductsList($seller, $listURL, $account, $numPages);
         return $response;
     }
@@ -47,14 +51,27 @@ class MiningController extends Controller
             ->first();
         return $account;
     }
-    public function getNumPage($listURL)
+    public function getNumPage($listURL, $seller)
     {
-        $scriptPath = public_path('js/pagination/metaldiy.js');
+        $scriptPath = public_path('js/pagination/' . $seller->name_eng . '.js');
         $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($listURL);
         exec($command, $output, $returnCode);
         if ($returnCode === 0 && isset($output[0])) {
             $numProducts = (int) $output[0];
-            $numPages = (int)ceil($numProducts / 60);
+            switch ($seller->vendor_id) {
+                case 2: // 철물박사
+                    $numPage = 60;
+                    break;
+                case 14: // 씨오코리아
+                    $numPage = 120;
+                    break;
+                default:
+                    return [
+                        'status' => false,
+                        'return' => '잘못된 원청사 정보입니다.'
+                    ];
+            }
+            $numPages = (int)ceil($numProducts / $numPage);
             return [
                 'status' => true,
                 'return' => (int)$numPages
