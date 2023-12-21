@@ -72,7 +72,7 @@ class FormProductController extends Controller
                     'LADAM',
                     'N',
                     'N',
-                    '1x1x1',
+                    '1X1X1',
                     '1',
                     $product->productCode,
                     $product->productImage,
