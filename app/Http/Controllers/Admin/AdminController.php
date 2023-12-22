@@ -198,4 +198,13 @@ class AdminController extends Controller
             'warning' => false
         ]);
     }
+    public function mapped()
+    {
+        $categoryMapping = DB::table('category_mapping AS cm')
+            ->join('ownerclan_category AS oc', 'oc.id', '=', 'cm.ownerclan')
+            ->get();
+        return view('admin/mapped', [
+            'categoryMapping' => $categoryMapping
+        ]);
+    }
 }

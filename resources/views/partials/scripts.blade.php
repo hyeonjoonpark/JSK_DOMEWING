@@ -45,4 +45,12 @@
             checkbox.checked = selectAll.checked
         });
     }
+
+    function swalError(message) {
+        Swal.fire({
+            icon: 'error',
+            html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">' +
+                message + '</h4>'
+        });
+    }
 </script>

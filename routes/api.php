@@ -79,6 +79,7 @@ Route::post('/product/insert-bulk-products', [ProductCollectController::class, '
 Route::post('/mappingwing/select-category', [SelectCategoryController::class, 'request']);
 Route::post('/mappingwing/category-search', [CategorySearchController::class, 'index']);
 Route::post('/mappingwing/request-mapping', [RequestMappingController::class, 'index']);
+Route::post('/mappingwing/get-mapped', [SelectCategoryController::class, 'mappedRequest']);
 
 Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
 Route::get('/admin/get-domain', [DomainController::class, 'getDomain']);

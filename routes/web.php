@@ -46,6 +46,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/minewing', [AdminController::class, 'minewing']);
     Route::get('product/excelwing', [AdminController::class, 'excelwing']);
     Route::get('mappingwing/unmapped', [AdminController::class, 'unmapped']);
+    Route::get('mappingwing/mapped', [AdminController::class, 'mapped']);
 
     //ving kong
     Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');
