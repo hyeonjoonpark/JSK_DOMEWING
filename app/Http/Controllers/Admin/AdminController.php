@@ -201,8 +201,17 @@ class AdminController extends Controller
     public function mapped()
     {
         $categoryMapping = DB::table('category_mapping AS cm')
-            ->join('ownerclan_category AS oc', 'oc.id', '=', 'cm.ownerclan')
+            ->join('ownerclan_category AS oc', 'oc.id', '=', 'cm.ownerclan');
+        $b2Bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('pr.is_active', 'Y')
             ->get();
+        foreach ($b2Bs as $b2B) {
+            $b2BEngName = $b2B->name_eng;
+            $categoryMapping->whereNot($b2BEngName, null);
+        }
+        $categoryMapping = $categoryMapping->get();
         return view('admin/mapped', [
             'categoryMapping' => $categoryMapping
         ]);
