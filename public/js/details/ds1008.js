@@ -24,7 +24,7 @@ const puppeteer = require('puppeteer');
             };
 
             const productName = document.querySelector('#frmView > div > div.goods-header > div.top > div > h2').textContent.trim();
-            const originalPriceElement = document.querySelector('#frmView > div > div.item > ul > li.price > div > strong').textContent.trim();
+            const originalPriceElement = document.querySelector('#frmView > input[type=hidden]:nth-child(13)').textContent.trim();
             let productPrice = parseInt(originalPriceElement.replace(/[^\d]/g, ''), 10);
             const productImage = document.querySelector('#mainImage > img').src;
             const baseUrl = window.location.origin;
