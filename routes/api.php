@@ -27,6 +27,7 @@ use App\Http\Controllers\Domewing\ToRateController;
 use App\Http\Controllers\Mappingwing\CategorySearchController;
 use App\Http\Controllers\Mappingwing\RequestMappingController;
 use App\Http\Controllers\Mappingwing\SelectCategoryController;
+use App\Http\Controllers\Minewing\ScrapeProductListController;
 use App\Http\Controllers\Product\CategoryMappingController;
 use App\Http\Controllers\Product\ExcelwingController;
 use App\Http\Controllers\Product\FilterDuplicatesController;
