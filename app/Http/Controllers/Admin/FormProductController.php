@@ -13,37 +13,6 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class FormProductController extends Controller
 {
-    public function index()
-    {
-        $data = [];
-        $fromUPID = 1;
-        $products = DB::table('minewing_products')
-            ->where('isActive', 'Y')
-            ->limit(500)
-            ->get();
-        $vendors = DB::table('product_register')
-            ->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')
-            ->where('vendors.is_active', 'ACTIVE')
-            ->where('product_register.is_active', 'Y')
-            ->get();
-        set_time_limit(0);
-        ini_set('memory_limit', '-1');
-        foreach ($vendors as $vendor) {
-            $vendorEngName = $vendor->name_eng;
-            $margin_rate = DB::table('margin_rate')
-                ->where('vendorID', $vendor->id)
-                ->first()
-                ->rate;
-            $margin_rate = (100 + $margin_rate) / 100;
-            $response = $this->$vendorEngName($products, $margin_rate, $vendor->id);
-            if ($response['status'] == 1) {
-                $data['return']['successVendors'][] = $vendor->name;
-                $data['return']['successVendorsNameEng'][] = $vendorEngName;
-                $data['return']['formedExcelFiles'][] = $response['return'];
-            }
-        }
-        return $data;
-    }
     public function domeggook($products, $margin_rate, $vendorEngName)
     {
         try {
@@ -52,9 +21,9 @@ class FormProductController extends Controller
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
             $rowIndex = 2;
-            $shippingCost = 3500;
             $minAmount = 5000;
             foreach ($products as $product) {
+                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -144,13 +113,13 @@ class FormProductController extends Controller
     public function domeatoz($products, $margin_rate, $vendorEngName)
     {
         try {
-            $shippingCost = 3500;
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/domeatoz.xlsx'));
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
             $rowIndex = 3;
             foreach ($products as $product) {
+                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -236,7 +205,6 @@ class FormProductController extends Controller
     public function wholesaledepot($products, $margin_rate, $vendorEngName)
     {
         try {
-            $shippingCost = 3500;
             $fixedShippingCost = 2500;
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/wholesaledepot.xls'));
@@ -244,6 +212,7 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 5;
             foreach ($products as $product) {
+                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + (int)($shippingCost - $fixedShippingCost);
@@ -336,13 +305,13 @@ class FormProductController extends Controller
     public function domesin($products, $margin_rate, $vendorEngName)
     {
         try {
-            $shippingCost = 3500;
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/domesin.xls'));
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
+                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -437,7 +406,6 @@ class FormProductController extends Controller
     {
         try {
             $startRowIndex = 4;
-            $shippingCost = 3500;
             $detailedDescription = str_repeat("상품 상세설명 참조\n", 6) . str_repeat("상품 상세정보에 별도 표기\n", 4);
 
             // 엑셀 파일 로드
@@ -447,6 +415,7 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = $startRowIndex;
             foreach ($products as $product) {
+                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -488,5 +457,14 @@ class FormProductController extends Controller
             ->first()
             ->code;
         return $categoryCode;
+    }
+    public function getShippingFee($vendorID)
+    {
+        $shippingFee = DB::table('product_search')
+            ->where('vendor_id', $vendorID)
+            ->select('shipping_fee')
+            ->first()
+            ->shipping_fee;
+        return $shippingFee;
     }
 }

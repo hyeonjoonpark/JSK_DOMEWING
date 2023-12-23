@@ -84,8 +84,14 @@ class AdminController extends Controller
             ->where('v.is_active', 'ACTIVE')
             ->select('*', 'mr.id AS mrID')
             ->get();
+        $vendors = DB::table('product_search AS ps')
+            ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('ps.is_active', 'Y')
+            ->get();
         return view('admin/account-setting', [
-            'marginRates' => $marginRates
+            'marginRates' => $marginRates,
+            'vendors' => $vendors
         ]);
     }
 

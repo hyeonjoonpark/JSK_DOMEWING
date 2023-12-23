@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProductDetailController;
 use App\Http\Controllers\Admin\ProductKeywordController;
 use App\Http\Controllers\Admin\ProductRegisterController;
 use App\Http\Controllers\Admin\ProductSearchController;
+use App\Http\Controllers\Admin\ShippingFeeController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -69,6 +70,7 @@ Route::post('/product/excelwing', [ExcelwingController::class, 'index']);
 Route::post('/product/category-mapping', [CategoryMappingController::class, 'index']);
 // account-setting
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
+Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);
 // Load product details
 Route::post('/product/load-product-detail', [ProductDetailController::class, 'index']);
 Route::post('/product/collect', [ProductCollectController::class, 'index']);
