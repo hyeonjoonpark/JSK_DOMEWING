@@ -13,7 +13,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class FormProductController extends Controller
 {
-    public function domeggook($products, $margin_rate, $vendorEngName)
+    public function domeggook($products, $margin_rate, $vendorEngName, $shippingCost)
     {
         try {
             // 엑셀 파일 로드
@@ -23,7 +23,6 @@ class FormProductController extends Controller
             $rowIndex = 2;
             $minAmount = 5000;
             foreach ($products as $product) {
-                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -110,7 +109,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function domeatoz($products, $margin_rate, $vendorEngName)
+    public function domeatoz($products, $margin_rate, $vendorEngName, $shippingCost)
     {
         try {
             // 엑셀 파일 로드
@@ -119,7 +118,6 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 3;
             foreach ($products as $product) {
-                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -202,7 +200,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function wholesaledepot($products, $margin_rate, $vendorEngName)
+    public function wholesaledepot($products, $margin_rate, $vendorEngName, $shippingCost)
     {
         try {
             $fixedShippingCost = 2500;
@@ -212,7 +210,6 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 5;
             foreach ($products as $product) {
-                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + (int)($shippingCost - $fixedShippingCost);
@@ -302,7 +299,7 @@ class FormProductController extends Controller
         }
     }
 
-    public function domesin($products, $margin_rate, $vendorEngName)
+    public function domesin($products, $margin_rate, $vendorEngName, $shippingCost)
     {
         try {
             // 엑셀 파일 로드
@@ -311,7 +308,6 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
-                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -402,7 +398,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function ownerclan($products, $margin_rate, $vendorEngName)
+    public function ownerclan($products, $margin_rate, $vendorEngName, $shippingCost)
     {
         try {
             $startRowIndex = 4;
@@ -415,7 +411,6 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = $startRowIndex;
             foreach ($products as $product) {
-                $shippingCost = $this->getShippingFee($product->sellerID);
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -457,14 +452,5 @@ class FormProductController extends Controller
             ->first()
             ->code;
         return $categoryCode;
-    }
-    public function getShippingFee($vendorID)
-    {
-        $shippingFee = DB::table('product_search')
-            ->where('vendor_id', $vendorID)
-            ->select('shipping_fee')
-            ->first()
-            ->shipping_fee;
-        return $shippingFee;
     }
 }

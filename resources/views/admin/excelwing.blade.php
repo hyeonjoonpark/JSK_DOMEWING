@@ -35,9 +35,10 @@
                         <div class="row">
                             @foreach ($sellers as $seller)
                                 <div class="col-3 mb-3">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="seller{{ $seller->vendor_id }}" name="sellers"
-                                            value="{{ $seller->vendor_id }}" class="custom-control-input">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" id="seller{{ $seller->vendor_id }}" name="sellers"
+                                            value="{{ $seller->vendor_id }}" class="custom-control-input"
+                                            {{ $loop->first ? 'checked' : '' }}>
                                         <label class="custom-control-label"
                                             for="seller{{ $seller->vendor_id }}">{{ $seller->name }}</label>
                                     </div>
@@ -56,16 +57,12 @@
 @section('scripts')
     <script>
         function initExcelwing() {
-            const inputSellers = document.querySelectorAll('input[name="sellers"]:checked');
-            const sellerIDs = [];
-            for (inputSeller of inputSellers) {
-                sellerIDs.push(parseInt(inputSeller.value));
-            }
-            b2BID = parseInt($("input[name='b2Bs']:checked").val());
+            const sellerID = parseInt($("input[name='sellers']:checked").val());
+            const b2BID = parseInt($("input[name='b2Bs']:checked").val());
             requestExcelwing(b2BID, sellerIDs);
         }
 
-        function requestExcelwing(b2BID, sellerIDs) {
+        function requestExcelwing(b2BID, sellerID) {
             popupLoader(1, "선택하신 상품셋을 B2B 업체를 위한 대량 등록 양식에 맞추어 엑셀 파일로 작성 중입니다.");
             $.ajax({
                 url: "/api/product/excelwing",
@@ -73,7 +70,7 @@
                 dataType: "JSON",
                 data: {
                     b2BID: b2BID,
-                    sellerIDs: sellerIDs
+                    sellerID: sellerID
                 },
                 success: function(response) {
                     console.log(response);

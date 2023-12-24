@@ -32,7 +32,12 @@ class ManufactureController extends Controller
             }
             $productName = $nameController->index($product['productName'], $byte);
             $productImage = $productImageController->index($product['productImage'])['return'];
-            $productDetail = $productImageController->processImages($product['productDetail']);
+            $headerImage = DB::table('product_search')
+                ->where('vendor_id', $product->sellerID)
+                ->select('header_image')
+                ->first()
+                ->header_image;
+            $productDetail = $productImageController->processImages($product['productDetail'], $headerImage);
             $productPrice = (int)$product['productPrice'];
             $productHref = $product['productHref'];
             $sellerID = $product['sellerID'];

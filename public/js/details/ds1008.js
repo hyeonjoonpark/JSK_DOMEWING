@@ -24,10 +24,8 @@ const puppeteer = require('puppeteer');
             };
 
             const productName = document.querySelector('#frmView > div > div.goods-header > div.top > div > h2').textContent.trim();
-            const productPriceEle = document.querySelector('#frmView > input[type=hidden]:nth-child(13)').value;
-            const VAT_RATE = 1.1;
-            let productPrice = productPriceEle * VAT_RATE;
-            productPrice = Math.ceil(productPrice);
+            const originalPriceElement = document.querySelector('#frmView > input[type=hidden]:nth-child(13)').value;
+            let productPrice = parseInt(originalPriceElement.replace(/[^\d]/g, ''), 10);
             const productImage = document.querySelector('#mainImage > img').src;
             const baseUrl = window.location.origin;
 
@@ -41,7 +39,7 @@ const puppeteer = require('puppeteer');
             let productOptions = [];
 
             if (hasOption) {
-                const optionElements = document.querySelectorAll('#frmView > div > div.choice > div > div > div > div > ul > li');
+                const optionElements = document.querySelectorAll('#frmView > div > div.choice > div > div > select > option');
 
                 // Use array destructuring and Array.slice to skip the first element
                 Array.from(optionElements).slice(1).forEach(el => {

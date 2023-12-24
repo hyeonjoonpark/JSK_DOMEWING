@@ -8,31 +8,38 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Process\Process;
 
+use function PHPUnit\Framework\isEmpty;
+
 class ProcessController extends Controller
 {
     public function index(Request $request)
     {
         set_time_limit(0);
         $productHrefs = $request->productHrefs;
-        $sellerID = $request->sellerID;
-        $remember_token = $request->remember_token;
-        $seller = $this->getSeller($sellerID);
-        $user = $this->getUser($remember_token);
-        $account = $this->getAccount($user->id, $seller->id);
-        if (!$seller || !$user || !$account) {
+        if (!isset($productHrefs)) {
             return [
                 'status' => false,
-                'message' => '잘못된 접근입니다.'
+                'return' => '이미 등록된 상품셋입니다.'
             ];
         }
-        $productDetails = [];
+        $vendorID = $request->vendorID;
+        $rememberToken = $request->rememberToken;
+        $vendor = $this->getVendor($vendorID);
+        $user = $this->getUser($rememberToken);
+        $account = $this->getAccount($user->id, $vendor->id);
+        if (!$vendor || !$user || !$account) {
+            return [
+                'status' => false,
+                'return' => '세션이 만료되었습니다. 다시 로그인해 주십시오.'
+            ];
+        }
+        $products = [];
         foreach ($productHrefs as $productHref) {
-            $productDetails[] = $this->scrapeProductDetails($seller->name_eng, $account->username, $account->password, $productHref);
+            $products[] = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
         }
         return [
             'status' => true,
-            'return' => $productDetails,
-            'message' => '"상품 정보들을 무사히 가져왔어요.<br>상품을 가공 중이에요."'
+            'return' => $products
         ];
     }
     protected function getAccount($userID, $sellerID)
@@ -51,7 +58,7 @@ class ProcessController extends Controller
             ->first();
         return $user;
     }
-    protected function getSeller($sellerID)
+    protected function getVendor($sellerID)
     {
         $seller = DB::table('vendors')
             ->where('is_active', 'ACTIVE')

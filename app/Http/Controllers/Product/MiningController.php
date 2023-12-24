@@ -11,23 +11,23 @@ class MiningController extends Controller
     public function index(Request $request)
     {
         set_time_limit(0);
-        $remember_token = $request->remember_token;
-        $sellerID = $request->sellerID;
-        $seller = $this->getVendor($sellerID);
+        $rememberToken = $request->rememberToken;
+        $vendorID = $request->vendorID;
+        $vendor = $this->getVendor($vendorID);
         $listURL = $request->listURL;
-        $account = $this->getAccount($remember_token, $sellerID);
+        $account = $this->getAccount($rememberToken, $vendorID);
         if (!$account) {
             return [
                 'status' => false,
                 'return' => '잘못된 접근입니다.'
             ];
         }
-        $response = $this->getNumPage($listURL, $seller);
+        $response = $this->getNumPage($listURL, $vendor);
         if (!$response['status']) {
             return $response;
         }
         $numPages = (int)$response['return'];
-        $response = $this->getProductsList($seller, $listURL, $account, $numPages);
+        $response = $this->getProductsList($vendor, $listURL, $account, $numPages);
         return $response;
     }
     public function getVendor($vendorID)
@@ -79,7 +79,7 @@ class MiningController extends Controller
         } else {
             return [
                 'status' => false,
-                'return' => '상품 데이터 추출에 실패했습니다.'
+                'return' => 'URL을 확인해주세요. 혹은 상품 리스트 페이지가 잘못 구성되어 있습니다.'
             ];
         }
     }

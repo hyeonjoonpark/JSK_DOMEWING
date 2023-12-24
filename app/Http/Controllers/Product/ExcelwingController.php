@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\FormProductController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Concerns\ToArray;
 
 class ExcelwingController extends Controller
 {
@@ -15,8 +14,9 @@ class ExcelwingController extends Controller
         set_time_limit(0);
         ini_set('memory_limit', -1);
         $b2BID = $request->b2BID;
-        $sellerIDs = $request->sellerIDs;
-        $response = $this->getProducts($sellerIDs);
+        $sellerID = $request->sellerID;
+        $shippingFee = $this->getShippingFee($sellerID);
+        $response = $this->getProducts($sellerID);
         if (!$response['status']) {
             return $response;
         }
@@ -37,7 +37,7 @@ class ExcelwingController extends Controller
         $formProductController = new FormProductController();
         $downloadURLs = [];
         foreach ($productsChunks as $products) {
-            $response = $formProductController->$vendorEngName($products, $marginRate, $vendorEngName);
+            $response = $formProductController->$vendorEngName($products, $marginRate, $vendorEngName, $shippingFee);
             if (!$response['status']) {
                 return $response;
             }
@@ -48,11 +48,20 @@ class ExcelwingController extends Controller
             'return' => $downloadURLs
         ];
     }
-    protected function getProducts($sellerIDs)
+    public function getShippingFee($vendorID)
+    {
+        $shippingFee = DB::table('product_search')
+            ->where('vendor_id', $vendorID)
+            ->select('shipping_fee')
+            ->first()
+            ->shipping_fee;
+        return $shippingFee;
+    }
+    protected function getProducts($sellerID)
     {
         $products = DB::table("minewing_products")
             ->where("isActive", "Y")
-            ->whereIn("sellerID", $sellerIDs)
+            ->where("sellerID", $sellerID)
             ->get();
         return [
             "status" => true,

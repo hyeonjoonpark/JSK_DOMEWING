@@ -195,9 +195,9 @@ class ProductImageController extends Controller
     }
 
     // 새로운 이미지 URL을 이용해 HTML 생성
-    public function createHtmlWithImages($images)
+    public function createHtmlWithImages($images, $headerImage = 'ladam_header.jpg')
     {
-        $html = '<center><img src="https://www.sellwing.kr/images/CDN/ladam_header.jpg">';
+        $html = '<center><img src="https://www.sellwing.kr/images/CDN/' . $headerImage . '">';
         foreach ($images as $img) {
             $html .= '<br><img src="' . $img . '" alt="">';
         }
@@ -206,9 +206,9 @@ class ProductImageController extends Controller
     }
 
     // 이미지 URL 배열을 처리하고 HTML 생성
-    public function processImages($imageUrls)
+    public function processImages($imageUrls, $headerImage)
     {
         $hostedImages = $this->hostImages($imageUrls);
-        return $this->createHtmlWithImages($hostedImages);
+        return $this->createHtmlWithImages($hostedImages, $headerImage);
     }
 }

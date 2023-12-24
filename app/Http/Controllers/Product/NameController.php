@@ -10,7 +10,8 @@ class NameController extends Controller
     public function index($productName, $byte)
     {
         $productName = $this->replaceForbiddenWords($productName);
-        $productName = $this->filterString($productName, $byte);
+        $productName = $this->filterString($productName);
+        $productName = $this->limitProductName($productName, $byte);
         return $productName;
     }
     public function replaceForbiddenWords($productName)
@@ -25,31 +26,33 @@ class NameController extends Controller
         // Return the sanitized product name
         return $productName;
     }
-    function filterString($str, $byte)
+    function filterString($str)
     {
-        // 한글, 숫자, 영어, 공백만 허용
-        $str = preg_replace('/[^a-zA-Z0-9\s가-힣]/', '', $str);
-
+        // 한글, 숫자, 영어, 공백만 허용 (유니코드 사용)
+        $str = preg_replace('/[^\p{L}\p{N}\s]/u', '', $str);
         // 연속된 공백을 하나로 줄임
         $str = preg_replace('/\s+/', ' ', $str);
-
         // 앞뒤 공백 제거
         $str = trim($str);
-
-        // 문자열을 바이트 단위로 안전하게 자르기
-        $byteLimit = $byte;
+        return $str;
+    }
+    function limitProductName($productName, $maxByte = 50)
+    {
         $byteCount = 0;
-        $resultStr = '';
+        $limitedName = '';
 
-        for ($i = 0; $i < mb_strlen($str, 'UTF-8') && $byteCount <= $byteLimit; $i++) {
-            $char = mb_substr($str, $i, 1, 'UTF-8');
-            $byteCount += strlen($char);
+        for ($i = 0; $i < mb_strlen($productName); $i++) {
+            $char = mb_substr($productName, $i, 1);
+            // ASCII 문자는 1byte, 그외는 2byte로 계산
+            $byteCount += (ord($char) <= 127) ? 1 : 2;
 
-            if ($byteCount <= $byteLimit) {
-                $resultStr .= $char;
+            if ($byteCount <= $maxByte) {
+                $limitedName .= $char;
+            } else {
+                break;
             }
         }
-
-        return $resultStr;
+        $limitedName = trim($limitedName);
+        return $limitedName;
     }
 }

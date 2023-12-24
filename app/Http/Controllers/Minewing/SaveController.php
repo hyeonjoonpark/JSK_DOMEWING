@@ -1,0 +1,199 @@
+<?php
+
+namespace App\Http\Controllers\Minewing;
+
+use App\Http\Controllers\Admin\ProductDataValidityController;
+use App\Http\Controllers\Admin\ProductImageController;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\Product\NameController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class SaveController extends Controller
+{
+    public function index(Request $request)
+    {
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        $rememberToken = $request->rememberToken;
+        $products = $request->products;
+        $categoryID = $request->categoryID;
+        $productKeywords = $request->productKeywords;
+        $isValid = $this->validateElements($categoryID, $productKeywords);
+        if (!$isValid['status']) {
+            return $isValid;
+        }
+        $userID = DB::table('users')
+            ->where('remember_token', $rememberToken)
+            ->where('is_active', 'ACTIVE')
+            ->select('id')
+            ->first()
+            ->id;
+        if ($userID === null) {
+            return [
+                'status' => false,
+                'return' => '잘못된 접근입니다.'
+            ];
+        }
+        $nameController = new NameController();
+        $productImageController = new ProductImageController();
+        $newProducts = [];
+        $failed = [];
+        foreach ($products as $index => $product) {
+            if (!isset($product['hasOption'])) {
+                $failed[] = $index + 1;
+                continue;
+            }
+            $hasOption = $product['hasOption'];
+            $byte = 50;
+            if ($hasOption == true && isset($product['productOptions'])) {
+                $byte = 40;
+            }
+            $productName = $nameController->index($product['productName'], $byte);
+            $productImage = $productImageController->index($product['productImage'])['return'];
+            $headerImage = DB::table('product_search')
+                ->where('vendor_id', $product['sellerID'])
+                ->select('header_image')
+                ->first()
+                ->header_image;
+            $productDetail = $productImageController->processImages($product['productDetail'], $headerImage);
+            $productPrice = (int)$product['productPrice'];
+            $productHref = $product['productHref'];
+            $sellerID = $product['sellerID'];
+            if ($hasOption == true && isset($product['productOptions'])) {
+                $productOptions = $product['productOptions'];
+                $optionPriceType = $this->getOptionPriceType($sellerID);
+                $type = '1';
+                foreach ($productOptions as $productOption) {
+                    $newProductName = $productName . ' TYPE ' . $type;
+                    $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:2rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1>' . $productDetail;
+                    if ($optionPriceType == 'ADD') {
+                        $productPrice = (int)$productPrice + (int)$productOption['optionPrice'];
+                    } else {
+                        $productPrice = (int)$productOption['optionPrice'];
+                    }
+                    $newProducts[] = [
+                        'productName' => $newProductName,
+                        'productImage' => $productImage,
+                        'productPrice' => $productPrice,
+                        'productDetail' => $newProductDetail,
+                        'productHref' => $productHref,
+                        'hasOption' => true,
+                        'sellerID' => $sellerID
+                    ];
+                    $type++;
+                    $response = $this->insertProducts($sellerID, $userID, $categoryID, $newProductName, $productKeywords, $productPrice, $productImage, $newProductDetail, $hasOption, $productHref);
+                    if (!$response['status']) {
+                        return $response;
+                    }
+                }
+            } else {
+                $newProducts[] = [
+                    'productName' => $productName,
+                    'productImage' => $productImage,
+                    'productPrice' => $productPrice,
+                    'productDetail' => $productDetail,
+                    'productHref' => $productHref,
+                    'hasOption' => false,
+                    'sellerID' => $sellerID
+                ];
+                $response = $this->insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref);
+                if (!$response['status']) {
+                    return $response;
+                }
+            }
+        }
+        return [
+            'status' => true,
+            'return' => '"상품셋을 성공적으로 저장했어요!"'
+        ];
+    }
+    public function validateElements($categoryID, $productKeywords)
+    {
+        $productDataValidityController = new ProductDataValidityController();
+        $isValid = $productDataValidityController->index($categoryID, $productKeywords);
+        return $isValid;
+    }
+    public function validateCategoryID($categoryID)
+    {
+        $isExist = DB::table('ownerclan_category')
+            ->where('id', $categoryID)
+            ->exists();
+        return $isExist;
+    }
+    public function getOptionPriceType($sellerID)
+    {
+        $optionPriceType = DB::table('product_search')
+            ->where('vendor_id', $sellerID)
+            ->select('optionPriceType')
+            ->first()
+            ->optionPriceType;
+        return $optionPriceType;
+    }
+    public function getIsVAT($sellerID)
+    {
+        $isVAT = DB::table('product_search')
+            ->where('vendor_id', $sellerID)
+            ->select('is_vat')
+            ->first()
+            ->is_vat;
+        return $isVAT;
+    }
+    public function insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref)
+    {
+        try {
+            $isVAT = $this->getIsVAT($sellerID);
+            if ($isVAT == 'Y') {
+                $productPrice *= 1.1;
+                $productPrice = ceil($productPrice);
+            }
+            do {
+                $productCode = $this->generateRandomProductCode(5);
+                $isExist = DB::table('minewing_products')
+                    ->where('productCode', $productCode)
+                    ->where('isActive', 'Y')
+                    ->exists();
+            } while ($isExist);
+            if ($hasOption) {
+                $hasOption = 'Y';
+            } else {
+                $hasOption = 'N';
+            }
+            DB::table('minewing_products')
+                ->insert([
+                    'sellerID' => $sellerID,
+                    'userID' => $userID,
+                    'categoryID' => $categoryID,
+                    'productCode' => $productCode,
+                    'productName' => $productName,
+                    'productKeywords' => $productKeywords,
+                    'productPrice' => $productPrice,
+                    'productImage' => $productImage,
+                    'productDetail' => $productDetail,
+                    'productHref' => $productHref,
+                    'hasOption' => $hasOption
+                ]);
+            return [
+                'status' => true,
+                'return' => '"상품셋을 성공적으로 저장했어요!"'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
+    protected function generateRandomProductCode($length)
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $charactersLength = strlen($characters);
+        $randomCode = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $randomCode .= $characters[rand(0, $charactersLength - 1)];
+        }
+
+        return $randomCode;
+    }
+}

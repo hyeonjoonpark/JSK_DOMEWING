@@ -26,6 +26,9 @@ use App\Http\Controllers\Domewing\ToRateController;
 use App\Http\Controllers\Mappingwing\CategorySearchController;
 use App\Http\Controllers\Mappingwing\RequestMappingController;
 use App\Http\Controllers\Mappingwing\SelectCategoryController;
+use App\Http\Controllers\Minewing\ManufactureController as MinewingManufactureController;
+use App\Http\Controllers\Minewing\SaveController;
+use App\Http\Controllers\Minewing\UniqueProductHrefsController;
 use App\Http\Controllers\Product\CategoryMappingController;
 use App\Http\Controllers\Product\ExcelwingController;
 use App\Http\Controllers\Product\FilterDuplicatesController;
@@ -71,6 +74,10 @@ Route::post('/product/category-mapping', [CategoryMappingController::class, 'ind
 // account-setting
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);
+// minewing
+Route::post('/minewing/unique-product-hrefs', [UniqueProductHrefsController::class, 'index']);
+Route::post('/minewing/manufacture', [MinewingManufactureController::class, 'index']);
+Route::post('/minewing/save-products', [SaveController::class, 'index']);
 // Load product details
 Route::post('/product/load-product-detail', [ProductDetailController::class, 'index']);
 Route::post('/product/collect', [ProductCollectController::class, 'index']);
