@@ -18,11 +18,14 @@ class NameController extends Controller
     {
         // Define the array of forbidden words
         $forbiddenWords = config('forbidden_words');
+        $replaceWords = config('replace_words');
         // Replace each forbidden word in the product name with a space
+        foreach ($replaceWords as $word) {
+            $productName = str_replace($word, 'JS', $productName);
+        }
         foreach ($forbiddenWords as $word) {
             $productName = str_replace($word, ' ', $productName);
         }
-
         // Return the sanitized product name
         return $productName;
     }
