@@ -171,7 +171,7 @@ class SaveController extends Controller
                     ->where('isActive', 'Y')
                     ->exists();
             } while ($isExist);
-            if ($hasOption) {
+            if ($hasOption == true) {
                 $hasOption = 'Y';
             } else {
                 $hasOption = 'N';
