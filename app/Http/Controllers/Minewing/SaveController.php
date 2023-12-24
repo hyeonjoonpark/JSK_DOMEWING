@@ -139,6 +139,23 @@ class SaveController extends Controller
             ->is_vat;
         return $isVAT;
     }
+    protected function insertMappingwing($ownerclanCategoryID)
+    {
+        try {
+            $isExist = DB::table('category_mapping')
+                ->where('ownerclan', $ownerclanCategoryID)
+                ->exists();
+            if (!$isExist) {
+                DB::table('category_mapping')
+                    ->insert([
+                        'ownerclan' => $ownerclanCategoryID
+                    ]);
+            }
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
     public function insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref)
     {
         try {
@@ -173,6 +190,13 @@ class SaveController extends Controller
                     'productHref' => $productHref,
                     'hasOption' => $hasOption
                 ]);
+            $response = $this->insertMappingwing($categoryID);
+            if (!$response) {
+                return [
+                    'status' => true,
+                    'return' => '"매핑윙 연동에 실패했습니다."'
+                ];
+            }
             return [
                 'status' => true,
                 'return' => '"상품셋을 성공적으로 저장했어요!"'
