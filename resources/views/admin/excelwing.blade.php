@@ -59,7 +59,7 @@
         function initExcelwing() {
             const sellerID = parseInt($("input[name='sellers']:checked").val());
             const b2BID = parseInt($("input[name='b2Bs']:checked").val());
-            requestExcelwing(b2BID, sellerIDs);
+            requestExcelwing(b2BID, sellerID);
         }
 
         function requestExcelwing(b2BID, sellerID) {
