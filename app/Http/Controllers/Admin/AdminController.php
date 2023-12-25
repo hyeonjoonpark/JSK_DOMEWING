@@ -138,8 +138,33 @@ class AdminController extends Controller
     }
     public function minewing(Request $request)
     {
-        $products = DB::table('minewing_products')
-            ->where('isActive', 'Y')
+        $products = DB::table('minewing_products AS mp')
+            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
+            ->where('mp.isActive', 'Y')
+            ->select('mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt', 'mp.id')
+            ->limit(1000)
+            ->orderBy('mp.createdAt', 'DESC')
+            ->get();
+        return view('admin/product_minewing', [
+            'products' => $products
+        ]);
+    }
+    function minewingPost(Request $request)
+    {
+        $searchKeyword = $request->searchKeyword;
+        $products = DB::table('minewing_products AS mp')
+            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
+            ->where('mp.isActive', 'Y')  // Always apply isActive = 'Y'
+            ->where(function ($query) use ($searchKeyword) {
+                $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('mp.productCode', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
+            })
+            ->select('mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt', 'mp.id')
+            ->limit(1000)
+            ->orderBy('mp.createdAt', 'DESC')
             ->get();
         return view('admin/product_minewing', [
             'products' => $products

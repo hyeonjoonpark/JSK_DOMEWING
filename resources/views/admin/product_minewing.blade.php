@@ -1,73 +1,78 @@
 @extends('layouts.main')
 @section('title')
-    마인윙 데이터셋
+    상품윙
 @endsection
 @section('subtitle')
     <p>
-        마인윙 데이터셋을 관리합니다.
+        마인윙으로부터 수집된 상품들을 관리합니다.
     </p>
 @endsection
 @section('content')
+    <div class="row g-gs mb-5">
+        <div class="col">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">통합 검색</h6>
+                    <p>테이블의 모든 컬럼 중 원하는 키워드를 검색하세요.</p>
+                    <div class="form-group">
+                        <label for="" class="form-label">상품 검색</label>
+                        <form class="d-flex text-nowrap" method="POST" action="minewing">
+                            @csrf
+                            <input type="text" class="form-control" placeholder="검색 키워드를 기입해주세요" name="searchKeyword">
+                            <button type="submit" class="btn btn-primary">검색</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row g-gs">
         <div class="col">
-            {{-- <button class="btn btn-warning mb-5" onclick="productsUpload();">업로드 테스트</button> --}}
-            <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="true" data-order='[[3, "asc"]]'>
-                <thead>
-                    <tr class="nk-tb-item nk-tb-head">
-                        <th class="nk-tb-col nk-tb-col-check">
-                            <div class="custom-control custom-control-sm custom-checkbox notext">
-                                <input type="checkbox" class="custom-control-input" id="products">
-                                <label class="custom-control-label" for="products"></label>
-                            </div>
-                        </th>
-                        <th class="nk-tb-col"><span class="sub-text">상품 정보</span></th>
-                        <th class="nk-tb-col tb-col-mb"><span class="sub-text">상품 가격</span></th>
-                        <th class="nk-tb-col tb-col-md"><span class="sub-text">업로드 일자</span></th>
-                        <th class="nk-tb-col tb-col-lg"><span class="sub-text">수정 일자</span></th>
-                        <th class="nk-tb-col nk-tb-col-tools text-end">ACTION
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($products as $product)
-                        <tr class="nk-tb-item">
-                            <td class="nk-tb-col nk-tb-col-check">
-                                <div class="custom-control custom-control-sm custom-checkbox notext">
-                                    <input type="checkbox" class="custom-control-input" id="product{{ $product->id }}">
-                                    <label class="custom-control-label" for="product{{ $product->id }}"></label>
-                                </div>
-                            </td>
-                            <td class="nk-tb-col col-4">
-                                <a href="{{ $product->productHref }}" target="_blank" class="user-card">
-                                    <div class="user-avatar bg-dim-primary d-none d-sm-flex">
-                                        <img src="{{ $product->productImage }}" alt="상품 대표 이미지">
-                                    </div>
-                                    <div class="user-info">
-                                        <span class="tb-lead">{{ $product->productName }} <span
-                                                class="dot dot-success d-md-none ms-1"></span></span>
-                                        <span>{{ $product->productKeywords }}</span>
-                                    </div>
-                                </a>
-                            </td>
-                            <td class="nk-tb-col" data-order="{{ $product->productPrice }}">
-                                <span class="tb-amount">{{ number_format($product->productPrice, 0) }} <span
-                                        class="currency">원</span></span>
-                            </td>
-                            <td class="nk-tb-col">
-                                <span>{{ $product->createdAt }}</span>
-                            </td>
-                            <td class="nk-tb-col" data-order="Email Verified - Kyc Unverified">
-                                <span>{{ $product->updatedAt }}</span>
-                            </td>
-                            <td class="nk-tb-col">
-                                <button class="btn btn-success"
-                                    onclick="requestProductDetails({{ $product->id }});">수정</button>
-                                <button class="btn btn-danger">삭제</button>
-                            </td>
-                        </tr><!-- .nk-tb-item  -->
-                    @endforeach
-                </tbody>
-            </table>
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">상품윙 테이블</h6>
+                    <p>검색된 상품이 총 {{ number_format(count($products), 0) }}건입니다. 상품 검색 결과는 최대 1,000건으로 제한됩니다.</p>
+                    <div class="table-responsive">
+                        <table class="table text-nowrap align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col"><input type="checkbox" onclick="selectAll(this);"></th>
+                                    <th scope="col">대표 이미지</th>
+                                    <th scope="col">상품명</th>
+                                    <th scope="col">코드</th>
+                                    <th scope="col">가격</th>
+                                    <th scope="col">원청사</th>
+                                    <th scope="col">수집일자</th>
+                                    <th scope="col">ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($products as $product)
+                                    <tr>
+                                        <td scope="row"><input type="checkbox" name="selectedProducts"
+                                                value="{{ $product->productCode }}"></td>
+                                        <td><a href="{{ $product->productHref }}" target="_blank"><img
+                                                    src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100
+                                                    height=100></a></td>
+                                        <td><a href="{{ $product->productHref }}"
+                                                target="_blank">{{ $product->productName }}</a></td>
+                                        <td><a href="{{ $product->productHref }}"
+                                                target="_blank">{{ $product->productCode }}</a></td>
+                                        <td><a href="{{ $product->productHref }}"
+                                                target="_blank">{{ number_format($product->productPrice, 0) }}원</a>
+                                        </td>
+                                        <td><a href="{{ $product->productHref }}" target="_blank">{{ $product->name }}</a>
+                                        </td>
+                                        <td>{{ date('Y-m-d', strtotime($product->createdAt)) }}</td>
+                                        <td><button class="btn btn-success mr-3">수정</button><button
+                                                class="btn btn-danger">품절</button></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -76,43 +81,9 @@
     <script src="{{ asset('assets/js/editors.js') }}"></script>
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
-        function viewProductDetail(product) {
-            Swal.fire({
-                html: product.productDetail
-            });
-        }
-
-        function requestProductDetails(productID) {
-            $('.btn').prop('disabled', true);
-            $.ajax({
-                url: '/api/product/request-product-detail',
-                type: 'post',
-                dataType: 'json',
-                data: {
-                    productID: productID
-                },
-                success: function(response) {
-                    $('.btn').prop('disabled', false);
-                    if (response.status) {
-                        viewProductDetail(response.return);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: '진행 실패',
-                            text: response.return
-                        });
-                    }
-                },
-                error: function(response) {
-                    $('.btn').prop('disabled', false);
-                    console.log(response);
-                    Swal.fire({
-                        icon: 'error',
-                        title: '진행 실패',
-                        text: '예기치 못한 오류가 발생했습니다. 기술자에게 문의해주십시오.'
-                    });
-                }
-            });
-        }
+        $(document).on('click', '#selectAll', function() {
+            const isChecked = $(this).is(':checked');
+            $('input[name="selectedProducts"]').prop('checked', isChecked);
+        });
     </script>
 @endsection

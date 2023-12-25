@@ -59,8 +59,8 @@
                         <button class="btn btn-warning" id="bulkCollectBtn" onclick="initScrape();">가공 및
                             수집하기</button>
                     </div>
-                    <div id="collectResult" class="mt-5">
-                        <table class="table table-striped">
+                    <div id="collectResult" class="table-responsive mt-5">
+                        <table class="table table-striped text-nowrap align-middle">
                             <thead>
                                 <tr>
                                     <th scope="col"><input type="checkbox" onclick="selectAll(this);"></th>

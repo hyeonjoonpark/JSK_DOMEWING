@@ -27,7 +27,7 @@
                                 <span class="nk-menu-text">대시보드</span>
                             </a>
                         </li>
-                        <li class="nk-menu-item has-sub">
+                        {{-- <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-cloud-arrow-up"></em></span>
                                 <span class="nk-menu-text">상품 데이터 센터</span>
@@ -38,20 +38,22 @@
                                             class="nk-menu-text">마인윙
                                             데이터</span></a>
                                 </li>
-                                {{-- <li class="nk-menu-item">
-                                    <a href="/admin/product/manage" class="nk-menu-link"><span class="nk-menu-text">수집된
-                                            상품 데이터</span></a>
-                                </li> --}}
                                 <li class="nk-menu-item">
                                     <a href="/admin/product/uploaded" class="nk-menu-link"><span
                                             class="nk-menu-text">레거시 데이터</span></a>
                                 </li>
-                            </ul><!-- .nk-menu-sub -->
-                        </li><!-- .nk-menu-item -->
+                            </ul>
+                        </li> --}}
                         <li class="nk-menu-item">
                             <a href="/admin/product/mining" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
                                 <span class="nk-menu-text">마인윙</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
+                            <a href="/admin/product/minewing" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-cloud-arrow-up"></em></span>
+                                <span class="nk-menu-text">상품윙</span>
                             </a>
                         </li>
                         <li class="nk-menu-item has-sub">
