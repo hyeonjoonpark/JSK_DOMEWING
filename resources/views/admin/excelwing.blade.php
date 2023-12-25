@@ -18,7 +18,7 @@
                         <label for="" class="form-label">B2B 업체</label>
                         <div class="row">
                             @foreach ($b2Bs as $b2B)
-                                <div class="col-3 mb-3">
+                                <div class="col-12 col-md-3 mb-3">
                                     <div class="custom-control custom-radio">
                                         <input type="radio" id="b2B{{ $b2B->id }}" name="b2Bs"
                                             value="{{ $b2B->id }}" class="custom-control-input"
@@ -34,7 +34,7 @@
                         <label for="" class="form-label">원청사</label>
                         <div class="row">
                             @foreach ($sellers as $seller)
-                                <div class="col-3 mb-3">
+                                <div class="col-12 col-md-3 mb-3">
                                     <div class="custom-control custom-radio">
                                         <input type="radio" id="seller{{ $seller->vendor_id }}" name="sellers"
                                             value="{{ $seller->vendor_id }}" class="custom-control-input"
