@@ -16,7 +16,7 @@
                     <p>테이블의 모든 컬럼 중 원하는 키워드를 검색하세요.</p>
                     <div class="form-group">
                         <label for="" class="form-label">상품 검색</label>
-                        <form class="d-flex text-nowrap" method="POST" action="minewing">
+                        <form class="d-flex text-nowrap" method="POST">
                             @csrf
                             <input type="text" class="form-control" placeholder="검색 키워드를 기입해주세요" name="searchKeyword"
                                 value="{{ $searchKeyword }}">
@@ -65,8 +65,7 @@
                                         <td><a href="{{ $product->productHref }}" target="_blank">{{ $product->name }}</a>
                                         </td>
                                         <td>{{ date('Y-m-d', strtotime($product->createdAt)) }}</td>
-                                        <td><button class="btn btn-success mr-3">수정</button><button class="btn btn-danger"
-                                                onclick="initSoldOut('{{ $product->productCode }}');">품절</button></td>
+                                        <td>레거시 상품</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -87,70 +86,5 @@
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
-
-        function initSoldOut(productCode) {
-            Swal.fire({
-                icon: 'warning',
-                title: '상품 품절 처리',
-                text: '해당 상품을 정말로 품절 처리하시겠습니까?',
-                showCancelButton: true, // Show cancel button
-                confirmButtonText: '확인', // Text for confirm button
-                cancelButtonText: '취소', // Text for cancel button
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    popupLoader(0, 'B2B 업체들에게 해당 상품의 품절 처리를 요청합니다.');
-                    soldOut(productCode);
-                }
-            });
-        }
-
-        function soldOut(productCode) {
-            $.ajax({
-                url: '/api/product/sold-out',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    productCode,
-                    rememberToken
-                },
-                success: soldOutSuccess,
-                error: soldOutError
-            });
-        }
-
-        function soldOutSuccess(response) {
-            console.log(response);
-            closePopup();
-            const success = response.return.success;
-            const error = response.return.error;
-            const html = soldOutSuccessHTML(success, error);
-            swalSuccess(html);
-        }
-
-        function soldOutSuccessHTML(success, error) {
-            let html = '';
-
-            if (Array.isArray(success) && success.length > 0) {
-                const successNames = success.map(b2b => b2b.return).join(', ');
-                html += `성공한 업체:<br>${successNames}<br>`;
-            } else {
-                html += '성공한 업체가 없습니다.<br>';
-            }
-            html += "<br>";
-            if (Array.isArray(error) && error.length > 0) {
-                const errorNames = error.map(b2b => b2b.return).join(', ');
-                html += `실패한 업체:<br>${errorNames}`;
-            } else {
-                html += '실패한 업체가 없습니다.';
-            }
-
-            return html;
-        }
-
-        function soldOutError(response) {
-            console.log(response);
-            closePopup();
-            swalError('예기치 못한 에러가 발생했습니다.');
-        }
     </script>
 @endsection

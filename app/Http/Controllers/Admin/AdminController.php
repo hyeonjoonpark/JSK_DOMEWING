@@ -145,8 +145,10 @@ class AdminController extends Controller
             ->limit(1000)
             ->orderBy('mp.createdAt', 'DESC')
             ->get();
+        $searchKeyword = '';
         return view('admin/product_minewing', [
-            'products' => $products
+            'products' => $products,
+            'searchKeyword' => $searchKeyword
         ]);
     }
     function minewingPost(Request $request)
@@ -163,26 +165,59 @@ class AdminController extends Controller
                     ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
             })
-            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt');
-
-        // Second Query: Legacy Products
-        $legacyProducts = DB::table('uploaded_products AS up')
-            ->join('collected_products AS cp', 'up.productId', '=', 'cp.id')
+            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt')
+            ->orderBy('createdAt', 'DESC')->limit(1000)->get();
+        return view('admin/product_minewing', [
+            'products' => $products,
+            'searchKeyword' => $searchKeyword
+        ]);
+    }
+    public function soldOut(Request $request)
+    {
+        $searchKeyword = '';
+        if (isset($request->searchKeyword)) {
+            $searchKeyword = $request->searchKeyword;
+        }
+        $products = DB::table('minewing_products AS mp')
+            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
+            ->where('mp.isActive', 'Y')
+            ->where(function ($query) use ($searchKeyword) {
+                $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('mp.productCode', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
+            })
+            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt')
+            ->orderBy('createdAt', 'DESC')->limit(1000)->get();
+        $searchKeyword = '';
+        return view('admin/product_sold_out', [
+            'products' => $products,
+            'searchKeyword' => $searchKeyword
+        ]);
+    }
+    public function legacy(Request $request)
+    {
+        $searchKeyword = '';
+        if (isset($request->searchKeyword)) {
+            $searchKeyword = $request->searchKeyword;
+        }
+        $products = DB::table('uploaded_products AS up')
+            ->join('collected_products AS cp', 'cp.id', '=', 'up.productId')
             ->join('vendors AS v', 'v.id', '=', 'cp.sellerID')
             ->where('up.isActive', 'Y')
             ->where(function ($query) use ($searchKeyword) {
                 $query->where('up.newProductName', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('cp.productPrice', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('up.productId', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('cp.createdAt', 'like', '%' . $searchKeyword . '%');
             })
-            ->select('cp.id AS productID', 'cp.id AS productCode', 'up.newImageHref AS productImage', 'up.newProductName AS productName', 'cp.productPrice', 'cp.productHref', 'v.name', 'cp.createdAt');
-
-        // Combine the two queries with UNION
-        $combinedProducts = $products->union($legacyProducts)->orderBy('createdAt', 'DESC')->limit(1000)->get();
-        return view('admin/product_minewing', [
-            'products' => $combinedProducts
+            ->select('cp.id AS productID', 'cp.id AS productCode', 'up.newImageHref AS productImage', 'up.newProductName AS productName', 'cp.productPrice', 'cp.productHref', 'v.name', 'cp.createdAt')
+            ->orderBy('cp.createdAt', 'DESC')->limit(1000)->get();
+        $searchKeyword = '';
+        return view('admin/product_legacy', [
+            'products' => $products,
+            'searchKeyword' => $searchKeyword
         ]);
     }
     public function excelwing(Request $request)

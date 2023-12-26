@@ -42,7 +42,7 @@ class ProcessController extends Controller
             'return' => $products
         ];
     }
-    protected function getAccount($userID, $sellerID)
+    public function getAccount($userID, $sellerID)
     {
         $account = DB::table('accounts')
             ->where('user_id', $userID)
