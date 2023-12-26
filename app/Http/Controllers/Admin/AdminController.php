@@ -152,9 +152,10 @@ class AdminController extends Controller
     function minewingPost(Request $request)
     {
         $searchKeyword = $request->searchKeyword;
+        // First Query: New Products
         $products = DB::table('minewing_products AS mp')
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
-            ->where('mp.isActive', 'Y')  // Always apply isActive = 'Y'
+            ->where('mp.isActive', 'Y')
             ->where(function ($query) use ($searchKeyword) {
                 $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')
@@ -162,12 +163,26 @@ class AdminController extends Controller
                     ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
             })
-            ->select('mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt', 'mp.id')
-            ->limit(1000)
-            ->orderBy('mp.createdAt', 'DESC')
-            ->get();
+            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt');
+
+        // Second Query: Legacy Products
+        $legacyProducts = DB::table('uploaded_products AS up')
+            ->join('collected_products AS cp', 'up.productId', '=', 'cp.id')
+            ->join('vendors AS v', 'v.id', '=', 'cp.sellerID')
+            ->where('up.isActive', 'Y')
+            ->where(function ($query) use ($searchKeyword) {
+                $query->where('up.newProductName', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('cp.productPrice', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('up.productId', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('cp.createdAt', 'like', '%' . $searchKeyword . '%');
+            })
+            ->select('cp.id AS productID', 'cp.id AS productCode', 'up.newImageHref AS productImage', 'up.newProductName AS productName', 'cp.productPrice', 'cp.productHref', 'v.name', 'cp.createdAt');
+
+        // Combine the two queries with UNION
+        $combinedProducts = $products->union($legacyProducts)->orderBy('createdAt', 'DESC')->limit(1000)->get();
         return view('admin/product_minewing', [
-            'products' => $products
+            'products' => $combinedProducts
         ]);
     }
     public function excelwing(Request $request)
