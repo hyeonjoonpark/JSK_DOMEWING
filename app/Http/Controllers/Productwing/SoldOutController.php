@@ -29,10 +29,25 @@ class SoldOutController extends Controller
             return $this->processSoldOut($b2B, $user->id, $request->productCode);
         }, $b2Bs->toArray());
 
+        $this->inactiveProduct($request->productCode);
+
         return [
             'status' => true,
             'return' => $this->formatResponses($responses)
         ];
+    }
+
+    protected function inactiveProduct($productCode)
+    {
+        try {
+            DB::table('minewing_products')
+                ->where('productCode', $productCode)
+                ->update([
+                    'isActive' => 'N'
+                ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     protected function processSoldOut($b2B, $userID, $productCode)

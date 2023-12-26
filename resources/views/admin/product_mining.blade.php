@@ -281,6 +281,7 @@
                     productHrefs: productHrefs
                 },
                 success: function(response) {
+                    console.log(response);
                     closePopup();
                     if (response.status) {
                         const products = response.return;
