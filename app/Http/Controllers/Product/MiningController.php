@@ -58,19 +58,7 @@ class MiningController extends Controller
         exec($command, $output, $returnCode);
         if ($returnCode === 0 && isset($output[0])) {
             $numProducts = (int) $output[0];
-            switch ($seller->vendor_id) {
-                case 2: // 철물박사
-                    $numPage = 60;
-                    break;
-                case 14: // 씨오코리아
-                    $numPage = 120;
-                    break;
-                default:
-                    return [
-                        'status' => false,
-                        'return' => '잘못된 원청사 정보입니다.'
-                    ];
-            }
+            $numPage = $seller->num_per_page;
             $numPages = (int)ceil($numProducts / $numPage);
             return [
                 'status' => true,

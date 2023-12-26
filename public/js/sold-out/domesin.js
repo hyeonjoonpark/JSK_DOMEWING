@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -15,11 +15,25 @@ const puppeteer = require('puppeteer');
         await page.click('#main > table.tb12 > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(2) > input');
         page.on('dialog', async dialog => {
             await dialog.accept();
-            console.log(true);
             return;
         });
-        await page.click('#btn_total_sold');
-        console.log(response);
+        const [newPage] = await Promise.all([
+            new Promise(resolve => browser.once('targetcreated', target => resolve(target.page()))),
+            page.click('#btn_total_sold')
+        ]);
+
+        // 새 페이지에서 원하는 요소의 textContent 가져오기
+        if (newPage) {
+            await newPage.waitForSelector('body > table > tbody > tr:nth-child(2) > td > div:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(4)');
+            const textContent = await newPage.$eval('body > table > tbody > tr:nth-child(2) > td > div:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(4)', element => element.textContent);
+            if (textContent.includes('변경')) {
+                console.log(true);
+            } else {
+                console.log(false);
+            }
+        } else {
+            console.log(false);
+        }
     } catch (error) {
         console.error('Error:', error);
     } finally {
