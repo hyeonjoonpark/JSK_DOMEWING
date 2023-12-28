@@ -1,7 +1,18 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const chromeExecutablePath = {
+        Windows: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+        MacOS: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        Linux: '/usr/bin/google-chrome'
+        // 자신의 OS에 맞는 경로를 사용하세요.
+    };
+
+    // Puppeteer를 실행하여 Google Chrome 브라우저를 사용합니다.
+    const browser = await puppeteer.launch({
+        headless: false, // 비헤드리스 모드 해제
+        executablePath: chromeExecutablePath.Windows // 운영체제에 맞는 경로 사용
+    });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
