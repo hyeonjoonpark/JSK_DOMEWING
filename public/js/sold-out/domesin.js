@@ -2,7 +2,11 @@ const puppeteer = require('puppeteer');
 
 (async () => {
     const browser = await puppeteer.launch({ headless: false, executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' });
-    const page = await browser.newPage();
+    // 브라우저의 모든 페이지(탭)를 가져옵니다.
+    const pages = await browser.pages();
+
+    // 첫 번째 탭을 선택합니다. 기본적으로 하나의 탭이 열립니다.
+    const page = pages[0];
     try {
         const args = process.argv.slice(2);
         const [username, password, productCode] = args;
