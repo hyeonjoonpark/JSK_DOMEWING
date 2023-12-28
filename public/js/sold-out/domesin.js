@@ -2,9 +2,7 @@ const puppeteer = require('puppeteer');
 
 (async () => {
     const browser = await puppeteer.launch({
-        headless: false,
-        executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-        ignoreDefaultArgs: ['--enable-automation']
+        headless: false
     });
     const pages = await browser.pages();
     const page = pages[0];
