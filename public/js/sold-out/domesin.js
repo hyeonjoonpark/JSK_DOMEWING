@@ -1,7 +1,11 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false, executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' });
+    const browser = await puppeteer.launch({
+        headless: false,
+        executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        ignoreDefaultArgs: ['--enable-automation']
+    });
     // 브라우저의 모든 페이지(탭)를 가져옵니다.
     const pages = await browser.pages();
 
