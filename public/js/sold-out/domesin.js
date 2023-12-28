@@ -6,7 +6,6 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [username, password, productCode] = args;
-        page.setDefaultNavigationTimeout(0);
         await page.goto('https://www.domesin.com/scm/login.html', { waitUntil: 'networkidle2', timeout: 0 });
         await page.type('body > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(1) > td > input', username);
         await page.type('body > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(3) > td > input', password);
