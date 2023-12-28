@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 (async () => {
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: false,
         executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
         ignoreDefaultArgs: ['--enable-automation']
     });
