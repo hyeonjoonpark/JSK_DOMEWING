@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -28,11 +28,7 @@ const puppeteer = require('puppeteer');
             const textContent = await newPage.$eval('body > table > tbody > tr:nth-child(2) > td > div:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(4)', element => element.textContent);
             if (textContent.includes('변경')) {
                 console.log(true);
-            } else {
-                console.log(false);
             }
-        } else {
-            console.log(false);
         }
     } catch (error) {
         console.error('Error:', error);
