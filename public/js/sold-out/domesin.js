@@ -14,7 +14,7 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [username, password, productCode] = args;
-        await page.goto('https://www.domesin.com/scm/login.html');
+        await page.goto('https://www.domesin.com/scm/login.html', { timeout: 0 });
         const usernameInput = await page.waitForSelector('body > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(1) > td > input');
         const passwordInput = await page.waitForSelector('body > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(3) > td > input');
         const signInBtn = await page.waitForSelector('body > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td > table > tbody > tr > td:nth-child(3) > input[type=image]');
