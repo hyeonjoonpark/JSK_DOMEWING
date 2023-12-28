@@ -180,7 +180,7 @@ class AdminController extends Controller
         }
         $products = DB::table('minewing_products AS mp')
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
-            ->where('mp.isActive', 'Y')
+            ->where('mp.isActive', 'N')
             ->where(function ($query) use ($searchKeyword) {
                 $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')

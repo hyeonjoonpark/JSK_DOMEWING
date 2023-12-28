@@ -6,6 +6,10 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [username, password, productCode] = args;
+        await page.setViewport({
+            width: 1920,
+            height: 1080
+        });
         await page.goto('https://www.domeatoz.com/seller-login', { waitUntil: 'networkidle2' });
         await page.type('#UserId', username);
         await page.type('#UserPass', password);

@@ -22,6 +22,7 @@ class SoldOutController extends Controller
 
     public function index(Request $request)
     {
+        set_time_limit(0);
         $user = $this->userController->getUser($request->rememberToken);
         $b2Bs = $this->getActiveB2Bs();
 
@@ -60,11 +61,17 @@ class SoldOutController extends Controller
 
     protected function soldOut($productCode, $b2BEngName, $username, $password, $b2BName)
     {
-        $process = new Process(['node', $this->getScriptPath($b2BEngName), $username, $password, $productCode]);
-        $process->run();
-
+        $scriptPath = $this->getScriptPath($b2BEngName);
+        $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($username) . " " . $password . " " . escapeshellarg($productCode);
+        exec($command, $output, $resultCode);
+        if (isset($output[0])) {
+            return [
+                'status' => true,
+                'return' => $b2BName
+            ];
+        }
         return [
-            'status' => $process->isSuccessful(),
+            'status' => false,
             'return' => $b2BName
         ];
     }
