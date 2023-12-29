@@ -36,7 +36,8 @@ class SoldOutController extends Controller
             DB::table('minewing_products')
                 ->where('productCode', $productCode)
                 ->update([
-                    'isActive' => 'N'
+                    'isActive' => 'N',
+                    'updatedAt' => now()
                 ]);
         } catch (\Exception $e) {
             return $e->getMessage();

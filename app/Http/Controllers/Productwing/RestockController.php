@@ -25,7 +25,7 @@ class RestockController extends Controller
         foreach ($b2Bs as $b2B) {
             $account = $processController->getAccount($user->id, $b2B->vendor_id);
             $response = $this->restock($productCode, $b2B->name_eng, $account->username, $account->password, $b2B->name);
-            if ($response['status'] === true) {
+            if ($response['status'] == true) {
                 $success[] = $response['return'];
             } else {
                 $error[] = $response['return'];
@@ -42,15 +42,9 @@ class RestockController extends Controller
         $scriptPath = public_path('js/restock/' . $b2BEngName . '.js');
         $command = 'node ' . $scriptPath . ' ' . $username . ' ' . $password . ' ' . $productCode;
         exec($command, $output, $resultCode);
-        if (isset($output[0])) {
-            if ($output[0] === true) {
-                return [
-                    'status' => true,
-                    'return' => $b2BName
-                ];
-            }
+        if (isset($output)) {
             return [
-                'status' => false,
+                'status' => $output,
                 'return' => $b2BName
             ];
         }
@@ -65,7 +59,8 @@ class RestockController extends Controller
             DB::table('minewing_products')
                 ->where('productCode', $productCode)
                 ->update([
-                    'isActive' => 'Y'
+                    'isActive' => 'Y',
+                    'updatedAt' => now()
                 ]);
         } catch (\Exception $e) {
             return $e->getMessage();
