@@ -45,7 +45,7 @@ const puppeteer = require('puppeteer');
                 Array.from(optionElements).slice(1).forEach(el => {
                     const text = el.textContent;
                     // Split text into optionName and optionPriceText using array destructuring
-                    const [optionName, optionPriceText] = text.split(':').map(s => s.trim());
+                    const [optionName, optionPriceText] = text.split(' : ').map(s => s.trim());
                     // Parse the price as an integer
                     let optionPrice = 0;
                     if (optionPriceText) {
