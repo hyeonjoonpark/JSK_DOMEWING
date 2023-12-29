@@ -68,7 +68,7 @@ class SaveController extends Controller
                     $newProductName = $productName . ' TYPE ' . $type;
                     $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:2rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1>' . $productDetail;
                     if ($optionPriceType == 'ADD') {
-                        $productPrice = (int)$productPrice + (int)$productOption['optionPrice'];
+                        (int)$productPrice = (int)$product['productPrice'] + (int)$productOption['optionPrice'];
                     } else {
                         $productPrice = (int)$productOption['optionPrice'];
                     }
