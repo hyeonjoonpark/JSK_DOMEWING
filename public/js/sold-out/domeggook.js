@@ -26,10 +26,7 @@ const puppeteer = require('puppeteer');
         await checkboxSelector.click();
         await selectSelector.select('N');
         page.on('dialog', async dialog => {
-            const message = dialog.message();
-            if (message.includes('완료')) {
-                console.log(true);
-            }
+            console.log(true);
             await dialog.accept();
             return;
         });
