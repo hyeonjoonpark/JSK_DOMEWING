@@ -49,7 +49,7 @@ class ManufactureController extends Controller
                     $newProductName = $productName . ' TYPE ' . $type;
                     $newProductDetail = '<h1 style="color:red; font-weight:bold; font-size:2rem;">옵션명 : ' . $productOption['optionName'] . '</h1>' . $productDetail;
                     if ($optionPriceType == 'ADD') {
-                        (int)$productPrice = (int)$product['productOptions'] + (int)$productOption['optionPrice'];
+                        (int)$productPrice = (int)$product['productPrice'] + (int)$productOption['optionPrice'];
                     } else {
                         $productPrice = (int)$productOption['optionPrice'];
                     }
