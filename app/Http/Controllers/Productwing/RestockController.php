@@ -13,6 +13,7 @@ class RestockController extends Controller
 {
     public function index(Request $request)
     {
+        set_time_limit(0);
         $productCode = $request->productCode;
         $soldOutController = new SoldOutController();
         $b2Bs = $soldOutController->getActiveB2Bs();
