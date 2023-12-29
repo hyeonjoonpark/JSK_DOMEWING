@@ -6,6 +6,11 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [username, password, productCode] = args;
+        await page.setViewport({
+            width: 1920,
+            height: 1080,
+            deviceScaleFactor: 1
+        });
         await page.goto('https://domeggook.com/sc/?login=pc', { waitUntil: 'networkidle2' });
         await page.type('#idInput', username);
         await page.type('#pwInput', password);
