@@ -25,7 +25,7 @@ class RestockController extends Controller
         foreach ($b2Bs as $b2B) {
             $account = $processController->getAccount($user->id, $b2B->vendor_id);
             $response = $this->restock($productCode, $b2B->name_eng, $account->username, $account->password, $b2B->name);
-            if ($response['status'] == true) {
+            if ($response['status'] === true) {
                 $success[] = $response['return'];
             } else {
                 $error[] = $response['return'];
