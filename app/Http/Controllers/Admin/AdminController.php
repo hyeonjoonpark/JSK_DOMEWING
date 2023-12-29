@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Productwing\SoldOutController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -16,9 +17,15 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $dashboardController = new DashboardController();
-        $posts = $dashboardController->loadPosts();
-        return view('admin/dashboard', ['posts' => $posts]);
+        $soldOutController = new SoldOutController();
+        $b2Bs = $soldOutController->getActiveB2Bs();
+        $b2BHrefs = array_map(function ($b2B) {
+            return $b2B->vendor_href;
+        }, $b2Bs->toArray());
+        return view('admin/dashboard', [
+            'b2Bs' => $b2Bs,
+            'b2BHrefs' => $b2BHrefs
+        ]);
     }
     public function productSearch()
     {
