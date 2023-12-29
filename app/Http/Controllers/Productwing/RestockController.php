@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Product\ProcessController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Productwing\SoldOutController;
+use Illuminate\Support\Facades\DB;
 
 class RestockController extends Controller
 {
@@ -29,6 +30,7 @@ class RestockController extends Controller
                 $error[] = $response['return'];
             }
         }
+        $this->activeProduct($request->productCode);
         return [
             'success' => $success,
             'error' => $error
@@ -49,5 +51,17 @@ class RestockController extends Controller
             'status' => false,
             'return' => $b2BName
         ];
+    }
+    protected function activeProduct($productCode)
+    {
+        try {
+            DB::table('minewing_products')
+                ->where('productCode', $productCode)
+                ->update([
+                    'isActive' => 'Y'
+                ]);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 }
