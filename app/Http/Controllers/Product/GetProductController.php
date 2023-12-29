@@ -10,12 +10,12 @@ class GetProductController extends Controller
 {
     public function index(Request $request)
     {
-        $productID = $request->productID;
-        $product = $this->getProduct($productID);
-        if ($product === null) {
+        $productCode = $request->productCode;
+        $product = $this->getProduct($productCode);
+        if ($product == null) {
             return [
                 'status' => false,
-                'return' => '상품 정보 불러오기에 실패했습니다. 다시 시도해주십시오.'
+                'return' => '상품 정보를 찾을 수 없습니다.'
             ];
         }
         return [
@@ -23,12 +23,10 @@ class GetProductController extends Controller
             'return' => $product
         ];
     }
-    public function getProduct($productID)
+    public function getProduct($productCode)
     {
-        $product = DB::table('minewing_products')
-            ->where('isActive', 'Y')
-            ->where('id', $productID)
+        return DB::table('minewing_products')
+            ->where('productCode', $productCode)
             ->first();
-        return $product;
     }
 }

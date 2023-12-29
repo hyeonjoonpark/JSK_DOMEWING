@@ -38,6 +38,7 @@ use App\Http\Controllers\Product\ManufactureController;
 use App\Http\Controllers\Product\MiningController;
 use App\Http\Controllers\Product\ProcessController;
 use App\Http\Controllers\Product\ValidateProductNamesController;
+use App\Http\Controllers\Productwing\RestockController;
 use App\Http\Controllers\Productwing\SoldOutController;
 
 /*
@@ -69,10 +70,11 @@ Route::post('/product/unique', [FilterDuplicatesController::class, 'index']);
 Route::post('/product/manufacture', [ManufactureController::class, 'index']);
 Route::post('/product/validate-product-names', [ValidateProductNamesController::class, 'index']);
 Route::post('/product/insert', [InsertController::class, 'index']);
-Route::post('/product/request-product-detail', [GetProductController::class, 'index']);
+Route::post('/product/get-product', [GetProductController::class, 'index']);
 Route::post('/product/excelwing', [ExcelwingController::class, 'index']);
 Route::post('/product/category-mapping', [CategoryMappingController::class, 'index']);
 Route::post('/product/sold-out', [SoldOutController::class, 'index']);
+Route::post('/product/restock', [RestockController::class, 'index']);
 // account-setting
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);

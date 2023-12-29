@@ -11,19 +11,11 @@ use Symfony\Component\Process\Process;
 
 class SoldOutController extends Controller
 {
-    protected $processController;
-    protected $userController;
-
-    public function __construct(ProcessController $processController, UserController $userController)
-    {
-        $this->processController = $processController;
-        $this->userController = $userController;
-    }
-
     public function index(Request $request)
     {
         set_time_limit(0);
-        $user = $this->userController->getUser($request->rememberToken);
+        $userController = new UserController();
+        $user = $userController->getUser($request->rememberToken);
         $b2Bs = $this->getActiveB2Bs();
 
         $responses = array_map(function ($b2B) use ($user, $request) {
@@ -53,7 +45,8 @@ class SoldOutController extends Controller
 
     protected function processSoldOut($b2B, $userID, $productCode)
     {
-        $account = $this->processController->getAccount($userID, $b2B->vendor_id);
+        $processController = new ProcessController();
+        $account = $processController->getAccount($userID, $b2B->vendor_id);
         $response = $this->soldOut($productCode, $b2B->name_eng, $account->username, $account->password, $b2B->name);
 
         return $response;
@@ -65,8 +58,14 @@ class SoldOutController extends Controller
         $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($username) . " " . $password . " " . escapeshellarg($productCode);
         exec($command, $output, $resultCode);
         if (isset($output[0])) {
+            if ($output[0]) {
+                return [
+                    'status' => true,
+                    'return' => $b2BName
+                ];
+            }
             return [
-                'status' => true,
+                'status' => false,
                 'return' => $b2BName
             ];
         }
@@ -81,7 +80,7 @@ class SoldOutController extends Controller
         return public_path("js/sold-out/" . $b2BEngName . ".js");
     }
 
-    protected function getActiveB2Bs()
+    public function getActiveB2Bs()
     {
         return DB::table('product_register AS pr')
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')

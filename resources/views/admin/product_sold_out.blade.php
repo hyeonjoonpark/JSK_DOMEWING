@@ -65,7 +65,8 @@
                                         <td><a href="{{ $product->productHref }}" target="_blank">{{ $product->name }}</a>
                                         </td>
                                         <td>{{ date('Y-m-d', strtotime($product->createdAt)) }}</td>
-                                        <td><button class="btn btn-success mr-3">재입고</button></td>
+                                        <td><button class="btn btn-success mr-3"
+                                                onclick="initRestock('{{ $product->productCode }}');">재입고</button></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -86,5 +87,74 @@
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
+
+        function initRestock(productCode) {
+            Swal.fire({
+                icon: 'warning',
+                title: '상품 재입고',
+                text: '해당 상품을 재입고 처리하시겠습니까? 이 작업은 몇 분 정도 소요될 수 있습니다.',
+                showCancelButton: true,
+                confirmButtonText: '확인',
+                cancelButtonText: '취소'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    popupLoader(0, 'B2B 업체들에게 재입고 소식을 알리고 올게요.');
+                    runRestock(productCode);
+                }
+            });
+        }
+
+        function runRestock(productCode) {
+            $.ajax({
+                url: '/api/product/restock',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    productCode,
+                    rememberToken
+                },
+                success: restockSuccess,
+                error: restockError
+            });
+        }
+
+        function restockSuccess(response) {
+            console.log(response);
+            closePopup();
+            const success = response.success;
+            const error = response.error;
+            const html = restockSuccessHTML(success, error);
+            swalSuccess(html);
+        }
+
+        function restockSuccessHTML(success, error) {
+            let html = '';
+
+            if (Array.isArray(success) && success.length > 0) {
+                html += '성공한 업체:<br>';
+                for (success of success) {
+                    html += `${success}, `;
+                }
+            } else {
+                html += '성공한 업체가 없습니다.';
+            }
+            html += "<br><br>";
+            if (Array.isArray(error) && error.length > 0) {
+                html += '실패한 업체:<br>';
+                for (error of error) {
+                    html += `${error}, `;
+                }
+            } else {
+                html += '실패한 업체가 없습니다.';
+            }
+
+            return html;
+        }
+
+        function restockError(response) {
+            console.log(response);
+            closePopup();
+            swalError('예기치 못한 에러가 발생했습니다.');
+        }
     </script>
 @endsection
