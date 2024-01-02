@@ -75,6 +75,12 @@
                                 <span class="nk-menu-text">엑셀윙</span>
                             </a>
                         </li>
+                        <li class="nk-menu-item">
+                            <a href="/admin/orderwing" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-truck"></em></span>
+                                <span class="nk-menu-text">발주윙</span>
+                            </a>
+                        </li>
                         {{-- <li class="nk-menu-item">
                             <a href="/admin/product/register" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
@@ -87,7 +93,7 @@
                                 <span class="nk-menu-text">상품 키워드 테스트</span>
                             </a>
                         </li> --}}
-                        <li class="nk-menu-item">
+                        {{-- <li class="nk-menu-item">
                             <a href="/admin/cms_dashboard" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
                                 <span class="nk-menu-text">CMS 저작물 관리 시스템</span>
@@ -98,7 +104,7 @@
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
                                 <span class="nk-menu-text">Seller CMS</span>
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="nk-menu-item">
                             <a href="/admin/account-setting" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-gear"></em></span>

@@ -227,6 +227,7 @@ class AdminController extends Controller
                 $query->where('up.newProductName', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('cp.productPrice', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('up.productId', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('cp.createdAt', 'like', '%' . $searchKeyword . '%');
             })
             ->select('cp.id AS productID', 'cp.id AS productCode', 'up.newImageHref AS productImage', 'up.newProductName AS productName', 'cp.productPrice', 'cp.productHref', 'v.name', 'cp.createdAt')
@@ -313,5 +314,9 @@ class AdminController extends Controller
         return view('admin/mapped', [
             'categoryMapping' => $categoryMapping
         ]);
+    }
+    public function orderwing(Request $request)
+    {
+        return view('admin/orderwing');
     }
 }
