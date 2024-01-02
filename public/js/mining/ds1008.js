@@ -10,9 +10,12 @@ async function extractProductsOnPage(page) {
             if (koreanRegex.test(priceText)) {
                 continue;
             }
+            const name = productElement.querySelector('div > div.txt > a > strong').textContent;
+            if (name.includes('화물')) {
+                continue;
+            }
             const priceNumber = priceText.match(/\d+/g);
             const price = parseInt(priceNumber.join(''), 10);
-            const name = productElement.querySelector('div > div.txt > a > strong').textContent;
             const imageText = productElement.querySelector('div > div.thumbnail > a > img');
             const image = imageText.getAttribute('src');
             const hrefSelector = productElement.querySelector('div > div.thumbnail > a').getAttribute('href');
