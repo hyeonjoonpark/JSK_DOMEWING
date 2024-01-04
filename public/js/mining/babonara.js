@@ -31,7 +31,7 @@ async function extractProductsOnPage(page) {
     });
 }
 (async () => {
-    const browser = await puppeteer.launch({ headless: false, ignoreDefaultArgs: ['--enable-automation'] });
+    const browser = await puppeteer.launch({ headless: true, ignoreDefaultArgs: ['--enable-automation'] });
     const page = await browser.newPage();
     // page.setDefaultNavigationTimeout(0);
     try {
