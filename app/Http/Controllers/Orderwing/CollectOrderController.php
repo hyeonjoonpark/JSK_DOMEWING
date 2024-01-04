@@ -29,6 +29,7 @@ class CollectOrderController extends Controller
             $account = $processController->getAccount($userID, $b2BVendorID);
             $username = $account->username;
             $password = $account->password;
+            $this->deleteLegacy($b2BEngName);
             $response = $this->getOrderExcelFile($b2BEngName, $b2BVendorID, $username, $password);
             if ($response['status'] === true) {
                 $success[] = $response['return'];
@@ -43,6 +44,17 @@ class CollectOrderController extends Controller
                 'error' => $error
             ]
         ];
+    }
+    public function deleteLegacy($b2BEngName)
+    {
+        $dir = public_path('assets/excel/orderwing/' . $b2BEngName . '/*'); // 디렉토리 경로 설정
+        // glob() 함수로 디렉토리 내 모든 파일 목록을 얻기
+        foreach (glob($dir) as $file) {
+            // 파일이면 삭제
+            if (is_file($file)) {
+                unlink($file); // 파일 삭제
+            }
+        }
     }
     public function requestExcelFile($b2BEngName = 'domesin', $b2BVendorID = 6, $username = 'sungiltradekorea', $password = 'tjddlf88!@')
     {
