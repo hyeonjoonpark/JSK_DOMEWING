@@ -161,7 +161,7 @@ class SaveController extends Controller
         try {
             $isVAT = $this->getIsVAT($sellerID);
             if ($isVAT == 'Y') {
-                $productPrice = (int)$productPrice + (int)ceil($productPrice * 0.1);
+                $productPrice = ceil((int)$productPrice * 1.1);
             }
             do {
                 $productCode = $this->generateRandomProductCode(5);
