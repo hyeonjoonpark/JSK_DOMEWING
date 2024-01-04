@@ -7,5 +7,6 @@ return [
     'In',
     'IN',
     'iN',
-    'In'
+    'In',
+    'GL'
 ];
