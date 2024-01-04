@@ -46,13 +46,15 @@ const puppeteer = require('puppeteer');
                     const text = el.textContent;
                     // Split text into optionName and optionPriceText using array destructuring
                     const [optionName, optionPriceText] = text.split(' : ').map(s => s.trim());
-                    // Parse the price as an integer
-                    let optionPrice = 0;
-                    if (optionPriceText) {
-                        optionPrice = parseInt(optionPriceText.replace(/[^\d]/g, ''), 10);
+                    if (!optionName.includes('품절')) {
+                        // Parse the price as an integer
+                        let optionPrice = 0;
+                        if (optionPriceText) {
+                            optionPrice = parseInt(optionPriceText.replace(/[^\d]/g, ''), 10);
+                        }
+                        // Push the object to productOptions
+                        productOptions.push({ optionName, optionPrice });
                     }
-                    // Push the object to productOptions
-                    productOptions.push({ optionName, optionPrice });
                 });
             }
 
