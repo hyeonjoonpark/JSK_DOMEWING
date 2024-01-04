@@ -78,7 +78,7 @@
                         <li class="nk-menu-item">
                             <a href="/admin/orderwing" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-truck"></em></span>
-                                <span class="nk-menu-text">발주윙</span>
+                                <span class="nk-menu-text">오더윙</span>
                             </a>
                         </li>
                         {{-- <li class="nk-menu-item">
