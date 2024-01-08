@@ -27,7 +27,7 @@ const path = require('path');
             await dialog.accept();
             return;
         });
-        await page.click('#btn_indb');
+        await page.click('button[onclick="execel_download()"]');
         await new Promise((page) => setTimeout(page, 3000));
         console.log(true);
     } catch (error) {

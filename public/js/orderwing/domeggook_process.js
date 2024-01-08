@@ -21,7 +21,7 @@ const puppeteer = require('puppeteer');
         await frame.click('#lXlsReqNoticeBtnSubmit');
         await new Promise((page) => setTimeout(page, 3000));
         await frame.click('#lXlsReqNoticeBtnClose');
-        await new Promise((page) => setTimeout(page, 3000));
+        await new Promise((page) => setTimeout(page, 70000));
         console.log(true);
     } catch (error) {
         console.error('Error:', error);

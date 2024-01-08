@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const client = await page.target().createCDPSession();
 
@@ -16,6 +16,10 @@ const path = require('path');
     try {
         const args = process.argv.slice(2);
         const [username, password] = args;
+        await page.setViewport({
+            width: 1920,
+            height: 1080
+        });
         await page.goto('https://ownerclan.com/vender/', { waitUntil: 'networkidle2' });
         const frame = page.frames().find(f => f.name() === 'vmainframe');
         await frame.type('body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(1) > input', username);

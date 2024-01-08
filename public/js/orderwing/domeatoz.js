@@ -28,6 +28,8 @@ const path = require('path');
         await page.goto('https://www.domeatoz.com/vendor-order', { waitUntil: 'networkidle2' });
         await page.select('#listBox > div > div.col-md-4.w-100.d-flex.mb-3 > select:nth-child(1)', '300');
         await new Promise((page) => setTimeout(page, 3000));
+        await page.click('#orderIngType1');
+        await new Promise((page) => setTimeout(page, 3000));
         await page.click('#listBox > div > div.dataTable-wrapper.dataTable-loading.no-footer.sortable.searchable.fixed-columns > div > table > thead > tr > th.text-center.align-middle.p-0 > input');
         await page.click('#orderSheetDown');
         await page.click('body > div.swal2-container.swal2-center.swal2-backdrop-show > div > div.swal2-actions > button.swal2-confirm.btn-danger.swal2-styled');
