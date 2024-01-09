@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     const client = await page.target().createCDPSession();
     const downloadPath = path.resolve('C:\\xampp\\htdocs\\sellwing\\public\\assets\\excel\\orderwing\\domesin'); // Update your download path
