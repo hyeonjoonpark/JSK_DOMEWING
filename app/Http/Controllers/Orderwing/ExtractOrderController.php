@@ -24,18 +24,20 @@ class ExtractOrderController extends Controller
     public function getProductHref($productCode)
     {
         // 미네윙 제품에서 활성화된 제품 정보 검색
-        $minewingQuery = DB::table('minewing_products')
+        $productHref = DB::table('minewing_products')
             ->where('isActive', 'Y')
             ->where('productCode', $productCode)
-            ->select('productHref', 'productImage');
-        // 업로드된 제품과 수집된 제품을 조인하여 활성화된 제품 정보 검색
-        $uploadedQuery = DB::table('uploaded_products AS up')
-            ->join('collected_products AS cp', 'up.productId', '=', 'cp.id')
-            ->where('up.isActive', 'Y')
-            ->where('up.productId', $productCode)
-            ->select('cp.productHref AS productHref', 'up.newImageHref AS productImage');
-        // 두 쿼리 결과의 합집합에서 첫 번째 결과 반환
-        $productHref = $minewingQuery->union($uploadedQuery)->first();
+            ->select('productHref', 'productImage')
+            ->first();
+        if ($productHref == null) {
+            // 업로드된 제품과 수집된 제품을 조인하여 활성화된 제품 정보 검색
+            $productHref = DB::table('uploaded_products AS up')
+                ->join('collected_products AS cp', 'up.productId', '=', 'cp.id')
+                ->where('up.isActive', 'Y')
+                ->where('up.productId', $productCode)
+                ->select('cp.productHref AS productHref', 'up.newImageHref AS productImage')
+                ->first();
+        }
         return $productHref;
     }
     public function extractExcelData($excelPath, $b2BEngName)
