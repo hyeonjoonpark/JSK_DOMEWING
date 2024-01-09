@@ -5,12 +5,9 @@ namespace App\Http\Controllers\Orderwing;
 use App\Http\Controllers\Controller;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
+
 class ProcessDataController extends Controller
 {
-    public function safeUtf8Encode($value, $sourceEncoding = 'auto')
-    {
-        return mb_convert_encoding($value, 'UTF-8', $sourceEncoding);
-    }
     public function ownerclan($excelPath)
     {
         $spreadsheet = IOFactory::load($excelPath);
@@ -34,6 +31,7 @@ class ProcessDataController extends Controller
             'V' => 'productCode',
             'W' => 'productCodeConditional', // Special handling for LADAM
             'A' => 'orderedAt',
+            'O' => 'amount'
             // ... Add more mappings if needed
         ];
 
@@ -51,13 +49,18 @@ class ProcessDataController extends Controller
                 $columnLetter = $cell->getColumn();
                 if (isset($columnMappings[$columnLetter])) {
                     // Extract value and convert it to UTF-8
-                    $value = $this->safeUtf8Encode($cell->getValue());
+                    $value = $cell->getValue();
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
-            $rowData['productHref'] = $extractOrderController->getProductHref($productCode);
+            $response = $extractOrderController->getProductHref($productCode);
+            $rowData['productHref'] = $response->productHref;
+            $rowData['productImage'] = $response->productImage;
             $rowData['b2BName'] = "오너클랜";
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty
@@ -77,7 +80,7 @@ class ProcessDataController extends Controller
             'C' => 'senderName',
             'D' => 'senderPhone',
             'E' => 'receiverName',
-            'F' => 'receiverPhone',
+            'G' => 'receiverPhone',
             'H' => 'postcode',
             'I' => 'address',
             'M' => 'productName',
@@ -89,6 +92,7 @@ class ProcessDataController extends Controller
             'X' => 'productCode',
             'Y' => 'productCodeConditional', // Special handling for LADAM
             'B' => 'orderedAt',
+            'S' => 'amount'
             // ... Add more mappings if needed
         ];
 
@@ -106,7 +110,10 @@ class ProcessDataController extends Controller
                 $columnLetter = $cell->getColumn();
                 if (isset($columnMappings[$columnLetter])) {
                     // Extract value and convert it to UTF-8
-                    $value = $this->safeUtf8Encode($cell->getValue());
+                    $value = $cell->getValue();
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
@@ -144,6 +151,7 @@ class ProcessDataController extends Controller
             'J' => 'productCode',
             'Y' => 'orderedAt',
             'AB' => 'shippingRemark',
+            'X' => 'amount'
             // Add more mappings as required
         ];
 
@@ -162,13 +170,18 @@ class ProcessDataController extends Controller
                 $columnLetter = $cell->getColumn();
                 if (isset($columnMappings[$columnLetter])) {
                     // Extract value and convert it to UTF-8
-                    $value = $this->safeUtf8Encode($cell->getValue());
+                    $value = $cell->getValue();
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
-            $rowData['productHref'] = $extractOrderController->getProductHref($productCode);
+            $response = $extractOrderController->getProductHref($productCode);
+            $rowData['productHref'] = $response->productHref;
+            $rowData['productImage'] = $response->productImage;
             $rowData['b2BName'] = "도매창고";
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty
@@ -179,12 +192,14 @@ class ProcessDataController extends Controller
     }
     public function domeggook($excelPath)
     {
-        $spreadsheet = IOFactory::load($excelPath);
+        $reader = IOFactory::createReader('Csv');
+        $reader->setInputEncoding('EUC-KR'); // EUC-KR 인코딩 설정
+        $spreadsheet = $reader->load($excelPath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = [];
-        $isFirstRow = true; // Flag to skip the first row
+        $isFirstRow = true; // 첫 행은 헤더로 간주, 건너뛰기 위한 플래그
 
-        // Define the column mappings for your data
+        // 열 매핑
         $columnMappings = [
             'L' => 'senderName',
             'M' => 'senderPhone',
@@ -193,41 +208,52 @@ class ProcessDataController extends Controller
             'P' => 'postcode',
             'O' => 'address',
             'G' => 'productName',
-            'AL' => 'quantity',
+            'J' => 'quantity',
             'AM' => 'productPrice',
             'AA' => 'shippingCost',
             'A' => 'orderCode',
             'U' => 'shippingRemark',
             'I' => 'productCode',
             'AH' => 'orderedAt',
-            // Add more mappings as required
+            'AN' => 'amount'
         ];
 
-        // Loop through each row of the worksheet
         foreach ($worksheet->getRowIterator() as $row) {
             if ($isFirstRow) {
                 $isFirstRow = false;
-                continue; // Skip the header row
+                continue;
             }
 
             $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false); // Loop through all cells
+            $cellIterator->setIterateOnlyExistingCells(false); // 모든 셀 순회
 
-            $rowData = []; // Initialize array to store the cell data
+            $rowData = [];
             foreach ($cellIterator as $cell) {
                 $columnLetter = $cell->getColumn();
                 if (isset($columnMappings[$columnLetter])) {
-                    // Extract value and convert it to UTF-8
-                    $value = $this->safeUtf8Encode($cell->getValue());
+                    $value = $cell->getValue();
+                    if ($columnLetter == 'P') {
+                        $value = str_replace("'", "", $value);
+                    }
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
+                    if ($columnMappings[$columnLetter] == 'amount') {
+                        (int)$value = (int)$value + (int)$rowData['shippingCost'];
+                    }
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
-            $productCode = $rowData['productCode'];
+
+            $productCode = $rowData['productCode'] ?? '';
             $extractOrderController = new ExtractOrderController();
-            $rowData['productHref'] = $extractOrderController->getProductHref($productCode);
+            $response = $extractOrderController->getProductHref($productCode);
+            $rowData['productHref'] = $response->productHref;
+            $rowData['productImage'] = $response->productImage;
             $rowData['b2BName'] = "도매꾹";
+
             if (!empty($rowData)) {
-                $data[] = $rowData; // Push the row data to the main data array if not empty
+                $data[] = $rowData;
             }
         }
 
@@ -275,13 +301,19 @@ class ProcessDataController extends Controller
                 $columnLetter = $cell->getColumn();
                 if (isset($columnMappings[$columnLetter])) {
                     // Extract value and convert it to UTF-8
-                    $value = $this->safeUtf8Encode($cell->getValue());
+                    $value = $cell->getValue();
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
-            $rowData['productHref'] = $extractOrderController->getProductHref($productCode);
+            $response = $extractOrderController->getProductHref($productCode);
+            $rowData['productHref'] = $response->productHref;
+            $rowData['productImage'] = $response->productImage;
+            (int)$rowData['amount'] = (int)$rowData['productPrice'] * (int)$rowData['quantity'] + (int)$rowData['shippingCost'];
             $rowData['b2BName'] = "도매의신";
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty

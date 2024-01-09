@@ -15,17 +15,15 @@
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">신규 주문</h6>
-                    <table class="table text-nowrap align-middle custom-table">
+                    <table class="table align-middle custom-table">
                         <thead>
                             <tr>
-                                <th scope="col">주문 넣은 사람</th>
-                                <th scope="col">물건 받는 사람</th>
-                                <th scope="col">상품 이미지</th>
+                                <th scope="col">발주 정보</th>
                                 <th scope="col">상품 정보</th>
                                 <th scope="col">갯수</th>
                                 <th scope="col">배송비</th>
+                                <th scope="col">총 금액</th>
                                 <th scope="col">B2B 업체</th>
-                                <th scope="col">ACTION</th>
                             </tr>
                         </thead>
                         <tbody id="orderwingResult">
@@ -50,33 +48,61 @@
                 data: {
                     rememberToken
                 },
-                success: function(response) {
-                    console.log(response);
-                    let html = "";
-                    for (order of response) {
-                        html += "<tr>";
-                        html += "<td>" + order.senderName + "<br>" + order.senderPhone + "</td>";
-                        html += "<td>" + order.receiverName + "<br>" + order.receiverPhone + "<br>" + order
-                            .postcode + "<br>" + order.address + "</td>";
-                        html += "<td><img src='" + order.productHref.productImage +
-                            "' width=100 height=100 /></td>";
-                        html += "<td>" + order.productName + "<br>" + order.productPrice + "원</td>";
-                        html += "<td>" + order.quantity + "개</td>";
-                        html += "<td>" + order.shippingCost + "원</td>";
-                        html += "<td>" + order.b2BName + "</td>";
-                        const productHref = order.productHref.productHref;
-                        html += "<td><a href='" + productHref +
-                            "' target='_blank' class='btn btn-primary'>상품 상세</a></td>";
-                        html += "</tr>";
-                    }
-                    $('#orderwingResult').html(html);
-                    closePopup();
-                },
+                success: updateOrderTable,
                 error: function(response) {
                     closePopup();
                     console.log(response);
                 }
             });
+        }
+
+        function updateOrderTable(response) {
+            console.log(response);
+            let html = response.map(order => `
+            <tr>
+                <td>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <h6 class='title'>주문자 정보</h6>
+                            <p>${order.senderName}<br>${order.senderPhone}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h6 class='title'>수취인 정보</h6>
+                            <p>${order.receiverName}<br>${order.receiverPhone}<br>${order.postcode}<br>${order.address}</p>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <a href="${order.productHref}" target="_blank"><img src="${order.productImage}" width=100 height=100 /></a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h6 class='title'><a href="${order.productHref}" target="_blank">${order.productName}</a></h6>
+                            <p><a href="${order.productHref}" target="_blank">${numberFormat(order.productPrice)}원</a></p>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-nowrap">
+                    ${order.quantity}개
+                </td>
+                <td class="text-nowrap">
+                    ${numberFormat(order.shippingCost)}원
+                </td>
+                <td class="text-nowrap">
+                    ${numberFormat(order.amount)}원
+                </td>
+                <td class="text-nowrap">
+                    ${order.b2BName}
+                </td>
+            </tr>
+            `).join('');
+            $('#orderwingResult').html(html);
+            closePopup();
         }
     </script>
 @endsection
