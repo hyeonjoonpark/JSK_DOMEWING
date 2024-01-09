@@ -32,8 +32,8 @@ class NameController extends Controller
     }
     function filterString($str)
     {
-        // 한글, 숫자, 영어, 공백만 허용 (유니코드 사용)
-        $str = preg_replace('/[^\p{L}\p{N}\s]/u', '', $str);
+        // 한글, 숫자, 영어, 공백, 마침표만 허용 (유니코드 사용)
+        $str = preg_replace('/[^\p{L}\p{N}\s\.]/u', '', $str);
         // 연속된 공백을 하나로 줄임
         $str = preg_replace('/\s+/', ' ', $str);
         // 앞뒤 공백 제거
