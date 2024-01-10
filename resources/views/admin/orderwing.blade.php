@@ -72,7 +72,7 @@
                     <div class="row">
                         <div class="col">
                             <h6 class='title'>수취인 정보</h6>
-                            <p>${order.receiverName}<br>${order.receiverPhone}<br>${order.postcode}<br>${order.address}<br>${order.shippingRemark}</p>
+                            <p>${order.receiverName}<br>${order.receiverPhone}<br>${order.postcode}<br>${order.address}<br>배송메시지: ${order.shippingRemark}</p>
                         </div>
                     </div>
                 </td>
