@@ -18,7 +18,7 @@ class ProductImageController extends Controller
         return $tempPath;
     }
 
-    function index($imageUrl)
+    function index($imageUrl, $hasWatermark)
     {
         $newWidth = 1000;
         $newHeight = 1000;
@@ -34,7 +34,9 @@ class ProductImageController extends Controller
             $image->save($savePathWithFile); // 이미지 저장
             $originalImagePath = $savePathWithFile;
             $watermarkImagePath = public_path('images/CDN/jsk_watermark.png');
-            $this->applyWatermark($originalImagePath, $watermarkImagePath);
+            if ($hasWatermark == 'Y') {
+                $this->applyWatermark($originalImagePath, $watermarkImagePath);
+            }
             return [
                 'status' => true,
                 'return' => "https://www.sellwing.kr/images/CDN/product/" . $newImageName

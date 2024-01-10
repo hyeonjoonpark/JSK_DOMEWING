@@ -75,7 +75,6 @@ class ProcessController extends Controller
             $result = json_decode($output[0], true);
             return $result;
         }
-        return response()->json(['error' => 'Failed to parse product data'], 500);
     }
     // public function scrapeProductDetails($sellerEngName, $username, $password, $productHref)
     // {

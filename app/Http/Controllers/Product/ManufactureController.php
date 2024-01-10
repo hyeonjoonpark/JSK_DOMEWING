@@ -31,7 +31,14 @@ class ManufactureController extends Controller
                 $byte = 40;
             }
             $productName = $nameController->index($product['productName'], $byte);
-            $productImage = $productImageController->index($product['productImage'])['return'];
+            $sellerID = $product['sellerID'];
+            $hasWatermark = DB::table('product_search')
+                ->where('vendor_id', $sellerID)
+                ->where('is_active', 'Y')
+                ->select('has_watermark')
+                ->first()
+                ->has_watermark;
+            $productImage = $productImageController->index($product['productImage'], $hasWatermark)['return'];
             $headerImage = DB::table('product_search')
                 ->where('vendor_id', $product->sellerID)
                 ->select('header_image')
@@ -40,7 +47,6 @@ class ManufactureController extends Controller
             $productDetail = $productImageController->processImages($product['productDetail'], $headerImage);
             $productPrice = (int)$product['productPrice'];
             $productHref = $product['productHref'];
-            $sellerID = $product['sellerID'];
             if ($hasOption == true && isset($product['productOptions'])) {
                 $productOptions = $product['productOptions'];
                 $optionPriceType = $this->getOptionPriceType($sellerID);

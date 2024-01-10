@@ -50,16 +50,21 @@ class SaveController extends Controller
                 $byte = 40;
             }
             $productName = $nameController->index($product['productName'], $byte);
-            $productImage = $productImageController->index($product['productImage'])['return'];
+            $sellerID = $product['sellerID'];
+            $hasWatermark = $this->getHasWatermark($sellerID);
+            $productImage = $productImageController->index($product['productImage'], $hasWatermark)['return'];
             $headerImage = DB::table('product_search')
                 ->where('vendor_id', $product['sellerID'])
                 ->select('header_image')
                 ->first()
                 ->header_image;
-            $productDetail = $productImageController->processImages($product['productDetail'], $headerImage);
+            if (isset($product['productDetail'])) {
+                $productDetail = $productImageController->processImages($product['productDetail'], $headerImage);
+            } else {
+                $productDetail = '<center><img src="https://www.sellwing.kr/images/CDN/' . $headerImage . '"></center>';
+            }
             $productPrice = (int)$product['productPrice'];
             $productHref = $product['productHref'];
-            $sellerID = $product['sellerID'];
             if ($hasOption == true && isset($product['productOptions'])) {
                 $productOptions = $product['productOptions'];
                 $optionPriceType = $this->getOptionPriceType($sellerID);
@@ -138,6 +143,15 @@ class SaveController extends Controller
             ->first()
             ->is_vat;
         return $isVAT;
+    }
+    public function getHasWatermark($sellerID)
+    {
+        $hasWatermark = DB::table('product_search')
+            ->where('vendor_id', $sellerID)
+            ->select('has_watermark')
+            ->first()
+            ->has_watermark;
+        return $hasWatermark;
     }
     protected function insertMappingwing($ownerclanCategoryID)
     {
