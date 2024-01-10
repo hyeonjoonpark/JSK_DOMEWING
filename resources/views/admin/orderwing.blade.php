@@ -24,6 +24,7 @@
                                 <th scope="col">갯수</th>
                                 <th scope="col">배송비</th>
                                 <th scope="col">총 금액</th>
+                                <th scope="col">주문상태</th>
                                 <th scope="col">B2B 업체</th>
                             </tr>
                         </thead>
@@ -71,7 +72,7 @@
                     <div class="row">
                         <div class="col">
                             <h6 class='title'>수취인 정보</h6>
-                            <p>${order.receiverName}<br>${order.receiverPhone}<br>${order.postcode}<br>${order.address}</p>
+                            <p>${order.receiverName}<br>${order.receiverPhone}<br>${order.postcode}<br>${order.address}<br>${order.shippingRemark}</p>
                         </div>
                     </div>
                 </td>
@@ -96,6 +97,10 @@
                 </td>
                 <td class="text-nowrap">
                     ${numberFormat(order.amount)}원
+                </td>
+                <td class="text-nowrap">
+                    <h6 class="title">${order.orderStatus}</h6>
+                    <p>${order.orderedAt}</p>
                 </td>
                 <td class="text-nowrap">
                     ${order.b2BName}

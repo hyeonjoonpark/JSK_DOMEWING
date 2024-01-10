@@ -61,6 +61,7 @@ class ProcessDataController extends Controller
             $response = $extractOrderController->getProductHref($productCode);
             $rowData['productHref'] = $response->productHref;
             $rowData['productImage'] = $response->productImage;
+            $rowData['orderStatus'] = '배송준비';
             $rowData['b2BName'] = "오너클랜";
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty
@@ -92,7 +93,8 @@ class ProcessDataController extends Controller
             'X' => 'productCode',
             'Y' => 'productCodeConditional', // Special handling for LADAM
             'B' => 'orderedAt',
-            'S' => 'amount'
+            'S' => 'amount',
+            'A' => 'orderStatus'
             // ... Add more mappings if needed
         ];
 
@@ -151,7 +153,8 @@ class ProcessDataController extends Controller
             'J' => 'productCode',
             'Y' => 'orderedAt',
             'AB' => 'shippingRemark',
-            'X' => 'amount'
+            'X' => 'amount',
+            'Z' => 'orderStatus'
             // Add more mappings as required
         ];
 
@@ -215,7 +218,8 @@ class ProcessDataController extends Controller
             'U' => 'shippingRemark',
             'I' => 'productCode',
             'AH' => 'orderedAt',
-            'AN' => 'amount'
+            'AN' => 'amount',
+            'B' => 'orderStatus'
         ];
 
         foreach ($worksheet->getRowIterator() as $row) {
@@ -280,6 +284,7 @@ class ProcessDataController extends Controller
             'Y' => 'shippingRemark',
             'J' => 'productCode',
             'V' => 'orderedAt',
+            'W' => 'orderStatus'
             // Add more mappings as required
         ];
 
