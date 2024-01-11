@@ -11,8 +11,90 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
+use function PHPSTORM_META\map;
+
 class FormProductController extends Controller
 {
+    public function domero($products, $margin_rate, $vendorEngName, $shippingCost)
+    {
+        try {
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/domero.xls'));
+            $sheet = $spreadsheet->getSheet(0);
+            // 데이터 추가
+            $rowIndex = 4;
+            foreach ($products as $product) {
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $data = [
+                    $categoryCode,
+                    $product->productName,
+                    $product->productName,
+                    $product->productCode,
+                    '기타',
+                    'LADAM',
+                    'LADAM',
+                    0,
+                    0,
+                    '',
+                    '',
+                    $product->productKeywords,
+                    $marginedPrice,
+                    '',
+                    '',
+                    $product->productDetail,
+                    $product->productImage,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    0,
+                    '',
+                    '',
+                    0,
+                    '',
+                    0,
+                    1,
+                    '',
+                    '',
+                    35,
+                    '상세정보별도표기',
+                    '상세정보별도표기',
+                    '상세정보별도표기',
+                    '상세정보별도표기',
+                    '상세정보별도표기',
+                    '상세정보별도표기',
+                    '상세정보별도표기',
+                    '상세정보별도표기'
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
+            }
+            // 엑셀 파일 저장
+            $fileName = 'domero_' . now()->format('YmdHis') . '.xls';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xls($spreadsheet);
+            $writer->save($formedExcelFile);
+            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            return ['status' => true, 'return' => $downloadURL];
+        } catch (Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage(),
+            ];
+        }
+    }
     public function domeggook($products, $margin_rate, $vendorEngName, $shippingCost)
     {
         try {
