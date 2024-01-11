@@ -35,12 +35,22 @@ class ProcessController extends Controller
         }
         $products = [];
         foreach ($productHrefs as $productHref) {
-            $products[] = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
+            $response = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
+            if ($response != 'false' && $response != false) {
+                $products[] = $response;
+            }
         }
-        return [
-            'status' => true,
-            'return' => $products
-        ];
+        if (count($products) > 0) {
+            return [
+                'status' => true,
+                'return' => $products
+            ];
+        } else {
+            return [
+                'status' => false,
+                'return' => '"재고가 50개 미만인 상품을 검색해 보니 전 상품이 필터링 됐습니다."'
+            ];
+        }
     }
     public function getAccount($userID, $sellerID)
     {

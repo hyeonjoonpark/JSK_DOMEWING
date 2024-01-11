@@ -11,6 +11,14 @@ const loginToSite = async (page, username, password) => {
 const getProductDetails = async (page, productHref) => {
     await page.goto(productHref, { waitUntil: 'load', timeout: 0 });
     return page.evaluate((productHref) => {
+        const stockSelector = '#select_option_lay > div.quantity_box > table > tbody > tr:nth-child(2) > td';
+        const stockElement = document.querySelector(stockSelector) !== null;
+        if (stockElement) {
+            const stock = parseInt(stockElement.textContent.trim().replace(/[^\d]/g, ''));
+            if (stock < 50) {
+                return false;
+            }
+        }
         const baseURL = 'https://dometopia.com';
         const productName = document.querySelector('#info > div.goods_info.clearbox > form > div.container > div > h2').textContent.trim();
         let productPrice = document.querySelector('#info > div.goods_info.clearbox > form > div.container > table > tbody > tr:nth-child(2) > td > ul:nth-child(2) > li:nth-child(3) > span').textContent.trim();
@@ -39,7 +47,7 @@ const getProductDetails = async (page, productHref) => {
 };
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const [productHref, username, password] = process.argv.slice(2);
