@@ -48,7 +48,7 @@ class ProcessController extends Controller
         } else {
             return [
                 'status' => false,
-                'return' => '"재고가 50개 미만인 상품을 검색해 보니 전 상품이 필터링 됐습니다."'
+                'return' => '"전 상품이 재고 50개 미만입니다."'
             ];
         }
     }
