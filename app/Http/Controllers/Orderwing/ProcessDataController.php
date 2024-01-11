@@ -326,4 +326,66 @@ class ProcessDataController extends Controller
         }
         return $data; // Return the extracted data
     }
+    public function domero($excelPath)
+    {
+        $spreadsheet = IOFactory::load($excelPath);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $data = [];
+        $isFirstRow = true;
+
+        $columnMappings = [
+            'B' => 'senderName',
+            'C' => 'senderPhone',
+            'E' => 'receiverName',
+            'G' => 'receiverPhone',
+            'H' => 'postcode',
+            'I' => 'address',
+            'J' => 'productName',
+            'L' => 'quantity',
+            'M' => 'productPrice',
+            'N' => 'shippingCost',
+            'P' => 'orderCode',
+            'S' => 'shippingRemark',
+            'V' => 'productCode',
+            'W' => 'productCodeConditional', // Special handling for LADAM
+            'A' => 'orderedAt',
+            'O' => 'amount'
+            // ... Add more mappings if needed
+        ];
+
+        foreach ($worksheet->getRowIterator() as $row) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+                continue;
+            }
+
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $rowData = [];
+            foreach ($cellIterator as $cell) {
+                $columnLetter = $cell->getColumn();
+                if (isset($columnMappings[$columnLetter])) {
+                    // Extract value and convert it to UTF-8
+                    $value = $cell->getValue();
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
+                    $rowData[$columnMappings[$columnLetter]] = $value;
+                }
+            }
+            $productCode = $rowData['productCode'];
+            $extractOrderController = new ExtractOrderController();
+            $response = $extractOrderController->getProductHref($productCode);
+            $rowData['productHref'] = $response->productHref;
+            $rowData['productImage'] = $response->productImage;
+            $rowData['orderStatus'] = '배송준비';
+            $rowData['b2BName'] = "오너클랜";
+            if (!empty($rowData)) {
+                $data[] = $rowData; // Push the row data to the main data array if not empty
+            }
+        }
+
+        return $data;
+    }
 }
