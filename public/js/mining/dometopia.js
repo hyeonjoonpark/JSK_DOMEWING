@@ -15,11 +15,20 @@ async function getProductList(page) {
         const products = [];
 
         const isValidProduct = productElement => {
-            const singleTagSelector = 'dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(1) > img';
-            const importTagSelector = 'dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(1) > img:nth-child(3)';
-            const singleTagExists = productElement.querySelector(singleTagSelector) !== null;
-            const importTagExists = productElement.querySelector(importTagSelector) !== null;
-
+            const tagElements = productElement.querySelectorAll('dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(1) img');
+            const singleTagSRC = '/data/skin/beauty/images/icon/G.gif';
+            const importTagSRC = '/data/skin/beauty/images/icon/__H.gif';
+            let singleTagExists = false;
+            let importTagExists = false;
+            tagElements.forEach(function (tagElement) {
+                const imgSRC = tagElement.getAttribute('src');
+                if (singleTagSRC == imgSRC) {
+                    singleTagExists = true;
+                }
+                if (importTagSRC == imgSRC) {
+                    importTagExists = true;
+                }
+            });
             return singleTagExists && !importTagExists;
         };
 
