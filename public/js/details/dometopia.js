@@ -14,7 +14,7 @@ const getProductDetails = async (page, productHref) => {
         const stockSelector = '#select_option_lay > div.quantity_box > table > tbody > tr:nth-child(2) > td';
         const stockElement = document.querySelector(stockSelector).textContent.trim();
         const stock = parseInt(stockElement.replace(/[^\d]/g, ''));
-        if (stock < 50) {
+        if (stock < 5) {
             return false;
         }
         const baseURL = 'https://dometopia.com';
