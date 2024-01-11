@@ -18,17 +18,12 @@ async function getProductList(page) {
             const tagElements = productElement.querySelectorAll('dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(1) img');
             const singleTagSRC = '/data/skin/beauty/images/icon/G.gif';
             const importTagSRC = '/data/skin/beauty/images/icon/__H.gif';
-            let singleTagExists = false;
-            let importTagExists = false;
-            tagElements.forEach(function (tagElement) {
-                const imgSRC = tagElement.getAttribute('src');
-                if (singleTagSRC == imgSRC) {
-                    singleTagExists = true;
-                }
-                if (importTagSRC == imgSRC) {
-                    importTagExists = true;
-                }
-            });
+
+            const hasTag = (src) => Array.from(tagElements).some(tagElement => tagElement.getAttribute('src') === src);
+
+            const singleTagExists = hasTag(singleTagSRC);
+            const importTagExists = hasTag(importTagSRC);
+
             return singleTagExists && !importTagExists;
         };
 
