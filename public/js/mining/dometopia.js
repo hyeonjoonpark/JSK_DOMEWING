@@ -15,11 +15,11 @@ async function getProductList(page) {
         const products = [];
 
         const isValidProduct = productElement => {
-            const tagElements = productElement.querySelectorAll('dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(1) img');
+            const tagElements = Array.from(productElement.querySelectorAll('dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(1) img'));
             const singleTagSRC = '/data/skin/beauty/images/icon/G.gif';
             const importTagSRC = '/data/skin/beauty/images/icon/__H.gif';
 
-            const hasTag = (src) => Array.from(tagElements).some(tagElement => tagElement.getAttribute('src') === src);
+            const hasTag = src => tagElements.some(tagElement => tagElement.getAttribute('src') === src);
 
             const singleTagExists = hasTag(singleTagSRC);
             const importTagExists = hasTag(importTagSRC);
