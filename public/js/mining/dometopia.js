@@ -26,36 +26,41 @@ async function getProductList(page) {
 
             return singleTagExists && !importTagExists;
         };
+        const productElements = document.querySelectorAll(productSelector);
+        for (const productElement of productElements) {
+            if (!isValidProduct(productElement)) {
+                continue;
+            }
 
-        const extractProductDetails = productElement => {
             const nameSelector = 'dl > dd.goodsDisplayTitle > div > a > h6';
             const priceSelector = 'dl > dd.goodsDisplaySalePrice.clfix > div > table > tbody > tr > td.price_num';
             const imageSelector = 'dl > dt > span > a > img';
             const hrefSelector = 'dl > dd.goodsDisplayTitle > div > a';
 
-            const name = productElement.querySelector(nameSelector)?.textContent.trim();
-            const productPriceText = productElement.querySelector(priceSelector)?.textContent;
-            const image = productElement.querySelector(imageSelector)?.getAttribute('src');
-            const productHref = productElement.querySelector(hrefSelector)?.getAttribute('href');
+            const nameElement = productElement.querySelector(nameSelector);
+            const priceElement = productElement.querySelector(priceSelector);
+            const imageElement = productElement.querySelector(imageSelector);
+            const hrefElement = productElement.querySelector(hrefSelector);
 
-            if (name && !name.includes('해외직구') && !name.includes('해외배송')) {
-                const price = parseInt(productPriceText.replace(/[^0-9]/g, '').trim());
-                const href = baseURL + productHref;
-                const platform = '도매토피아';
-
-                return { name, price, image, href, platform };
+            if (!nameElement || !priceElement || !imageElement || !hrefElement) {
+                continue; // 필요한 요소 중 하나라도 없으면, 이 상품은 건너뜀
             }
-        };
 
-        document.querySelectorAll(productSelector).forEach(productElement => {
-            if (isValidProduct(productElement)) {
-                const productDetails = extractProductDetails(productElement);
-                if (productDetails) {
-                    products.push(productDetails);
-                }
+            const name = nameElement.textContent.trim();
+            const productPriceText = priceElement.textContent;
+            const image = imageElement.getAttribute('src');
+            const productHref = hrefElement.getAttribute('href');
+
+            if (name.includes('해외직구') || name.includes('해외배송')) {
+                continue; // 해외직구 또는 해외배송 상품은 건너뜀
             }
-        });
 
+            const price = parseInt(productPriceText.replace(/[^0-9]/g, '').trim());
+            const href = baseURL + productHref;
+            const platform = '도매토피아';
+
+            products.push({ name, price, image, href, platform });
+        }
         return products;
     });
 }
