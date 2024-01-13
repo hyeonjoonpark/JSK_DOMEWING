@@ -23,7 +23,7 @@ class InsertCategoryController extends Controller
         try {
             DB::table($b2BEngName . '_category')
                 ->insert([
-                    'code' => $row[0],
+                    'code' => $row[1],
                     'name' => $row[1]
                 ]);
         } catch (\Exception $e) {
@@ -35,22 +35,23 @@ class InsertCategoryController extends Controller
         try {
             $spreadsheet = IOFactory::load($excel);
             $worksheet = $spreadsheet->getSheet(1);
-            $rows = [];
-            $index = 0;
-            foreach ($worksheet->getRowIterator() as $row) {
-                if ($index == 0) {
-                    $index++;
-                    continue;
-                }
-                $rowIndex = $row->getRowIndex();
-                // 각 행에서 첫 번째(A)와 두 번째(B) 셀의 값을 가져오기
-                $cells = [];
-                $cells[] = $worksheet->getCell('A' . $rowIndex)->getValue();
-                $cells[] = $worksheet->getCell('G' . $rowIndex)->getValue();
 
+            $startRow = 5206; // Begin processing from this row (skip rows before this)
+            $rows = [];
+
+            foreach ($worksheet->getRowIterator($startRow) as $row) {
+                $rowIndex = $row->getRowIndex();
+
+                // Extract values from specific columns
+                $cellAValue = $worksheet->getCell('A' . $rowIndex)->getValue();
+                $cellGValue = $worksheet->getCell('G' . $rowIndex)->getValue();
+                $cells = [$cellAValue, $cellGValue];
+
+                // Add to rows array and insert into database
                 $rows[] = $cells;
                 $this->insertDB($cells, $b2BEngName);
             }
+
             return true;
         } catch (\Exception $e) {
             return $e->getMessage();

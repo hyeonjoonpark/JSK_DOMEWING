@@ -12,10 +12,14 @@ const getProductDetails = async (page, productHref) => {
     await page.goto(productHref, { waitUntil: 'load', timeout: 0 });
     return page.evaluate((productHref) => {
         const stockSelector = '#select_option_lay > div.quantity_box > table > tbody > tr:nth-child(2) > td';
-        const stockElement = document.querySelector(stockSelector).textContent.trim();
-        const stock = parseInt(stockElement.replace(/[^\d]/g, ''));
-        if (stock < 5) {
-            return false;
+        const stockElement = document.querySelector(stockSelector);
+        // 요소의 존재 여부를 검사
+        if (stockElement) {
+            const stock = parseInt(stockElement.textContent.trim().replace(/[^\d]/g, ''));
+            console.log(stock);
+            if (stock < 5) {
+                return false;
+            }
         }
         const baseURL = 'https://dometopia.com';
         const productName = document.querySelector('#info > div.goods_info.clearbox > form > div.container > div > h2').textContent.trim();
@@ -45,7 +49,7 @@ const getProductDetails = async (page, productHref) => {
 };
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const [productHref, username, password] = process.argv.slice(2);

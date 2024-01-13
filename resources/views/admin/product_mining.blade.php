@@ -257,11 +257,17 @@
                 },
                 success: function(response) {
                     closePopup();
-                    const numDups = productHrefs.length - response.length;
-                    popupLoader(0, '"총 ' + numDups +
-                        '개의 중복 상품을 검열했어요.<br>각 상품의 상세 정보를 스크래핑해올게요."');
-                    const vendorID = $('input[name="sellers"]:checked').val();
-                    runScrape(response, vendorID);
+                    const status = response.status;
+                    if (status == true) {
+                        const numDuplicated = response.return.numDuplicated;
+                        const productHrefs = response.return.productHrefs;
+                        popupLoader(0, '"총 ' + numDuplicated + '개의 중복 상품을 검열했어요.<br>각 상품의 상세 정보를 스크래핑해올게요."');
+                        const vendorID = $('input[name="sellers"]:checked').val();
+                        runScrape(productHrefs, vendorID);
+                    } else {
+                        const message = response.return.message;
+                        swalError(message);
+                    }
                 },
                 error: function(response) {
                     closePopup();

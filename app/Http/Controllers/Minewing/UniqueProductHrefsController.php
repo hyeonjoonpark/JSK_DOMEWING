@@ -23,7 +23,20 @@ class UniqueProductHrefsController extends Controller
 
         // Use array_diff to find new product hrefs.
         $newProductHrefs = array_diff($uniqueProductHrefs, $existingProductHrefs);
-
-        return $newProductHrefs; // Reset keys and return
+        if (count($newProductHrefs) < 1) {
+            return [
+                'status' => false,
+                'return' => [
+                    'message' => '이미 수집된 상품셋입니다.'
+                ]
+            ];
+        }
+        return [
+            'status' => true,
+            'return' => [
+                'productHrefs' => $newProductHrefs,
+                'numDuplicated' => count($existingProductHrefs)
+            ]
+        ]; // Reset keys and return
     }
 }
