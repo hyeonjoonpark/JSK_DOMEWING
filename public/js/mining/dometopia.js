@@ -12,14 +12,13 @@ async function getProductList(page) {
         const baseURL = 'https://dometopia.com';
         const products = [];
         const isValidProduct = productElement => {
+            const soldOutTagExists = document.querySelector('#designDisplay_65a4e7f8f2ad8 > table > tbody > tr:nth-child(9) > td:nth-child(3) > dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(2) > img');
             const tagElements = Array.from(productElement.querySelectorAll('dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(1) img'));
             const singleTagSRC = '/data/skin/beauty/images/icon/G.gif';
             const importTagSRC = '/data/skin/beauty/images/icon/__H.gif';
-            const soldOutTagSRC = '/data/icon/goods_status/icon_list_soldout.gif';
             const hasTag = src => tagElements.some(tagElement => tagElement.getAttribute('src') === src);
             const singleTagExists = hasTag(singleTagSRC);
             const importTagExists = hasTag(importTagSRC);
-            const soldOutTagExists = hasTag(soldOutTagSRC);
             return singleTagExists && !importTagExists && !soldOutTagExists;
         };
         const productElements = document.querySelectorAll(productSelector);
