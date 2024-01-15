@@ -45,15 +45,21 @@ class ExtractOrderController extends Controller
         $processDataController = new ProcessDataController();
         return $processDataController->$b2BEngName($excelPath);
     }
-    public function getExcelPath($b2BEngName)
+    public function getNewestExcelPath($b2BEngName)
     {
         $excelPath = public_path('assets/excel/orderwing/' . $b2BEngName . '/');
+
+        // Check if the directory exists, if not, create it
+        if (!is_dir($excelPath)) {
+            // Create the directory with permission 0755
+            mkdir($excelPath, 0755, true);
+        }
 
         // Get all files in the directory
         $files = scandir($excelPath, SCANDIR_SORT_DESCENDING);
 
         // Initialize variables to store the newest file data
-        $newestFile = '';
+        $newestFile = null;
         $newestFileTime = 0;
 
         // Iterate over each file in the directory
@@ -73,9 +79,13 @@ class ExtractOrderController extends Controller
                 }
             }
         }
-        if ($newestFile == '') {
-            return -1;
+
+        // Check if any files were found
+        if ($newestFile === null) {
+            return null; // No files found
         }
+
+        // Return the full path to the newest file
         return $excelPath . $newestFile;
     }
 }
