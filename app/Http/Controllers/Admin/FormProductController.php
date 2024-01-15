@@ -91,6 +91,7 @@ class FormProductController extends Controller
     }
     public function domero($products, $margin_rate, $vendorEngName, $shippingCost)
     {
+        $fixedShippingCost = 3000;
         try {
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/domero.xls'));
@@ -100,7 +101,7 @@ class FormProductController extends Controller
             foreach ($products as $product) {
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
-                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + (int)($shippingCost - $fixedShippingCost);
                 $data = [
                     $categoryCode,
                     $product->productName,

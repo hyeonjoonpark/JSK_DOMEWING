@@ -5,5 +5,7 @@ B2B 업체 연동
    nameType 은 카테고리 name 이 나뉘어진 형태인지, 한 셀에 합쳐진 형태인지 여부
 3. margin_rate 테이블에 열 추가
 4. Product/InsertCategoryController 활용해서 업체 카테고리 테이블 추가 nameEng_category 형식으로
-5. 엑셀윙 연동
-6. 오더윙 연동
+5. accounts 테이블에 계정 정보 연동
+6. 엑셀윙 연동
+7. 오더윙 연동
+8. 상품윙 품절/재입고 연동

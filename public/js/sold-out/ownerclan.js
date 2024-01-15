@@ -45,6 +45,7 @@ const puppeteer = require('puppeteer');
             return;
         });
         await page.click('body > table:nth-child(1) > tbody > tr:nth-child(6) > td > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td > table:nth-child(2) > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(2) > input[type=button]:nth-child(2)');
+        await new Promise((page) => setTimeout(page, 3000));
     } catch (error) {
         console.error('Error:', error);
     } finally {

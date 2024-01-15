@@ -62,6 +62,10 @@ class CollectOrderController extends Controller
                     'return' => $b2BVendorID
                 ];
             }
+            return [
+                'status' => false,
+                'return' => $b2BVendorID
+            ];
         }
         return [
             'status' => false,
