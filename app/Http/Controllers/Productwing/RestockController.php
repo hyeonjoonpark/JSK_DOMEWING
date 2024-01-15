@@ -42,15 +42,10 @@ class RestockController extends Controller
         $scriptPath = public_path('js/restock/' . $b2BEngName . '.js');
         $command = 'node ' . $scriptPath . ' ' . $username . ' ' . $password . ' ' . $productCode;
         exec($command, $output, $resultCode);
-        if (isset($output)) {
-            return [
-                'status' => $output,
-                'return' => $b2BName
-            ];
-        }
+        $status = $resultCode == 0 && isset($output[0]) && $output[0] == 'true';
         return [
-            'status' => false,
-            'return' => $b2BName
+            'status' => $status,
+            'return' => $b2BName,
         ];
     }
     protected function activeProduct($productCode)
