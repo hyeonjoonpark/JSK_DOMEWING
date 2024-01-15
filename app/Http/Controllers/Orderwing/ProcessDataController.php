@@ -17,9 +17,9 @@ class ProcessDataController extends Controller
 
         $columnMappings = [
             'B' => 'senderName',
-            'C' => 'senderPhone',
+            'D' => 'senderPhone',
             'E' => 'receiverName',
-            'G' => 'receiverPhone',
+            'F' => 'receiverPhone',
             'H' => 'postcode',
             'I' => 'address',
             'J' => 'productName',
