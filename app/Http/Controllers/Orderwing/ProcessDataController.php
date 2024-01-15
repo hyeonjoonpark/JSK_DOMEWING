@@ -134,10 +134,12 @@ class ProcessDataController extends Controller
     }
     public function wholesaledepot($excelPath)
     {
-        $reader = IOFactory::createReader('Xls');
-        $reader->setInputEncoding('EUC-KR'); // EUC-KR 인코딩 설정
+        // Create a reader for Xls format
+        $reader = IOFactory::createReader('Csv');
+        $reader->setInputEncoding('EUC-KR'); // EUC-KR encoding setting
         $spreadsheet = $reader->load($excelPath);
         $worksheet = $spreadsheet->getActiveSheet();
+
         $data = [];
         $isFirstRow = true; // Flag to skip the first row
 
@@ -176,18 +178,20 @@ class ProcessDataController extends Controller
                 if (isset($columnMappings[$columnLetter])) {
                     // Extract value and convert it to UTF-8
                     $value = $cell->getValue();
-                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                    if (in_array($columnMappings[$columnLetter], ['productPrice', 'shippingCost', 'amount'])) {
                         $value = preg_replace('/[^0-9]/', '', $value);
                     }
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
+
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
             $rowData['productHref'] = $response->productHref;
             $rowData['productImage'] = $response->productImage;
             $rowData['b2BName'] = "도매창고";
+
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }

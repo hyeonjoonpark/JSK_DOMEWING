@@ -10,10 +10,10 @@ class ExtractOrderController extends Controller
     public function index($b2Bs)
     {
         $data = [];
-        foreach ($b2Bs as $index => $b2B) {
+        foreach ($b2Bs as $b2B) {
             $b2BEngName = $b2B->name_eng;
             $excelPath = $this->getExcelPath($b2BEngName);
-            if ($excelPath == -1) {
+            if ($excelPath == null) {
                 continue;
             }
             $tmpData = $this->extractExcelData($excelPath, $b2BEngName);
