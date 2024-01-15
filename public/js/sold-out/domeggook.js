@@ -31,6 +31,7 @@ const puppeteer = require('puppeteer');
             return;
         });
         await buttonSelector.click();
+        await new Promise((page) => setTimeout(page, 3000));
     } catch (error) {
         console.error('Error:', error);
     } finally {
