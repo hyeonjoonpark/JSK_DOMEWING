@@ -134,7 +134,9 @@ class ProcessDataController extends Controller
     }
     public function wholesaledepot($excelPath)
     {
-        $spreadsheet = IOFactory::load($excelPath);
+        $reader = IOFactory::createReader('Xls');
+        $reader->setInputEncoding('EUC-KR'); // EUC-KR 인코딩 설정
+        $spreadsheet = $reader->load($excelPath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = [];
         $isFirstRow = true; // Flag to skip the first row
