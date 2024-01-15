@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const client = await page.target().createCDPSession();
 
@@ -22,6 +22,9 @@ const path = require('path');
         await page.click('#frm > div > div > button');
         await page.waitForNavigation();
         await page.goto('https://www.wholesaledepot.co.kr/wms/order/order_list.php', { waitUntil: 'networkidle2' });
+        await page.click('#istep2');
+        await page.click('#btn_indb');
+        await new Promise((page) => setTimeout(page, 3000));
         await page.click('#chkIdxAll');
         page.on('dialog', async dialog => {
             await dialog.accept();
