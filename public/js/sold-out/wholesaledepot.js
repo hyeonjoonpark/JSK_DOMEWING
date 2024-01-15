@@ -13,8 +13,11 @@ const puppeteer = require('puppeteer');
         await page.waitForNavigation();
         await page.goto('https://www.wholesaledepot.co.kr/wms/goods/goods_list2.php', { waitUntil: 'networkidle2' });
         await page.select('#search_key', 'goodscd2');
+        await page.click('#s_open1');
+        await page.click('#s_runout1');
         await page.type('#search_str', productCode);
         await page.click('#sfrm > div > div > div > ul:nth-child(16) > li:nth-child(2) > button');
+        await new Promise((page) => setTimeout(page, 3000));
         const checkbox = await page.waitForSelector('#chkIdx0');
         await checkbox.click();
         page.on('dialog', async dialog => {
@@ -29,6 +32,6 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        await browser.close();
+        // await browser.close();
     }
 })();

@@ -53,26 +53,20 @@ class SoldOutController extends Controller
         return $response;
     }
 
-    protected function soldOut($productCode, $b2BEngName, $username, $password, $b2BName)
+    public function soldOut($productCode, $b2BEngName, $username, $password, $b2BName)
     {
         $scriptPath = $this->getScriptPath($b2BEngName);
         $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($username) . " " . $password . " " . escapeshellarg($productCode);
+
+        // Execute the command
         exec($command, $output, $resultCode);
-        if (isset($output[0])) {
-            if ($output[0]) {
-                return [
-                    'status' => true,
-                    'return' => $b2BName
-                ];
-            }
-            return [
-                'status' => false,
-                'return' => $b2BName
-            ];
-        }
+
+        // Check the result code and output
+        $status = $resultCode == 0 && isset($output[0]) && $output[0] == 'true';
+
         return [
-            'status' => false,
-            'return' => $b2BName
+            'status' => $status,
+            'return' => $b2BName,
         ];
     }
 

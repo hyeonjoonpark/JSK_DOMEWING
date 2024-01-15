@@ -17,10 +17,14 @@ const puppeteer = require('puppeteer');
         await page.click('#s_open1');
         await page.click('#s_runout1');
         await page.click('#sfrm > div > div > div > ul:nth-child(16) > li:nth-child(2) > button');
+        await new Promise((page) => setTimeout(page, 3000));
         const checkbox = await page.waitForSelector('#chkIdx0');
         await checkbox.click();
         page.on('dialog', async dialog => {
-            console.log(true);
+            const message = dialog.message();
+            if (message.includes('완료')) {
+                console.log(true);
+            }
             await dialog.accept();
             return;
         });
