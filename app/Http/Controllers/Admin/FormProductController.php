@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
@@ -11,10 +10,85 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
-use function PHPSTORM_META\map;
-
 class FormProductController extends Controller
 {
+    public function sellingkok($products, $margin_rate, $vendorEngName, $shippingCost)
+    {
+        try {
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/sellingkok.xlsx'));
+            $sheet = $spreadsheet->getSheet(0);
+            // 데이터 추가
+            $rowIndex = 3;
+            foreach ($products as $product) {
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $data = [
+                    '',
+                    'Y',
+                    $product->productName,
+                    $product->productName,
+                    $product->productKeywords,
+                    $categoryCode,
+                    '상세설명표시',
+                    'LADAM',
+                    'LADAM',
+                    '',
+                    'N',
+                    'N',
+                    0,
+                    $product->productCode,
+                    'N',
+                    $product->productImage,
+                    '',
+                    $product->productDetail,
+                    '',
+                    40,
+                    '',
+                    $marginedPrice,
+                    '',
+                    'N',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '과세',
+                    '택배',
+                    '',
+                    0,
+                    '선결제:기본배송비',
+                    $shippingCost,
+                    'Y',
+                    'A1692598741',
+                    'A1692598741',
+                    $shippingCost,
+                    'Y',
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
+            }
+            // 엑셀 파일 저장
+            $fileName = 'sellingkok_' . now()->format('YmdHis') . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($formedExcelFile);
+            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            return ['status' => true, 'return' => $downloadURL];
+        } catch (\Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
     public function domero($products, $margin_rate, $vendorEngName, $shippingCost)
     {
         try {

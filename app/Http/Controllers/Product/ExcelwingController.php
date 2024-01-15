@@ -38,7 +38,7 @@ class ExcelwingController extends Controller
         $downloadURLs = [];
         foreach ($productsChunks as $products) {
             $response = $formProductController->$vendorEngName($products, $marginRate, $vendorEngName, $shippingFee);
-            if (!$response['status']) {
+            if ($response['status'] == -1) {
                 return $response;
             }
             $downloadURLs[] = $response['return'];

@@ -29,7 +29,7 @@ const puppeteer = require('puppeteer');
             return;
         });
         await page.click('body > div.scm_contents_warp > div.container-fluid > div.oh-tbwarp > table > tbody > tr:nth-child(1) > td > button.btn.btn-danger.btn-xs');
-        await new Promise((page) => setTimeout(page, 3000));
+        await new Promise((page) => setTimeout(page, 5000));
     } catch (error) {
         console.error('Error:', error);
     } finally {
