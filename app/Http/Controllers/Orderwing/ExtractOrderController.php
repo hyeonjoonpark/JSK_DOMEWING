@@ -45,7 +45,7 @@ class ExtractOrderController extends Controller
         $processDataController = new ProcessDataController();
         return $processDataController->$b2BEngName($excelPath);
     }
-    public function getNewestExcelPath($b2BEngName)
+    public function getExcelPath($b2BEngName)
     {
         $excelPath = public_path('assets/excel/orderwing/' . $b2BEngName . '/');
 
