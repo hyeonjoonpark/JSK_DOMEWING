@@ -12,7 +12,7 @@ async function getProductList(page) {
         const baseURL = 'https://dometopia.com';
         const products = [];
         const isValidProduct = productElement => {
-            const soldOutElement = document.querySelector('dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(2) > img');
+            const soldOutElement = productElement.querySelector('dl > dd.goodsDisplayCode > table > tbody > tr:nth-child(1) > td > a:nth-child(2) > img');
             let soldOutTagExists = false;
             if (soldOutElement) {
                 soldOutTagExists = true;
