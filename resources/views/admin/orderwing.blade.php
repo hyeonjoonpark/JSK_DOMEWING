@@ -42,7 +42,7 @@
         var rememberToken = '{{ Auth::user()->remember_token }}';
 
         function initOrderwing() {
-            popupLoader(0, '"B2B 업체들로부터 신규 주문 내역들을 추출해올게요."');
+            popupLoader(0, '"신규 주문 내역을 B2B 업체로부터 추출하겠습니다."');
             $.ajax({
                 url: '/api/orderwing',
                 type: 'POST',
