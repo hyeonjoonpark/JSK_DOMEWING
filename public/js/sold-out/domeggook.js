@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -26,7 +26,11 @@ const puppeteer = require('puppeteer');
         await checkboxSelector.click();
         await selectSelector.select('N');
         page.on('dialog', async dialog => {
-            console.log(true);
+            const message = dialog.message();
+            console.log(message);
+            if (message.includes('상품수정이 모두 완료')) {
+                console.log(true);
+            }
             await dialog.accept();
             return;
         });
