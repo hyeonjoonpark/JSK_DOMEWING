@@ -23,7 +23,6 @@
                                     <th scope="col">수취인 정보</th>
                                     <th scope="col">주문 정보</th>
                                     <th scope="col">주문상태</th>
-                                    <th scope="col">B2B 업체</th>
                                     <th scope="col">주문자 정보</th>
                                 </tr>
                             </thead>
@@ -94,11 +93,9 @@
                     <p>${order.orderedAt}</p>
                 </td>
                 <td class="text-nowrap">
-                    ${order.b2BName}
-                </td>
-                <td class="text-nowrap">
                     <div class="row mb-3">
                         <div class="col">
+                            <h6>${order.b2BName}</h6>
                             <p><b>이름:</b><br>${order.senderName}<br><b>연락처:</b><br>${order.senderPhone}</p>
                         </div>
                     </div>
