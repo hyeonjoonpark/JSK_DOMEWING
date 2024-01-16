@@ -26,6 +26,7 @@ const puppeteer = require('puppeteer');
         await checkboxSelector.click();
         await selectSelector.select('Y');
         page.on('dialog', async dialog => {
+            const message = dialog.message();
             if (message.includes('상품수정이 모두 완료')) {
                 console.log(true);
             }
