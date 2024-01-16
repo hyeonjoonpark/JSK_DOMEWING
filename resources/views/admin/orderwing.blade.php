@@ -72,7 +72,7 @@
                 <td>
                     <div class="row mb-3">
                         <div class="col">
-                            <a href="${order.productHref}" target="_blank"><img src="${order.productImage}" width=100 height=100 /></a>
+                            <a href="${order.productHref}" target="_blank"><img src="${order.productImage}" class="product-list-image" /></a>
                         </div>
                     </div>
                     <div class="row mb-3">

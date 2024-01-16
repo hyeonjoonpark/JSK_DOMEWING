@@ -11,3 +11,10 @@
 <!-- StyleSheets  -->
 <link rel="stylesheet" href="{{ asset('assets/css/dashlite.css?ver=3.1.1') }}">
 <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/theme.css?ver=3.1.1') }}">
+<style>
+    .product-list-image {
+        border: 1px solid black;
+        border-bottom: 2px solid black;
+        border-right: 2px solid black;
+    }
+</style>
