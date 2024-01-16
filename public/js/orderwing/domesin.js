@@ -26,6 +26,10 @@ const path = require('path');
         });
         await page.click('#main > div > input.bt_red');
         await new Promise((page) => setTimeout(page, 3000));
+        await page.goto('http://domesin.com/scm/M_order/list.html?o_status=1', { waitUntil: 'networkidle2' });
+        await page.click('#main > table.tb13 > tbody > tr:nth-child(1) > td:nth-child(1) > input[type=checkbox]');
+        await page.click('#main > div > input.bt_red');
+        await new Promise((page) => setTimeout(page, 3000));
         console.log(true);
     } catch (error) {
         console.error('Error:', error);
