@@ -26,11 +26,14 @@ const puppeteer = require('puppeteer');
         await checkboxSelector.click();
         await selectSelector.select('Y');
         page.on('dialog', async dialog => {
-            console.log(true);
+            if (message.includes('상품수정이 모두 완료')) {
+                console.log(true);
+            }
             await dialog.accept();
             return;
         });
         await buttonSelector.click();
+        await new Promise((page) => setTimeout(page, 3000));
     } catch (error) {
         console.error('Error:', error);
     } finally {
