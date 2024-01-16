@@ -22,7 +22,7 @@ class ExcelwingController extends Controller
         }
         $products = $response['return'];
         $products = $products->toArray();
-        $productsChunks = array_chunk($products, 1000);
+        $productsChunks = array_chunk($products, 500);
         $response = $this->getMarginRate($b2BID);
         if (!$response['status']) {
             return $response;
@@ -36,12 +36,16 @@ class ExcelwingController extends Controller
         $vendorEngName = $b2B->name_eng;
         $formProductController = new FormProductController();
         $downloadURLs = [];
-        foreach ($productsChunks as $products) {
-            $response = $formProductController->$vendorEngName($products, $marginRate, $vendorEngName, $shippingFee);
-            if ($response['status'] == -1) {
-                return $response;
+        foreach ($productsChunks as $index => $products) {
+            $response = $formProductController->$vendorEngName($products, $marginRate, $vendorEngName, $shippingFee, $index);
+            if ($response['status'] == true) {
+                $downloadURLs[] = $response['return'];
+            } else {
+                return [
+                    'status' => false,
+                    'return' => '"엑셀 파일에 데이터를 기록하던 중 오류가 발생했습니다."'
+                ];
             }
-            $downloadURLs[] = $response['return'];
         }
         return [
             'status' => true,

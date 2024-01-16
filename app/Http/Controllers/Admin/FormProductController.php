@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class FormProductController extends Controller
 {
-    public function sellingkok($products, $margin_rate, $vendorEngName, $shippingCost)
+    public function sellingkok($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
             // 엑셀 파일 로드
@@ -76,7 +76,7 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'sellingkok_' . now()->format('YmdHis') . '.xlsx';
+            $fileName = 'sellingkok_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
@@ -89,7 +89,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function domero($products, $margin_rate, $vendorEngName, $shippingCost)
+    public function domero($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         $fixedShippingCost = 3000;
         try {
@@ -157,7 +157,7 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'domero_' . now()->format('YmdHis') . '.xls';
+            $fileName = 'domero_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
@@ -170,7 +170,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function domeggook($products, $margin_rate, $vendorEngName, $shippingCost)
+    public function domeggook($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
             // 엑셀 파일 로드
@@ -253,7 +253,7 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'domeggook_' . now()->format('YmdHis') . '.xls';
+            $fileName = 'domeggook_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
@@ -266,7 +266,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function domeatoz($products, $margin_rate, $vendorEngName, $shippingCost)
+    public function domeatoz($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
             // 엑셀 파일 로드
@@ -344,7 +344,7 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'domeatoz_' . now()->format('YmdHis') . '.xlsx';
+            $fileName = 'domeatoz_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
@@ -357,7 +357,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function wholesaledepot($products, $margin_rate, $vendorEngName, $shippingCost)
+    public function wholesaledepot($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
             $fixedShippingCost = 2500;
@@ -442,7 +442,7 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'wholesaledepot_' . now()->format('YmdHis') . '.xls';
+            $fileName = 'wholesaledepot_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
@@ -456,7 +456,7 @@ class FormProductController extends Controller
         }
     }
 
-    public function domesin($products, $margin_rate, $vendorEngName, $shippingCost)
+    public function domesin($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
             // 엑셀 파일 로드
@@ -542,7 +542,7 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'domesin_' . now()->format('YmdHis') . '.xls';
+            $fileName = 'domesin_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
@@ -555,7 +555,7 @@ class FormProductController extends Controller
             ];
         }
     }
-    public function ownerclan($products, $margin_rate, $vendorEngName, $shippingCost)
+    public function ownerclan($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
             $startRowIndex = 4;
@@ -589,7 +589,7 @@ class FormProductController extends Controller
             }
 
             // 엑셀 파일 저장
-            $fileName = 'ownerclan_' . now()->format('YmdHis') . '.xlsx';
+            $fileName = 'ownerclan_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
