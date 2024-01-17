@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToArray;
 
+use function PHPUnit\Framework\isEmpty;
+
 class AdminController extends Controller
 {
     public function dashboard()
@@ -178,7 +180,9 @@ class AdminController extends Controller
             ->orderBy('createdAt', 'DESC')->get()->toArray();
         $numResults = count($products);
         $numPages = ceil($numResults / 1000);
-        $products = array_chunk($products, 1000)[$page - 1];
+        if (!isEmpty($products)) {
+            $products = array_chunk($products, 1000)[$page - 1];
+        }
         return view('admin/product_minewing', [
             'products' => $products,
             'searchKeyword' => $searchKeyword,
