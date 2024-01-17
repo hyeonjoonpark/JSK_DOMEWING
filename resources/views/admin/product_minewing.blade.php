@@ -34,13 +34,32 @@
                     <h6 class="title">상품윙 테이블</h6>
                     <p>검색된 상품이 총 {{ number_format($numResults, 0) }}건입니다. 페이지 당 1,000건의 상품이 출력됩니다.</p>
                     <div class="form-group">
-                        <div class="d-flex justify-content-center">
-                            @for ($i = 1; $i <= $numPages; $i++)
+                        <div class="d-flex justify-content-center align-items-center">
+                            @if ($page > 1)
+                                <a class="pagination"
+                                    href="/admin/product/minewing?page={{ $page - 1 }}&searchKeyword={{ $searchKeyword }}">
+                                    &lt; 이전
+                                </a>
+                            @endif
+
+                            @php
+                                $startPage = max(1, $page - 5);
+                                $endPage = min($numPages, $startPage + 9);
+                            @endphp
+
+                            @for ($i = $startPage; $i <= $endPage; $i++)
                                 <a class="pagination {{ $page == $i ? 'active' : '' }}"
                                     href="/admin/product/minewing?page={{ $i }}&searchKeyword={{ $searchKeyword }}">
                                     {{ $i }}
                                 </a>
                             @endfor
+
+                            @if ($page < $numPages)
+                                <a class="pagination"
+                                    href="/admin/product/minewing?page={{ $page + 1 }}&searchKeyword={{ $searchKeyword }}">
+                                    다음 &gt;
+                                </a>
+                            @endif
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -83,13 +102,32 @@
                         </table>
                     </div>
                     <div class="form-group">
-                        <div class="d-flex justify-content-center">
-                            @for ($i = 1; $i <= $numPages; $i++)
+                        <div class="d-flex justify-content-center align-items-center">
+                            @if ($page > 1)
+                                <a class="pagination"
+                                    href="/admin/product/minewing?page={{ $page - 1 }}&searchKeyword={{ $searchKeyword }}">
+                                    &lt; 이전
+                                </a>
+                            @endif
+
+                            @php
+                                $startPage = max(1, $page - 5);
+                                $endPage = min($numPages, $startPage + 9);
+                            @endphp
+
+                            @for ($i = $startPage; $i <= $endPage; $i++)
                                 <a class="pagination {{ $page == $i ? 'active' : '' }}"
                                     href="/admin/product/minewing?page={{ $i }}&searchKeyword={{ $searchKeyword }}">
                                     {{ $i }}
                                 </a>
                             @endfor
+
+                            @if ($page < $numPages)
+                                <a class="pagination"
+                                    href="/admin/product/minewing?page={{ $page + 1 }}&searchKeyword={{ $searchKeyword }}">
+                                    다음 &gt;
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
