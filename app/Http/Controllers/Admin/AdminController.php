@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Schema;
 
 //vingkong - use this to format date
 use Carbon\Carbon;
+use Maatwebsite\Excel\Concerns\ToArray;
 
 class AdminController extends Controller
 {
@@ -155,23 +156,14 @@ class AdminController extends Controller
     }
     public function minewing(Request $request)
     {
-        $products = DB::table('minewing_products AS mp')
-            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
-            ->where('mp.isActive', 'Y')
-            ->select('mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt', 'mp.id')
-            ->limit(1000)
-            ->orderBy('mp.createdAt', 'DESC')
-            ->get();
         $searchKeyword = '';
-        return view('admin/product_minewing', [
-            'products' => $products,
-            'searchKeyword' => $searchKeyword
-        ]);
-    }
-    function minewingPost(Request $request)
-    {
-        $searchKeyword = $request->searchKeyword;
-        // First Query: New Products
+        $page = 1;
+        if (isset($request->searchKeyword)) {
+            $searchKeyword = $request->searchKeyword;
+        }
+        if (isset($request->page)) {
+            $page = $request->page;
+        }
         $products = DB::table('minewing_products AS mp')
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->where('mp.isActive', 'Y')
@@ -183,10 +175,16 @@ class AdminController extends Controller
                     ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
             })
             ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt')
-            ->orderBy('createdAt', 'DESC')->limit(1000)->get();
+            ->orderBy('createdAt', 'DESC')->get()->toArray();
+        $numResults = count($products);
+        $numPages = ceil($numResults / 1000);
+        $products = array_chunk($products, 1000)[$page - 1];
         return view('admin/product_minewing', [
             'products' => $products,
-            'searchKeyword' => $searchKeyword
+            'searchKeyword' => $searchKeyword,
+            'numResults' => $numResults,
+            'numPages' => $numPages,
+            'page' => $page
         ]);
     }
     public function soldOut(Request $request)

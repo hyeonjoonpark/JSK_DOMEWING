@@ -19,4 +19,28 @@
         width: 100px;
         height: 100px;
     }
+
+    /* Active state for pagination */
+    .pagination.active {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+    }
+
+    /* Inactive state for pagination */
+    .pagination {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 4px;
+        font-size: 14px;
+        color: #007bff;
+        border: 1px solid #007bff;
+        text-decoration: none;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .pagination:hover {
+        background-color: #f8f9fa;
+    }
 </style>

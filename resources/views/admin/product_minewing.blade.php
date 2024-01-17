@@ -16,7 +16,7 @@
                     <p>테이블의 모든 컬럼 중 원하는 키워드를 검색하세요.</p>
                     <div class="form-group">
                         <label for="" class="form-label">상품 검색</label>
-                        <form class="d-flex text-nowrap" method="POST" action="minewing">
+                        <form class="d-flex text-nowrap" method="GET" action="minewing">
                             @csrf
                             <input type="text" class="form-control" placeholder="검색 키워드를 기입해주세요" name="searchKeyword"
                                 value="{{ $searchKeyword }}">
@@ -32,7 +32,17 @@
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">상품윙 테이블</h6>
-                    <p>검색된 상품이 총 {{ number_format(count($products), 0) }}건입니다. 상품 검색 결과는 최대 1,000건으로 제한됩니다.</p>
+                    <p>검색된 상품이 총 {{ number_format($numResults, 0) }}건입니다. 페이지 당 1,000건의 상품이 출력됩니다.</p>
+                    <div class="form-group">
+                        <div class="d-flex justify-content-center">
+                            @for ($i = 1; $i <= $numPages; $i++)
+                                <a class="pagination {{ $page == $i ? 'active' : '' }}"
+                                    href="/admin/product/minewing?page={{ $i }}&searchKeyword={{ $searchKeyword }}">
+                                    {{ $i }}
+                                </a>
+                            @endfor
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table text-nowrap align-middle">
                             <thead>
@@ -71,6 +81,16 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    <div class="form-group">
+                        <div class="d-flex justify-content-center">
+                            @for ($i = 1; $i <= $numPages; $i++)
+                                <a class="pagination {{ $page == $i ? 'active' : '' }}"
+                                    href="/admin/product/minewing?page={{ $i }}&searchKeyword={{ $searchKeyword }}">
+                                    {{ $i }}
+                                </a>
+                            @endfor
+                        </div>
                     </div>
                 </div>
             </div>
