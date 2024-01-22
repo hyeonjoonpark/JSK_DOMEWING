@@ -111,7 +111,7 @@ class ExcelwingController extends Controller
             ];
         }
     }
-    protected function getVendor($vendorID)
+    public function getVendor($vendorID)
     {
         $vendor = DB::table("product_register AS pr")
             ->join("vendors AS v", 'pr.vendor_id', '=', 'v.id')

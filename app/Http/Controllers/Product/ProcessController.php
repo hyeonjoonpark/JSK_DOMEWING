@@ -68,7 +68,7 @@ class ProcessController extends Controller
             ->first();
         return $user;
     }
-    protected function getVendor($sellerID)
+    public function getVendor($sellerID)
     {
         $seller = DB::table('vendors')
             ->where('is_active', 'ACTIVE')

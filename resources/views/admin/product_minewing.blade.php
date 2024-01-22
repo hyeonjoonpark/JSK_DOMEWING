@@ -1,3 +1,6 @@
+@php
+    set_time_limit(0);
+@endphp
 @extends('layouts.main')
 @section('title')
     상품윙
