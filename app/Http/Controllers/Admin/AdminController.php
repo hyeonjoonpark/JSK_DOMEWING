@@ -151,6 +151,7 @@ class AdminController extends Controller
             ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
             ->where('v.is_active', 'ACTIVE')
             ->where('ps.is_active', 'Y')
+            ->where('ps.has_api', 'N')
             ->get();
         return view('admin/product_mining', [
             'sellers' => $sellers
@@ -320,5 +321,29 @@ class AdminController extends Controller
     public function orderwing(Request $request)
     {
         return view('admin/orderwing');
+    }
+    public function apiwing(Request $request)
+    {
+        $sellers = DB::table('product_search AS ps')
+            ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
+            ->where('ps.has_api', 'Y')
+            ->get()
+            ->toArray();
+        $products = [];
+        if (isset($request->sellerID)) {
+            $sellerID = $request->sellerID;
+            $controller = new Controller();
+            $seller = $controller->getSeller($sellerID);
+            $table = $seller->name_eng . '_products';
+            $products = DB::table($table)
+                ->whereNull('updatedAt')
+                ->groupBy('categoryName')
+                ->get()
+                ->toArray();
+        }
+        return view('admin/apiwing', [
+            'products' => $products,
+            'sellers' => $sellers
+        ]);
     }
 }

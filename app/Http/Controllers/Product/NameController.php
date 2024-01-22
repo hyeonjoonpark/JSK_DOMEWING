@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class NameController extends Controller
 {
-    public function index($productName, $byte)
+    public function index($productName, $byte = 50)
     {
         $productName = $this->replaceForbiddenWords($productName);
         $productName = $this->filterString($productName);
@@ -26,7 +26,7 @@ class NameController extends Controller
         foreach ($forbiddenWords as $word) {
             $productName = str_replace($word, ' ', $productName);
         }
-        $productName = str_replace('×', 'X', $productName);
+        $productName = str_replace(['×', '*', 'x'], 'X', $productName);
         // Return the sanitized product name
         return $productName;
     }

@@ -3,12 +3,8 @@
 namespace App\Http\Controllers\APIwing;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Minewing\SaveController;
-use App\Http\Controllers\Product\InsertController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Product\NameController;
 use Illuminate\Support\Facades\DB;
-
-use function PHPUnit\Framework\isEmpty;
 
 class MainController extends Controller
 {
@@ -33,28 +29,28 @@ class MainController extends Controller
             return $response;
         }
         $products = $response['return'];
-        return $products;
-        $optionColNameController = new OptionColNameController();
+        $success = 0;
+        $error = 0;
         foreach ($products as $index => $product) {
+            $response = $this->$sellerEngName($product);
+            $success += $response['success'];
+            $error += $response['error'];
         }
+        return [
+            'success' => $success,
+            'error' => $error
+        ];
     }
     public function threeMRO($product)
     {
         $sellerID = 16;
         $userID = 15;
-        $categoryID = null;
-        $saveController = new SaveController();
-        do {
-            $productCode = $saveController->generateRandomProductCode(5);
-            $isExist = DB::table('minewing_products')
-                ->where('productCode', $productCode)
-                ->where('isActive', 'Y')
-                ->exists();
-        } while ($isExist);
-        $productName = $product['prdtname'];
+        $categoryName = trim($product['mrocatenm']);
+        $controller = new Controller();
+        $table = '3mro_products';
         $productKeywords = '';
         for ($i = 1; $i <= 5; $i++) {
-            $keyword = $product['keyword']['keyword' . $i];
+            $keyword = $product['keyword']['@attributes']['keyword' . $i];
             if ($keyword != '') {
                 if ($productKeywords != '') {
                     $keyword .= ',' . $keyword;
@@ -62,8 +58,50 @@ class MainController extends Controller
                 $productKeywords .= $keyword;
             }
         }
-        $productPrice = (int)$product['price']['buyprice'];
-        $productImage = $product['listimg']['url'];
-        $productDetail = '<center><img src="https://www.sellwing.kr/images/CDN/' . $headerImage . '"></center>' . $product['content'];
+        $productPrice = (int)$product['price']['@attributes']['buyprice'];
+        $productImage = $product['listimg']['@attributes']['url'];
+        $productDetail = '<center><img src="https://www.sellwing.kr/images/CDN/ladam_header.jpg"></center>' . trim($product['content']);
+        $productHref = 'https://www.3mro.co.kr/shop/goods/goods_view.php?goodsno=' . $product['@attributes']['code'] . '&category=';
+        $nameController = new NameController();
+        if ($product['option1'] == '' || is_array($product['option1'])) {
+            $productName = $nameController->index(trim($product['prdtname']));
+            $hasOption = 'N';
+            $response = $controller->insertProduct($table, $sellerID, $userID, $categoryName, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $productHref, $hasOption);
+            $success = 0;
+            $error = 0;
+            if ($response['status'] == true) {
+                $success++;
+            } else {
+                $error++;
+            }
+            return [
+                'success' => $success,
+                'error' => $error
+            ];
+        } else {
+            $productName = $nameController->index(trim($product['prdtname']), 42);
+            $hasOption = 'Y';
+            $productOptions = trim($product['option1']);
+            $productOptions = explode(',', $productOptions);
+            $optionPrices = trim($product['option1price']);
+            $optionPrices = explode(',', $optionPrices);
+            $success = 0;
+            $error = 0;
+            for ($i = 1; $i < count($productOptions); $i++) {
+                $newProductName = $productName . ' 옵션 ' . $i;
+                $newProductPrice = $productPrice + $optionPrices[$i - 1];
+                $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:2rem !important;">옵션명 : ' . $productOptions[$i] . '</h1>' . $productDetail;
+                $response = $controller->insertProduct($table, $sellerID, $userID, $categoryName, $newProductName, $productKeywords, $newProductPrice, $productImage, $newProductDetail, $productHref, $hasOption);
+                if ($response['status'] == true) {
+                    $success++;
+                } else {
+                    $error++;
+                }
+            }
+            return [
+                'success' => $success,
+                'error' => $error
+            ];
+        }
     }
 }

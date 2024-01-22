@@ -70,7 +70,7 @@ class SaveController extends Controller
                 $optionPriceType = $this->getOptionPriceType($sellerID);
                 $type = '1';
                 foreach ($productOptions as $productOption) {
-                    $newProductName = $productName . ' TYPE ' . $type;
+                    $newProductName = $productName . ' 옵션 ' . $type;
                     $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:2rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1>' . $productDetail;
                     if ($optionPriceType == 'ADD') {
                         (int)$productPrice = (int)$product['productPrice'] + (int)$productOption['optionPrice'];
