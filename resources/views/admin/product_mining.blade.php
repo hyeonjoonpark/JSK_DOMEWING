@@ -7,6 +7,10 @@
         더욱 강력해진 엔진 마인윙과 함께 상품 데이터셋을 수집합니다.
     </p>
 @endsection
+@php
+    set_time_limit(0);
+    ini_set('memory_limit', '-1');
+@endphp
 @section('content')
     <div class="row g-gs">
         <div class="col">
@@ -196,6 +200,7 @@
                     listURL: listURL
                 },
                 success: function(response) {
+                    console.log(response);
                     if (response.status) {
                         const products = response.return;
                         updateMinewingResult(products);

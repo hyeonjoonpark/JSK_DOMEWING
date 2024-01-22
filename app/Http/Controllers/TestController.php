@@ -2,43 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
-use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\Http;
 
 class TestController extends Controller
 {
     public function index()
     {
-        $filePath = public_path('assets/excel/domesin_category.xls');
-        $reader = IOFactory::createReaderForFile($filePath);
-        $spreadsheet = $reader->load($filePath);
-        $worksheet = $spreadsheet->getActiveSheet();
+        // 기본 GET 요청
+        $response = Http::get('http://3mro.co.kr/shop/api/api_out.php?div=all&m_no=11841');
 
-        $isFirstRow = true; // Flag to skip the first row
+        // 응답 확인
+        $statusCode = $response->status(); // 상태 코드
+        $data = $response->json(); // JSON 응답을 배열로 파싱
 
-        foreach ($worksheet->getRowIterator() as $row) {
-            // Skip the first row (header)
-            if ($isFirstRow) {
-                $isFirstRow = false;
-                continue;
-            }
-
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
-
-            $cells = [];
-            foreach ($cellIterator as $cell) {
-                $cells[] = $cell->getValue();
-            }
-
-            $categoryCode = $cells[0]; // Assuming '분류코드' is in the first column
-            $category = $cells[1];     // Assuming '카테고리' is in the second column
-
-            // Insert into database
-            DB::table('domesin_category')->insert([
-                'code' => $categoryCode,
-                'name' => $category
-            ]);
+        // 예외 처리
+        if ($response->failed()) {
+            // 실패 시 로직
         }
+
+        return [
+            'status' => $statusCode,
+            'return' => $data
+        ];
     }
 }

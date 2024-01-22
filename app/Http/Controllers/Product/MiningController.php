@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Product;
 
+use App\Http\Controllers\APIwing\MainController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,10 @@ class MiningController extends Controller
         $rememberToken = $request->rememberToken;
         $vendorID = $request->vendorID;
         $vendor = $this->getVendor($vendorID);
+        if ($vendor->has_api == 'Y') {
+            $apiwingMainController = new MainController();
+            return $apiwingMainController->index($vendor->vendor_id);
+        }
         $listURL = $request->listURL;
         $account = $this->getAccount($rememberToken, $vendorID);
         if (!$account) {
