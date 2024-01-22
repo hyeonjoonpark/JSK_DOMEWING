@@ -30,17 +30,19 @@ class NameController extends Controller
         // Return the sanitized product name
         return $productName;
     }
-    function filterString($str)
+    public function filterString($str)
     {
         // 한글, 숫자, 영어, 공백, 마침표만 허용 (유니코드 사용)
         $str = preg_replace('/[^\p{L}\p{N}\s\.]/u', '', $str);
+        // 이제 연속된 마침표를 단일 마침표로 대체합니다.
+        $str = preg_replace('/\.{2,}/', '.', $str);
         // 연속된 공백을 하나로 줄임
         $str = preg_replace('/\s+/', ' ', $str);
         // 앞뒤 공백 제거
         $str = trim($str);
         return $str;
     }
-    function limitProductName($productName, $maxByte = 50)
+    public function limitProductName($productName, $maxByte = 50)
     {
         $byteCount = 0;
         $limitedName = '';
