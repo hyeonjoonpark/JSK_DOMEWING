@@ -26,7 +26,7 @@ class NameController extends Controller
         foreach ($forbiddenWords as $word) {
             $productName = str_replace($word, ' ', $productName);
         }
-        $productName = str_replace(['×', '*', 'x'], 'X', $productName);
+        $productName = str_replace(['×', '*'], 'X', $productName);
         // Return the sanitized product name
         return $productName;
     }
