@@ -14,8 +14,8 @@ const puppeteer = require('puppeteer');
             document.querySelector("body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(3) > input[type=submit]").click();
         });
         await frame.waitForNavigation({ waitUntil: 'networkidle2' });
-        await page.goto('https://ownerclan.com/vender/product_myprd.php');
-        await page.select('#sForm > table > tbody > tr:nth-child(7) > td > table > tbody > tr > td > select', 'vcode');
+        await page.goto('https://ownerclan.com/vender/product_myprd.php', { waitUntil: 'networkidle2' });
+        await page.select('select[name="s_check"]', 'vcode');
         await page.evaluate(() => {
             const closeBtn = document.querySelector('#Notice10 > table > tbody > tr:nth-child(2) > td > div');
             if (closeBtn) {
@@ -24,8 +24,8 @@ const puppeteer = require('puppeteer');
         });
         await page.click('#idx_saletype1');
         await page.click('#idx_statustype1');
-        await page.type('#sForm > table > tbody > tr:nth-child(7) > td > table > tbody > tr > td > input[type=text]:nth-child(2)', productCode);
-        await page.click('#sForm > table > tbody > tr:nth-child(7) > td > table > tbody > tr > td > a');
+        await page.type('input[name="search"]', productCode);
+        await page.click('#sForm > table > tbody > tr:nth-child(9) > td > table > tbody > tr > td > a');
         await new Promise((page) => setTimeout(page, 3000));
         const checkboxSelector = 'body > table:nth-child(1) > tbody > tr:nth-child(6) > td > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td > table:nth-child(2) > tbody > tr:nth-child(5) > td > table > tbody > tr:nth-child(2) > td:nth-child(1) > input[type=checkbox]';
         // 요소가 있는지 확인합니다.
