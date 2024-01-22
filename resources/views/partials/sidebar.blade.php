@@ -33,6 +33,12 @@
                                 <span class="nk-menu-text">마인윙</span>
                             </a>
                         </li>
+                        <li class="nk-menu-item">
+                            <a href="/admin/apiwing" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-code-pull-request"></em></span>
+                                <span class="nk-menu-text">API윙</span>
+                            </a>
+                        </li>
                         <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-cloud-arrow-up"></em></span>
