@@ -47,10 +47,9 @@ class NameController extends Controller
         $byteCount = 0;
         $limitedName = '';
 
-        for ($i = 0; $i < mb_strlen($productName); $i++) {
-            $char = mb_substr($productName, $i, 1);
-            // ASCII 문자는 1byte, 그외는 2byte로 계산
-            $byteCount += (ord($char) <= 127) ? 1 : 2;
+        for ($i = 0; $i < strlen($productName); $i++) {
+            $char = substr($productName, $i, 1);
+            $byteCount += strlen($char);
 
             if ($byteCount <= $maxByte) {
                 $limitedName .= $char;
@@ -58,7 +57,7 @@ class NameController extends Controller
                 break;
             }
         }
-        $limitedName = trim($limitedName);
-        return $limitedName;
+
+        return trim($limitedName);
     }
 }

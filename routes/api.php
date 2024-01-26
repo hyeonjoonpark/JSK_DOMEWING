@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProductKeywordController;
 use App\Http\Controllers\Admin\ProductRegisterController;
 use App\Http\Controllers\Admin\ProductSearchController;
 use App\Http\Controllers\Admin\ShippingFeeController;
+use App\Http\Controllers\APIwing\IndexController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -122,3 +123,5 @@ Route::get('member/get-transaction-details/{id}', [MemberController::class, 'get
 Route::post('member/order-received', [ToReceiveController::class, 'confirmReceived']);
 Route::post('member/submit-review', [ToRateController::class, 'submitReview']);
 Route::post('member/edit-review', [ToRateController::class, 'editReview']);
+
+Route::post('apiwing/get-unset-categories', [IndexController::class, 'getUnsetCategories']);

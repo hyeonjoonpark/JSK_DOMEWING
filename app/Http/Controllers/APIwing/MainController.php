@@ -47,7 +47,7 @@ class MainController extends Controller
         $userID = 15;
         $categoryName = trim($product['mrocatenm']);
         $controller = new Controller();
-        $table = '3mro_products';
+        $table = 'threemro_products';
         $productKeywords = '';
         for ($i = 1; $i <= 5; $i++) {
             $keyword = $product['keyword']['@attributes']['keyword' . $i];

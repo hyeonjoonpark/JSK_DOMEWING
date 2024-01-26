@@ -27,7 +27,7 @@ use App\Http\Controllers\Domewing\WishlistController;
 use App\Http\Controllers\Domewing\Auth\ForgetPasswordController;
 use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
 use App\Http\Controllers\Domewing\FAQController;
-
+use App\Http\Controllers\ProductEditor\ViewController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -53,6 +53,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('mappingwing/mapped', [AdminController::class, 'mapped']);
     Route::get('/orderwing', [AdminController::class, 'orderwing']);
     Route::get('apiwing', [AdminController::class, 'apiwing']);
+    Route::get('product-editor', [ViewController::class, 'index']);
 
     //ving kong
     Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');

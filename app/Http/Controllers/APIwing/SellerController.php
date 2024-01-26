@@ -10,7 +10,7 @@ use Exception;
 
 class SellerController extends Controller
 {
-    public function threeMRO()
+    public function threemro()
     {
         set_time_limit(0); // 스크립트 실행 시간 제한을 해제합니다.
         ini_set('memory_limit', '-1'); // 메모리 제한을 해제합니다.

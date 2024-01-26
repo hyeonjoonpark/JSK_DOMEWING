@@ -206,7 +206,7 @@ class SaveController extends Controller
             $response = $this->insertMappingwing($categoryID);
             if (!$response) {
                 return [
-                    'status' => true,
+                    'status' => false,
                     'return' => '"매핑윙 연동에 실패했습니다."'
                 ];
             }

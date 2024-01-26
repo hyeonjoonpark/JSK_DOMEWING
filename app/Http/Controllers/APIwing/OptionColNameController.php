@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class OptionColNameController extends Controller
 {
-    public function threeMRO()
+    public function threemro()
     {
         return ['option1', 'option1price'];
     }
