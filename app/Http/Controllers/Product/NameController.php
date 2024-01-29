@@ -42,22 +42,22 @@ class NameController extends Controller
         $str = trim($str);
         return $str;
     }
-    public function limitProductName($productName, $maxByte = 50)
+    public function limitProductName($string, $limit = 50)
     {
         $byteCount = 0;
-        $limitedName = '';
+        $limitedString = '';
 
-        for ($i = 0; $i < strlen($productName); $i++) {
-            $char = substr($productName, $i, 1);
-            $byteCount += strlen($char);
+        for ($i = 0; $i < mb_strlen($string, 'UTF-8'); $i++) {
+            $char = mb_substr($string, $i, 1, 'UTF-8');
+            $byteCount += (strlen($char) >= 2) ? 2 : 1; // 한글 2바이트, 그 외 1바이트 계산
 
-            if ($byteCount <= $maxByte) {
-                $limitedName .= $char;
+            if ($byteCount <= $limit) {
+                $limitedString .= $char;
             } else {
                 break;
             }
         }
 
-        return trim($limitedName);
+        return $limitedString;
     }
 }
