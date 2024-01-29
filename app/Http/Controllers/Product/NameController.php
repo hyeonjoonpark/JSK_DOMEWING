@@ -49,7 +49,7 @@ class NameController extends Controller
 
         for ($i = 0; $i < mb_strlen($string, 'UTF-8'); $i++) {
             $char = mb_substr($string, $i, 1, 'UTF-8');
-            $byteCount += (strlen($char) >= 2) ? 2 : 1; // 한글 2바이트, 그 외 1바이트 계산
+            $byteCount += strlen($char); // 한글 2바이트, 그 외 1바이트 계산
 
             if ($byteCount <= $limit) {
                 $limitedString .= $char;
