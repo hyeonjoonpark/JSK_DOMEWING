@@ -80,30 +80,24 @@ class ProcessController extends Controller
     {
         $scriptPath = public_path('js/details/' . $sellerEngName . '.js');
         $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref) . " " . escapeshellarg($username) . " " . $password;
-        exec($command, $output, $returnCode);
-        if ($returnCode == 0 && isset($output[0])) {
-            $result = json_decode($output[0], true);
-            return $result;
+        try {
+            exec($command, $output, $returnCode);
+            if ($returnCode == 0 && isset($output[0])) {
+                $result = json_decode($output[0], true);
+                return [
+                    'status' => true,
+                    'return' => $result,
+                ];
+            }
+            return [
+                'status' => false,
+                'return' => '상품 정보 추출에 실패했습니다.',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'return' => $e->getMessage(),
+            ];
         }
     }
-    // public function scrapeProductDetails($sellerEngName, $username, $password, $productHref)
-    // {
-    //     // Node.js 스크립트 경로와 필요한 인자
-    //     $scriptPath = public_path('js/details/' . $sellerEngName . '.js');
-    //     // Node.js 스크립트 실행
-    //     $process = new Process(['node', $scriptPath, $productHref, $username, $password]);
-    //     $process->run();
-    //     // 스크립트 실행에 실패한 경우 예외 처리
-    //     if (!$process->isSuccessful()) {
-    //         throw new ProcessFailedException($process);
-    //     }
-    //     // 출력 결과 추출 및 JSON 파싱
-    //     $result = json_decode($process->getOutput(), true);
-    //     if ($result === null) {
-    //         return response()->json(['error' => 'Failed to parse product data'], 500);
-    //     }
-    //     // 결과 데이터를 사용하여 필요한 작업 수행
-    //     // 예: 데이터베이스에 저장, 추가 처리 등
-    //     return $result;
-    // }
 }
