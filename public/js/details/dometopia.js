@@ -49,7 +49,7 @@ const getProductDetails = async (page, productHref) => {
 };
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const [productHref, username, password] = process.argv.slice(2);
