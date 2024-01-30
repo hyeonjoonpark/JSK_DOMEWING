@@ -292,6 +292,7 @@
                     productHrefs: productHrefs
                 },
                 success: function(response) {
+                    console.log(response);
                     const responseReturn = response.return;
                     const products = responseReturn.products;
                     const errors = responseReturn.errors;
