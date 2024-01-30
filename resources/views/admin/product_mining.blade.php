@@ -297,15 +297,15 @@
                     const errors = responseReturn.errors;
                     const status = response.status;
                     closePopup();
-                    if (status == true) {
+                    if (status) {
                         popupLoader(1, '"상품명을 가공 중이에요."');
                         runManufacture(products);
                     } else {
                         swalError(errors.message);
                     }
                 },
-                error: function(response) {
-                    console.log(response);
+                error: function(xhr, status, error) {
+                    console.log("Error: ", xhr, status, error);
                     closePopup();
                     swalError('예기치 못한 에러가 발생했습니다. 기술자에게 문의해 주십시오.');
                 }

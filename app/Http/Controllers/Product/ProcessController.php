@@ -22,6 +22,12 @@ class ProcessController extends Controller
         }
         $vendorID = $request->vendorID;
         $rememberToken = $request->rememberToken;
+        if (empty($productHrefs)) {
+            return response()->json([
+                'status' => false,
+                'return' => '가공 및 저장할 상품을 선택해주세요.'
+            ]);
+        }
         $vendor = $this->getVendor($vendorID);
         $user = $this->getUser($rememberToken);
         $account = $this->getAccount($user->id, $vendor->id);
@@ -34,13 +40,20 @@ class ProcessController extends Controller
         $products = [];
         $errors = [];
         foreach ($productHrefs as $productHref) {
-            $response = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
-            if ($response['status'] == true) {
-                $products[] = $response['return'];
-            } else {
+            try {
+                $response = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
+                if ($response['status'] == true) {
+                    $products[] = $response['return'];
+                } else {
+                    $errors[] = [
+                        'product' => $productHref,
+                        'message' => $response['return'],
+                    ];
+                }
+            } catch (\Exception $e) {
                 $errors[] = [
                     'product' => $productHref,
-                    'message' => $response['return'],
+                    'message' => $e->getMessage(),
                 ];
             }
         }
