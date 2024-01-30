@@ -36,8 +36,8 @@ class ProcessController extends Controller
         $products = [];
         foreach ($productHrefs as $productHref) {
             $response = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
-            if ($response != 'false' && $response != false) {
-                $products[] = $response;
+            if ($response['status'] == true) {
+                $products[] = $response['return'];
             }
         }
         if (count($products) > 0) {
@@ -83,7 +83,20 @@ class ProcessController extends Controller
         exec($command, $output, $returnCode);
         if ($returnCode == 0 && isset($output[0])) {
             $result = json_decode($output[0], true);
-            return $result;
+            if ($result == 'false' || $result == false) {
+                return [
+                    'status' => false,
+                    'return' => '재고가 5개 미만인 상품입니다. ' . $result,
+                ];
+            }
+            return [
+                'status' => true,
+                'return' => $result,
+            ];
         }
+        return [
+            'status' => false,
+            'return' => '아래 상품 정보를 추출하는 과정에서 오류가 발생했습니다.',
+        ];
     }
 }
