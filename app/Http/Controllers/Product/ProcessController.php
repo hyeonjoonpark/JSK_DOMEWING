@@ -40,28 +40,22 @@ class ProcessController extends Controller
         $products = [];
         $errors = [];
         foreach ($productHrefs as $productHref) {
-            try {
-                $response = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
-                if ($response['status'] == true) {
-                    $products[] = $response['return'];
-                } else {
-                    $errors[] = [
-                        'product' => $productHref,
-                        'message' => $response['return'],
-                    ];
-                }
-            } catch (\Exception $e) {
+            $response = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
+            if ($response['status'] === true) {
+                $products[] = $response['return'];
+            } else {
                 $errors[] = [
                     'product' => $productHref,
-                    'message' => $e->getMessage(),
+                    'message' => $response['return'],
                 ];
             }
         }
-        if (isEmpty($products)) {
+        if (count($products) < 1) {
             return [
                 'status' => false,
                 'return' => '상품셋이 모두 필터링되었습니다.',
                 'errors' => $errors,
+                'products' => $products,
             ];
         }
         return [
