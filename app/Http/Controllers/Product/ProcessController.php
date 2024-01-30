@@ -57,6 +57,12 @@ class ProcessController extends Controller
                 ];
             }
         }
+        if (isEmpty($products)) {
+            return [
+                'status' => false,
+                'return' => '중복 및 재고 수량 이슈로 인해 가공 및 저장할 수 있는 상품이 모두 필터링되었습니다.',
+            ];
+        }
         return [
             'status' => true,
             'return' => [
@@ -107,7 +113,7 @@ class ProcessController extends Controller
         if ($returnCode !== 0 || !isset($output[0])) {
             return [
                 'status' => false,
-                'return' => '상품 정보 추출 과정에서 오류가 발생했습니다: ' . $productHref,
+                'return' => '상품 정보 추출 과정에서 오류가 발생했습니다',
             ];
         }
         // 결과 처리

@@ -15,12 +15,6 @@ class ManufactureController extends Controller
     {
         set_time_limit(0);
         $products = $request->products;
-        if (isEmpty($products)) {
-            return [
-                'status' => false,
-                'return' => '가공 가능한 상품이 없습니다.',
-            ];
-        }
         $nameController = new NameController();
         $productNames = [];
         foreach ($products as $i => &$product) {
