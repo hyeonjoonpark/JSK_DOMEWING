@@ -100,7 +100,7 @@ class ProcessController extends Controller
             ];
         }
         // Node.js 스크립트 실행
-        $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref) . " " . escapeshellarg($username) . " " . escapeshellarg($password);
+        $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref) . " " . escapeshellarg($username) . " " . $password;
         exec($command, $output, $returnCode);
         // 실행 결과 확인
         if ($returnCode !== 0 || !isset($output[0])) {
