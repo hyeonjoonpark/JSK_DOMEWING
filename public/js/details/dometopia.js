@@ -16,7 +16,7 @@ const getProductDetails = async (page, productHref) => {
         // 요소의 존재 여부를 검사
         if (stockElement) {
             const stock = parseInt(stockElement.textContent.trim().replace(/[^\d]/g, ''));
-            console.log(stock);
+            console.log(false);
             if (stock < 5) {
                 return false;
             }

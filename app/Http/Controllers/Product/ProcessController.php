@@ -60,7 +60,7 @@ class ProcessController extends Controller
         if (isEmpty($products)) {
             return [
                 'status' => false,
-                'return' => '중복 및 재고 수량 이슈로 인해 가공 및 저장할 수 있는 상품이 모두 필터링되었습니다.',
+                'return' => '상품셋이 모두 필터링되었습니다.',
                 'errors' => $errors,
             ];
         }
