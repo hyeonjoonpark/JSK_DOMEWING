@@ -305,8 +305,8 @@
                         swalError(errors.message);
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.log("Error: ", xhr, status, error);
+                error: function(error) {
+                    console.log(error);
                     closePopup();
                     swalError('예기치 못한 에러가 발생했습니다. 기술자에게 문의해 주십시오.');
                 }
