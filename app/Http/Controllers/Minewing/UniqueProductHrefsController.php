@@ -12,6 +12,15 @@ class UniqueProductHrefsController extends Controller
     {
         set_time_limit(0);
         // Get unique product hrefs directly.
+        $productHrefs = $request->productHrefs;
+        if (!is_array($productHrefs)) {
+            return [
+                'status' => false,
+                'return' => [
+                    'message' => '수집 및 가공을 진행할 상품들을 선택해주세요.'
+                ]
+            ];
+        }
         $uniqueProductHrefs = array_unique($request->productHrefs);
 
         // Get existing active product hrefs from the database in one query.
