@@ -16,6 +16,7 @@
                 <div class="card-inner">
                     <h6 class="title">신규 주문</h6>
                     <p>상품 정보를 클릭하면 해당 상품의 상세 페이지로 이동합니다.</p>
+                    <p>총 <span id="numOrders">0</span>개의 주문이 접수되었습니다.</p>
                     <div class="table-responsive">
                         <table class="table align-middle custom-table">
                             <thead>
@@ -59,6 +60,7 @@
 
         function updateOrderTable(response) {
             console.log(response);
+            $('#numOrders').html(response.length);
             let html = response.map(order => `
             <tr>
                 <td>
