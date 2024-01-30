@@ -161,7 +161,6 @@ class AdminController extends Controller
     {
         $searchKeyword = '';
         $page = 1;
-        $products = [];
         if (isset($request->searchKeyword)) {
             $searchKeyword = $request->searchKeyword;
             $products = DB::table('minewing_products AS mp')
@@ -176,15 +175,21 @@ class AdminController extends Controller
                 })
                 ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt')
                 ->orderBy('createdAt', 'DESC')->get()->toArray();
+        } else {
+            $products = DB::table('minewing_products AS mp')
+                ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
+                ->where('mp.isActive', 'Y')
+                ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt')
+                ->orderBy('createdAt', 'DESC')->limit(500)->get()->toArray();
         }
         if (isset($request->page)) {
             $page = $request->page;
         }
 
         $numResults = count($products);
-        $numPages = ceil($numResults / 1000);
+        $numPages = ceil($numResults / 500);
         if (!isEmpty($products)) {
-            $products = array_chunk($products, 1000)[$page - 1];
+            $products = array_chunk($products, 500)[$page - 1];
         }
         return view('admin/product_minewing', [
             'products' => $products,
@@ -211,7 +216,7 @@ class AdminController extends Controller
                     ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
             })
             ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt')
-            ->orderBy('createdAt', 'DESC')->limit(1000)->get();
+            ->orderBy('createdAt', 'DESC')->limit(500)->get();
         $searchKeyword = '';
         return view('admin/product_sold_out', [
             'products' => $products,

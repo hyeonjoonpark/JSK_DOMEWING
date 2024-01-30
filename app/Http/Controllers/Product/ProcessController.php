@@ -91,6 +91,7 @@ class ProcessController extends Controller
     }
     public function scrapeProductDetails($sellerEngName, $username, $password, $productHref)
     {
+        set_time_limit(0);
         // 스크립트 파일 경로 확인
         $scriptPath = public_path('js/details/' . $sellerEngName . '.js');
         if (!file_exists($scriptPath)) {

@@ -35,7 +35,7 @@
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">상품윙 테이블</h6>
-                    <p>검색된 상품이 총 {{ number_format($numResults, 0) }}건입니다. 페이지 당 1,000건의 상품이 출력됩니다.</p>
+                    <p>검색된 상품이 총 {{ number_format($numResults, 0) }}건입니다. 페이지 당 500건의 상품이 출력됩니다.</p>
                     <div class="form-group">
                         <div class="d-flex justify-content-center align-items-center">
                             @if ($page > 1)
