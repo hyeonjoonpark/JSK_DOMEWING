@@ -295,14 +295,13 @@
                     console.log(response);
                     const responseReturn = response.return;
                     const products = responseReturn.products;
-                    const errors = responseReturn.errors;
                     const status = response.status;
                     closePopup();
                     if (status) {
                         popupLoader(1, '"상품명을 가공 중이에요."');
                         runManufacture(products);
                     } else {
-                        swalError(errors.message);
+                        swalError(responseReturn);
                     }
                 },
                 error: function(error) {
