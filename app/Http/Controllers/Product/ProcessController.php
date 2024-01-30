@@ -80,24 +80,10 @@ class ProcessController extends Controller
     {
         $scriptPath = public_path('js/details/' . $sellerEngName . '.js');
         $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref) . " " . escapeshellarg($username) . " " . $password;
-        try {
-            exec($command, $output, $returnCode);
-            if ($returnCode == 0 && isset($output[0])) {
-                $result = json_decode($output[0], true);
-                return [
-                    'status' => true,
-                    'return' => $result,
-                ];
-            }
-            return [
-                'status' => false,
-                'return' => '상품 정보 추출에 실패했습니다.',
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'return' => $e->getMessage(),
-            ];
+        exec($command, $output, $returnCode);
+        if ($returnCode == 0 && isset($output[0])) {
+            $result = json_decode($output[0], true);
+            return $result;
         }
     }
 }

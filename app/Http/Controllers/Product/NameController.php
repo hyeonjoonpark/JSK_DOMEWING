@@ -58,6 +58,6 @@ class NameController extends Controller
             }
         }
 
-        return $byteCount;
+        return $limitedString;
     }
 }
