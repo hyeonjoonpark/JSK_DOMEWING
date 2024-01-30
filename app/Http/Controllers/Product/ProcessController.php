@@ -34,23 +34,25 @@ class ProcessController extends Controller
             ];
         }
         $products = [];
+        $errors = [];
         foreach ($productHrefs as $productHref) {
             $response = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
             if ($response['status'] == true) {
                 $products[] = $response['return'];
+            } else {
+                $errors[] = [
+                    'product' => $productHref,
+                    'message' => $response['return'],
+                ];
             }
         }
-        if (count($products) > 0) {
-            return [
-                'status' => true,
-                'return' => $products
-            ];
-        } else {
-            return [
-                'status' => false,
-                'return' => '"전 상품이 재고 5개 미만입니다."'
-            ];
-        }
+        return [
+            'status' => true,
+            'return' => [
+                'products' => $products,
+                'errors' => $errors,
+            ],
+        ];
     }
     public function getAccount($userID, $sellerID)
     {
@@ -96,7 +98,7 @@ class ProcessController extends Controller
         }
         return [
             'status' => false,
-            'return' => '아래 상품 정보를 추출하는 과정에서 오류가 발생했습니다.',
+            'return' => '아래 상품 정보를 추출하는 과정에서 오류가 발생했습니다. ' . $productHref,
         ];
     }
 }
