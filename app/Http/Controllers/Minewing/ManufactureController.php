@@ -7,12 +7,20 @@ use App\Http\Controllers\Product\NameController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use function PHPUnit\Framework\isEmpty;
+
 class ManufactureController extends Controller
 {
     public function index(Request $request)
     {
         set_time_limit(0);
         $products = $request->products;
+        if (isEmpty($products)) {
+            return [
+                'status' => false,
+                'return' => '가공 가능한 상품이 없습니다.',
+            ];
+        }
         $nameController = new NameController();
         $productNames = [];
         foreach ($products as $i => &$product) {

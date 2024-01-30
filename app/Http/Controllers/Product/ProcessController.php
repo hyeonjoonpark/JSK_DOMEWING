@@ -57,12 +57,6 @@ class ProcessController extends Controller
                 ];
             }
         }
-        if (isEmpty($products)) {
-            return [
-                'status' => false,
-                'return' => '"중복 상품도 거르고, 재고 상품도 걸렀더니 남은 상품이 없어요."',
-            ];
-        }
         return [
             'status' => true,
             'return' => [
