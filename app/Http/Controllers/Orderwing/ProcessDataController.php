@@ -59,8 +59,11 @@ class ProcessDataController extends Controller
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
-            $rowData['productHref'] = $response->productHref;
-            $rowData['productImage'] = $response->productImage;
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
             $rowData['orderStatus'] = '배송준비';
             $rowData['b2BName'] = "오너클랜";
             if (!empty($rowData)) {
@@ -122,8 +125,11 @@ class ProcessDataController extends Controller
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
-            $rowData['productHref'] = $response->productHref;
-            $rowData['productImage'] = $response->productImage;
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
             $rowData['b2BName'] = "도매아토즈";
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty
@@ -188,8 +194,11 @@ class ProcessDataController extends Controller
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
-            $rowData['productHref'] = $response->productHref;
-            $rowData['productImage'] = $response->productImage;
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
             $rowData['b2BName'] = "도매창고";
 
             if (!empty($rowData)) {
@@ -258,8 +267,11 @@ class ProcessDataController extends Controller
             $productCode = $rowData['productCode'] ?? '';
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
-            $rowData['productHref'] = $response->productHref;
-            $rowData['productImage'] = $response->productImage;
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
             $rowData['b2BName'] = "도매꾹";
 
             if (!empty($rowData)) {
@@ -322,8 +334,11 @@ class ProcessDataController extends Controller
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
-            $rowData['productHref'] = $response->productHref;
-            $rowData['productImage'] = $response->productImage;
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
             (int)$rowData['amount'] = (int)$rowData['productPrice'] * (int)$rowData['quantity'] + (int)$rowData['shippingCost'];
             $rowData['b2BName'] = "도매의신";
             if (!empty($rowData)) {
@@ -383,8 +398,11 @@ class ProcessDataController extends Controller
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
-            $rowData['productHref'] = $response->productHref;
-            $rowData['productImage'] = $response->productImage;
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
             $rowData['orderStatus'] = '배송준비';
             $rowData['b2BName'] = "오너클랜";
             if (!empty($rowData)) {

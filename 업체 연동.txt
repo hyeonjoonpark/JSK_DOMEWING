@@ -9,3 +9,11 @@ B2B 업체 연동
 6. 엑셀윙 연동
 7. 오더윙 연동
 8. 상품윙 품절/재입고 연동
+
+원청사 연동
+
+1. vendors 테이블에 열 추가
+2. product_search 테이블에 열 추가
+3. pagination 스크립트 작성
+4. mining 스크립트 작성
+5. details 스크립트 작성

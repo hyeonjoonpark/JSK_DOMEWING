@@ -65,7 +65,17 @@ class ExtractOrderController extends Controller
             $productHref = $this->getUploadedProductHref($productCode);
         }
 
-        return $productHref;
+        if ($productHref === null) {
+            return [
+                'status' => false,
+                'return' => '상품 정보를 찾을 수 없습니다.',
+            ];
+        }
+
+        return [
+            'status' => true,
+            'return' => $productHref,
+        ];
     }
 
     private function getUploadedProductHref($productCode)
