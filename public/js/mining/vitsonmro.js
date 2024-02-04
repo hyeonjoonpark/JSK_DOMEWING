@@ -32,17 +32,20 @@ async function selectNumPages(page, listURL) {
 }
 async function moveToPage(page, listURL, curPage) {
     await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
-    await page.evaluate((curPage) => {
-        const pageBtn = document.querySelector('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > a:nth-child(4)');
-        pageBtn.setAttribute('data-page', curPage);
-        pageBtn.click();
-    }, curPage);
+    if (curPage != 1) {
+        await page.evaluate((curPage) => {
+            const pageBtn = document.querySelector('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > a:nth-child(4)');
+            pageBtn.setAttribute('data-page', curPage);
+            pageBtn.click();
+        }, curPage);
+    }
 }
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         function processProduct(productElement) {
             // Remove this.
             const index = parseInt(productElement.querySelector('td:nth-child(3)').textContent.trim());
+            //
             const stockText = productElement.querySelector('td:nth-child(9) > span.hdsp_bot').textContent.trim();
             if (stockText !== '재고보유') {
                 return false;
