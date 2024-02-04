@@ -90,28 +90,6 @@ class CategoryMappingController extends Controller
 
         $rand = rand(676, 6930);
         return DB::table('domeatoz_category')->where('id', $rand)->value('code'); // 수정됨
-        // $categoryString = DB::table('category')->where('code', $code)->select('wholeCategoryName')->first()->wholeCategoryName;
-        // $categories = explode(">", $categoryString);
-        // // 배열의 마지막 요소를 선택합니다.
-        // $keyword = trim(end($categories));
-        // $spreadsheet = IOFactory::load(public_path('assets/excel/domeatoz_category.xlsx'));
-        // $worksheet = $spreadsheet->getSheet(0);
-        // $data = [];
-        // foreach ($worksheet->getRowIterator() as $row) {
-        //     $cellIterator = $row->getCellIterator();
-        //     $rowData = [];
-        //     foreach ($cellIterator as $cell) {
-        //         $rowData[] = $cell->getValue();
-        //     }
-        //     $data[] = $rowData;
-        // }
-        // $code = '1001001001';
-        // foreach ($data as $row) {
-        //     if (in_array($keyword, $row)) {
-        //         $code = $row[4];
-        //     }
-        // }
-        // return $code;
     }
     public function wsConvertCategoryCode($categoryId)
     {

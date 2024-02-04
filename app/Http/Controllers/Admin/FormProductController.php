@@ -605,7 +605,7 @@ class FormProductController extends Controller
         $categoryCode = DB::table('category_mapping AS cm')
             ->join($tableName, $tableName . '.id', '=', 'cm.' . $vendorEngName)
             ->where('cm.ownerclan', $ownerclanCategoryID)
-            ->select('code')
+            ->select($tableName . '.code')
             ->first()
             ->code;
         return $categoryCode;
