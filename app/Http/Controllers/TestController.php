@@ -3,26 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 
 class TestController extends Controller
 {
     public function index()
     {
-        // 기본 GET 요청
-        $response = Http::get('http://3mro.co.kr/shop/api/api_out.php?div=all&m_no=11841');
-
-        // 응답 확인
-        $statusCode = $response->status(); // 상태 코드
-        $data = $response->json(); // JSON 응답을 배열로 파싱
-
-        // 예외 처리
-        if ($response->failed()) {
-            // 실패 시 로직
+        $threeMROProducts = DB::table('minewing_products AS mp')
+            ->where('sellerID', 16)
+            ->where('isActive', 'Y')
+            ->groupBy('categoryID')
+            ->select('categoryID')
+            ->get();
+        foreach ($threeMROProducts as $categoryID) {
+            $isExist = DB::table('category_mapping')
+                ->where('ownerclan', $categoryID->categoryID)
+                ->exists();
+            if (!$isExist) {
+                DB::table('category_mapping')
+                    ->insert([
+                        'ownerclan' => $categoryID->categoryID
+                    ]);
+            }
         }
-
-        return [
-            'status' => $statusCode,
-            'return' => $data
-        ];
     }
 }
