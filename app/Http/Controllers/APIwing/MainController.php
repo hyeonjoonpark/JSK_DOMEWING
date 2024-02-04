@@ -10,36 +10,36 @@ class MainController extends Controller
 {
     public function index($vendorID)
     {
-        set_time_limit(0);
-        ini_set('memory_limit', '-1');
-        $seller = DB::table('product_search AS ps')
-            ->join('vendors AS v', 'v.id', '=', 'ps.vendor_id')
-            ->where('ps.vendor_id', $vendorID)
-            ->first();
-        if ($seller == null) {
-            return [
-                'status' => false,
-                'return' => '유효한 원청사가 아닙니다.'
-            ];
-        }
-        $sellerEngName = $seller->name_eng;
-        $sellerController = new SellerController();
-        $response = $sellerController->$sellerEngName();
-        if ($response['status'] == false) {
-            return $response;
-        }
-        $products = $response['return'];
-        $success = 0;
-        $error = 0;
-        foreach ($products as $index => $product) {
-            $response = $this->$sellerEngName($product);
-            $success += $response['success'];
-            $error += $response['error'];
-        }
-        return [
-            'success' => $success,
-            'error' => $error
-        ];
+        // set_time_limit(0);
+        // ini_set('memory_limit', '-1');
+        // $seller = DB::table('product_search AS ps')
+        //     ->join('vendors AS v', 'v.id', '=', 'ps.vendor_id')
+        //     ->where('ps.vendor_id', $vendorID)
+        //     ->first();
+        // if ($seller == null) {
+        //     return [
+        //         'status' => false,
+        //         'return' => '유효한 원청사가 아닙니다.'
+        //     ];
+        // }
+        // $sellerEngName = $seller->name_eng;
+        // $sellerController = new SellerController();
+        // $response = $sellerController->$sellerEngName();
+        // if ($response['status'] == false) {
+        //     return $response;
+        // }
+        // $products = $response['return'];
+        // $success = 0;
+        // $error = 0;
+        // foreach ($products as $index => $product) {
+        //     $response = $this->$sellerEngName($product);
+        //     $success += $response['success'];
+        //     $error += $response['error'];
+        // }
+        // return [
+        //     'success' => $success,
+        //     'error' => $error
+        // ];
     }
     public function threeMRO($product)
     {
