@@ -602,12 +602,16 @@ class FormProductController extends Controller
     public function getCategoryCode($vendorEngName, $ownerclanCategoryID)
     {
         $tableName = $vendorEngName . '_category';
-        $categoryCode = DB::table('category_mapping AS cm')
-            ->join($tableName, $tableName . '.id', '=', 'cm.' . $vendorEngName)
-            ->where('cm.ownerclan', $ownerclanCategoryID)
-            ->select($tableName . '.code')
-            ->first()
-            ->code;
-        return $categoryCode;
+        try {
+            $categoryCode = DB::table('category_mapping AS cm')
+                ->join($tableName, $tableName . '.id', '=', 'cm.' . $vendorEngName)
+                ->where('cm.ownerclan', $ownerclanCategoryID)
+                ->select($tableName . '.code')
+                ->first()
+                ->code;
+            return $categoryCode;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 }
