@@ -39,6 +39,7 @@ async function moveToPage(page, listURL, curPage) {
             pageBtn.setAttribute('data-page', curPage);
             pageBtn.click();
         }, curPage);
+        await new Promise((page) => setTimeout(page, 3000));
     }
 }
 async function scrapeProducts(page) {
