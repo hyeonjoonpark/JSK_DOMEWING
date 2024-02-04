@@ -6,8 +6,8 @@ const puppeteer = require('puppeteer');
         const args = process.argv.slice(2);
         const [listURL, username, password, curPage] = args;
         await signIn(page, username, password);
-        await selectNumPages(page, listURL);
         await moveToPage(page, listURL, curPage);
+        await selectNumPages(page, listURL);
         const products = await scrapeProducts(page);
         console.log(JSON.stringify(products));
     } catch (error) {
@@ -28,7 +28,7 @@ async function signIn(page, username, password) {
 async function selectNumPages(page, listURL) {
     await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
-    await new Promise((page) => setTimeout(page, 10000));
+    await new Promise((page) => setTimeout(page, 5000));
 }
 async function moveToPage(page, listURL, curPage) {
     await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
@@ -41,7 +41,13 @@ async function moveToPage(page, listURL, curPage) {
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         function processProduct(productElement) {
-            const name = productElement.querySelector('td:nth-child(6) > span.hdsp_top.link > a').textContent.trim();
+            const stockText = productElement.querySelector('td:nth-child(9) > span.hdsp_bot').textContent.trim();
+            if (stockText !== '재고보유') {
+                return false;
+            }
+            const productName = productElement.querySelector('td:nth-child(6) > span.hdsp_top.link > a').textContent.trim();
+            const standard = productElement.querySelector('td:nth-child(6) > span.hdsp_bot').textContent.trim();
+            const name = productName + ' ' + standard;
             const productPriceText = productElement.querySelector('td:nth-child(10) > span.hdsp_top.price_cr').textContent;
             const price = productPriceText.replace(/[^0-9]/g, '').trim();
             const image = productElement.querySelector('td:nth-child(4) > div > img').getAttribute('src');
@@ -53,7 +59,10 @@ async function scrapeProducts(page) {
         const productElements = document.querySelectorAll('#grid > div.k-grid-content.k-auto-scrollable > table > tbody tr');
         const products = [];
         productElements.forEach(productElement => {
-            products.push(processProduct(productElement));
+            const result = processProduct(productElement);
+            if (result !== false) {
+                products.push(result);
+            }
         });
         return products;
     });
