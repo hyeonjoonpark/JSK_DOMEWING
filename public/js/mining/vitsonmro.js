@@ -41,6 +41,8 @@ async function moveToPage(page, listURL, curPage) {
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         function processProduct(productElement) {
+            // Remove this.
+            const index = parseInt(productElement.querySelector('td:nth-child(3)').textContent.trim());
             const stockText = productElement.querySelector('td:nth-child(9) > span.hdsp_bot').textContent.trim();
             if (stockText !== '재고보유') {
                 return false;
@@ -54,7 +56,7 @@ async function scrapeProducts(page) {
             const productCode = productElement.querySelector('td:nth-child(5) > span.hdsp_top').textContent.replace(/[^0-9]/g, '').trim();
             const href = 'https://vitsonmro.com/mro/shop/productDetail.do?productCode=' + productCode;
             const platform = '비츠온엠알오';
-            return { name, price, image, href, platform };
+            return { name, price, image, href, platform, index };
         }
         const productElements = document.querySelectorAll('#grid > div.k-grid-content.k-auto-scrollable > table > tbody tr');
         const products = [];
