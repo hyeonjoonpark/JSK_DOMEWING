@@ -32,6 +32,7 @@ async function selectNumPages(page, listURL) {
 }
 async function moveToPage(page, listURL, curPage) {
     await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
+    curPage = parseInt(curPage);
     if (curPage != 1) {
         await page.evaluate((curPage) => {
             const pageBtn = document.querySelector('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > a:nth-child(4)');
