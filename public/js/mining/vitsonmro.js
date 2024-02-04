@@ -34,7 +34,7 @@ async function moveToPage(page, listURL, curPage) {
     curPage = parseInt(curPage);
     if (curPage != 1) {
         await page.evaluate((curPage) => {
-            const pageBtn = document.querySelector('a[class="k-link"]');
+            const pageBtn = document.querySelector('a[class="k-link"][data-page="' + curPage + '"]');
             pageBtn.setAttribute('data-page', curPage);
             pageBtn.click();
         }, curPage);
