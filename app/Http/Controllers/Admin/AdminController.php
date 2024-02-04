@@ -99,10 +99,9 @@ class AdminController extends Controller
 
     public function accountSetting(Request $request)
     {
-        $marginRates = DB::table('margin_rate AS mr')
-            ->join('vendors AS v', 'mr.vendorID', '=', 'v.id')
-            ->where('v.is_active', 'ACTIVE')
-            ->select('*', 'mr.id AS mrID')
+        $b2Bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('pr.is_active', 'Y')
             ->get();
         $vendors = DB::table('product_search AS ps')
             ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
@@ -110,7 +109,7 @@ class AdminController extends Controller
             ->where('ps.is_active', 'Y')
             ->get();
         return view('admin/account-setting', [
-            'marginRates' => $marginRates,
+            'b2Bs' => $b2Bs,
             'vendors' => $vendors
         ]);
     }

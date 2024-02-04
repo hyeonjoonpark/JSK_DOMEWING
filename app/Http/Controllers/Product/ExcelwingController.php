@@ -74,11 +74,11 @@ class ExcelwingController extends Controller
     }
     protected function getMarginRate($vendorID)
     {
-        $marginRate = DB::table("margin_rate")
-            ->where("vendorID", $vendorID)
+        $marginRate = DB::table("product_register AS pr")
+            ->where("pr.vendor_id", $vendorID)
             ->first();
         if ($marginRate) {
-            $marginRate = (int)$marginRate->rate;
+            $marginRate = (int)$marginRate->margin_rate;
             $marginRate = (float)((100 + $marginRate) / 100);
             return [
                 'status' => true,

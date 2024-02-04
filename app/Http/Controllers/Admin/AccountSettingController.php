@@ -32,10 +32,10 @@ class AccountSettingController extends Controller
     protected function updateMarginRate($mrID, $rate)
     {
         try {
-            DB::table('margin_rate')
-                ->where('id', $mrID)
+            DB::table('product_register AS pr')
+                ->where('pr.vendor_id', $mrID)
                 ->update([
-                    'rate' => $rate
+                    'pr.margin_rate' => $rate
                 ]);
             return $this->getResponseData(true, '마진율을 성공적으로 변경했습니다.');
         } catch (Exception $e) {

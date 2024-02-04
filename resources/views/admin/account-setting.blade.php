@@ -12,20 +12,20 @@
                 <div class="card-inner">
                     <h6 class="title">마진율</h6>
                     <p>B2B 업체별로 각 상품의 원가에 적용될 마진율을 설정합니다.</p>
-                    @foreach ($marginRates as $marginRate)
+                    @foreach ($b2Bs as $b2B)
                         <div class="form-group">
-                            <label for="" class="form-label">{{ $marginRate->name }}</label>
+                            <label for="" class="form-label">{{ $b2B->name }}</label>
                             <div class="d-flex text-nowrap">
                                 <div class="form-control-wrap w-100">
                                     <div class="form-text-hint">
                                         <span class="overline-title">%</span>
                                     </div>
-                                    <input type="number" class="form-control" id="marginRate{{ $marginRate->mrID }}"
-                                        value="{{ $marginRate->rate }}" placeholder="마진율(%)를 기입해주세요."
-                                        onkeydown="handleEnter(event, 'marginBtn{{ $marginRate->mrID }}')">
+                                    <input type="number" class="form-control" id="marginRate{{ $b2B->vendor_id }}"
+                                        value="{{ $b2B->margin_rate }}" placeholder="마진율(%)를 기입해주세요."
+                                        onkeydown="handleEnter(event, 'marginBtn{{ $b2B->vendor_id }}')">
                                 </div>
-                                <button class="btn btn-primary" id="marginBtn{{ $marginRate->mrID }}"
-                                    onclick="changeMarginRate({{ $marginRate->mrID }});">변경</button>
+                                <button class="btn btn-primary" id="marginBtn{{ $b2B->vendor_id }}"
+                                    onclick="changeMarginRate({{ $b2B->vendor_id }});">변경</button>
                             </div>
                         </div>
                     @endforeach
