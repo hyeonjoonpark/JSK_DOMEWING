@@ -1,13 +1,13 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true, ignoreDefaultArgs: ['--enable-automation'] });
+    const browser = await puppeteer.launch({ headless: false, ignoreDefaultArgs: ['--enable-automation'] });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [listURL, username, password, curPage] = args;
         await signIn(page, username, password);
-        await moveToPage(page, listURL, curPage);
         await selectNumPages(page, listURL);
+        await moveToPage(page, listURL, curPage);
         const products = await scrapeProducts(page);
         console.log(JSON.stringify(products));
     } catch (error) {
@@ -23,7 +23,7 @@ async function signIn(page, username, password) {
         document.querySelector('#custPw').value = password;
         document.querySelector('#loginForm > div > a:nth-child(3)').click();
     }, username, password);
-    await page.waitForNavigation();
+    await page.waitForNavigation({ timeout: 0 });
 }
 async function selectNumPages(page, listURL) {
     await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
@@ -31,15 +31,14 @@ async function selectNumPages(page, listURL) {
     await new Promise((page) => setTimeout(page, 10000));
 }
 async function moveToPage(page, listURL, curPage) {
-    await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
     curPage = parseInt(curPage);
     if (curPage != 1) {
         await page.evaluate((curPage) => {
-            const pageBtn = document.querySelector('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > a:nth-child(4)');
+            const pageBtn = document.querySelector('a[class="k-link"][data-page="' + curPage + '"]');
             pageBtn.setAttribute('data-page', curPage);
             pageBtn.click();
         }, curPage);
-        await new Promise((page) => setTimeout(page, 3000));
+        await new Promise((page) => setTimeout(page, 10000));
     }
 }
 async function scrapeProducts(page) {
