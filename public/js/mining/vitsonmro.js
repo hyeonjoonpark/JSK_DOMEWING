@@ -28,7 +28,7 @@ async function signIn(page, username, password) {
 async function selectNumPages(page, listURL) {
     await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
-    await new Promise((page) => setTimeout(page, 5000));
+    await new Promise((page) => setTimeout(page, 10000));
 }
 async function moveToPage(page, listURL, curPage) {
     await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
