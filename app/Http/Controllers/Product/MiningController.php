@@ -78,6 +78,7 @@ class MiningController extends Controller
     }
     public function getProductsList($seller, $listURL, $account, $numPages)
     {
+        set_time_limit(0);
         $scriptPath = public_path('js/mining/' . $seller->name_eng . '.js');
         $allProducts = [];
         for ($i = $numPages; $i > 0; $i--) {

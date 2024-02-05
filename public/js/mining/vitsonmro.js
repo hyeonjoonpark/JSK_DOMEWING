@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true, ignoreDefaultArgs: ['--enable-automation'] });
+    const browser = await puppeteer.launch({ headless: false, ignoreDefaultArgs: ['--enable-automation'] });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -28,13 +28,13 @@ async function signIn(page, username, password) {
 async function selectNumPages(page, listURL) {
     await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
-    await new Promise((page) => setTimeout(page, 5000));
+    await new Promise((page) => setTimeout(page, 3000));
 }
 async function moveToPage(page, curPage) {
     curPage = parseInt(curPage);
-    if (curPage !== 1) {
+    if (curPage > 1) {
         await page.evaluate((curPage) => {
-            const pageBtn = document.querySelector('a[class="k-link"][data-page="2"]');
+            const pageBtn = document.querySelector('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > div > ul > li:nth-child(2) > a');
             pageBtn.setAttribute('data-page', curPage);
             pageBtn.click();
         }, curPage);
@@ -61,12 +61,12 @@ async function scrapeProducts(page) {
         }
         const productElements = document.querySelectorAll('#grid > div.k-grid-content.k-auto-scrollable > table > tbody tr');
         const products = [];
-        productElements.forEach(productElement => {
+        for (const productElement of productElements) {
             const result = processProduct(productElement);
             if (result !== false) {
                 products.push(result);
             }
-        });
+        }
         return products;
     });
     return products;
