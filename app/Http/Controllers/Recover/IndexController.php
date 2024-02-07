@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Recover;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Product\ProcessController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
@@ -14,22 +15,79 @@ class IndexController extends Controller
 {
     public function index()
     {
-        $products = $this->getProducts();
+        set_time_limit(0);
+        ini_set('memory_limit', '-1'); // 메모리 한도 증가
+        $products = $this->getProducts(3);
         foreach ($products as $product) {
-            $newImageFileName = $this->getFileNameFromURL($product->newImageHref);
-            $this->sibal($product->productImage, $newImageFileName);
-            $newDetailFileNames = $this->extractImageFilenames($product->newProductDetail);
-            $this->processProductDetail($product->productDetail, $newDetailFileNames);
+            $response = $this->getFileNames($product);
+            if ($response['status'] === false) {
+                $productImageFileName = $response['return']['productImage'];
+                $productDetailFileNames = $response['return']['productDetailImages'];
+                $productHref = $product->productHref;
+                $scrapeProductImageFiles = $this->scrapeProductImageFiles($productHref);
+                $productContents = $scrapeProductImageFiles['return'];
+                $productImageFile = $productContents['productImage'];
+                $productDetailFiles = $productContents['productDetail'];
+                $this->sibal($productImageFile, $productImageFileName, 'product');
+                for ($i = 0; $i < count($productDetailFileNames); $i++) {
+                    $this->sibal($productDetailFiles[$i], $productDetailFileNames[$i], 'detail');
+                }
+            }
         }
         return true;
     }
-    public function getProducts()
+    public function scrapeProductImageFiles($productHref)
     {
-        $products = DB::table('uploaded_products AS up')
-            ->join('collected_products AS cp', 'up.productId', '=', 'cp.id')
-            ->join('vendors AS v', 'cp.sellerID', '=', 'v.id')
-            ->where('cp.isActive', 'Y')
-            ->where('up.isActive', 'Y')
+        $scriptPath = public_path('js/recovery/dometopia.js');
+        $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref);
+        exec($command, $output, $returnCode);
+        // 실행 결과 확인
+        if ($returnCode !== 0 || !isset($output[0])) {
+            return [
+                'status' => false,
+                'return' => '상품 정보 추출 과정에서 오류가 발생했습니다',
+            ];
+        }
+        // 결과 처리
+        $result = json_decode($output[0], true);
+        return [
+            'status' => true,
+            'return' => $result,
+        ];
+    }
+    public function getFileNames($product)
+    {
+        // 상품 이미지 파일 이름 추출
+        $productImage = $product->productImage;
+        $productImageFileName = basename($productImage);
+
+        // 상품 상세 내 이미지 파일 이름 추출
+        $productDetail = $product->productDetail;
+        $productDetailFileNames = $this->extractImageFilenames($productDetail);
+
+
+        // 상품 이미지 파일 존재 여부 검사
+        $productImageDir = public_path('images/CDN/product/' . $productImageFileName);
+        if (!is_file($productImageDir)) {
+            // 파일이 존재하지 않을 경우
+            return [
+                'status' => false,
+                'return' => [
+                    'productImage' => $productImageFileName,
+                    'productDetailImages' => $productDetailFileNames
+                ]
+            ];
+        }
+
+        // 모든 검사가 성공적으로 완료될 경우
+        return [
+            'status' => true,
+        ];
+    }
+    public function getProducts($sellerID)
+    {
+        $products = DB::table('minewing_products')
+            ->where('sellerID', $sellerID)
             ->get();
         return $products;
     }
@@ -39,23 +97,25 @@ class IndexController extends Controller
         $filename = basename($path);
         return $filename;
     }
-    function extractImageFilenames($html)
+    public function extractImageFilenames($html)
     {
         $pattern = '/<img[^>]+src="([^"]+)"/';
         preg_match_all($pattern, $html, $matches);
 
         $filenames = array();
-        foreach ($matches[1] as $url) {
-            $filenames[] = basename($url);
+        foreach ($matches[1] as $index => $url) {
+            if ($index !== 0) {
+                $filenames[] = basename($url);
+            }
         }
 
         return $filenames;
     }
-    function sibal($imageUrl, $newImageName)
+    public function sibal($imageUrl, $newImageName, $path)
     {
         $newWidth = 1000;
         $newHeight = 1000;
-        $savePath = public_path('images/product/'); // 경로 수정
+        $savePath = public_path('images/CDN/' . $path); // 경로 수정
         try {
             $image = Image::make($imageUrl)->resize($newWidth, $newHeight);
 
@@ -64,7 +124,6 @@ class IndexController extends Controller
             $image->save($savePathWithFile); // 이미지 저장
             return [
                 'status' => true,
-                'return' => "https://www.sellwing.kr/images/product/" . $newImageName
             ];
         } catch (Exception $e) {
             error_log("Error processing image: " . $e->getMessage());
@@ -73,50 +132,5 @@ class IndexController extends Controller
                 'return' => $e->getMessage()
             ];
         }
-    }
-    private function processProductDetail($productDetail, $newProductDetailNames)
-    {
-        $doc = $this->loadHtmlDocument($productDetail);
-        $images = $this->extractImages($doc);
-
-        return $this->createImageHtml($images, $newProductDetailNames);
-    }
-
-    private function loadHtmlDocument($htmlContent)
-    {
-        $doc = new DOMDocument();
-        libxml_use_internal_errors(true);
-        $doc->loadHTML($htmlContent);
-        libxml_clear_errors();
-
-        return $doc;
-    }
-
-    private function extractImages(DOMDocument $doc)
-    {
-        $xpath = new DOMXPath($doc);
-        return $xpath->query("//img");
-    }
-
-    private function createImageHtml($images, $newDetailFileNames)
-    {
-        $html = '<center>';
-        for ($i = 0; $i < count($images); $i++) {
-            $html .= $this->getImageHtml($images[$i], $newDetailFileNames[$i]);
-        }
-        $html .= '</center>';
-
-        return $html;
-    }
-
-    private function getImageHtml($img, $newProductDetailName)
-    {
-        $src = $img->getAttribute('src');
-        $imageContent = file_get_contents($src);
-        $savePath = public_path('images/product/detail') . '/' . $newProductDetailName;
-        file_put_contents($savePath, $imageContent);
-        $tmpSrc = "https://www.sellwing.kr/images/product/detail/" . $newProductDetailName;
-
-        return '<img src="' . $tmpSrc . '" alt="">';
     }
 }

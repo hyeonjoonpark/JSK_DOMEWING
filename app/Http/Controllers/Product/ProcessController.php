@@ -113,12 +113,6 @@ class ProcessController extends Controller
         }
         // 결과 처리
         $result = json_decode($output[0], true);
-        if ($result === false || $result === 'false') {
-            return [
-                'status' => false,
-                'return' => '재고가 5개 미만인 상품입니다.',
-            ];
-        }
         return [
             'status' => true,
             'return' => $result,
