@@ -88,6 +88,7 @@ class IndexController extends Controller
     {
         $products = DB::table('minewing_products')
             ->where('sellerID', $sellerID)
+            ->select('productImage', 'productDetail', 'productHref')
             ->get();
         return $products;
     }
@@ -115,9 +116,14 @@ class IndexController extends Controller
     {
         $newWidth = 1000;
         $newHeight = 1000;
-        $savePath = public_path('images/CDN/' . $path); // 경로 수정
+        $savePath = public_path('images/CDN/' . $path . '/'); // 경로 수정
         try {
-            $image = Image::make($imageUrl)->resize($newWidth, $newHeight);
+            if ($path === 'product') {
+                $image = Image::make($imageUrl)->resize($newWidth, $newHeight);
+            } else {
+                $image = Image::make($imageUrl);
+            }
+
 
             $savePathWithFile = $savePath . $newImageName;
 
