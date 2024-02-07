@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const getProductDetails = async (page, productHref) => {
-    await page.goto(productHref, { waitUntil: 'load', timeout: 0 });
+    await page.goto(productHref, { waitUntil: 'load' });
     return page.evaluate(() => {
         const baseURL = 'https://dometopia.com';
         const productImages = document.querySelectorAll('#goods_thumbs > div.box > div.slides_container.hide img');
@@ -26,7 +26,7 @@ const getProductDetails = async (page, productHref) => {
         const productContents = await getProductDetails(page, productHref);
         console.log(JSON.stringify(productContents));
     } catch (error) {
-        console.error('Error occurred:', error);
+        console.log(false);
     } finally {
         await browser.close();
     }

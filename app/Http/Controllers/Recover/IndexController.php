@@ -18,6 +18,7 @@ class IndexController extends Controller
         set_time_limit(0);
         ini_set('memory_limit', '-1'); // 메모리 한도 증가
         $products = $this->getProducts(3);
+        $errors = [];
         foreach ($products as $product) {
             $response = $this->getFileNames($product);
             if ($response['status'] === false) {
@@ -25,6 +26,10 @@ class IndexController extends Controller
                 $productDetailFileNames = $response['return']['productDetailImages'];
                 $productHref = $product->productHref;
                 $scrapeProductImageFiles = $this->scrapeProductImageFiles($productHref);
+                if ($scrapeProductImageFiles['status'] === false) {
+                    $errors[] = $productHref;
+                    continue;
+                }
                 $productContents = $scrapeProductImageFiles['return'];
                 $productImageFile = $productContents['productImage'];
                 $productDetailFiles = $productContents['productDetail'];
@@ -34,7 +39,7 @@ class IndexController extends Controller
                 }
             }
         }
-        return true;
+        return $errors;
     }
     public function scrapeProductImageFiles($productHref)
     {
@@ -50,6 +55,12 @@ class IndexController extends Controller
         }
         // 결과 처리
         $result = json_decode($output[0], true);
+        if ($result === false || $result === 'false') {
+            return [
+                'status' => true,
+                'return' => $productHref,
+            ];
+        }
         return [
             'status' => true,
             'return' => $result,
