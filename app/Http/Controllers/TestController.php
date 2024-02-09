@@ -4,67 +4,53 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Product\NameController;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class TestController extends Controller
 {
-    protected $nameController;
-
-    /**
-     * Inject NameController to utilize its functionalities.
-     *
-     * @param NameController $nameController
-     */
-    public function __construct(NameController $nameController)
-    {
-        $this->nameController = $nameController;
-    }
-
-    /**
-     * Process and update keywords for each product in the database.
-     *
-     * @return string
-     */
     public function index()
     {
-        $threeMROProducts = DB::table('minewing_products')
-            ->where('sellerID', 16)
-            ->where('isActive', 'Y')
-            ->get();
-
-        foreach ($threeMROProducts as $product) {
-            $processedKeywords = $this->processKeywords($product->productKeywords);
-            $this->updateProductKeywords($product->id, $processedKeywords);
+        $spreadsheet = IOFactory::load(public_path('assets/excel/product_name_edit.xlsx'));
+        $sheet = $spreadsheet->getSheet(0);
+        $fails = [];
+        foreach ($sheet->getRowIterator() as $row) {
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false); // 빈 셀도 반복
+            $cells = [];
+            foreach ($cellIterator as $cell) {
+                $cells[] = $cell->getValue();
+            }
+            // A열(상품코드)과 B열(상품명) 추출
+            $productCode = $cells[0]; // A열 값
+            $productName = $cells[1]; // B열 값
+            // 상품코드와 상품명이 모두 있는 경우만 배열에 추가
+            if (!empty($productCode) && !empty($productName)) {
+                $response = $this->updateProductName($productCode, $productName);
+                if ($response['status'] === false) {
+                    $fails[] = $productCode;
+                }
+            } else {
+                $fails[] = $productCode;
+            }
         }
-
-        return 'success';
+        return $fails;
     }
-
-    /**
-     * Process the keywords by limiting their length.
-     *
-     * @param string $keywords
-     * @return string
-     */
-    protected function processKeywords($keywords)
+    public function updateProductName($productCode, $productName)
     {
-        $keywordsArray = explode(',', $keywords);
-        $newKeywords = array_map(function ($keyword) {
-            return mb_substr($keyword, 0, 10, "UTF-8");
-        }, $keywordsArray);
-
-        return implode(',', $newKeywords);
-    }
-
-    /**
-     * Update the keywords of a product in the database.
-     *
-     * @param int $productID
-     * @param string $newKeywords
-     */
-    protected function updateProductKeywords($productID, $newKeywords)
-    {
-        DB::table('minewing_products')
-            ->where('id', $productID)
-            ->update(['productKeywords' => $newKeywords]);
+        try {
+            DB::table('minewing_products')
+                ->where('productCode', $productCode)
+                ->update([
+                    'productName' => $productName
+                ]);
+            return [
+                'status' => true,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'return' => $e->getMessage(),
+            ];
+        }
     }
 }

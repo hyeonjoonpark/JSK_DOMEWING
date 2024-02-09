@@ -19,7 +19,7 @@
                     <p>테이블의 모든 컬럼 중 원하는 키워드를 검색하세요.</p>
                     <div class="form-group">
                         <label for="" class="form-label">상품 검색</label>
-                        <form class="d-flex text-nowrap" method="GET" action="minewing">
+                        <form class="d-flex text-nowrap" method="GET" action="{{ route('admin.minewing') }}">
                             @csrf
                             <input type="text" class="form-control" placeholder="검색 키워드를 기입해주세요" name="searchKeyword"
                                 value="{{ $searchKeyword }}">
@@ -30,41 +30,21 @@
             </div>
         </div>
     </div>
+
     <div class="row g-gs">
         <div class="col">
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">상품윙 테이블</h6>
-                    <p>검색된 상품이 총 {{ number_format($numResults, 0) }}건입니다. 페이지 당 500건의 상품이 출력됩니다.</p>
+                    <p>검색된 상품이 총 {{ number_format($products->total(), 0) }}건입니다. 페이지 당 500건의 상품이 출력됩니다.</p>
                     <div class="form-group">
-                        <div class="d-flex justify-content-center align-items-center">
-                            @if ($page > 1)
-                                <a class="pagination"
-                                    href="/admin/product/minewing?page={{ $page - 1 }}&searchKeyword={{ $searchKeyword }}">
-                                    &lt; 이전
-                                </a>
-                            @endif
-
-                            @php
-                                $startPage = max(1, $page - 5);
-                                $endPage = min($numPages, $startPage + 9);
-                            @endphp
-
-                            @for ($i = $startPage; $i <= $endPage; $i++)
-                                <a class="pagination {{ $page == $i ? 'active' : '' }}"
-                                    href="/admin/product/minewing?page={{ $i }}&searchKeyword={{ $searchKeyword }}">
-                                    {{ $i }}
-                                </a>
-                            @endfor
-
-                            @if ($page < $numPages)
-                                <a class="pagination"
-                                    href="/admin/product/minewing?page={{ $page + 1 }}&searchKeyword={{ $searchKeyword }}">
-                                    다음 &gt;
-                                </a>
-                            @endif
-                        </div>
+                        @include('partials.pagination', [
+                            'page' => $products->currentPage(),
+                            'numPages' => $products->lastPage(),
+                            'searchKeyword' => $searchKeyword,
+                        ])
                     </div>
+
                     <div class="table-responsive">
                         <table class="table text-nowrap align-middle">
                             <thead>
@@ -92,46 +72,27 @@
                                         <td><a href="{{ $product->productHref }}"
                                                 target="_blank">{{ $product->productCode }}</a></td>
                                         <td><a href="{{ $product->productHref }}"
-                                                target="_blank">{{ number_format($product->productPrice, 0) }}원</a>
-                                        </td>
+                                                target="_blank">{{ number_format($product->productPrice, 0) }}원</a></td>
                                         <td><a href="{{ $product->productHref }}" target="_blank">{{ $product->name }}</a>
                                         </td>
                                         <td>{{ date('Y-m-d', strtotime($product->createdAt)) }}</td>
-                                        <td><button class="btn btn-success mr-3">수정</button><button class="btn btn-danger"
-                                                onclick="initSoldOut('{{ $product->productCode }}');">품절</button></td>
+                                        <td>
+                                            <button class="btn btn-success mr-3">수정</button>
+                                            <button class="btn btn-danger"
+                                                onclick="initSoldOut('{{ $product->productCode }}');">품절</button>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
+
                     <div class="form-group">
-                        <div class="d-flex justify-content-center align-items-center">
-                            @if ($page > 1)
-                                <a class="pagination"
-                                    href="/admin/product/minewing?page={{ $page - 1 }}&searchKeyword={{ $searchKeyword }}">
-                                    &lt; 이전
-                                </a>
-                            @endif
-
-                            @php
-                                $startPage = max(1, $page - 5);
-                                $endPage = min($numPages, $startPage + 9);
-                            @endphp
-
-                            @for ($i = $startPage; $i <= $endPage; $i++)
-                                <a class="pagination {{ $page == $i ? 'active' : '' }}"
-                                    href="/admin/product/minewing?page={{ $i }}&searchKeyword={{ $searchKeyword }}">
-                                    {{ $i }}
-                                </a>
-                            @endfor
-
-                            @if ($page < $numPages)
-                                <a class="pagination"
-                                    href="/admin/product/minewing?page={{ $page + 1 }}&searchKeyword={{ $searchKeyword }}">
-                                    다음 &gt;
-                                </a>
-                            @endif
-                        </div>
+                        @include('partials/pagination', [
+                            'page' => $products->currentPage(),
+                            'numPages' => $products->lastPage(),
+                            'searchKeyword' => $searchKeyword,
+                        ])
                     </div>
                 </div>
             </div>

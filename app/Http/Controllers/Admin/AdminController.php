@@ -158,42 +158,27 @@ class AdminController extends Controller
     }
     public function minewing(Request $request)
     {
-        $searchKeyword = '';
-        $page = 1;
-        if (isset($request->searchKeyword)) {
-            $searchKeyword = $request->searchKeyword;
-            $products = DB::table('minewing_products AS mp')
-                ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
-                ->where('mp.isActive', 'Y')
-                ->where(function ($query) use ($searchKeyword) {
-                    $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
-                        ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')
-                        ->orWhere('mp.productCode', 'like', '%' . $searchKeyword . '%')
-                        ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
-                        ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
-                })
-                ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt')
-                ->orderBy('createdAt', 'DESC')->get()->toArray();
-        } else {
-            $products = DB::table('minewing_products AS mp')
-                ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
-                ->where('mp.isActive', 'Y')
-                ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt')
-                ->orderBy('createdAt', 'DESC')->limit(500)->get()->toArray();
-        }
-        if (isset($request->page)) {
-            $page = $request->page;
+        $searchKeyword = $request->input('searchKeyword', '');
+        $query = DB::table('minewing_products AS mp')
+            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
+            ->where('mp.isActive', 'Y')
+            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt');
+
+        if (!empty($searchKeyword)) {
+            $query->where(function ($query) use ($searchKeyword) {
+                $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('mp.productCode', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
+                    ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
+            });
         }
 
-        $numResults = count($products);
-        $numPages = ceil($numResults / 500);
-        $products = array_chunk($products, 500)[$page - 1];
+        $products = $query->orderBy('createdAt', 'DESC')->paginate(500);
+
         return view('admin/product_minewing', [
             'products' => $products,
             'searchKeyword' => $searchKeyword,
-            'numResults' => $numResults,
-            'numPages' => $numPages,
-            'page' => $page
         ]);
     }
     public function soldOut(Request $request)
