@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
         const args = process.argv.slice(2);
         const [productHref, username, password] = args;
         await signIn(page, username, password);
-        await page.goto(productHref, { waitUntil: 'networkidle2', timeout: 0 });
+        await page.goto(productHref, { waitUntil: 'networkidle2' });
         const product = await scrapeProduct(page, productHref);
         console.log(JSON.stringify(product));
     } catch (error) {
@@ -16,7 +16,7 @@ const puppeteer = require('puppeteer');
     }
 })();
 async function signIn(page, username, password) {
-    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle2', timeout: 0 });
+    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle2' });
     await page.evaluate((username, password) => {
         document.querySelector('#custId').value = username;
         document.querySelector('#custPw').value = password;

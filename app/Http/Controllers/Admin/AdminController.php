@@ -187,9 +187,7 @@ class AdminController extends Controller
 
         $numResults = count($products);
         $numPages = ceil($numResults / 500);
-        if (!isEmpty($products)) {
-            $products = array_chunk($products, 500)[$page - 1];
-        }
+        $products = array_chunk($products, 500)[$page - 1];
         return view('admin/product_minewing', [
             'products' => $products,
             'searchKeyword' => $searchKeyword,
