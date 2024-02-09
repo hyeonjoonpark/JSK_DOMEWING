@@ -339,7 +339,7 @@ class ProcessDataController extends Controller
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
             }
-            (int)$rowData['amount'] = (int)$rowData['productPrice'] * (int)$rowData['quantity'] + (int)$rowData['shippingCost'];
+            $rowData['amount'] = (int)$rowData['productPrice'] * (int)$rowData['quantity'] + (int)$rowData['shippingCost'];
             $rowData['b2BName'] = "도매의신";
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty
