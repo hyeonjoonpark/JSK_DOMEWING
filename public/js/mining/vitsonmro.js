@@ -1,13 +1,17 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true, ignoreDefaultArgs: ['--enable-automation'] });
+    const browser = await puppeteer.launch({ headless: false, ignoreDefaultArgs: ['--enable-automation'] });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        const [listURL, username, password, curPage] = args;
+        const [listURL, username, password] = args;
+        let curPage = args[3];
         await signIn(page, username, password);
         await selectNumPages(page, listURL);
-        await moveToPage(page, curPage);
+        curPage = parseInt(curPage, 10);
+        if (curPage > 1) {
+            await moveToPage(page, curPage);
+        }
         const products = await scrapeProducts(page);
         console.log(JSON.stringify(products));
     } catch (error) {
@@ -32,14 +36,12 @@ async function selectNumPages(page, listURL) {
 }
 async function moveToPage(page, curPage) {
     curPage = parseInt(curPage);
-    if (curPage > 1) {
-        await page.evaluate((curPage) => {
-            const pageBtn = document.querySelector('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > div > ul > li:nth-child(2) > a');
-            pageBtn.setAttribute('data-page', curPage);
-            pageBtn.click();
-        }, curPage);
-        await new Promise((page) => setTimeout(page, 10000));
-    }
+    await page.evaluate((curPage) => {
+        const pageBtn = document.querySelector('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > div > ul > li:nth-child(2) > a');
+        pageBtn.setAttribute('data-page', curPage);
+        pageBtn.click();
+    }, curPage);
+    await new Promise((page) => setTimeout(page, 5000));
 }
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {

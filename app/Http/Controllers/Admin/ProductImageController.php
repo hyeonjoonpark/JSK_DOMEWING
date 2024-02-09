@@ -135,39 +135,6 @@ class ProductImageController extends Controller
             ];
         }
     }
-    // private function processProductDetail($productDetail)
-    // {
-    //     $doc = $this->loadHtmlDocument($productDetail);
-    //     $images = $this->extractImages($doc);
-
-    //     return $this->createImageHtml($images);
-    // }
-
-    // private function loadHtmlDocument($htmlContent)
-    // {
-    //     $doc = new DOMDocument();
-    //     libxml_use_internal_errors(true);
-    //     $doc->loadHTML($htmlContent);
-    //     libxml_clear_errors();
-
-    //     return $doc;
-    // }
-
-    // private function extractImages(DOMDocument $doc)
-    // {
-    //     $xpath = new DOMXPath($doc);
-    //     $imageNodes = $xpath->query("//img");
-    //     $images = [];
-
-    //     foreach ($imageNodes as $node) {
-    //         // 각 이미지 노드의 src 속성을 추출
-    //         $images[] = $node->getAttribute('src');
-    //     }
-
-    //     return $images;
-    // }
-    // HTML에서 이미지 URL 추출
-    // 이미지를 서버에 저장하고 새로운 URL 생성
     public function hostImages($imageUrls)
     {
         $hostedImages = array_map(fn ($url) => $this->saveImageAndGetNewUrl($url), $imageUrls);
@@ -175,19 +142,50 @@ class ProductImageController extends Controller
         return array_filter($hostedImages, fn ($url) => $url !== null);
     }
     // 이미지를 서버에 저장하고 새로운 호스팅 URL 반환
-    private function saveImageAndGetNewUrl($url)
+    public function saveImageAndGetNewUrl($url)
     {
         try {
-            $imageData = file_get_contents($url);
+            // Encode the URL to handle spaces and special characters correctly
+            $encodedUrl = $this->encodeUrl($url);
+
+            // Initialize cURL session
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $encodedUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Bypass SSL verification, consider the security implications
+            $imageData = curl_exec($ch);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlError) {
+                throw new Exception("cURL error: $curlError");
+            }
+
+            if ($imageData === false) {
+                throw new Exception("Failed to get image data from URL: $url");
+            }
+
             $extension = $this->getFileExtension($url);
             $imageName = uniqid() . '.' . $extension;
             $savePath = public_path('images/CDN/detail/' . $imageName);
-            file_put_contents($savePath, $imageData);
+            if (file_put_contents($savePath, $imageData) === false) {
+                throw new Exception("Failed to save image to disk.");
+            }
+
             return 'https://www.sellwing.kr/images/CDN/detail/' . $imageName;
         } catch (\Exception $e) {
-            // 예외 발생시 null 반환
-            return null;
+            // Log the exception or handle it as needed
+            return null; // 예외 발생시 null 반환
         }
+    }
+
+    protected function encodeUrl($url)
+    {
+        // Only encode the path part of the URL
+        $parsedUrl = parse_url($url);
+        $path = implode("/", array_map("rawurlencode", explode("/", $parsedUrl['path'])));
+        $encodedUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . $path;
+        return $encodedUrl;
     }
     // 파일 확장자 추출
     private function getFileExtension($url)
