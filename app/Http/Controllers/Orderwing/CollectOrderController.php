@@ -7,6 +7,7 @@ use App\Http\Controllers\Product\ProcessController;
 use App\Http\Controllers\Productwing\SoldOutController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CollectOrderController extends Controller
 {
@@ -32,6 +33,15 @@ class CollectOrderController extends Controller
             $this->getOrderExcelFile($b2BEngName, $b2BVendorID, $username, $password);
         }
         return $extractOrderController->index($b2Bs);
+    }
+    public function getOrderwingB2bs()
+    {
+        return DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('pr.is_active', 'Y')
+            ->whereNot('v.id', 6)
+            ->get();
     }
     public function deleteLegacy($b2BEngName)
     {
