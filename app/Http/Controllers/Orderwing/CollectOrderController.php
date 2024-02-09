@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Orderwing;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Product\ProcessController;
-use App\Http\Controllers\Productwing\SoldOutController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,13 +15,12 @@ class CollectOrderController extends Controller
         set_time_limit(0);
         $this->requestExcelFile();
         $userController = new UserController();
-        $soldOutController = new SoldOutController();
         $processController = new ProcessController();
         $extractOrderController = new ExtractOrderController();
         $rememberToken = $request->rememberToken;
         $user = $userController->getUser($rememberToken);
         $userID = $user->id;
-        $b2Bs = $soldOutController->getActiveB2Bs();
+        $b2Bs = $this->getOrderwingB2bs();
         foreach ($b2Bs as $b2B) {
             $b2BEngName = $b2B->name_eng;
             $b2BVendorID = $b2B->vendor_id;
