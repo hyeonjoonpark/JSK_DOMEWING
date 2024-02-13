@@ -9,73 +9,37 @@ use Illuminate\Support\Facades\DB;
 
 class NaverShopController extends Controller
 {
-    public function getCategories()
+    public function index()
     {
-        $client_id = '5QuwVHMFmrkfq98AdIgu43';
-        $client_secret = '$2a$04$EEaznqQ.Sk3Uz5z6mkZ3Ve';
-        $timestamp = (int) (microtime(true) * 1000);
-        $password = $client_id . '_' . $timestamp;
-        $hashed = crypt($password, $client_secret);
-        $b64_hashed = base64_encode($hashed);
-
-        # 1) 인증토큰
-        $aGetParm = [
-            "client_id" => $client_id,
-            "timestamp" => $timestamp,
-            "grant_type" => "client_credentials",
-            "type" => "SELF",
-            "client_secret_sign" => "$b64_hashed"
+        $productHrefs = [
+            "https://dometopia.com/goods/view?no=179372&code=00300036",
+            "https://dometopia.com/goods/view?no=179373&code=00300036",
+            "https://dometopia.com/goods/view?no=172960&code=010200220001",
+            "https://dometopia.com/goods/view?no=182127&code=01390019",
+            "https://dometopia.com/goods/view?no=182117&code=01390019",
+            "https://dometopia.com/goods/view?no=182085&code=01390019",
+            "https://dometopia.com/goods/view?no=153803&code=01390019",
+            "https://dometopia.com/goods/view?no=62704&code=01390019",
+            "https://dometopia.com/goods/view?no=62686&code=01390019",
+            "https://dometopia.com/goods/view?no=3128&code=002100120008",
+            "https://dometopia.com/goods/view?no=182308&code=002100120008",
+            "https://dometopia.com/goods/view?no=182309&code=002100120008",
+            "https://dometopia.com/goods/view?no=141959&code=009700070003",
+            "https://dometopia.com/goods/view?no=169977&code=001700570004",
+            "https://dometopia.com/goods/view?no=160584&code=001700570004",
+            "https://dometopia.com/goods/view?no=154000&code=002100130005",
+            "https://dometopia.com/goods/view?no=115426&code=00350038",
+            "https://dometopia.com/goods/view?no=115426&code=003500380003",
+            "https://dometopia.com/goods/view?no=162872&code=001700330001",
+            "https://dometopia.com/goods/view?no=110121&code=00250012",
+            "https://dometopia.com/goods/view?no=107997&code=00870019",
+            "https://dometopia.com/goods/view?no=92603&code=00870019",
         ];
-        $queryString = http_build_query($aGetParm);
-
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => "https://api.commerce.naver.com/external/v1/oauth2/token",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => $queryString,
-        ]);
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if ($err) {
-            echo $queryString . PHP_EOL;
-            echo "cURL Error #:" . $err . PHP_EOL;
-            exit;
-        } else {
-            echo '<pre>' . print_r($response, true) . '</pre>';
-            $oJson = json_decode($response);
-            $access_token = $oJson->access_token;
-            $expires_in = $oJson->expires_in;
-            $token_type = $oJson->token_type;
-            curl_setopt_array($curl, [
-                CURLOPT_URL => "https://api.commerce.naver.com/external/v1/products/search",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_HTTPHEADER => [
-                    "Authorization: Bearer $access_token",
-                    "content-type: application/json"
-                ],
+        DB::table('minewing_products')
+            ->whereIn('productHref', $productHrefs)
+            ->update([
+                'isActive' => 'N'
             ]);
-
-            $response = curl_exec($curl);
-            $err = curl_error($curl);
-
-            curl_close($curl);
-
-            if ($err) {
-                echo "cURL Error #:" . $err;
-            } else {
-                echo $response;
-            }
-        }
+        return true;
     }
 }

@@ -83,4 +83,10 @@
         // Reassemble the number and return it.
         return parts.join(decPoint);
     }
+
+    function AjaxErrorHandling(error) {
+        console.log(error);
+        closePopup();
+        swalError('"API 통신 요청 과정에서 에러가 발생했습니다."');
+    }
 </script>

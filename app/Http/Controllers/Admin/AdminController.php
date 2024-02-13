@@ -4,17 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Productwing\SoldOutController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\Product\ProcessController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-
-//vingkong - use this to format date
 use Carbon\Carbon;
-use Maatwebsite\Excel\Concerns\ToArray;
-
-use function PHPUnit\Framework\isEmpty;
 
 class AdminController extends Controller
 {
@@ -176,9 +171,16 @@ class AdminController extends Controller
 
         $products = $query->orderBy('createdAt', 'DESC')->paginate(500);
 
+        $b2bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('pr.is_active', 'Y')
+            ->get();
+
         return view('admin/product_minewing', [
             'products' => $products,
             'searchKeyword' => $searchKeyword,
+            'b2bs' => $b2bs
         ]);
     }
     public function soldOut(Request $request)
