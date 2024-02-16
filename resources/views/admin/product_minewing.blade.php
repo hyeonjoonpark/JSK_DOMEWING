@@ -85,7 +85,6 @@
                             </tbody>
                         </table>
                     </div>
-
                     <div class="form-group">
                         @include('partials/pagination', [
                             'page' => $products->currentPage(),
