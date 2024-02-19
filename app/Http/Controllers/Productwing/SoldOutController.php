@@ -46,10 +46,13 @@ class SoldOutController extends Controller
             ]);
         }
         $html = $this->runSoldOut($productCodes, $b2bIds, $rememberToken);
-        $inactiveProducts = $this->indexController->inactiveProducts($productCodes);
-        $status = $inactiveProducts['status'];
-        if ($status === false) {
-            return $inactiveProducts;
+        $isSellwingChecked = $request->isSellwingChecked;
+        if ($isSellwingChecked === true) {
+            $inactiveProducts = $this->indexController->inactiveProducts($productCodes);
+            $status = $inactiveProducts['status'];
+            if ($status === false) {
+                return $inactiveProducts;
+            }
         }
         return response()->json([
             'status' => true,

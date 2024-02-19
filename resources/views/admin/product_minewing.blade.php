@@ -112,6 +112,15 @@
                             <div class="form-group">
                                 <label for="" class="form-label">B2B 업체 리스트</label>
                                 <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <div class="custom-control custom-checkbox">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="sellwing" name="sellwing" value="0"
+                                                    class="custom-control-input" checked>
+                                                <label class="custom-control-label" for="sellwing">셀윙</label>
+                                            </div>
+                                        </div>
+                                    </div>
                                     @foreach ($b2bs as $b2b)
                                         <div class="col-6 mb-3">
                                             <div class="custom-control custom-checkbox">
@@ -164,6 +173,7 @@
             const b2bs = $('input[name="b2bs"]:checked').map(function() {
                 return $(this).val();
             }).get();
+            const isSellwingChecked = $('#sellwing').isChecked;
             $.ajax({
                 url: '/api/product/sold-out',
                 type: 'POST',
@@ -171,7 +181,8 @@
                 data: {
                     productCodes,
                     rememberToken,
-                    b2bs
+                    b2bs,
+                    isSellwingChecked
                 },
                 success: soldOutSuccess,
                 error: AjaxErrorHandling
