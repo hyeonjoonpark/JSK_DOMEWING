@@ -152,11 +152,9 @@
             const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
                 return $(this).val();
             }).get();
-
-            $('#runSoldOutBtn').click(function() {
+            $('#runSoldOutBtn').off('click').on('click', function() {
                 runSoldOut(productCodes);
             });
-
             $('#selectB2bModal').modal('show');
         }
 
@@ -181,6 +179,7 @@
         }
 
         function soldOutSuccess(response) {
+            console.log(response);
             closePopup();
             const status = response.status;
             if (status === true) {

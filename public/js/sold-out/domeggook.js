@@ -20,12 +20,23 @@ const puppeteer = require('puppeteer');
         await page.type('textarea[name="nos"]', productCode);
         await page.click('input[value="검색"]');
         await new Promise((page) => setTimeout(page, 3000));
-        const checkboxSelector = await page.waitForSelector('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody > tr:nth-child(1) > td.tui-grid-cell.tui-grid-cell-has-input.tui-grid-cell-row-header > div > input[type=checkbox]');
+        let status = await page.evaluate(() => {
+            const checkbox = document.querySelector('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody > tr > td.tui-grid-cell.tui-grid-cell-has-input.tui-grid-cell-row-header > div > input[type=checkbox]');
+            if (checkbox) {
+                checkbox.click();
+                return true;
+            } else {
+                return false;
+            }
+        });
+        if (status === false) {
+            console.log(status);
+            return;
+        }
         const selectSelector = await page.waitForSelector('#lList > div.pFunctions > select');
         const buttonSelector = await page.waitForSelector('#lList > div.pFunctions > a:nth-child(4)');
-        await checkboxSelector.click();
         await selectSelector.select('N');
-        page.on('dialog', async dialog => {
+        status = page.on('dialog', async dialog => {
             const message = dialog.message();
             if (message.includes('상품수정이 모두 완료')) {
                 console.log(true);

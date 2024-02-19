@@ -18,8 +18,19 @@ const puppeteer = require('puppeteer');
         await page.type('#search_str', productCode);
         await page.click('#sfrm > div > div > div > ul:nth-child(16) > li:nth-child(2) > button');
         await new Promise((page) => setTimeout(page, 3000));
-        const checkbox = await page.waitForSelector('#chkIdx0');
-        await checkbox.click();
+        let status = await page.evaluate(() => {
+            const checkbox = document.querySelector('#chkIdx0');
+            if (checkbox) {
+                checkbox.click();
+                return true;
+            } else {
+                return false;
+            }
+        });
+        if (status === false) {
+            console.log(status);
+            return;
+        }
         page.on('dialog', async dialog => {
             const message = dialog.message();
             if (message.includes('완료')) {

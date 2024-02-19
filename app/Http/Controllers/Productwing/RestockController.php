@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Product\ProcessController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\Productwing\SoldOutController;
 use Illuminate\Support\Facades\DB;
 
 class RestockController extends Controller
@@ -15,8 +14,8 @@ class RestockController extends Controller
     {
         set_time_limit(0);
         $productCode = $request->productCode;
-        $soldOutController = new SoldOutController();
-        $b2Bs = $soldOutController->getActiveB2Bs();
+        $Controller = new Controller();
+        $b2Bs = $Controller->getActiveB2Bs();
         $userController = new UserController();
         $user = $userController->getUser($request->rememberToken);
         $processController = new ProcessController();
