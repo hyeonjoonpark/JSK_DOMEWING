@@ -27,6 +27,7 @@ class SoldOutController extends Controller
     public function index(Request $request)
     {
         set_time_limit(0);
+        ini_set('memory_limit', '-1');
         $validator = $this->validator($request);
         if ($validator->fails()) {
             return [
@@ -45,11 +46,11 @@ class SoldOutController extends Controller
             ]);
         }
         $html = $this->runSoldOut($productCodes, $b2bIds, $rememberToken);
-        // $inactiveProducts = $this->indexController->inactiveProducts($productCodes);
-        // $status = $inactiveProducts['status'];
-        // if ($status === false) {
-        //     return $inactiveProducts;
-        // }
+        $inactiveProducts = $this->indexController->inactiveProducts($productCodes);
+        $status = $inactiveProducts['status'];
+        if ($status === false) {
+            return $inactiveProducts;
+        }
         return response()->json([
             'status' => true,
             'return' => $html
