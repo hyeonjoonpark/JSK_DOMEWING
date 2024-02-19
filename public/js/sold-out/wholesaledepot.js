@@ -31,6 +31,7 @@ const puppeteer = require('puppeteer');
             console.log(status);
             return;
         }
+        await new Promise((page) => setTimeout(page, 1000));
         page.on('dialog', async dialog => {
             const message = dialog.message();
             if (message.includes('완료')) {
