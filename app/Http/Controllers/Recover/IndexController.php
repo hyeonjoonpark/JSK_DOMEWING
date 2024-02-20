@@ -20,7 +20,6 @@ class IndexController extends Controller
                 $productImageFileName = $response['return']['productImage'];
                 $productDetailFileNames = $response['return']['productDetailImages'];
                 $productHref = $product->productHref;
-                echo 'Processing product: ' . $productHref . PHP_EOL;;
                 $scrapeProductImageFiles = $this->scrapeProductImageFiles($productHref);
                 if ($scrapeProductImageFiles['status'] === false) {
                     $errors[] = $productHref;
