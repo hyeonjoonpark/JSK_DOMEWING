@@ -49,7 +49,7 @@ class IndexController extends Controller
             ];
         }
         // 결과 처리
-        $result = json_decode($output[0], true);
+        $result = $output[0];
         if ($result === false || $result === 'false') {
             return [
                 'status' => true,
