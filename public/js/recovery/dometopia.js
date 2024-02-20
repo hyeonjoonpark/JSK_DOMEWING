@@ -1,8 +1,6 @@
 const puppeteer = require('puppeteer');
 
-const getProductDetails = async (page, productHref) => {
-    await page.goto(productHref, { waitUntil: 'domcontentloaded' });
-
+const getProductDetails = async (page) => {
     const productImage = await page.evaluate(() => {
         const productImages = Array.from(document.querySelectorAll('#goods_thumbs > div.box > div.slides_container.hide img'));
         return productImages.length > 3 ? productImages[2].src : productImages[0]?.src;
@@ -25,7 +23,8 @@ const getProductDetails = async (page, productHref) => {
     const page = await browser.newPage();
     try {
         const [productHref] = process.argv.slice(2);
-        const productContents = await getProductDetails(page, productHref);
+        await page.goto(productHref, { waitUntil: 'domcontentloaded' });
+        const productContents = await getProductDetails(page);
         console.log(JSON.stringify(productContents));
     } catch (error) {
         console.log(false);
