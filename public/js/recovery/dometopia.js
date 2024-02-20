@@ -29,6 +29,6 @@ const getProductDetails = async (page) => {
     } catch (error) {
         console.log(false);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();

@@ -101,6 +101,7 @@ class IndexController extends Controller
     {
         $products = DB::table('minewing_products')
             ->where('sellerID', $sellerID)
+            ->where('isActive', 'Y')
             ->select('productImage', 'productDetail', 'productHref')
             ->get();
         return $products;
