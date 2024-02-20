@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class IndexController extends Controller
 {
@@ -28,9 +29,9 @@ class IndexController extends Controller
                 $productContents = $scrapeProductImageFiles['return'];
                 $productImageFile = $productContents['productImage'];
                 $productDetailFiles = $productContents['productDetail'];
-                $this->sibal($productImageFile, $productImageFileName, 'product', $productHref);
+                $this->sibal($productImageFile, $productImageFileName, 'product');
                 for ($i = 0; $i < count($productDetailFileNames); $i++) {
-                    $this->sibal($productDetailFiles[$i], $productDetailFileNames[$i], 'detail', $productHref);
+                    $this->sibal($productDetailFiles[$i], $productDetailFileNames[$i], 'detail');
                 }
             }
         }
@@ -38,6 +39,7 @@ class IndexController extends Controller
     }
     public function scrapeProductImageFiles($productHref)
     {
+        Log::info($productHref);
         $scriptPath = public_path('js/recovery/dometopia.js');
         $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref);
         exec($command, $output, $returnCode);
@@ -118,7 +120,7 @@ class IndexController extends Controller
 
         return $filenames;
     }
-    public function sibal($imageUrl, $newImageName, $path, $productHref)
+    public function sibal($imageUrl, $newImageName, $path)
     {
         $newWidth = 1000;
         $newHeight = 1000;
@@ -138,7 +140,7 @@ class IndexController extends Controller
                 'status' => true,
             ];
         } catch (Exception $e) {
-            error_log("Error processing image: " . $e->getMessage() . ' ' . $productHref);
+            error_log("Error processing image: " . $e->getMessage());
             return [
                 'status' => false,
                 'return' => $e->getMessage()
