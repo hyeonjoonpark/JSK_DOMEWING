@@ -3,13 +3,9 @@
 namespace App\Http\Controllers\Recover;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Product\ProcessController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
 use Exception;
-use DOMDocument;
-use DOMXPath;
 
 class IndexController extends Controller
 {
