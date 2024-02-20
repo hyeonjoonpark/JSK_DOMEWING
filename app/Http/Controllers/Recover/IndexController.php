@@ -17,18 +17,28 @@ class IndexController extends Controller
         foreach ($products as $product) {
             $response = $this->getFileNames($product);
             if ($response['status'] === false) {
-                $productImageFileName = $response['return']['productImage'];
-                $productDetailFileNames = $response['return']['productDetailImages'];
-                $productHref = $product->productHref;
-                $scrapeProductImageFiles = $this->scrapeProductImageFiles($productHref);
-                if ($scrapeProductImageFiles['status'] === false) {
-                    $errors[] = $productHref;
-                    continue;
+                try {
+                    $productImageFileName = $response['return']['productImage'];
+                    $productDetailFileNames = $response['return']['productDetailImages'];
+                    $productHref = $product->productHref;
+                    $scrapeProductImageFiles = $this->scrapeProductImageFiles($productHref);
+                    if ($scrapeProductImageFiles['status'] === false) {
+                        $errors[] = $productHref;
+                        continue;
+                    }
+                    $productContents = $scrapeProductImageFiles['return'];
+                    $productImageFile = $productContents['productImage'];
+                    $productDetailFiles = $productContents['productDetail'];
+                    $this->sibal($productImageFile, $productImageFileName, 'product');
+                } catch (Exception $e) {
+                    return [
+                        'status' => false,
+                        'return' => [
+                            'message' => $e->getMessage(),
+                            'product' => $product
+                        ]
+                    ];
                 }
-                $productContents = $scrapeProductImageFiles['return'];
-                $productImageFile = $productContents['productImage'];
-                $productDetailFiles = $productContents['productDetail'];
-                $this->sibal($productImageFile, $productImageFileName, 'product');
                 for ($i = 0; $i < count($productDetailFileNames); $i++) {
                     $this->sibal($productDetailFiles[$i], $productDetailFileNames[$i], 'detail');
                 }
