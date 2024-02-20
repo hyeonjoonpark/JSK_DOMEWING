@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const getProductDetails = async (page, productHref) => {
-    await page.goto(productHref, { waitUntil: 'load' });
+    await page.goto(productHref, { waitUntil: 'networkidle2' });
     return page.evaluate(() => {
         const baseURL = 'https://dometopia.com';
         const productImages = document.querySelectorAll('#goods_thumbs > div.box > div.slides_container.hide img');
