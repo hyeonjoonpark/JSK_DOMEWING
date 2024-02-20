@@ -17,30 +17,20 @@ class IndexController extends Controller
         foreach ($products as $product) {
             $response = $this->getFileNames($product);
             if ($response['status'] === false) {
-                try {
-                    $productImageFileName = $response['return']['productImage'];
-                    $productDetailFileNames = $response['return']['productDetailImages'];
-                    $productHref = $product->productHref;
-                    $scrapeProductImageFiles = $this->scrapeProductImageFiles($productHref);
-                    if ($scrapeProductImageFiles['status'] === false) {
-                        $errors[] = $productHref;
-                        continue;
-                    }
-                    $productContents = $scrapeProductImageFiles['return'];
-                    $productImageFile = $productContents['productImage'];
-                    $productDetailFiles = $productContents['productDetail'];
-                    $this->sibal($productImageFile, $productImageFileName, 'product');
-                } catch (Exception $e) {
-                    return [
-                        'status' => false,
-                        'return' => [
-                            'message' => $e->getMessage(),
-                            'product' => $product
-                        ]
-                    ];
+                $productImageFileName = $response['return']['productImage'];
+                $productDetailFileNames = $response['return']['productDetailImages'];
+                $productHref = $product->productHref;
+                $scrapeProductImageFiles = $this->scrapeProductImageFiles($productHref);
+                if ($scrapeProductImageFiles['status'] === false) {
+                    $errors[] = $productHref;
+                    continue;
                 }
+                $productContents = $scrapeProductImageFiles['return'];
+                $productImageFile = $productContents['productImage'];
+                $productDetailFiles = $productContents['productDetail'];
+                $this->sibal($productImageFile, $productImageFileName, 'product', $product);
                 for ($i = 0; $i < count($productDetailFileNames); $i++) {
-                    $this->sibal($productDetailFiles[$i], $productDetailFileNames[$i], 'detail');
+                    $this->sibal($productDetailFiles[$i], $productDetailFileNames[$i], 'detail', $product);
                 }
             }
         }
@@ -128,7 +118,7 @@ class IndexController extends Controller
 
         return $filenames;
     }
-    public function sibal($imageUrl, $newImageName, $path)
+    public function sibal($imageUrl, $newImageName, $path, $product)
     {
         $newWidth = 1000;
         $newHeight = 1000;
@@ -148,7 +138,7 @@ class IndexController extends Controller
                 'status' => true,
             ];
         } catch (Exception $e) {
-            error_log("Error processing image: " . $e->getMessage());
+            error_log("Error processing image: " . $e->getMessage() . ' ' . $product);
             return [
                 'status' => false,
                 'return' => $e->getMessage()
