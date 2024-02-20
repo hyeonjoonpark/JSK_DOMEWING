@@ -27,7 +27,6 @@ const getProductDetails = async (page) => {
             await page.goto(productHref, { waitUntil: 'domcontentloaded' });
         } catch (error) {
             console.log(false);
-            return;
         }
         const productContents = await getProductDetails(page);
         console.log(JSON.stringify(productContents));
