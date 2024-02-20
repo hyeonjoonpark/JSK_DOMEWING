@@ -87,4 +87,25 @@ class Controller extends BaseController
             ];
         }
     }
+    // 업체 계정 가져오기
+    protected function getVendorAccount($rememberToken, $vendorId)
+    {
+        $account = DB::table('accounts')
+            ->join('users', 'users.id', '=', 'accounts.user_id')
+            ->join('vendors', 'vendors.id', '=', 'accounts.vendor_id')
+            ->where('users.remember_token', $rememberToken)
+            ->where('vendors.id', $vendorId)
+            ->where('accounts.is_active', 'Y')
+            ->select('accounts.username', 'accounts.password')
+            ->first();
+        return $account;
+    }
+    protected function getActiveB2Bs()
+    {
+        return DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('pr.is_active', 'Y')
+            ->get();
+    }
 }

@@ -3,127 +3,139 @@
 namespace App\Http\Controllers\Productwing;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Product\ProcessController;
+use App\Http\Controllers\ProductEditor\IndexController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class SoldOutController extends Controller
 {
+    private $userController;
+    private $controller;
+    private $indexController;
+    public function __construct()
+    {
+        $this->userController = new UserController();
+        $this->controller = new Controller();
+        $this->indexController = new IndexController();
+    }
+    /**
+     * 비즈니스 로직
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
-        $validator = $request->validate([
-            'rememberToken' => 'required',
-            'b2bs' => 'required|array',
-            'productCodes' => 'required|array',
-        ], [
-            'rememberToken' => '로그인 세션이 만료되었습니다. 다시 로그인해주십시오.',
-            'b2bs' => '품절 요청을 보낼 업체들을 선택해주세요.',
-            'productCodes' => '품절 요청을 보낼 상품들을 선택해주세요.'
-        ]);
-        $userController = new UserController();
-        $user = $userController->getUser($request->rememberToken);
-        $b2bIds = $request->b2bs;
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+        $validator = $this->validator($request);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'return' => $validator->errors()->first()
+            ];
+        }
+        $rememberToken = $request->rememberToken;
         $productCodes = $request->productCodes;
-        if (!is_array($productCodes)) {
-            return [
+        $b2bIds = $request->b2bs;
+        $validateRememberToken = $this->userController->validateRememberToken($rememberToken);
+        if ($validateRememberToken === false) {
+            return response()->json([
                 'status' => false,
-                'return' => '"품절 요청을 보낼 상품들을 선택해주세요."'
-            ];
+                'return' => '세션이 만료되었습니다. 안전한 서비스 이용을 위해 다시 로그인해주세요.'
+            ]);
         }
-        if (!is_array($b2bIds)) {
-            return [
-                'status' => false,
-                'return' => '"품절 요청을 보낼 업체들을 선택해주세요."'
-            ];
+        $html = $this->runSoldOut($productCodes, $b2bIds, $rememberToken);
+        $isSellwingChecked = $request->isSellwingChecked;
+        if ($isSellwingChecked === true) {
+            $inactiveProducts = $this->indexController->inactiveProducts($productCodes);
+            $status = $inactiveProducts['status'];
+            if ($status === false) {
+                return $inactiveProducts;
+            }
         }
-        $b2bs = DB::table('product_register AS pr')
-            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
-            ->whereIn('v.id', $b2bIds)
-            ->get();
-        $returnHtml = '품절 요청에 실패한 리스트<br>';
+        return response()->json([
+            'status' => true,
+            'return' => $html
+        ]);
+    }
+    /**
+     * @param array $productCodes
+     * @param array $b2bIds
+     * @param string $rememberToken
+     * @return string
+     */
+    protected function runSoldOut($productCodes, $b2bIds, $rememberToken)
+    {
+        $html = '상품 코드 및 실패한 업체 리스트<br><br><br>';
         foreach ($productCodes as $productCode) {
-            foreach ($b2bs as $b2b) {
-                $returnHtml .= $b2b->name . ': ';
-                $response = $this->processSoldOut($b2b, $user->id, $productCode);
-                if ($response['status'] !== true) {
-                    $returnHtml .= $response['return'] . ', ';
+            $loopB2bIds = $this->loopB2bIds($productCode, $b2bIds, $rememberToken);
+            $html .= $productCode . ': ' . $loopB2bIds . '<br><br>';
+        }
+        return $html;
+    }
+    /**
+     * 선택된 업체들을 위한 반복문
+     * @param string $productCode
+     * @param array $b2bIds
+     * @param string $rememberToken
+     * @return string
+     */
+    protected function loopB2bIds($productCode, $b2bIds, $rememberToken)
+    {
+        $errors = '';
+        foreach ($b2bIds as $b2bId) {
+            $getVendor = $this->controller->getVendor($b2bId);
+            $status = $getVendor['status'];
+            if ($status === false) {
+                return $getVendor;
+            }
+            $vendor = $getVendor['return'];
+            $vendorEngName = $vendor->name_eng;
+            $vendorName = $vendor->name;
+            $account = $this->controller->getVendorAccount($rememberToken, $b2bId);
+            $username = $account->username;
+            $password = $account->password;
+            $sendSoldOutRequest = $this->sendSoldOutRequest($productCode, $vendorEngName, $username, $password);
+            if ($sendSoldOutRequest === false) {
+                if ($errors === '') {
+                    $errors .= $vendorName;
+                } else {
+                    $errors .= ', ' . $vendorName;
                 }
             }
-            $returnHtml .= '<br>';
-            $this->inactiveProduct($productCode);
         }
-
-        return [
-            'status' => true,
-            'return' => $returnHtml
-        ];
+        return $errors;
     }
-
-    protected function inactiveProduct($productCode)
+    /**
+     * 스크래핑 봇을 보내는 메소드
+     * @param string $productCode
+     * @param string $vendorEngName
+     * @param string $username
+     * @param string $password
+     * @return boolean
+     */
+    protected function sendSoldOutRequest($productCode, $vendorEngName, $username, $password)
     {
-        try {
-            DB::table('minewing_products')
-                ->where('productCode', $productCode)
-                ->update([
-                    'isActive' => 'N',
-                    'updatedAt' => now()
-                ]);
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    protected function processSoldOut($b2B, $userID, $productCode)
-    {
-        $processController = new ProcessController();
-        $account = $processController->getAccount($userID, $b2B->vendor_id);
-        $response = $this->soldOut($productCode, $b2B->name_eng, $account->username, $account->password, $b2B->name);
-
-        return $response;
-    }
-
-    public function soldOut($productCode, $b2BEngName, $username, $password, $b2BName)
-    {
-        $scriptPath = $this->getScriptPath($b2BEngName);
-        $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($username) . " " . $password . " " . escapeshellarg($productCode);
-
-        // Execute the command
+        $script = public_path('js/sold-out/' . $vendorEngName . '.js');
+        $command = 'node ' . $script . ' ' . $username . ' ' . $password . ' ' . $productCode;
         exec($command, $output, $resultCode);
-
-        // Check the result code and output
-        $status = $resultCode == 0 && isset($output[0]) && $output[0] == 'true';
-
-        return [
-            'status' => $status,
-            'return' => $b2BName,
-        ];
+        if ($resultCode === 0 && $output[0] === 'true') {
+            return true;
+        }
+        return false;
     }
-
-    protected function getScriptPath($b2BEngName)
+    protected function validator(Request $request)
     {
-        return public_path("js/sold-out/" . $b2BEngName . ".js");
-    }
-
-    public function getActiveB2Bs()
-    {
-        return DB::table('product_register AS pr')
-            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
-            ->where('v.is_active', 'ACTIVE')
-            ->where('pr.is_active', 'Y')
-            ->get();
-    }
-
-    protected function formatResponses($responses)
-    {
-        $success = array_filter($responses, function ($res) {
-            return $res['status'] === true;
-        });
-
-        $error = array_filter($responses, function ($res) {
-            return $res['status'] === false;
-        });
-
-        return ['success' => array_values($success), 'error' => array_values($error)];
+        $validator = Validator::make($request->all(), [
+            'productCodes' => 'required|array',
+            'rememberToken' => 'required|string',
+            'b2bs' => 'required|array'
+        ], [
+            'productCodes' => '품절 처리할 상품을 하나 이상 선택해주세요.',
+            'rememberToken' => '세션이 만료되었습니다. 안전한 서비스 이용을 위해 다시 로그인해주세요.',
+            'b2bs' => '품절 요청을 보낼 업체를 하나 이상 선택해주세요.'
+        ]);
+        return $validator;
     }
 }

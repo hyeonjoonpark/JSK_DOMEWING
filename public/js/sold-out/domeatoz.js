@@ -21,7 +21,19 @@ const puppeteer = require('puppeteer');
         await page.click('#form > div > div:nth-child(6) > button.btn.btn-primary.px-5.ms-2');
         await new Promise((page) => setTimeout(page, 3000));
         await page.select('#stateChange', '2');
-        await page.click('#list > tr:first-child > td.text-center.align-middle.p-1 > input');
+        let status = await page.evaluate(() => {
+            const checkbox = document.querySelector('#list > tr:first-child > td.text-center.align-middle.p-1 > input');
+            if (checkbox) {
+                checkbox.click();
+                return true;
+            } else {
+                return false;
+            }
+        });
+        if (status === false) {
+            console.log(status);
+            return;
+        }
         await page.click('#listBox > div > div:nth-child(1) > button.btn.btn-primary.px-3.btn-sm.ms-1');
         await page.waitForSelector('.swal2-popup.swal2-show', { visible: true });
         await page.click('body > div.swal2-container.swal2-center.swal2-backdrop-show > div > div.swal2-actions > button.swal2-confirm.btn-danger.swal2-styled', { waitUntil: 'networkidle2' });
