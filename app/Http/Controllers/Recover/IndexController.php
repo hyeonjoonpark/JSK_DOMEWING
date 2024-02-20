@@ -3,20 +3,15 @@
 namespace App\Http\Controllers\Recover;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Product\ProcessController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
 use Exception;
-use DOMDocument;
-use DOMXPath;
 
 class IndexController extends Controller
 {
     public function index()
     {
         set_time_limit(0);
-        ini_set('memory_limit', '-1'); // 메모리 한도 증가
         $products = $this->getProducts(3);
         $errors = [];
         foreach ($products as $product) {

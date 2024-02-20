@@ -1,9 +1,7 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({
-        headless: true
-    });
+    const browser = await puppeteer.launch({ headless: true });
     const pages = await browser.pages();
     const page = pages[0];
     try {
@@ -18,8 +16,19 @@ const puppeteer = require('puppeteer');
         await signInBtn.click();
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
         await page.goto('https://www.domesin.com/scm/M_item/item_list.html?cate1=&cate2=&cate3=&cate4=&cid=&date=w&start_date=&end_date=&status=&raid=&i_type=&adult=&delivery_type=&isreturn=&tax=&item_sale_type=&ok=&is_overseas=&ls=&q_type=vender_code&rows=20&isort=iid&q=&q2=' + productCode, { waitUntil: 'networkidle2' });
-        const checkboxInput = await page.waitForSelector('#main > table.tb12 > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(2) > input');
-        await checkboxInput.click();
+        let status = await page.evaluate(() => {
+            const checkboxInput = document.querySelector('#main > table.tb12 > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(2) > input');
+            if (checkboxInput) {
+                checkboxInput.click();
+                return true;
+            } else {
+                return false;
+            }
+        });
+        if (status === false) {
+            console.log(status);
+            return;
+        }
         page.on('dialog', async dialog => {
             await dialog.accept();
             return;
@@ -32,9 +41,10 @@ const puppeteer = require('puppeteer');
             await newPage.waitForSelector('body > table > tbody > tr:nth-child(2) > td > div:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(4)');
             const textContent = await newPage.$eval('body > table > tbody > tr:nth-child(2) > td > div:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(4)', element => element.textContent);
             if (textContent.includes('변경')) {
-                console.log(true);
+                status = true;
             }
         }
+        console.log(status);
     } catch (error) {
         console.error('Error:', error);
     } finally {

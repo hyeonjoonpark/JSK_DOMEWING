@@ -15,8 +15,8 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $soldOutController = new SoldOutController();
-        $b2Bs = $soldOutController->getActiveB2Bs();
+        $controller = new Controller();
+        $b2Bs = $controller->getActiveB2Bs();
         $b2BHrefs = array_map(function ($b2B) {
             return $b2B->vendor_href;
         }, $b2Bs->toArray());

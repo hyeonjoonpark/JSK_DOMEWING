@@ -19,4 +19,12 @@ class UserController extends Controller
             return $e->getMessage();
         }
     }
+    public function validateRememberToken($rememberToken)
+    {
+        $user = DB::table('users')
+            ->where('remember_token', $rememberToken)
+            ->where('is_active', 'ACTIVE')
+            ->exists();
+        return $user;
+    }
 }
