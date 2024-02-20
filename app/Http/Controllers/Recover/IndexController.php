@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Intervention\Image\Facades\Image;
 use Exception;
-use Illuminate\Support\Facades\Log;
 
 class IndexController extends Controller
 {
@@ -39,29 +38,35 @@ class IndexController extends Controller
     }
     public function scrapeProductImageFiles($productHref)
     {
-        Log::info($productHref);
         $scriptPath = public_path('js/recovery/dometopia.js');
         $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref);
-        exec($command, $output, $returnCode);
-        // 실행 결과 확인
-        if ($returnCode !== 0 || !isset($output[0])) {
-            return [
-                'status' => false,
-                'return' => '상품 정보 추출 과정에서 오류가 발생했습니다',
-            ];
-        }
-        // 결과 처리
-        $result = json_decode($output[0], true);
-        if ($result === false || $result === 'false') {
+        try {
+            exec($command, $output, $returnCode);
+            // 실행 결과 확인
+            if ($returnCode !== 0 || !isset($output[0])) {
+                return [
+                    'status' => false,
+                    'return' => '상품 정보 추출 과정에서 오류가 발생했습니다',
+                ];
+            }
+            // 결과 처리
+            $result = json_decode($output[0], true);
+            if ($result === false || $result === 'false') {
+                return [
+                    'status' => true,
+                    'return' => $productHref,
+                ];
+            }
             return [
                 'status' => true,
-                'return' => $productHref,
+                'return' => $result,
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => false,
+                'return' => $e->getMessage() . ' ' . $productHref
             ];
         }
-        return [
-            'status' => true,
-            'return' => $result,
-        ];
     }
     public function getFileNames($product)
     {
