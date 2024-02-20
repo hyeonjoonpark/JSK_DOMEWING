@@ -23,15 +23,11 @@ const getProductDetails = async (page) => {
     const page = await browser.newPage();
     try {
         const [productHref] = process.argv.slice(2);
-        try {
-            await page.goto(productHref, { waitUntil: 'domcontentloaded' });
-        } catch (error) {
-            console.log(false);
-        }
+        await page.goto(productHref, { waitUntil: 'domcontentloaded' });
         const productContents = await getProductDetails(page);
         console.log(JSON.stringify(productContents));
     } catch (error) {
-        console.log(false);
+        console.error(false);
     } finally {
         await browser.close();
     }
