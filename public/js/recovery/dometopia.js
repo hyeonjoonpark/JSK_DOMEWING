@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 
 const getProductDetails = async (page, productHref) => {
     await page.goto(productHref, { waitUntil: 'domcontentloaded' });
