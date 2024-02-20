@@ -28,9 +28,9 @@ class IndexController extends Controller
                 $productContents = $scrapeProductImageFiles['return'];
                 $productImageFile = $productContents['productImage'];
                 $productDetailFiles = $productContents['productDetail'];
-                $this->sibal($productImageFile, $productImageFileName, 'product');
+                $this->sibal($productImageFile, $productImageFileName, 'product', $productHref);
                 for ($i = 0; $i < count($productDetailFileNames); $i++) {
-                    $this->sibal($productDetailFiles[$i], $productDetailFileNames[$i], 'detail');
+                    $this->sibal($productDetailFiles[$i], $productDetailFileNames[$i], 'detail', $productHref);
                 }
             }
         }
@@ -118,7 +118,7 @@ class IndexController extends Controller
 
         return $filenames;
     }
-    public function sibal($imageUrl, $newImageName, $path)
+    public function sibal($imageUrl, $newImageName, $path, $productHref)
     {
         $newWidth = 1000;
         $newHeight = 1000;
@@ -138,7 +138,7 @@ class IndexController extends Controller
                 'status' => true,
             ];
         } catch (Exception $e) {
-            error_log("Error processing image: " . $e->getMessage());
+            error_log("Error processing image: " . $e->getMessage() . ' ' . $productHref);
             return [
                 'status' => false,
                 'return' => $e->getMessage()
