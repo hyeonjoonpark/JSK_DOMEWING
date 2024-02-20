@@ -30,6 +30,6 @@ const getProductDetails = async (page, productHref) => {
     } catch (error) {
         console.log(false);
     } finally {
-        await browser.close();
+        // await browser.close();
     }
 })();
