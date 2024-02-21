@@ -20,7 +20,7 @@ async function signIn(page, username, password) {
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
-    await page.waitForNavigation();
+    await page.waitForSelector('#wrap');
 }
 async function moveToPage(page, url, curPage) {
     await page.goto(url, { waitUntil: 'networkidle0' });
