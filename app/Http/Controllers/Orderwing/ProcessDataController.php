@@ -93,8 +93,8 @@ class ProcessDataController extends Controller
             'R' => 'shippingCost',
             'T' => 'orderCode',
             'V' => 'shippingRemark',
-            'X' => 'productCode',
-            'Y' => 'productCodeConditional', // Special handling for LADAM
+            'Y' => 'productCode',
+            'Z' => 'productCodeConditional', // Special handling for LADAM
             'B' => 'orderedAt',
             'S' => 'amount',
             'A' => 'orderStatus'
