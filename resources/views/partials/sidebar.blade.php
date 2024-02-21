@@ -34,6 +34,12 @@
                             </a>
                         </li>
                         <li class="nk-menu-item">
+                            <a href="/admin/product/new-minewing" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
+                                <span class="nk-menu-text">뉴 마인윙</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
                             <a href="/admin/apiwing" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-code-pull-request"></em></span>
                                 <span class="nk-menu-text">API윙</span>

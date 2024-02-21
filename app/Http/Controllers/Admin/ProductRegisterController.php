@@ -260,7 +260,7 @@ class ProductRegisterController extends Controller
     }
 
     // 업체 계정 가져오기
-    protected function getAccount(Request $request, $vendorId)
+    public function getAccount(Request $request, $vendorId)
     {
         $account = DB::table('accounts')
             ->join('users', 'users.id', '=', 'accounts.user_id')

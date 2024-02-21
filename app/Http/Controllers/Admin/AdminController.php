@@ -146,6 +146,7 @@ class AdminController extends Controller
             ->where('v.is_active', 'ACTIVE')
             ->where('ps.is_active', 'Y')
             ->where('ps.has_api', 'N')
+            ->where('ps.new_minewing', 'N')
             ->get();
         return view('admin/product_mining', [
             'sellers' => $sellers
@@ -334,6 +335,19 @@ class AdminController extends Controller
         }
         return view('admin/apiwing', [
             'products' => $products,
+            'sellers' => $sellers
+        ]);
+    }
+    public function newMinewing(Request $request)
+    {
+        $sellers = DB::table('product_search AS ps')
+            ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('ps.is_active', 'Y')
+            ->where('ps.has_api', 'N')
+            ->where('ps.new_minewing', 'Y')
+            ->get();
+        return view('admin/new_minewing', [
             'sellers' => $sellers
         ]);
     }
