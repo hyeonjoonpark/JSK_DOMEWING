@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [listURL] = args;
-        await page.goto(listURL, { waitUntil: 'networkidle0' });
+        await page.goto(listURL, { waitUntil: 'networkidle0', timeout: 0 });
         const numProducts = await page.evaluate(() => {
             const numProductsText = document.querySelector('body > div.container > div > div.content > div.top_toolbar.align_side > div.tool_left > p > strong').textContent.trim();
             const numProducts = parseInt(numProductsText.replace(/[^\d]/g, ''));
