@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
         const args = process.argv.slice(2);
         const [productHref, username, password] = args;
         await signIn(page, username, password);
-        await page.goto(productHref, { waitUntil: 'domcontentloaded' });
+        await page.goto(productHref, { waitUntil: 'networkidle0' });
         const product = await scrapeProduct(page, productHref);
         console.log(JSON.stringify(product));
     } catch (error) {
@@ -16,7 +16,7 @@ const puppeteer = require('puppeteer');
     }
 })();
 async function signIn(page, username, password) {
-    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'domcontentloaded' });
+    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0' });
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
