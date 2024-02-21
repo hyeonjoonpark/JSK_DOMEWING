@@ -1,12 +1,17 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: false, ignoreDefaultArgs: ['--enable-automation'] });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        const [listURL, username, password, curPage] = args;
+        const [listURL, username, password] = args;
+        let curPage = args[3];
         await signIn(page, username, password);
-        await moveToPage(page, listURL, curPage);
+        await selectNumPages(page, listURL);
+        curPage = parseInt(curPage, 10);
+        if (curPage > 1) {
+            await moveToPage(page, curPage);
+        }
         const products = await scrapeProducts(page);
         console.log(JSON.stringify(products));
     } catch (error) {
@@ -16,23 +21,27 @@ const puppeteer = require('puppeteer');
     }
 })();
 async function signIn(page, username, password) {
-    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle2' });
-    await page.type('#custId', username);
-    await page.type('#custPw', password);
-    await page.click('#loginForm > div > a:nth-child(3)');
-    await page.waitForNavigation();
+    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle2', timeout: 0 });
+    await page.evaluate((username, password) => {
+        document.querySelector('#custId').value = username;
+        document.querySelector('#custPw').value = password;
+        document.querySelector('#loginForm > div > a:nth-child(3)').click();
+    }, username, password);
+    await page.waitForNavigation({ timeout: 0 });
 }
-async function moveToPage(page, url, curPage) {
-    await page.goto(url, { waitUntil: 'networkidle2' });
+async function selectNumPages(page, listURL) {
+    await page.goto(listURL, { waitUntil: 'networkidle2', timeout: 0 });
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
-    await new Promise((page) => setTimeout(page, 3000));
+    await new Promise((page) => setTimeout(page, 10000));
+}
+async function moveToPage(page, curPage) {
     curPage = parseInt(curPage);
     await page.evaluate((curPage) => {
         const pageBtn = document.querySelector('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > div > ul > li:nth-child(2) > a');
         pageBtn.setAttribute('data-page', curPage);
         pageBtn.click();
     }, curPage);
-    await new Promise((page) => setTimeout(page, 3000));
+    await new Promise((page) => setTimeout(page, 5000));
 }
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
