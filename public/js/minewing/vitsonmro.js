@@ -92,7 +92,7 @@ async function scrapeProducts(page) {
             const productPriceText = productElement.querySelector('td:nth-child(10) > span.hdsp_top.price_cr').textContent;
             const price = productPriceText.replace(/[^0-9]/g, '').trim();
             const image = productElement.querySelector('td:nth-child(4) > div > img').getAttribute('src');
-            if (image.include('이미지준비중')) {
+            if (image.includes('이미지준비중')) {
                 return false;
             }
             const productCode = productElement.querySelector('td:nth-child(5) > span.hdsp_top').textContent.replace(/[^0-9]/g, '').trim();
