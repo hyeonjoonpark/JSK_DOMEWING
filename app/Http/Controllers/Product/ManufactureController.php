@@ -27,7 +27,7 @@ class ManufactureController extends Controller
             }
             $hasOption = $product['hasOption'];
             $byte = 50;
-            if ($hasOption == true && isset($product['productOptions'])) {
+            if ($hasOption === true && isset($product['productOptions'])) {
                 $byte = 40;
             }
             $productName = $nameController->index($product['productName'], $byte);

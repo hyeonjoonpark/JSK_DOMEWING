@@ -94,31 +94,4 @@ class ProcessController extends Controller
             ->first();
         return $seller;
     }
-    // public function scrapeProductDetails($sellerEngName, $username, $password, $productHref)
-    // {
-    //     // 스크립트 파일 경로 확인
-    //     $scriptPath = public_path('js/details/' . $sellerEngName . '.js');
-    //     if (!file_exists($scriptPath)) {
-    //         return [
-    //             'status' => false,
-    //             'return' => '스크립트 파일을 찾을 수 없습니다: ' . $scriptPath,
-    //         ];
-    //     }
-    //     // Node.js 스크립트 실행
-    //     $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref) . " " . escapeshellarg($username) . " " . $password;
-    //     exec($command, $output, $returnCode);
-    //     // 실행 결과 확인
-    //     if ($returnCode !== 0 || !isset($output[0])) {
-    //         return [
-    //             'status' => false,
-    //             'return' => '상품 정보 추출 과정에서 오류가 발생했습니다',
-    //         ];
-    //     }
-    //     // 결과 처리
-    //     $result = json_decode($output[0], true);
-    //     return [
-    //         'status' => true,
-    //         'return' => $result,
-    //     ];
-    // }
 }

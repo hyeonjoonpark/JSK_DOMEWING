@@ -190,7 +190,6 @@
         }
 
         function runMinewing(listURL, vendorID, rememberToken) {
-            console.log(listURL);
             $.ajax({
                 url: "/api/product/new-minewing",
                 type: "POST",
@@ -262,6 +261,7 @@
                     productHrefs: productHrefs
                 },
                 success: function(response) {
+                    console.log(response);
                     closePopup();
                     const status = response.status;
                     if (status == true) {
@@ -294,15 +294,13 @@
                 },
                 success: function(response) {
                     console.log(response);
-                    const responseReturn = response.return;
-                    const products = responseReturn.products;
                     const status = response.status;
                     closePopup();
                     if (status) {
                         popupLoader(1, '"상품명을 가공 중이에요."');
-                        runManufacture(products);
+                        runManufacture(response.return);
                     } else {
-                        swalError(responseReturn);
+                        swalError(response.return);
                     }
                 },
                 error: function(error) {
@@ -434,7 +432,6 @@
                                 .name + "</option>";
                         }
                         $("#categoryId").html(html);
-                        console.log(html);
                     } else {
                         Swal.fire({
                             icon: 'error',

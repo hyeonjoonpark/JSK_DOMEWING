@@ -36,12 +36,11 @@ async function scrapeProduct(page, productHref) {
         const productPrice = document.querySelector('#negoPrice').textContent.trim().replace(/[^\d]/g, '');
         const productImage = document.querySelector('body > div.container > div > div.content > div.wrap_deal > div.deal_view > div.deal_gallery > div.swiper-container.gallery-top.swiper-container-horizontal > div > div.swiper-slide.swiper-slide-active > img').src;
         const images = document.querySelectorAll('#detail_box > div > ul img');
-        // 각 이미지의 src 속성을 절대 경로로 변환합니다.
         const productDetail = Array.from(images, img => {
             let src = img.getAttribute('src');
             return src;
         });
-        const hasOption = true;
+        const hasOption = false;
         const productOptions = [];
         return {
             productName: productName,
