@@ -45,7 +45,7 @@ class MiningController extends Controller
         } else {
             return [
                 'status' => false,
-                'return' => $listUrl
+                'return' => '상품 데이터 마이닝에 실패했습니다.'
             ];
         }
         return [
