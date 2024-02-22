@@ -5,7 +5,11 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [listURL, username, password] = args;
-        await signIn(page, username, password);
+        const signInResult = await signIn(page, username, password);
+        if (signInResult === false) {
+            console.log(false);
+            return;
+        }
         const numPage = await getNumPage(page, listURL);
         const products = [];
         for (let i = numPage; i > 0; i--) {
@@ -20,6 +24,19 @@ const puppeteer = require('puppeteer');
         await browser.close();
     }
 })();
+async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
+    for (let i = 0; i < attempts; i++) {
+        try {
+            await page.goto(url, { waitUntil: 'networkidle0' });
+            return true;
+        } catch (error) {
+            if (i < attempts - 1) {
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+    }
+    return false;
+}
 async function getNumPage(page, url) {
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
@@ -34,11 +51,15 @@ async function getNumPage(page, url) {
     return numPage;
 }
 async function signIn(page, username, password) {
-    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0', timeout: 0 });
+    const navigateWithRetryResponse = await navigateWithRetry(page, 'https://vitsonmro.com/mro/login.do');
+    if (navigateWithRetryResponse === false) {
+        return false;
+    }
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
     await page.waitForSelector('#wrap');
+    return true;
 }
 async function moveToPage(page, curPage) {
     curPage = parseInt(curPage);
