@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-use function PHPUnit\Framework\isEmpty;
-
 class ProcessController extends Controller
 {
     public function index(Request $request)
@@ -37,33 +35,39 @@ class ProcessController extends Controller
                 'return' => '세션이 만료되었습니다. 다시 로그인해 주십시오.'
             ];
         }
-        $products = [];
-        $errors = [];
-        foreach ($productHrefs as $productHref) {
-            $response = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
-            if ($response['status'] === true) {
-                $products[] = $response['return'];
-            } else {
-                $errors[] = [
-                    'product' => $productHref,
-                    'message' => $response['return'],
-                ];
-            }
+        $scrapeProductDetails = $this->scrapeProductDetails($productHrefs, $vendor->name_eng, $account->username, $account->password);
+        if ($scrapeProductDetails['status'] === false) {
+            return $scrapeProductDetails;
         }
-        if (count($products) < 1) {
-            return [
-                'status' => false,
-                'return' => '상품셋이 모두 필터링되었습니다.',
-                'errors' => $errors,
-                'products' => $products,
-            ];
-        }
+        $products = $scrapeProductDetails['return'];
         return [
             'status' => true,
-            'return' => [
-                'products' => $products,
-                'errors' => $errors,
-            ],
+            'return' => $products
+        ];
+    }
+    private function scrapeProductDetails($productHrefs, $sellerEngName, $username, $password)
+    {
+        // 임시 파일에 URL 배열 저장
+        $tempFilePath = storage_path('app/' . uniqid() . '.json');
+        file_put_contents($tempFilePath, json_encode($productHrefs));
+        // Node.js 스크립트 실행
+        $scriptPath = public_path('js/minewing/details/' . $sellerEngName . '.js');
+        $command = "node {$scriptPath} {$tempFilePath} {$username} {$password}";
+        exec($command, $output, $returnCode);
+        // 실행 결과 확인
+        if ($returnCode === 0 && isset($output[0])) {
+            $products = json_decode($output[0], true);
+        } else {
+            return [
+                'status' => false,
+                'return' => '"상품 상세 정보 추출에 실패했습니다."'
+            ];
+        }
+        // 임시 파일 삭제
+        unlink($tempFilePath);
+        return [
+            'status' => true,
+            'return' => $products
         ];
     }
     public function getAccount($userID, $sellerID)
@@ -90,32 +94,31 @@ class ProcessController extends Controller
             ->first();
         return $seller;
     }
-    public function scrapeProductDetails($sellerEngName, $username, $password, $productHref)
-    {
-        set_time_limit(0);
-        // 스크립트 파일 경로 확인
-        $scriptPath = public_path('js/details/' . $sellerEngName . '.js');
-        if (!file_exists($scriptPath)) {
-            return [
-                'status' => false,
-                'return' => '스크립트 파일을 찾을 수 없습니다: ' . $scriptPath,
-            ];
-        }
-        // Node.js 스크립트 실행
-        $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref) . " " . escapeshellarg($username) . " " . $password;
-        exec($command, $output, $returnCode);
-        // 실행 결과 확인
-        if ($returnCode !== 0 || !isset($output[0])) {
-            return [
-                'status' => false,
-                'return' => '상품 정보 추출 과정에서 오류가 발생했습니다',
-            ];
-        }
-        // 결과 처리
-        $result = json_decode($output[0], true);
-        return [
-            'status' => true,
-            'return' => $result,
-        ];
-    }
+    // public function scrapeProductDetails($sellerEngName, $username, $password, $productHref)
+    // {
+    //     // 스크립트 파일 경로 확인
+    //     $scriptPath = public_path('js/details/' . $sellerEngName . '.js');
+    //     if (!file_exists($scriptPath)) {
+    //         return [
+    //             'status' => false,
+    //             'return' => '스크립트 파일을 찾을 수 없습니다: ' . $scriptPath,
+    //         ];
+    //     }
+    //     // Node.js 스크립트 실행
+    //     $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref) . " " . escapeshellarg($username) . " " . $password;
+    //     exec($command, $output, $returnCode);
+    //     // 실행 결과 확인
+    //     if ($returnCode !== 0 || !isset($output[0])) {
+    //         return [
+    //             'status' => false,
+    //             'return' => '상품 정보 추출 과정에서 오류가 발생했습니다',
+    //         ];
+    //     }
+    //     // 결과 처리
+    //     $result = json_decode($output[0], true);
+    //     return [
+    //         'status' => true,
+    //         'return' => $result,
+    //     ];
+    // }
 }
