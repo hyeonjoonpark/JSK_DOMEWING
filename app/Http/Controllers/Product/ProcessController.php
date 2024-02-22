@@ -57,6 +57,12 @@ class ProcessController extends Controller
         // 실행 결과 확인
         if ($returnCode === 0 && isset($output[0])) {
             $products = json_decode($output[0], true);
+            if ($products === false || $products === 'false') {
+                return [
+                    'status' => false,
+                    'return' => '"타겟 업체로부터의 응답이 없습니다."'
+                ];
+            }
         } else {
             return [
                 'status' => false,
