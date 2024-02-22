@@ -10,7 +10,7 @@ const fs = require('fs');
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
-            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 0 });
+            await navigateWithRetry(page, url);
             const product = await scrapeProduct(page, url);
             products.push(product);
         }
@@ -21,8 +21,20 @@ const fs = require('fs');
         await browser.close();
     }
 })();
+async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
+    for (let i = 0; i < attempts; i++) {
+        try {
+            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            return;
+        } catch (error) {
+            if (i < attempts - 1) {
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+    }
+}
 async function signIn(page, username, password) {
-    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0', timeout: 0 });
+    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0' });
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
