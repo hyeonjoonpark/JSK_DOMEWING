@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -85,6 +85,9 @@ async function scrapeProducts(page) {
             const productPriceText = productElement.querySelector('td:nth-child(10) > span.hdsp_top.price_cr').textContent;
             const price = productPriceText.replace(/[^0-9]/g, '').trim();
             const image = productElement.querySelector('td:nth-child(4) > div > img').getAttribute('src');
+            if (image.include('이미지준비중')) {
+                return false;
+            }
             const productCode = productElement.querySelector('td:nth-child(5) > span.hdsp_top').textContent.replace(/[^0-9]/g, '').trim();
             const href = 'https://vitsonmro.com/mro/shop/productDetail.do?productCode=' + productCode;
             const platform = '비츠온엠알오';
