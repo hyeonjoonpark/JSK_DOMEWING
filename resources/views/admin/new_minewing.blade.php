@@ -1,10 +1,10 @@
 @extends('layouts.main')
 @section('title')
-    상품 데이터 마인윙
+    뉴 마인윙
 @endsection
 @section('subtitle')
     <p>
-        더욱 강력해진 엔진 마인윙과 함께 상품 데이터셋을 수집합니다.
+        더욱 강력해진 엔진 뉴 마인윙과 함께 상품 데이터셋을 수집합니다.
     </p>
 @endsection
 @php
@@ -170,6 +170,9 @@
     <script>
         var rememberToken = '{{ Auth::user()->remember_token }}';
         var varIndex, varDupIndex, varProducts;
+        var audioMining = new Audio('{{ asset('assets/audio/mining.mp3') }}');
+        var audioCollect = new Audio('{{ asset('assets/audio/collect.mp3') }}');
+        var audioSuccess = new Audio('{{ asset('assets/audio/success.mp3') }}');
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
@@ -205,6 +208,7 @@
                         const products = response.return;
                         updateMinewingResult(products);
                         closePopup();
+                        audioMining.play();
                         swalSuccess('"상품 데이터셋을 성공적으로 가져왔어요!"');
                     } else {
                         closePopup();
@@ -330,6 +334,7 @@
 
             if (response.status) {
                 varProducts = response.return;
+                audioCollect.play();
                 $('#productSaveForm').modal('show');
             } else {
                 // Handle failed response
@@ -475,6 +480,7 @@
         function successHandle(response) {
             closePopup();
             if (response.status) {
+                audioSuccess.play();
                 swalSuccess(response.return);
             } else {
                 $('#productSaveForm').modal('show');

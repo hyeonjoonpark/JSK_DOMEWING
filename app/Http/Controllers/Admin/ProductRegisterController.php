@@ -19,9 +19,9 @@ class ProductRegisterController extends Controller
 
         // 검증 규칙 설정
         $validator = Validator::make($request->all(), [
-            'keyword' => ['required', 'min:2', 'max:20'] // 키워드 필드에 대한 유효성 검사 규칙 설정
+            'keyword' => ['required', 'min:1', 'max:20'] // 키워드 필드에 대한 유효성 검사 규칙 설정
         ], [
-            'keyword' => '검색어는 2자 이상 20자 이하로 기입해주세요.' // 유효성 검사 실패 시 반환할 오류 메시지 설정
+            'keyword' => '검색어는 1자 이상 20자 이하로 기입해주세요.' // 유효성 검사 실패 시 반환할 오류 메시지 설정
         ]);
 
         // 유효성 검사 실패 시 오류 반환
