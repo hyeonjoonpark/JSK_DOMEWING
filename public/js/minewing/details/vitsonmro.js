@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -10,7 +10,7 @@ const fs = require('fs');
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
-            await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
+            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 0 });
             const product = await scrapeProduct(page, url);
             products.push(product);
         }
