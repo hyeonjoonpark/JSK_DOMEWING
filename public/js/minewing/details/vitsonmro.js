@@ -49,7 +49,7 @@ async function signIn(page, username, password) {
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
-    await page.waitForSelector('#wrap');
+    await page.waitForNavigation();
     return true;
 }
 async function scrapeProduct(page, productHref) {
