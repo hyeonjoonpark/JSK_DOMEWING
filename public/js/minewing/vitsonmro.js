@@ -13,7 +13,10 @@ const puppeteer = require('puppeteer');
         const numPage = await getNumPage(page, listURL);
         const products = [];
         for (let i = numPage; i > 0; i--) {
-            await moveToPage(page, i);
+            const moveToPageResult = await moveToPage(page, i);
+            if (moveToPageResult === false) {
+                await moveToPage();
+            }
             let list = await scrapeProducts(page);
             products.push(...list);
         }
@@ -64,13 +67,17 @@ async function signIn(page, username, password) {
 async function moveToPage(page, curPage) {
     curPage = parseInt(curPage);
     const selector = `a[data-page="${curPage}"]`; // 동적 셀렉터 생성
-    await page.evaluate(selector => {
+    const result = await page.evaluate(selector => {
         const link = document.querySelector(selector);
         if (link) {
             link.click(); // 링크가 존재하면 클릭
+            return true;
+        } else {
+            return false;
         }
     }, selector);
     await new Promise((page) => setTimeout(page, 3000));
+    return result;
 }
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
