@@ -31,7 +31,7 @@ const fs = require('fs');
 async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
     for (let i = 0; i < attempts; i++) {
         try {
-            await page.goto(url, { waitUntil: 'networkidle0' });
+            await page.goto(url, { waitUntil: 'domcontentloaded' });
             return true;
         } catch (error) {
             if (i < attempts - 1) {
@@ -42,10 +42,7 @@ async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
     return false;
 }
 async function signIn(page, username, password) {
-    const navigateWithRetryResponse = await navigateWithRetry(page, 'https://vitsonmro.com/mro/login.do');
-    if (navigateWithRetryResponse === false) {
-        return false;
-    }
+    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0' });
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');

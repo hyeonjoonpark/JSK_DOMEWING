@@ -54,10 +54,7 @@ async function getNumPage(page, url) {
     return numPage;
 }
 async function signIn(page, username, password) {
-    const navigateWithRetryResponse = await navigateWithRetry(page, 'https://vitsonmro.com/mro/login.do');
-    if (navigateWithRetryResponse === false) {
-        return false;
-    }
+    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0' });
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
