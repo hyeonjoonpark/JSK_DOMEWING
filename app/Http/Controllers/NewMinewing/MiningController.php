@@ -17,6 +17,7 @@ class MiningController extends Controller
     public function index(Request $request)
     {
         set_time_limit(0);
+        ini_set('max_input_vars', '100000');
         $rememberToken = $request->rememberToken;
         $vendorId = $request->vendorID;
         $listUrl = $request->listUrl;

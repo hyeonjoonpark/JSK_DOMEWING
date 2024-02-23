@@ -11,6 +11,7 @@ class ManufactureController extends Controller
 {
     public function index(Request $request)
     {
+        ini_set('max_input_vars', '100000');
         set_time_limit(0);
         $products = $request->products;
         $nameController = new NameController();

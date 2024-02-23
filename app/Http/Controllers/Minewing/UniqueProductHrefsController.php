@@ -11,6 +11,7 @@ class UniqueProductHrefsController extends Controller
     public function index(Request $request)
     {
         set_time_limit(0);
+        ini_set('max_input_vars', '100000');
         // Get unique product hrefs directly.
         $productHrefs = $request->productHrefs;
         if (!is_array($productHrefs)) {
