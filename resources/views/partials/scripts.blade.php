@@ -2,7 +2,7 @@
 <script src="{{ asset('assets/js/scripts.js') }}"></script>
 <script src="https://kit.fontawesome.com/0a14a1d42d.js" crossorigin="anonymous"></script>
 <script>
-    var audioError = new Audio('{{ asset('assets/audio/error.mp3') }}');
+    var audioError = new Audio('{{ asset('assets/audio/diring.mp3') }}');
 
     function popupLoader(index, text) {
         const loaders = ["{{ asset('assets/images/loading.gif') }}",

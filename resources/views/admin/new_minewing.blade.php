@@ -170,9 +170,9 @@
     <script>
         var rememberToken = '{{ Auth::user()->remember_token }}';
         var varIndex, varDupIndex, varProducts;
-        var audioMining = new Audio('{{ asset('assets/audio/mining.mp3') }}');
-        var audioCollect = new Audio('{{ asset('assets/audio/collect.mp3') }}');
-        var audioSuccess = new Audio('{{ asset('assets/audio/success.mp3') }}');
+        var audioMining = new Audio('{{ asset('assets/audio/diring.mp3') }}');
+        var audioCollect = new Audio('{{ asset('assets/audio/diring.mp3') }}');
+        var audioSuccess = new Audio('{{ asset('assets/audio/diring.mp3') }}');
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
