@@ -28,10 +28,9 @@ const fs = require('fs');
             products.push(product);
         }
         console.log(JSON.stringify(products));
+        await browser.close();
     } catch (error) {
         console.error('Error occurred:', error);
-    } finally {
-        await browser.close();
     }
 })();
 async function goToWithRepeat(page, url, index) {

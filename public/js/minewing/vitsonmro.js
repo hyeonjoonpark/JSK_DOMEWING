@@ -16,7 +16,6 @@ const puppeteer = require('puppeteer');
         console.log(JSON.stringify(products));
     } catch (error) {
         console.error(error);
-    } finally {
         await browser.close();
     }
 })();
