@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -13,8 +13,21 @@ const fs = require('fs');
             return;
         }
         const products = [];
+        let index = 0;
         for (const url of urls) {
-            await page.goto(url, 'domcontentloaded');
+            if (index === 0) {
+                await page.goto(url, 'networkidle0');
+                await page.evaluate(() => {
+                    const isPopup = document.querySelector('#groobeeWrap');
+                    if (isPopup) {
+                        isPopup.style.display = 'none';
+                        document.querySelector('body > div.grbDim.grbLayer').style.display = 'none';
+                    }
+                });
+                index++;
+            } else {
+                await page.goto(url, 'domcontentloaded');
+            }
             const product = await scrapeProduct(page, url);
             products.push(product);
         }

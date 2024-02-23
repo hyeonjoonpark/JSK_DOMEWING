@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -15,7 +15,7 @@ const puppeteer = require('puppeteer');
         for (let i = numPage; i > 0; i--) {
             const moveToPageResult = await moveToPage(page, i);
             if (moveToPageResult === false) {
-                await moveToPage();
+                await moveToPage(page, i);
             }
             let list = await scrapeProducts(page);
             products.push(...list);
