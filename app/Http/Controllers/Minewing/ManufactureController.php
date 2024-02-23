@@ -9,62 +9,68 @@ use Illuminate\Support\Facades\DB;
 
 class ManufactureController extends Controller
 {
+    const OPTION_BYTE = 42;
+    const DEFAULT_BYTE = 50;
+
     public function index(Request $request)
     {
         ini_set('max_input_vars', '100000');
         set_time_limit(0);
+
         $products = $request->products;
-        $nameController = new NameController();
         $productNames = [];
         foreach ($products as $i => &$product) {
-            $productName = $product['productName'];
-            $hasOption = $product['hasOption'];
-            $byte = 50;
-            if ($hasOption === true) {
-                $byte = 42;
+            $product['productName'] = $this->processProductName($product, $i, $productNames);
+            if ($product['productName'] === false) {
+                return $this->createErrorResponse($productNames, $products, $i);
             }
-            $productName = $nameController->index($productName, $byte);
-            $duplicateIndex = array_search($productName, $productNames);
-            if ($duplicateIndex !== false) {
-                return [
-                    'status' => false,
-                    'return' => [
-                        'type' => 'FROM_ARRAY',
-                        'duplicatedProductName' => $productName,
-                        'duplicatedIndex' => $duplicateIndex,
-                        'index' => $i,
-                        'products' => $products
-                    ]
-                ];
-            }
-            $isDuplicated = $this->isDuplicated($productName);
-            if ($isDuplicated != null) {
-                return [
-                    'status' => false,
-                    'return' => [
-                        'type' => 'FROM_DB',
-                        'duplicatedProductName' => $productName,
-                        'index' => $i,
-                        'products' => $products,
-                        'duplicatedProduct' => $isDuplicated
-                    ]
-                ];
-            }
-            $product['productName'] = $productName;
-            $productNames[] = $productName;
+            $productNames[] = $product['productName'];
         }
-        unset($product);
+        unset($product); // Break reference link.
+
+        return ['status' => true, 'return' => $products];
+    }
+
+    private function processProductName(&$product, $index, $productNames)
+    {
+        $nameController = new NameController();
+        $byte = $product['hasOption'] === true ? self::OPTION_BYTE : self::DEFAULT_BYTE;
+        $productName = $nameController->index($product['productName'], $byte);
+
+        if (in_array($productName, $productNames) || $this->isDuplicated($productName)) {
+            return false;
+        }
+
+        return $productName;
+    }
+
+    private function createErrorResponse($productNames, $products, $index)
+    {
+        $productName = $products[$index]['productName'];
+        $duplicateIndex = array_search($productName, $productNames);
+        $isDuplicated = $this->isDuplicated($productName);
+
+        $errorType = $isDuplicated ? 'FROM_DB' : 'FROM_ARRAY';
+        $duplicatedProduct = $isDuplicated ?: null;
+
         return [
-            'status' => true,
-            'return' => $products
+            'status' => false,
+            'return' => [
+                'type' => $errorType,
+                'duplicatedProductName' => $productName,
+                'duplicatedIndex' => $duplicateIndex,
+                'index' => $index,
+                'products' => $products,
+                'duplicatedProduct' => $duplicatedProduct,
+            ],
         ];
     }
+
     public function isDuplicated($productName)
     {
-        $duplicatedProduct = DB::table('minewing_products')
+        return DB::table('minewing_products')
             ->where('productName', $productName)
             ->where('isActive', 'Y')
             ->first();
-        return $duplicatedProduct;
     }
 }
