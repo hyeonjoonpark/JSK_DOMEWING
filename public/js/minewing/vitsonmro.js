@@ -29,13 +29,13 @@ const puppeteer = require('puppeteer');
 })();
 async function getNumPage(page, url) {
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
-    const isElementPresent = await page.$('#grb-close-x') !== null;
-    if (isElementPresent) {
-        // 요소가 존재하는 경우, 클릭합니다.
-        await page.click('#grb-close-x');
-        // 클릭 후 1초 기다립니다.
-        await new Promise(resolve => setTimeout(resolve, 1000));
-    }
+    await page.evaluate(() => {
+        const isPopup = document.querySelector('#groobeeWrap');
+        if (isPopup) {
+            isPopup.style.display = 'none';
+            document.querySelector('body > div.grbDim.grbLayer').style.display = 'none';
+        }
+    });
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
     await new Promise((page) => setTimeout(page, 3000));
     const numProducts = await page.evaluate(() => {
