@@ -12,7 +12,7 @@ const fs = require('fs');
         let index = 0;
         for (const url of urls) {
             if (index === 0) {
-                await goToWithRepeat(page, url, 0);
+                await goToWithRepeat(page, url, 0, 'networkidle0');
                 await new Promise((page) => setTimeout(page, 3000));
                 await page.evaluate(() => {
                     const isPopup = document.querySelector('#groobeeWrap');
@@ -23,7 +23,7 @@ const fs = require('fs');
                 });
                 index++;
             } else {
-                await page.goto(url, { waitUntil: 'domcontentloaded' });
+                await goToWithRepeat(page, url, 0, 'domcontentloaded');
             }
             const product = await scrapeProduct(page, url);
             products.push(product);
@@ -36,20 +36,20 @@ const fs = require('fs');
         await browser.close();
     }
 })();
-async function goToWithRepeat(page, url, index) {
+async function goToWithRepeat(page, url, index, wiatUntilType) {
     try {
-        await page.goto(url, 'networkidle0');
+        await page.goto(url, { waitUntil: wiatUntilType });
         return true;
     } catch (error) {
         if (index < 3) {
             index++
-            await goToWithRepeat(page, url, index);
+            await goToWithRepeat(page, url, index, wiatUntilType);
         }
         return false;
     }
 }
 async function signIn(page, username, password) {
-    await goToWithRepeat(page, 'https://vitsonmro.com/mro/login.do', 0);
+    await goToWithRepeat(page, 'https://vitsonmro.com/mro/login.do', 0, 'networkidle0');
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');

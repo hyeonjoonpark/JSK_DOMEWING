@@ -41,20 +41,20 @@ async function getNumPage(page, url) {
     const numPage = Math.ceil(numProducts / numPerPage);
     return numPage;
 }
-async function goToWithRepeat(page, url, index) {
+async function goToWithRepeat(page, url, index, wiatUntilType) {
     try {
-        await page.goto(url, 'networkidle0');
+        await page.goto(url, { waitUntil: wiatUntilType });
         return true;
     } catch (error) {
         if (index < 3) {
             index++
-            await goToWithRepeat(page, url, index);
+            await goToWithRepeat(page, url, index, wiatUntilType);
         }
         return false;
     }
 }
 async function signIn(page, username, password) {
-    await goToWithRepeat(page, 'https://vitsonmro.com/mro/login.do', 0);
+    await goToWithRepeat(page, 'https://vitsonmro.com/mro/login.do', 0, 'networkidle0');
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
