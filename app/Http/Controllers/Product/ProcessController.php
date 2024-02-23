@@ -10,6 +10,7 @@ class ProcessController extends Controller
 {
     public function index(Request $request)
     {
+        ini_set('max_input_vars', '100000');
         set_time_limit(0);
         $productHrefs = $request->productHrefs;
         if (!isset($productHrefs)) {
@@ -47,24 +48,29 @@ class ProcessController extends Controller
     }
     private function scrapeProductDetails($productHrefs, $sellerEngName, $username, $password)
     {
-        // 임시 파일에 URL 배열 저장
-        $tempFilePath = storage_path('app/' . uniqid() . '.json');
-        file_put_contents($tempFilePath, json_encode($productHrefs));
-        // Node.js 스크립트 실행
-        $scriptPath = public_path('js/minewing/details/' . $sellerEngName . '.js');
-        $command = "node {$scriptPath} {$tempFilePath} {$username} {$password}";
-        exec($command, $output, $returnCode);
-        // 실행 결과 확인
-        if ($returnCode === 0 && isset($output[0])) {
-            $products = json_decode($output[0], true);
-        } else {
-            return [
-                'status' => false,
-                'return' => '"상품 상세 정보 추출에 실패했습니다."'
-            ];
+        $productHrefsChunk = array_chunk($productHrefs, 100);
+        $products = [];
+        foreach ($productHrefsChunk as $index => $productHrefs) {
+            // 임시 파일에 URL 배열 저장
+            $tempFilePath = storage_path('app/' . uniqid() . '.json');
+            file_put_contents($tempFilePath, json_encode($productHrefs));
+            // Node.js 스크립트 실행
+            $scriptPath = public_path('js/minewing/details/' . $sellerEngName . '.js');
+            $command = "node {$scriptPath} {$tempFilePath} {$username} {$password}";
+            exec($command, $output, $returnCode);
+            // 실행 결과 확인
+            if ($returnCode === 0 && isset($output[0])) {
+                $tmpProducts = json_decode($output[0], true);
+                $products = array_merge($products, $tmpProducts);
+            } else {
+                return [
+                    'status' => false,
+                    'return' => ($index + 1) . '번째 상품군에서 에러가 발생했습니다.'
+                ];
+            }
+            // 임시 파일 삭제
+            unlink($tempFilePath);
         }
-        // 임시 파일 삭제
-        unlink($tempFilePath);
         return [
             'status' => true,
             'return' => $products

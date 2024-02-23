@@ -14,10 +14,7 @@ const fs = require('fs');
         }
         const products = [];
         for (const url of urls) {
-            const navigateWithRetryResult = await navigateWithRetry(page, url);
-            if (navigateWithRetryResult === false) {
-                continue;
-            }
+            await page.goto(url, 'domcontentloaded');
             const product = await scrapeProduct(page, url);
             products.push(product);
         }
@@ -28,19 +25,6 @@ const fs = require('fs');
         await browser.close();
     }
 })();
-async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
-    for (let i = 0; i < attempts; i++) {
-        try {
-            await page.goto(url, { waitUntil: 'domcontentloaded' });
-            return true;
-        } catch (error) {
-            if (i < attempts - 1) {
-                await new Promise(resolve => setTimeout(resolve, delay));
-            }
-        }
-    }
-    return false;
-}
 async function signIn(page, username, password) {
     await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0' });
     await page.type('#custId', username);
