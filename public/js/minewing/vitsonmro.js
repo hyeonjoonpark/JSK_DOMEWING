@@ -5,11 +5,7 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [listURL, username, password] = args;
-        const signInResult = await signIn(page, username, password);
-        if (signInResult === false) {
-            console.log(false);
-            return;
-        }
+        await signIn(page, username, password);
         const numPage = await getNumPage(page, listURL);
         const products = [];
         for (let i = numPage; i > 0; i--) {
@@ -53,7 +49,6 @@ async function signIn(page, username, password) {
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
     await page.waitForSelector('#wrap');
-    return true;
 }
 async function moveToPage(page, curPage) {
     curPage = parseInt(curPage);

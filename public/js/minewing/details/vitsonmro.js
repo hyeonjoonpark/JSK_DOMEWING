@@ -7,16 +7,12 @@ const fs = require('fs');
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const signInResult = await signIn(page, username, password);
-        if (signInResult === false) {
-            console.log(false);
-            return;
-        }
+        await signIn(page, username, password);
         const products = [];
         let index = 0;
         for (const url of urls) {
             if (index === 0) {
-                await page.goto(url, 'networkidle0');
+                await page.goto(url, { waitUntil: 'networkidle0' });
                 await page.evaluate(() => {
                     const isPopup = document.querySelector('#groobeeWrap');
                     if (isPopup) {
@@ -26,7 +22,7 @@ const fs = require('fs');
                 });
                 index++;
             } else {
-                await page.goto(url, 'domcontentloaded');
+                await page.goto(url, { waitUntil: 'domcontentloaded' });
             }
             const product = await scrapeProduct(page, url);
             products.push(product);
@@ -44,7 +40,6 @@ async function signIn(page, username, password) {
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
     await page.waitForSelector('#wrap');
-    return true;
 }
 async function scrapeProduct(page, productHref) {
     const product = await page.evaluate((productHref) => {
