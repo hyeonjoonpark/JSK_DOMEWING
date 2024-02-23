@@ -17,6 +17,8 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error(error);
         await browser.close();
+    } finally {
+        await browser.close();
     }
 })();
 async function getNumPage(page, url) {

@@ -12,7 +12,8 @@ const fs = require('fs');
         let index = 0;
         for (const url of urls) {
             if (index === 0) {
-                await page.goto(url, { waitUntil: 'networkidle0' });
+                await goToWithRepeat(page, url, 0);
+                await new Promise((page) => setTimeout(page, 3000));
                 await page.evaluate(() => {
                     const isPopup = document.querySelector('#groobeeWrap');
                     if (isPopup) {
@@ -31,6 +32,8 @@ const fs = require('fs');
         await browser.close();
     } catch (error) {
         console.error('Error occurred:', error);
+    } finally {
+        await browser.close();
     }
 })();
 async function goToWithRepeat(page, url, index) {
