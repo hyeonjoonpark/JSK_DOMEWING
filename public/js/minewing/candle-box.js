@@ -65,7 +65,7 @@ async function scrapeProducts(page) {
             const name = nameElement ? removeSoldOutMessage(nameElement.textContent) : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
             const href = nameElement ? nameElement.href.trim() : 'Detail page URL not found';
-            const price = priceElement ? priceElement.textContent.split(':')[1].trim().replace(',', '') : 'Price not found';
+            const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
             const platform = "캔들아트";
             products.push({ name, price, image, href, platform });
         }
@@ -95,3 +95,8 @@ async function scrapeProducts(page) {
     });
     return products;
 }
+
+
+
+
+
