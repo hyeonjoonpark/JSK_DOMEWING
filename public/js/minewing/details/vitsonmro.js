@@ -34,8 +34,20 @@ const fs = require('fs');
         await browser.close();
     }
 })();
+async function goToWithRepeat(page, url, index) {
+    try {
+        await page.goto(url, 'networkidle0');
+        return true;
+    } catch (error) {
+        if (index < 3) {
+            index++
+            await goToWithRepeat(page, url, index);
+        }
+        return false;
+    }
+}
 async function signIn(page, username, password) {
-    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0' });
+    await goToWithRepeat(page, 'https://vitsonmro.com/mro/login.do', 0);
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
