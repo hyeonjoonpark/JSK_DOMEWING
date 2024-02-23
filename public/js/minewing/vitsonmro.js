@@ -22,6 +22,13 @@ const puppeteer = require('puppeteer');
 })();
 async function getNumPage(page, url) {
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
+    await page.evaluate(() => {
+        const isPopup = document.querySelector('#groobeeWrap');
+        if (isPopup) {
+            isPopup.style.display = 'none';
+            document.querySelector('body > div.grbDim.grbLayer').style.display = 'none';
+        }
+    });
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
     await new Promise((page) => setTimeout(page, 3000));
     const numProducts = await page.evaluate(() => {
@@ -33,8 +40,20 @@ async function getNumPage(page, url) {
     const numPage = Math.ceil(numProducts / numPerPage);
     return numPage;
 }
+async function goToWithRepeat(page, url, index, wiatUntilType) {
+    try {
+        await page.goto(url, { waitUntil: wiatUntilType });
+        return true;
+    } catch (error) {
+        if (index < 3) {
+            index++
+            await goToWithRepeat(page, url, index, wiatUntilType);
+        }
+        return false;
+    }
+}
 async function signIn(page, username, password) {
-    await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0', timeout: 0 });
+    await goToWithRepeat(page, 'https://vitsonmro.com/mro/login.do', 0, 'networkidle0');
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
@@ -43,13 +62,17 @@ async function signIn(page, username, password) {
 async function moveToPage(page, curPage) {
     curPage = parseInt(curPage);
     const selector = `a[data-page="${curPage}"]`; // 동적 셀렉터 생성
-    await page.evaluate(selector => {
+    const result = await page.evaluate(selector => {
         const link = document.querySelector(selector);
         if (link) {
             link.click(); // 링크가 존재하면 클릭
+            return true;
+        } else {
+            return false;
         }
     }, selector);
     await new Promise((page) => setTimeout(page, 3000));
+    return result;
 }
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
@@ -64,6 +87,9 @@ async function scrapeProducts(page) {
             const productPriceText = productElement.querySelector('td:nth-child(10) > span.hdsp_top.price_cr').textContent;
             const price = productPriceText.replace(/[^0-9]/g, '').trim();
             const image = productElement.querySelector('td:nth-child(4) > div > img').getAttribute('src');
+            if (image.includes('이미지준비중')) {
+                return false;
+            }
             const productCode = productElement.querySelector('td:nth-child(5) > span.hdsp_top').textContent.replace(/[^0-9]/g, '').trim();
             const href = 'https://vitsonmro.com/mro/shop/productDetail.do?productCode=' + productCode;
             const platform = '비츠온엠알오';

@@ -2,6 +2,8 @@
 <script src="{{ asset('assets/js/scripts.js') }}"></script>
 <script src="https://kit.fontawesome.com/0a14a1d42d.js" crossorigin="anonymous"></script>
 <script>
+    var audioError = new Audio('{{ asset('assets/audio/diring.mp3') }}');
+
     function popupLoader(index, text) {
         const loaders = ["{{ asset('assets/images/loading.gif') }}",
             "{{ asset('assets/images/search-loader.gif') }}"
@@ -47,6 +49,7 @@
     }
 
     function swalError(message) {
+        audioError.play();
         Swal.fire({
             icon: 'error',
             html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">' +
@@ -87,6 +90,7 @@
     function AjaxErrorHandling(error) {
         console.log(error);
         closePopup();
+        audioError.play();
         swalError('"API 통신 요청 과정에서 에러가 발생했습니다."');
     }
 </script>

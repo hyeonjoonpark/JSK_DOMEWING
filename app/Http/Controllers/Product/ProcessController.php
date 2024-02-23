@@ -6,12 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-use function PHPUnit\Framework\isEmpty;
-
 class ProcessController extends Controller
 {
     public function index(Request $request)
     {
+        ini_set('max_input_vars', '100000');
         set_time_limit(0);
         $productHrefs = $request->productHrefs;
         if (!isset($productHrefs)) {
@@ -37,33 +36,44 @@ class ProcessController extends Controller
                 'return' => '세션이 만료되었습니다. 다시 로그인해 주십시오.'
             ];
         }
+        $scrapeProductDetails = $this->scrapeProductDetails($productHrefs, $vendor->name_eng, $account->username, $account->password);
+        if ($scrapeProductDetails['status'] === false) {
+            return $scrapeProductDetails;
+        }
+        $products = $scrapeProductDetails['return'];
+        return [
+            'status' => true,
+            'return' => $products
+        ];
+    }
+    private function scrapeProductDetails($productHrefs, $sellerEngName, $username, $password)
+    {
+        $productHrefsChunk = array_chunk($productHrefs, 100);
         $products = [];
-        $errors = [];
-        foreach ($productHrefs as $productHref) {
-            $response = $this->scrapeProductDetails($vendor->name_eng, $account->username, $account->password, $productHref);
-            if ($response['status'] === true) {
-                $products[] = $response['return'];
+        foreach ($productHrefsChunk as $index => $productHrefs) {
+            // 임시 파일에 URL 배열 저장
+            $tempFilePath = storage_path('app/' . uniqid() . '.json');
+            file_put_contents($tempFilePath, json_encode($productHrefs));
+            // Node.js 스크립트 실행
+            $scriptPath = public_path('js/minewing/details/' . $sellerEngName . '.js');
+            $command = "node {$scriptPath} {$tempFilePath} {$username} {$password}";
+            exec($command, $output, $returnCode);
+            // 실행 결과 확인
+            if ($returnCode === 0 && isset($output[0])) {
+                $tmpProducts = json_decode($output[0], true);
+                $products = array_merge($products, $tmpProducts);
             } else {
-                $errors[] = [
-                    'product' => $productHref,
-                    'message' => $response['return'],
+                return [
+                    'status' => false,
+                    'return' => ($index + 1) . '번째 상품군에서 에러가 발생했습니다.'
                 ];
             }
-        }
-        if (count($products) < 1) {
-            return [
-                'status' => false,
-                'return' => '상품셋이 모두 필터링되었습니다.',
-                'errors' => $errors,
-                'products' => $products,
-            ];
+            // 임시 파일 삭제
+            unlink($tempFilePath);
         }
         return [
             'status' => true,
-            'return' => [
-                'products' => $products,
-                'errors' => $errors,
-            ],
+            'return' => $products
         ];
     }
     public function getAccount($userID, $sellerID)
@@ -89,33 +99,5 @@ class ProcessController extends Controller
             ->where('id', $sellerID)
             ->first();
         return $seller;
-    }
-    public function scrapeProductDetails($sellerEngName, $username, $password, $productHref)
-    {
-        set_time_limit(0);
-        // 스크립트 파일 경로 확인
-        $scriptPath = public_path('js/details/' . $sellerEngName . '.js');
-        if (!file_exists($scriptPath)) {
-            return [
-                'status' => false,
-                'return' => '스크립트 파일을 찾을 수 없습니다: ' . $scriptPath,
-            ];
-        }
-        // Node.js 스크립트 실행
-        $command = "node " . escapeshellarg($scriptPath) . " " . escapeshellarg($productHref) . " " . escapeshellarg($username) . " " . $password;
-        exec($command, $output, $returnCode);
-        // 실행 결과 확인
-        if ($returnCode !== 0 || !isset($output[0])) {
-            return [
-                'status' => false,
-                'return' => '상품 정보 추출 과정에서 오류가 발생했습니다',
-            ];
-        }
-        // 결과 처리
-        $result = json_decode($output[0], true);
-        return [
-            'status' => true,
-            'return' => $result,
-        ];
     }
 }

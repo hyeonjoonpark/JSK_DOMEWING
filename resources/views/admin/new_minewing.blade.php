@@ -1,10 +1,10 @@
 @extends('layouts.main')
 @section('title')
-    상품 데이터 마인윙
+    뉴 마인윙
 @endsection
 @section('subtitle')
     <p>
-        더욱 강력해진 엔진 마인윙과 함께 상품 데이터셋을 수집합니다.
+        더욱 강력해진 엔진 뉴 마인윙과 함께 상품 데이터셋을 수집합니다.
     </p>
 @endsection
 @php
@@ -170,6 +170,9 @@
     <script>
         var rememberToken = '{{ Auth::user()->remember_token }}';
         var varIndex, varDupIndex, varProducts;
+        var audioMining = new Audio('{{ asset('assets/audio/diring.mp3') }}');
+        var audioCollect = new Audio('{{ asset('assets/audio/diring.mp3') }}');
+        var audioSuccess = new Audio('{{ asset('assets/audio/diring.mp3') }}');
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
@@ -190,7 +193,6 @@
         }
 
         function runMinewing(listURL, vendorID, rememberToken) {
-            console.log(listURL);
             $.ajax({
                 url: "/api/product/new-minewing",
                 type: "POST",
@@ -206,6 +208,7 @@
                         const products = response.return;
                         updateMinewingResult(products);
                         closePopup();
+                        audioMining.play();
                         swalSuccess('"상품 데이터셋을 성공적으로 가져왔어요!"');
                     } else {
                         closePopup();
@@ -262,6 +265,7 @@
                     productHrefs: productHrefs
                 },
                 success: function(response) {
+                    console.log(response);
                     closePopup();
                     const status = response.status;
                     if (status == true) {
@@ -294,15 +298,13 @@
                 },
                 success: function(response) {
                     console.log(response);
-                    const responseReturn = response.return;
-                    const products = responseReturn.products;
                     const status = response.status;
                     closePopup();
                     if (status) {
                         popupLoader(1, '"상품명을 가공 중이에요."');
-                        runManufacture(products);
+                        runManufacture(response.return);
                     } else {
-                        swalError(responseReturn);
+                        swalError(response.return);
                     }
                 },
                 error: function(error) {
@@ -332,6 +334,7 @@
 
             if (response.status) {
                 varProducts = response.return;
+                audioCollect.play();
                 $('#productSaveForm').modal('show');
             } else {
                 // Handle failed response
@@ -434,7 +437,6 @@
                                 .name + "</option>";
                         }
                         $("#categoryId").html(html);
-                        console.log(html);
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -478,6 +480,7 @@
         function successHandle(response) {
             closePopup();
             if (response.status) {
+                audioSuccess.play();
                 swalSuccess(response.return);
             } else {
                 $('#productSaveForm').modal('show');
