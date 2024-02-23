@@ -173,7 +173,8 @@
             const b2bs = $('input[name="b2bs"]:checked').map(function() {
                 return $(this).val();
             }).get();
-            const isSellwingChecked = $('#sellwing').isChecked;
+            const isSellwingChecked = $('#sellwing').prop('checked');
+            console.log(isSellwingChecked);
             $.ajax({
                 url: '/api/product/sold-out',
                 type: 'POST',

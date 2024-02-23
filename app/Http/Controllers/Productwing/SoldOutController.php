@@ -38,6 +38,9 @@ class SoldOutController extends Controller
         $rememberToken = $request->rememberToken;
         $productCodes = $request->productCodes;
         $b2bIds = $request->b2bs;
+        if (!isset($b2bIds)) {
+            $b2bIds = [];
+        }
         $validateRememberToken = $this->userController->validateRememberToken($rememberToken);
         if ($validateRememberToken === false) {
             return response()->json([
@@ -129,12 +132,10 @@ class SoldOutController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'productCodes' => 'required|array',
-            'rememberToken' => 'required|string',
-            'b2bs' => 'required|array'
+            'rememberToken' => 'required|string'
         ], [
             'productCodes' => '품절 처리할 상품을 하나 이상 선택해주세요.',
             'rememberToken' => '세션이 만료되었습니다. 안전한 서비스 이용을 위해 다시 로그인해주세요.',
-            'b2bs' => '품절 요청을 보낼 업체를 하나 이상 선택해주세요.'
         ]);
         return $validator;
     }
