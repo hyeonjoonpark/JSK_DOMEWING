@@ -50,7 +50,7 @@ class SoldOutController extends Controller
         }
         $html = $this->runSoldOut($productCodes, $b2bIds, $rememberToken);
         $isSellwingChecked = $request->isSellwingChecked;
-        if ($isSellwingChecked === true) {
+        if ($isSellwingChecked === 'true') {
             $inactiveProducts = $this->indexController->inactiveProducts($productCodes);
             $status = $inactiveProducts['status'];
             if ($status === false) {
