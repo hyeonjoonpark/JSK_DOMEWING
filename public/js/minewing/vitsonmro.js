@@ -27,19 +27,6 @@ const puppeteer = require('puppeteer');
         await browser.close();
     }
 })();
-async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
-    for (let i = 0; i < attempts; i++) {
-        try {
-            await page.goto(url, { waitUntil: 'networkidle0' });
-            return true;
-        } catch (error) {
-            if (i < attempts - 1) {
-                await new Promise(resolve => setTimeout(resolve, delay));
-            }
-        }
-    }
-    return false;
-}
 async function getNumPage(page, url) {
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
