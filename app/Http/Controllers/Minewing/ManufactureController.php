@@ -21,9 +21,9 @@ class ManufactureController extends Controller
         $productNames = [];
         foreach ($products as $i => &$product) {
             $product['productName'] = $this->processProductName($product, $i, $productNames);
-            if ($product['productName'] === false) {
-                return $this->createErrorResponse($productNames, $products, $i);
-            }
+            // if ($product['productName'] === false) {
+            //     return $this->createErrorResponse($productNames, $products, $i);
+            // }
             $productNames[] = $product['productName'];
         }
         unset($product); // Break reference link.
