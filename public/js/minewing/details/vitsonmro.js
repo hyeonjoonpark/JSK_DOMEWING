@@ -43,8 +43,9 @@ async function goToWithRepeat(page, url, index, wiatUntilType) {
         if (index < 3) {
             index++
             await goToWithRepeat(page, url, index, wiatUntilType);
+        } else {
+            return false;
         }
-        return false;
     }
 }
 async function signIn(page, username, password) {

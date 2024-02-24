@@ -22,6 +22,7 @@ const puppeteer = require('puppeteer');
 })();
 async function getNumPage(page, url) {
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
+    await new Promise((page) => setTimeout(page, 3000));
     await page.evaluate(() => {
         const isPopup = document.querySelector('#groobeeWrap');
         if (isPopup) {
@@ -48,8 +49,9 @@ async function goToWithRepeat(page, url, index, wiatUntilType) {
         if (index < 3) {
             index++
             await goToWithRepeat(page, url, index, wiatUntilType);
+        } else {
+            return false;
         }
-        return false;
     }
 }
 async function signIn(page, username, password) {
