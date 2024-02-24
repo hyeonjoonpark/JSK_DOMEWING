@@ -38,17 +38,11 @@ class SaveController extends Controller
         }
         $nameController = new NameController();
         $productImageController = new ProductImageController();
-        $newProducts = [];
-        $failed = [];
-        foreach ($products as $index => $product) {
-            if (!isset($product['hasOption'])) {
-                $failed[] = $index + 1;
-                continue;
-            }
+        foreach ($products as $product) {
             $hasOption = $product['hasOption'];
             $byte = 50;
-            if ($hasOption == true && isset($product['productOptions'])) {
-                $byte = 40;
+            if ($hasOption === 'true' && isset($product['productOptions'])) {
+                $byte = 42;
             }
             $productName = $nameController->index($product['productName'], $byte);
             $sellerID = $product['sellerID'];
@@ -66,7 +60,7 @@ class SaveController extends Controller
             }
             $productPrice = (int)$product['productPrice'];
             $productHref = $product['productHref'];
-            if ($hasOption == true && isset($product['productOptions'])) {
+            if ($hasOption === 'true' && isset($product['productOptions'])) {
                 $productOptions = $product['productOptions'];
                 $optionPriceType = $this->getOptionPriceType($sellerID);
                 $type = '1';
@@ -74,35 +68,17 @@ class SaveController extends Controller
                     $newProductName = $productName . ' 옵션 ' . $type;
                     $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:2rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1><br><br>' . $productDetail;
                     if ($optionPriceType == 'ADD') {
-                        (int)$productPrice = (int)$product['productPrice'] + (int)$productOption['optionPrice'];
+                        $productPrice = (int)$product['productPrice'] + (int)$productOption['optionPrice'];
                     } else {
                         $productPrice = (int)$productOption['optionPrice'];
                     }
-                    $newProducts[] = [
-                        'productName' => $newProductName,
-                        'productImage' => $productImage,
-                        'productPrice' => $productPrice,
-                        'productDetail' => $newProductDetail,
-                        'productHref' => $productHref,
-                        'hasOption' => true,
-                        'sellerID' => $sellerID
-                    ];
-                    $type++;
                     $response = $this->insertProducts($sellerID, $userID, $categoryID, $newProductName, $productKeywords, $productPrice, $productImage, $newProductDetail, $hasOption, $productHref);
                     if (!$response['status']) {
                         return $response;
                     }
+                    $type++;
                 }
             } else {
-                $newProducts[] = [
-                    'productName' => $productName,
-                    'productImage' => $productImage,
-                    'productPrice' => $productPrice,
-                    'productDetail' => $productDetail,
-                    'productHref' => $productHref,
-                    'hasOption' => false,
-                    'sellerID' => $sellerID
-                ];
                 $response = $this->insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref);
                 if (!$response['status']) {
                     return $response;
@@ -185,7 +161,7 @@ class SaveController extends Controller
                     ->where('isActive', 'Y')
                     ->exists();
             } while ($isExist);
-            if ($hasOption == true) {
+            if ($hasOption === 'true') {
                 $hasOption = 'Y';
             } else {
                 $hasOption = 'N';

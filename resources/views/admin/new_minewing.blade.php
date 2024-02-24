@@ -117,7 +117,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="initSave();">저장하기</button>
+                    <button type="button" class="btn btn-primary" id="saveBtn">저장하기</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">종료하기</button>
                 </div>
             </div>
@@ -169,7 +169,6 @@
 @section('scripts')
     <script>
         var rememberToken = '{{ Auth::user()->remember_token }}';
-        var varIndex, varDupIndex, varProducts;
         var audioMining = new Audio('{{ asset('assets/audio/diring.mp3') }}');
         var audioCollect = new Audio('{{ asset('assets/audio/diring.mp3') }}');
         var audioSuccess = new Audio('{{ asset('assets/audio/diring.mp3') }}');
@@ -301,8 +300,8 @@
                     const status = response.status;
                     closePopup();
                     if (status) {
-                        popupLoader(1, '"상품명을 가공 중이에요."');
-                        runManufacture(response.return);
+                        popupLoader(1, '"상품을 가공 중이에요."');
+                        initSaveForm(response.return);
                     } else {
                         swalError(response.return);
                     }
@@ -315,104 +314,13 @@
             });
         }
 
-        function runManufacture(products) {
-            $.ajax({
-                url: '/api/minewing/manufacture',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    products
-                },
-                success: handleManufactureSuccess,
-                error: errorHandle
+        function initSaveForm(products) {
+            closePopup();
+            audioCollect.play();
+            $('#saveBtn').off('click').on('click', function() {
+                initSave(products);
             });
-        }
-
-        function handleManufactureSuccess(response) {
-            console.log(response);
-            closePopup();
-
-            if (response.status) {
-                varProducts = response.return;
-                audioCollect.play();
-                $('#productSaveForm').modal('show');
-            } else {
-                // Handle failed response
-                updateDuplicatedDetails(response);
-            }
-        }
-
-        function errorHandle(response) {
-            closePopup();
-            console.log(response);
-            swalError('예기치 못한 에러가 발생했어요.');
-        }
-
-        function updateDuplicatedDetails(response) {
-            const {
-                index,
-                duplicatedProductName,
-                products,
-                type
-            } = response.return;
-            varProducts = products;
-            varIndex = index;
-
-            $('#duplicatedType').val(type);
-            updateEditProductDetails(products, index, duplicatedProductName); // Update UI for the product to edit
-
-            if (type == 'FROM_ARRAY') {
-                handleFromArrayType(response.return);
-            } else {
-                handleOtherType(response.return);
-            }
-        }
-
-        function updateEditProductDetails(products, index, duplicatedProductName) {
-            $('#editProductImage').attr('src', products[index].productImage);
-            $('#editProductNameOri').html(products[index].productName);
-            $('#editProductHref').attr('href', products[index].productHref);
-            $('#editNewName').val(duplicatedProductName);
-        }
-
-        function handleFromArrayType(details) {
-            varDupIndex = details.duplicatedIndex;
-            const duplicatedProductNameOri = $('#duplicatedProductNameOri' + varDupIndex).html();
-            const products = varProducts;
-
-            $('#duplicatedProductImage').attr('src', products[varDupIndex].productImage);
-            $('#duplicatedProductNameOri').html(duplicatedProductNameOri);
-            $('#duplicatedProductHref').attr('href', products[varDupIndex].productHref);
-            $('#duplicatedNewName').val(products[varDupIndex].productName);
-            $("#handleDupNamesModal").modal('show');
-        }
-
-        function handleOtherType(details) {
-            const duplicatedProduct = details.duplicatedProduct;
-            $('#duplicatedProductImage').attr('src', duplicatedProduct.productImage);
-            $('#duplicatedProductNameOri').html(duplicatedProduct.productName);
-            $('#duplicatedProductHref').attr('href', duplicatedProduct.productHref);
-            $('#duplicatedNewName').val('상품 DB로부터 검출된 상품은 상품명 변경이 불가합니다.').attr('disabled', true);
-            $("#handleDupNamesModal").modal('show');
-        }
-
-        function initHandleDupName() {
-            const type = $('#duplicatedType').val();
-            const editedProductName = $('#editNewName').val(); // 중복을 줄이기 위해 함수 시작 부분으로 이동
-
-            // 'FROM_ARRAY' 타입일 때만 duplicatedProductName 업데이트
-            if (type == 'FROM_ARRAY') {
-                const duplicatedProductName = $('#duplicatedNewName').val();
-                varProducts[varDupIndex].productName = duplicatedProductName.trim();
-            }
-
-            // editedProductName 업데이트는 두 경우 모두에서 수행됨
-            varProducts[varIndex].productName = editedProductName.trim();
-
-            // 수정된 varProducts로 다음 단계 실행
-            closePopup();
-            popupLoader(1, '"상품명을 가공 중이에요."');
-            runManufacture(varProducts);
+            $('#productSaveForm').modal('show');
         }
 
         function categorySearch() {
@@ -453,10 +361,10 @@
             });
         }
 
-        function initSave() {
+        function initSave(products) {
             const categoryID = $('#categoryId').val();
             const productKeywords = $('#productKeywords').val();
-            runSave(categoryID, productKeywords, varProducts, rememberToken);
+            runSave(categoryID, productKeywords, products, rememberToken);
             closePopup();
             popupLoader(1, '"데이터베이스에 상품 정보를 입력하고 있어요."');
         }
@@ -486,6 +394,12 @@
                 $('#productSaveForm').modal('show');
                 swalError(response.return);
             }
+        }
+
+        function errorHandle(response) {
+            closePopup();
+            console.log(response);
+            swalError('예기치 못한 에러가 발생했어요.');
         }
     </script>
 @endsection
