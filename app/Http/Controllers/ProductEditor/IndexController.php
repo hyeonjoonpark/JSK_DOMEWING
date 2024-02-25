@@ -17,7 +17,8 @@ class IndexController extends Controller
             DB::table('minewing_products')
                 ->whereIn('productCode', $productCodes)
                 ->update([
-                    'isActive' => 'N'
+                    'isActive' => 'N',
+                    'updatedAt' => now()
                 ]);
             return [
                 'status' => true

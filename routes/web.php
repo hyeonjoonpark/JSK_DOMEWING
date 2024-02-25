@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NaverShopController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\Admin\CMSController;
@@ -27,6 +26,7 @@ use App\Http\Controllers\Domewing\WishlistController;
 use App\Http\Controllers\Domewing\Auth\ForgetPasswordController;
 use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
 use App\Http\Controllers\Domewing\FAQController;
+use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\ProductEditor\ViewController;
 
 // 관리자 콘솔 라우트 그룹 설정
@@ -55,6 +55,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/orderwing', [AdminController::class, 'orderwing']);
     Route::get('apiwing', [AdminController::class, 'apiwing']);
     Route::get('product-editor', [ViewController::class, 'index']);
+    Route::get('namewing', [NamewingController::class, 'main']);
 
     //ving kong
     Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');

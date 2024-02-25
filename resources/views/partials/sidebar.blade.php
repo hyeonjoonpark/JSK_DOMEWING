@@ -86,6 +86,12 @@
                             </ul><!-- .nk-menu-sub -->
                         </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item">
+                            <a href="/admin/namewing" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-clone"></em></span>
+                                <span class="nk-menu-text">네임윙</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
                             <a href="/admin/product/excelwing" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-file-excel"></em></span>
                                 <span class="nk-menu-text">엑셀윙</span>
