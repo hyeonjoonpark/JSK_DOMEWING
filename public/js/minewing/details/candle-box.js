@@ -15,6 +15,9 @@ const fs = require('fs');
                 continue;
             }
             const product = await scrapeProduct(page, url);
+            if (product === false) {
+                continue;
+            }
             products.push(product);
         }
         console.log(JSON.stringify(products));
@@ -48,11 +51,14 @@ async function signIn(page, username, password) {
 
 async function scrapeProduct(page, productHref) {
     const product = await page.evaluate((productHref) => {
-        const rawName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h2').textContent.trim();
+        const rawName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h2').textContent;
         const productName = removeSoldOutMessage(rawName);
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
         const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').getAttribute('src');
         const images = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-additional img');
+        if (images.length < 1) {
+            return false;
+        }
         const productDetail = Array.from(images, img => {
             let src = img.getAttribute('src');
             return src;
@@ -62,28 +68,42 @@ async function scrapeProduct(page, productHref) {
         let hasOption = false;
 
         if (optionElement) {
-            const hasOptionEle = optionElement.value;
-            hasOption = hasOptionEle === 'y';
+            hasOption = true;
         }
 
         let productOptions = [];
 
         if (hasOption) {
-            const optionElements = document.querySelectorAll('#product_option_id1 > option link_image');
+            //const optionElements = document.querySelectorAll('tbody.xans-element-.xans-product.xans-product-option.xans-record-');
+            // Array.from(optionElements).forEach(optionElement => {
+            //     console.log(optionElement);
+            // });
+            const optionElements = document.querySelectorAll('#product_option_id1 > optgroup option');
             Array.from(optionElements).forEach(el => {
-                const text = el.textContent;
-                const canSplit = text.split(' ');
-                if (canSplit.length === 2) {
-                    const [optionName, optionPriceText] = text.split(' ').map(s => s.trim());
-                    let optionPrice = 0;
-                    if (optionPriceText) {
-                        optionPrice = parseInt(optionPriceText.replace(/[^\d]/g, ''), 10) + parseInt(productPrice);
-                    }
-                    productOptions.push({ optionName, optionPrice });
+                const optionText = el.textContent.trim();
+                let optionName, optionPrice;
+                if (optionText.includes('원')) { // 
+                    const optionFull = optionText.split(' (');
+                    optionName = optionFull[0].trim();
+                    optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
+                    optionPrice = parseInt(optionPrice, 10);
+                } else {
+                    optionName = optionText.trim();
+                    optionPrice = 0;
                 }
-                else if (canSplit.length === 1) {
-                    productOptions.push({ productName, productPrice });
-                }
+                productOptions.push({ optionName, optionPrice });
+                // const canSplit = text.split(' ');
+                // if (canSplit.length === 2) {
+                //     const [optionName, optionPriceText] = text.split(' ').map(s => s.trim());
+                //     let optionPrice = 0;
+                //     if (optionPriceText) {
+                //         optionPrice = parseInt(optionPriceText.replace(/[^\d]/g, ''), 10) + parseInt(productPrice);
+                //     }
+                //     productOptions.push({ optionName, optionPrice });
+                // }
+                // else if (canSplit.length === 1) {
+                //     productOptions.push({ productName, productPrice });
+                // }
             });
         }
         return {
