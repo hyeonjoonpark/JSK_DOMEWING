@@ -30,7 +30,7 @@ async function signIn(page, username, password) {
     await page.waitForNavigation();
 }
 async function getNumPage(page, listUrl) {
-    await page.goto(listUrl, { waitUntil: 'networkidle0', timeout: 0 });
+    await page.goto(listUrl, { waitUntil: 'domcontentloaded' });
     const numProducts = await page.evaluate(() => {
         const numProductsText = document.querySelector('#Product_ListMenu > p').textContent.trim();
         const numProducts = parseInt(numProductsText.replace(/[^\d]/g, ''));
@@ -43,7 +43,7 @@ async function getNumPage(page, listUrl) {
 async function moveToPage(page, listUrl, curPage) {
     curPage = parseInt(curPage);
     listUrl += '?page=' + curPage;
-    await page.goto(listUrl, { waitUntil: 'networkidle0', timeout: 0 });
+    await page.goto(listUrl, { waitUntil: 'domcontentloaded' });
 }
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
