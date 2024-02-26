@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -61,10 +61,11 @@ async function scrapeProducts(page) {
             const nameElement = productElement.querySelector('div.description > strong > a > span:nth-child(2)');
             const imageElement = productElement.querySelector('div.thumbnail > div.prdImg > a > img');
             const priceElement = productElement.querySelector('div.description > ul > li > span:nth-child(2)');
+            const hrefElement = productElement.querySelector('div.description > strong > a');
 
             const name = nameElement ? removeSoldOutMessage(nameElement.textContent) : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
-            const href = nameElement ? nameElement.href.trim() : 'Detail page URL not found';
+            const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
             const platform = "캔들아트";
             products.push({ name, price, image, href, platform });
