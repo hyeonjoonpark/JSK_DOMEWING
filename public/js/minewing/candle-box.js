@@ -58,9 +58,9 @@ async function scrapeProducts(page) {
                 }
             }
 
-            const nameElement = productElement.querySelector('.description .name a');
-            const imageElement = productElement.querySelector('.thumbnail .prdImg img');
-            const priceElement = productElement.querySelector('.description .spec li:first-child');
+            const nameElement = productElement.querySelector('div.description > strong > a > span:nth-child(2)');
+            const imageElement = productElement.querySelector('div.thumbnail > div.prdImg > a > img');
+            const priceElement = productElement.querySelector('div.description > ul > li > span:nth-child(2)');
 
             const name = nameElement ? removeSoldOutMessage(nameElement.textContent) : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
