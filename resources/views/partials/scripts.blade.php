@@ -2,6 +2,7 @@
 <script src="{{ asset('assets/js/scripts.js') }}"></script>
 <script src="https://kit.fontawesome.com/0a14a1d42d.js" crossorigin="anonymous"></script>
 <script>
+    var rememberToken = '{{ Auth::user()->remember_token }}';
     var audioError = new Audio('{{ asset('assets/audio/diring.mp3') }}');
 
     function popupLoader(index, text) {
@@ -62,6 +63,33 @@
             icon: 'success',
             html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Success.svg') }}"><h4 class="swal2-title mt-5">' +
                 message + '</h4>'
+        });
+    }
+
+    function swalWithReload(message, status) {
+        // Determine the icon and image based on the status
+        const icons = {
+            'success': {
+                icon: 'success',
+                image: '{{ asset('media/Asset_Notif_Success.svg') }}'
+            },
+            'error': {
+                icon: 'error',
+                image: '{{ asset('media/Asset_Notif_Error.svg') }}'
+            }
+        };
+
+        const {
+            icon,
+            image
+        } = icons[status] || {};
+
+        // Show the alert
+        Swal.fire({
+            icon,
+            html: `<img class="w-100" src="${image}"><h4 class="swal2-title mt-5">${message}</h4>`
+        }).then(result => {
+            location.reload();
         });
     }
 

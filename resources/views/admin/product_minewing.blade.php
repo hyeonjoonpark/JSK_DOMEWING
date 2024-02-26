@@ -78,7 +78,7 @@
                                         <td>{{ date('Y-m-d', strtotime($product->createdAt)) }}</td>
                                         <td>
                                             <button class="btn btn-success mr-3">수정</button>
-                                            <button class="btn btn-danger" onclick="initSoldOut();">품절</button>
+                                            <button class="btn btn-danger" onclick="getProductCodes();">품절</button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -96,109 +96,26 @@
             </div>
         </div>
     </div>
-    <div class="modal" tabindex="-1" role="dialog" id="selectB2bModal" data-bs-backdrop="static"
-        data-bs-keyboard="false">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">B2B 업체 선택</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="" class="form-label">B2B 업체 리스트</label>
-                                <div class="row">
-                                    <div class="col-6 mb-3">
-                                        <div class="custom-control custom-checkbox">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" id="sellwing" name="sellwing" value="0"
-                                                    class="custom-control-input" checked>
-                                                <label class="custom-control-label" for="sellwing">셀윙</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @foreach ($b2bs as $b2b)
-                                        <div class="col-6 mb-3">
-                                            <div class="custom-control custom-checkbox">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" id="b2b{{ $b2b->vendor_id }}" name="b2bs"
-                                                        value="{{ $b2b->vendor_id }}" class="custom-control-input" checked>
-                                                    <label class="custom-control-label"
-                                                        for="b2b{{ $b2b->vendor_id }}">{{ $b2b->name }}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="runSoldOutBtn">선택완료</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">종료하기</button>
-                </div>
-            </div>
-        </div>
-    </div>
+@section('sold_out_modal')
+@endsection
 @endsection
 @section('scripts')
-    <link rel="stylesheet" href="{{ asset('assets/css/editors/summernote.css') }}">
-    <script src="{{ asset('assets/js/editors.js') }}"></script>
-    <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
-    <script>
-        var rememberToken = '{{ Auth::user()->remember_token }}';
-        $(document).on('click', '#selectAll', function() {
-            const isChecked = $(this).is(':checked');
-            $('input[name="selectedProducts"]').prop('checked', isChecked);
-        });
+<link rel="stylesheet" href="{{ asset('assets/css/editors/summernote.css') }}">
+<script src="{{ asset('assets/js/editors.js') }}"></script>
+<script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
+<script>
+    $(document).on('click', '#selectAll', function() {
+        const isChecked = $(this).is(':checked');
+        $('input[name="selectedProducts"]').prop('checked', isChecked);
+    });
 
-        function initSoldOut() {
-            const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
-                return $(this).val();
-            }).get();
-            $('#runSoldOutBtn').off('click').on('click', function() {
-                runSoldOut(productCodes);
-            });
-            $('#selectB2bModal').modal('show');
-        }
-
-        function runSoldOut(productCodes) {
-            closePopup();
-            popupLoader(0, '"선택된 업체들에게 품절 소식을 알리고 올게요."');
-            const b2bs = $('input[name="b2bs"]:checked').map(function() {
-                return $(this).val();
-            }).get();
-            const isSellwingChecked = $('#sellwing').prop('checked');
-            console.log(isSellwingChecked);
-            $.ajax({
-                url: '/api/product/sold-out',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    productCodes,
-                    rememberToken,
-                    b2bs,
-                    isSellwingChecked
-                },
-                success: soldOutSuccess,
-                error: AjaxErrorHandling
-            });
-        }
-
-        function soldOutSuccess(response) {
-            console.log(response);
-            closePopup();
-            const status = response.status;
-            if (status === true) {
-                swalSuccess(response.return);
-            } else {
-                swalError(response.return);
-            }
-        }
-    </script>
+    function getProductCodes() {
+        const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
+            return $(this).val();
+        }).get();
+        initSoldOut(productCodes);
+    }
+</script>
+@endsection
+@section('sold_out_scripts')
 @endsection

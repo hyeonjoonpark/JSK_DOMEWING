@@ -1,19 +1,16 @@
 {{-- layouts/main.blade.php를 상속받음 --}}
 @extends('layouts.main')
-
 {{-- 페이지 타이틀 섹션 --}}
 @section('title', '네임윙')
-
 {{-- 서브타이틀 섹션 --}}
 @section('subtitle')
     <p>중복된 상품명들을 관리합니다.</p>
 @endsection
-
 {{-- 메인 콘텐츠 섹션 --}}
 @section('content')
     <div class="row g-gs">
         @forelse ($duplicatedProducts as $product)
-            <div class="col-6">
+            <div class="col-12 col-lg-6">
                 <div class="card card-bordered preview">
                     <div class="card-inner text-center">
                         <img src="{{ $product->productImage }}" class="img-fluid col-12 col-lg-6 mx-auto d-block"><br>
@@ -23,7 +20,9 @@
                             <input type="text" id="{{ $product->productCode }}" class="form-control"
                                 value="{{ $product->productName }}">
                         </div>
-                        <button class="btn btn-success">수정완료</button>
+                        <button class="btn btn-success"
+                            onclick="initEditProductName('{{ $product->productCode }}');">수정완료</button>
+                        <button class="btn btn-danger" onclick="initSoldOut(['{{ $product->productCode }}']);">품절처리</button>
                     </div>
                 </div>
             </div>
@@ -33,11 +32,40 @@
             </div>
         @endforelse
     </div>
+    @section('sold_out_modal')
+    @endsection
 @endsection
-
 {{-- 추가 스크립트 섹션 --}}
 @section('scripts')
     <script>
-        // 여기에 필요한 자바스크립트 코드를 추가할 수 있습니다.
+        var rememberToken = '{{ Auth::user()->remember_token }}';
+
+        function initEditProductName(productCode) {
+            const newProductName = $('#' + productCode).val();
+            $.ajax({
+                url: '/api/product/edit-name',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    productCode,
+                    newProductName,
+                    rememberToken
+                },
+                success: function(response) {
+                    const status = response.status;
+                    let statusStr = 'error';
+                    if (status === true) {
+                        statusStr = 'success';
+                    }
+                    swalWithReload(response.return, statusStr);
+                },
+                error: function(response) {
+                    console.log(response);
+                    swalError('통신 상에 문제가 발생했습니다.');
+                }
+            });
+        }
     </script>
+@endsection
+@section('sold_out_scripts')
 @endsection
