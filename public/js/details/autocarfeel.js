@@ -17,9 +17,9 @@ const puppeteer = require('puppeteer');
 })();
 async function signIn(page, username, password) {
     await page.goto('http://www.autocarfeel.co.kr/shop/member/login.php?&', { waitUntil: 'networkidle0', timeout: 0 });
-    await page.type('#form > table > tbody > tr:nth-child(1) > td:nth-child(2) > input[type=text]', username); // ㅋ
-    await page.type('#form > table > tbody > tr:nth-child(2) > td:nth-child(2) > input[type=password]', password); // ㅋ
-    await page.click('#form > table > tbody > tr:nth-child(1) > td.noline > input[type=image]'); // ㅋ
+    await page.type('#form > table > tbody > tr:nth-child(1) > td:nth-child(2) > input[type=text]', username);
+    await page.type('#form > table > tbody > tr:nth-child(2) > td:nth-child(2) > input[type=password]', password);
+    await page.click('#form > table > tbody > tr:nth-child(1) > td.noline > input[type=image]');
     await page.waitForSelector('#wrap');
 }
 async function scrapeProduct(page, productHref) {

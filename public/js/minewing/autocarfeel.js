@@ -18,19 +18,19 @@ const puppeteer = require('puppeteer'); // 변수선언
 async function login(page, username, password) { // async 아바타? 연동? 그런 개념 login 함수를 연동시키라는거임? 암튼 로그인 함수에는 페이지 id pw 를 넣은거고 실행시키려는듯?
     await page.goto('http://www.autocarfeel.co.kr/shop/member/login.php?&', { waitUntil: 'networkidle0', timeout: 0 }); // 기다렸다가 페이지로 가게하는 코드
     await page.type('#form > table > tbody > tr:nth-child(1) > td:nth-child(2) > input[type=text]', username); // id를 입력
-    await page.type('#form > table > tbody > tr:nth-child(2) > td:nth-child(2) > input[type=password]', password);
-    await page.click('#form > table > tbody > tr:nth-child(1) > td.noline > input[type=image]');
-    await page.waitForNavigation();
+    await page.type('#form > table > tbody > tr:nth-child(2) > td:nth-child(2) > input[type=password]', password); // pw를 입력
+    await page.click('#form > table > tbody > tr:nth-child(1) > td.noline > input[type=image]'); // 로그인 버튼 클릭
+    await page.waitForNavigation(); // 네비게이션 대기
 }
-async function processPage(page, listURL) {
-    await page.goto(listURL, { waitUntil: 'networkidle0', timeout: 0 });
-    const numProducts = await page.evaluate(() => {
-        const numProductsText = document.querySelector('#b_white > font > b').textContent;
-        const numProducts = parseInt(numProductsText.replace(/[^0-9]/g, '').trim());
-        return numProducts;
+async function processPage(page, listURL) { // 상품 목록이 있는 페이지로 이동
+    await page.goto(listURL, { waitUntil: 'networkidle0', timeout: 0 }); // 페이지로 가라 기다렸다가
+    const numProducts = await page.evaluate(() => { //상품 넘버를 변수화? 기다렸다가 페이지 평가..?
+        const numProductsText = document.querySelector('#b_white > font > b').textContent; // 상품 텍스트 넘버 뭐리 선택자...
+        const numProducts = parseInt(numProductsText.replace(/[^0-9]/g, '').trim()); // 상품넘버를 정수처리? 숫자외에 문자를 전부 없애는 기능?
+        return numProducts; // 리턴시키고 종료?
     });
-    listURL += '&page_num=' + numProducts;
-    await page.goto(listURL, { waitUntil: 'networkidle0', timeout: 0 });
+    listURL += '&page_num=' + numProducts; // 리스트랑 상품넘버 사이에 페이지 넘버를 넣어주는 기능
+    await page.goto(listURL, { waitUntil: 'networkidle0', timeout: 0 }); // 기다렸다가 페이지로 넘어가라
 }
 // 이 메소드는 BitsOnMRO를 사용하여 상품 정보를 스크래핑합니다.
 // 모든 product 객체의 필드명은 일치해야 합니다. 오토카필을 사용해 셀렉터를 정확히 지정하고 필요에 따라 수정하세요.
@@ -43,7 +43,7 @@ async function scrapeProducts(page) {
             if (stockText !== '재고보유') { // 만약 상품의 재고가 없다면,
                 return false; // false를 반환하여 해당 상품을 건너뜁니다.
             }
-            const productName = productElement.querySelector('#menuLayer > tbody > tr:nth-child(1) > td:nth-child(1) > a').textContent.trim(); // 상품명을 가져옵니다.
+            const productName = productElement.querySelector('td:nth-child(1) > div:nth-child(2) > a').textContent.trim(); // 상품명을 가져옵니다. // 일단 여기는 해봤음
             const standard = productElement.querySelector('td:nth-child(6) > span.hdsp_bot').textContent.trim(); // 상품의 기준을 가져옵니다.
             const name = productName + ' ' + standard; // 상품명과 기준을 결합하여 전체 상품명을 생성합니다.
             const productPriceText = productElement.querySelector('td:nth-child(10) > span.hdsp_top.price_cr').textContent; // 상품 가격을 나타내는 텍스트를 가져옵니다.
