@@ -250,6 +250,15 @@ class AdminController extends Controller
         if (count($unmappedCategories) > 0) {
             return redirect('admin/mappingwing/unmapped');
         }
+        $duplicates = DB::table('minewing_products')
+            ->select('productName', DB::raw('COUNT(*) as count'))
+            ->where('isActive', 'Y')
+            ->groupBy('productName')
+            ->havingRaw('COUNT(*) > 1')
+            ->exists();
+        if ($duplicates === true) {
+            return redirect('admin/namewing');
+        }
         return view('admin/excelwing', [
             'b2Bs' => $b2Bs,
             'sellers' => $sellers

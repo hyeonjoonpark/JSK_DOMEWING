@@ -100,7 +100,7 @@ class Controller extends BaseController
             ->first();
         return $account;
     }
-    protected function getActiveB2Bs()
+    public function getActiveB2Bs()
     {
         return DB::table('product_register AS pr')
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')

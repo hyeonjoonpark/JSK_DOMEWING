@@ -4,7 +4,7 @@
 @section('title', '네임윙')
 {{-- 서브타이틀 섹션 --}}
 @section('subtitle')
-    <p>중복된 상품명들을 관리합니다.</p>
+    <p>중복된 상품명들을 관리합니다. 엑셀윙 추출을 위해서는 반드시 네임윙이 선행되어야 합니다.</p>
 @endsection
 {{-- 메인 콘텐츠 섹션 --}}
 @section('content')
@@ -20,6 +20,15 @@
                             <input type="text" id="{{ $product->productCode }}" class="form-control"
                                 value="{{ $product->productName }}">
                         </div>
+                        <div class="form-group text-start mt-3">
+                            <label class="form-label">상품가</label>
+                            <input type="text" class="form-control" value="{{ number_format($product->productPrice) }}원"
+                                disabled />
+                        </div>
+                        <div class="form-group text-start mt-3">
+                            <label class="form-label">상품 상세 주소</label>
+                            <input type="text" class="form-control" value="{{ $product->productHref }}" disabled />
+                        </div>
                         <button class="btn btn-success"
                             onclick="initEditProductName('{{ $product->productCode }}');">수정완료</button>
                         <button class="btn btn-danger" onclick="initSoldOut(['{{ $product->productCode }}']);">품절처리</button>
@@ -32,8 +41,55 @@
             </div>
         @endforelse
     </div>
-    @section('sold_out_modal')
-    @endsection
+    <div class="modal" tabindex="-1" role="dialog" id="selectB2bModal" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">B2B 업체 선택</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="" class="form-label">B2B 업체 리스트</label>
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <div class="custom-control custom-checkbox">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="sellwing" name="sellwing" value="0"
+                                                    class="custom-control-input" checked>
+                                                <label class="custom-control-label" for="sellwing">셀윙</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @foreach ($b2bs as $b2b)
+                                        <div class="col-6 mb-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" id="b2b{{ $b2b->vendor_id }}" name="b2bs"
+                                                        value="{{ $b2b->vendor_id }}" class="custom-control-input">
+                                                    <label class="custom-control-label"
+                                                        for="b2b{{ $b2b->vendor_id }}">{{ $b2b->name }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="runSoldOutBtn">선택완료</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">종료하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 {{-- 추가 스크립트 섹션 --}}
 @section('scripts')
@@ -41,6 +97,7 @@
         var rememberToken = '{{ Auth::user()->remember_token }}';
 
         function initEditProductName(productCode) {
+            popupLoader(1, '변경된 상품명을 DB에 적용 중입니다.');
             const newProductName = $('#' + productCode).val();
             $.ajax({
                 url: '/api/product/edit-name',
@@ -52,6 +109,7 @@
                     rememberToken
                 },
                 success: function(response) {
+                    closePopup();
                     const status = response.status;
                     let statusStr = 'error';
                     if (status === true) {
@@ -60,12 +118,11 @@
                     swalWithReload(response.return, statusStr);
                 },
                 error: function(response) {
+                    closePopup();
                     console.log(response);
                     swalError('통신 상에 문제가 발생했습니다.');
                 }
             });
         }
     </script>
-@endsection
-@section('sold_out_scripts')
 @endsection

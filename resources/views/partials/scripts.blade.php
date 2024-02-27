@@ -121,4 +121,45 @@
         audioError.play();
         swalError('"API 통신 요청 과정에서 에러가 발생했습니다."');
     }
+
+    function initSoldOut(productCodes) {
+        $('#runSoldOutBtn').off('click').on('click', function() {
+            runSoldOut(productCodes);
+        });
+        $('#selectB2bModal').modal('show');
+    }
+
+    function runSoldOut(productCodes) {
+        closePopup();
+        popupLoader(0, '"선택된 업체들에게 품절 소식을 알리고 올게요."');
+        const b2bs = $('input[name="b2bs"]:checked').map(function() {
+            return $(this).val();
+        }).get();
+        const isSellwingChecked = $('#sellwing').prop('checked');
+        console.log(isSellwingChecked);
+        $.ajax({
+            url: '/api/product/sold-out',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                productCodes,
+                rememberToken,
+                b2bs,
+                isSellwingChecked
+            },
+            success: soldOutSuccess,
+            error: AjaxErrorHandling
+        });
+    }
+
+    function soldOutSuccess(response) {
+        console.log(response); // 응답 로그 출력
+        closePopup(); // 팝업 닫기
+
+        // 응답 상태에 따라 'success' 또는 'error'로 설정
+        const statusType = response.status ? 'success' : 'error';
+
+        // swalWithReload를 호출하여 사용자에게 결과 표시
+        swalWithReload(response.return, statusType);
+    }
 </script>

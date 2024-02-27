@@ -30,6 +30,7 @@ use App\Http\Controllers\Mappingwing\SelectCategoryController;
 use App\Http\Controllers\Minewing\ManufactureController as MinewingManufactureController;
 use App\Http\Controllers\Minewing\SaveController;
 use App\Http\Controllers\Minewing\UniqueProductHrefsController;
+use App\Http\Controllers\Namewing\EditProductNameController;
 use App\Http\Controllers\NewMinewing\MiningController as NewMinewingMiningController;
 use App\Http\Controllers\Orderwing\CollectOrderController;
 use App\Http\Controllers\Product\CategoryMappingController;
@@ -79,6 +80,7 @@ Route::post('/product/category-mapping', [CategoryMappingController::class, 'ind
 Route::post('/product/sold-out', [SoldOutController::class, 'index']);
 Route::post('/product/restock', [RestockController::class, 'index']);
 Route::post('/product/new-minewing', [NewMinewingMiningController::class, 'index']);
+Route::post('/product/edit-name', [EditProductNameController::class, 'index']);
 // account-setting
 Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
 Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);

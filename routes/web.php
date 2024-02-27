@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\NaverShopController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\Admin\CMSController;
+use App\Http\Controllers\BusinessPageController;
 
 use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Domewing\GeneralController;
@@ -83,6 +84,9 @@ Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(fu
     Route::get('/wishlist/search', [WishlistController::class, 'searchWishlist'])->name('search.wishlist');
 });
 
+//Index Page
+Route::get('/', [BusinessPageController::class, 'showBusinessPage'])->name('business_page');
+
 //ving kong
 Route::prefix('domewing')->middleware(['translation'])->group(function () {
     Route::get('/{domain_name}', [GeneralController::class, 'loadDomain']);
@@ -118,9 +122,9 @@ Route::prefix('auth')->group(function () {
 });
 
 //Index for Domewing
-Route::middleware(['category', 'translation'])->group(function () {
-    Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('home');
-});
+// Route::middleware(['category', 'translation'])->group(function () {
+//     Route::get('/', [GeneralController::class, 'loadBusinessPage'])->name('home');
+// });
 
 Route::get('/naver-shop/categories', [NaverShopController::class, 'getCategories']);
 Route::get('/test', [TestController::class, 'handle']);
