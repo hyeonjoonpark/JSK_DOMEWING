@@ -1,0 +1,95 @@
+/* custom style */
+:root {
+    --dark-blue: #0a3a8c;
+    --blue: #0f4eb8;
+    --light-blue: #b6d0fa;
+    --yellow: #ffdc3e;
+    --baby-yellow: #fff3a1;
+    --cream: #fffdf0;
+    --white: #ffffff;
+    /* Add more colors as needed */
+}
+
+html {
+    /* 영문이면 roboto가 적용되고, 한글이면 Noto Sans KR가 적용되도록 아래와 같은 순서로 배치 */
+    font-family: "GmarketSansMedium", "GmarketSansLight", "GmarketSansBold",
+        sans-serif;
+    scroll-behavior: smooth;
+}
+
+section {
+    scroll-margin-top: 100px;
+}
+
+/*폰트 여러개 지정하는 방법*/
+@font-face {
+    font-family: "GmarketSansLight";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansLight.woff")
+        format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "GmarketSansMedium";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff")
+        format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "GmarketSansBold";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff")
+        format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+/*폰트만들기*/
+.font-light {
+    font-family: "GmarketSansLight" !important;
+}
+
+.font-medium {
+    font-family: "GmarketSansMedium" !important;
+}
+
+.font-bold {
+    font-family: "GmarketSansBold" !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: inherit;
+    /* inherit from body */
+    /* or set specific font-family for headings if needed */
+}
+
+button,
+.btn {
+    font-family: inherit;
+}
+
+a:hover h5 {
+    color: var(--light-blue); /* Change to the desired light blue color */
+}
+
+a h5 {
+    color: var(--dark-blue); /* Change to the desired light blue color */
+}
+
+.btn-sellwing {
+    border: 2px solid var(--dark-blue);
+    background-color: var(--light-blue);
+    border-radius: 3px;
+}
+
+.btn-sellwing:hover {
+    border: 2px solid var(--dark-blue);
+    background-color: var(--yellow);
+    border-radius: 3px;
+}
