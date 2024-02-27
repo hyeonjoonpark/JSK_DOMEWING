@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\NaverShopController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\Admin\CMSController;
+use App\Http\Controllers\BusinessPageController;
 
 use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Domewing\GeneralController;
@@ -82,6 +83,8 @@ Route::middleware(['auth.members', 'translation'])->prefix('domewing')->group(fu
     Route::get('wishlist', [WishlistController::class, 'showWishlist'])->name('wishlist');
     Route::get('/wishlist/search', [WishlistController::class, 'searchWishlist'])->name('search.wishlist');
 });
+
+Route::get('/business-page', [BusinessPageController::class, 'showBusinessPage'])->name('business_page');
 
 //ving kong
 Route::prefix('domewing')->middleware(['translation'])->group(function () {
