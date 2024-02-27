@@ -15,6 +15,11 @@ class NamewingController extends Controller
      */
     public function main()
     {
+        $b2bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('pr.is_active', 'Y')
+            ->where('v.is_active', 'ACTIVE')
+            ->get();
         // 중복된 productName을 가진 상품 찾기
         $duplicates = DB::table('minewing_products')
             ->select('productName', DB::raw('COUNT(*) as count'))
@@ -28,7 +33,8 @@ class NamewingController extends Controller
             ->where('productName', $duplicates->productName)
             ->get(['productName', 'productHref', 'productImage', 'productCode']);
         return view('admin/namewing', [
-            'duplicatedProducts' => $products
+            'duplicatedProducts' => $products,
+            'b2bs' => $b2bs
         ]);
     }
 }

@@ -153,13 +153,13 @@
     }
 
     function soldOutSuccess(response) {
-        console.log(response);
-        closePopup();
-        const status = response.status;
-        if (status === true) {
-            swalSuccess(response.return);
-        } else {
-            swalError(response.return);
-        }
+        console.log(response); // 응답 로그 출력
+        closePopup(); // 팝업 닫기
+
+        // 응답 상태에 따라 'success' 또는 'error'로 설정
+        const statusType = response.status ? 'success' : 'error';
+
+        // swalWithReload를 호출하여 사용자에게 결과 표시
+        swalWithReload(response.return, statusType);
     }
 </script>
