@@ -23,7 +23,7 @@ const puppeteer = require('puppeteer');
         console.error(error);
     } finally {
         // 작업이 완료되면 브라우저를 닫습니다.
-        // await browser.close();
+        await browser.close();
     }
 })();
 
