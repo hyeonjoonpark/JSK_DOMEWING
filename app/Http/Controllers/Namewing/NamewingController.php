@@ -31,7 +31,7 @@ class NamewingController extends Controller
         $products = DB::table('minewing_products')
             ->where('isActive', 'Y')
             ->where('productName', $duplicates->productName)
-            ->get(['productName', 'productHref', 'productImage', 'productCode']);
+            ->get(['productName', 'productHref', 'productImage', 'productCode', 'productPrice']);
         return view('admin/namewing', [
             'duplicatedProducts' => $products,
             'b2bs' => $b2bs

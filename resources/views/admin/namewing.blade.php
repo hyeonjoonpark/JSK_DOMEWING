@@ -20,6 +20,15 @@
                             <input type="text" id="{{ $product->productCode }}" class="form-control"
                                 value="{{ $product->productName }}">
                         </div>
+                        <div class="form-group text-start mt-3">
+                            <label class="form-label">상품가</label>
+                            <input type="text" class="form-control" value="{{ number_format($product->productPrice) }}원"
+                                disabled />
+                        </div>
+                        <div class="form-group text-start mt-3">
+                            <label class="form-label">상품 상세 주소</label>
+                            <input type="text" class="form-control" value="{{ $product->productHref }}" disabled />
+                        </div>
                         <button class="btn btn-success"
                             onclick="initEditProductName('{{ $product->productCode }}');">수정완료</button>
                         <button class="btn btn-danger" onclick="initSoldOut(['{{ $product->productCode }}']);">품절처리</button>
