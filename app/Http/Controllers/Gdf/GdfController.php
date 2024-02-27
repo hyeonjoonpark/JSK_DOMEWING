@@ -13,6 +13,7 @@ class GdfController extends Controller
     private $processController;
     private $soldOutController;
     const USER_ID = 15;
+    const VENDOR_IDS = [5, 10];
     public function __construct()
     {
         $this->controller = new Controller();
@@ -29,10 +30,12 @@ class GdfController extends Controller
         }
         $productHrefs = $runGdfScriptResult['return'];
         $productCodes = $this->getProductCodes($productHrefs);
-        $b2bs = $this->controller->getActiveB2Bs();
+        $b2bs = DB::table('vendors')
+            ->whereIn('id', self::VENDOR_IDS)
+            ->get();
         foreach ($productCodes as $productCode) {
             foreach ($b2bs as $b2b) {
-                $b2bId = $b2b->vendor_id;
+                $b2bId = $b2b->id;
                 $vendorEngName = $b2b->name_eng;
                 $account = $this->processController->getAccount(self::USER_ID, $b2bId);
                 $username = $account->username;
