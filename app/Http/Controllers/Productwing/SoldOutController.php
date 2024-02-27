@@ -68,7 +68,7 @@ class SoldOutController extends Controller
      * @param string $rememberToken
      * @return string
      */
-    protected function runSoldOut($productCodes, $b2bIds, $rememberToken)
+    private function runSoldOut($productCodes, $b2bIds, $rememberToken)
     {
         $html = '상품 코드 및 실패한 업체 리스트<br><br><br>';
         foreach ($productCodes as $productCode) {
@@ -84,7 +84,7 @@ class SoldOutController extends Controller
      * @param string $rememberToken
      * @return string
      */
-    protected function loopB2bIds($productCode, $b2bIds, $rememberToken)
+    private function loopB2bIds($productCode, $b2bIds, $rememberToken)
     {
         $errors = '';
         foreach ($b2bIds as $b2bId) {
@@ -118,7 +118,7 @@ class SoldOutController extends Controller
      * @param string $password
      * @return boolean
      */
-    protected function sendSoldOutRequest($productCode, $vendorEngName, $username, $password)
+    private function sendSoldOutRequest($productCode, $vendorEngName, $username, $password)
     {
         $script = public_path('js/sold-out/' . $vendorEngName . '.js');
         $command = 'node ' . $script . ' ' . $username . ' ' . $password . ' ' . $productCode;
@@ -128,7 +128,7 @@ class SoldOutController extends Controller
         }
         return false;
     }
-    protected function validator(Request $request)
+    private function validator(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'productCodes' => 'required|array',
