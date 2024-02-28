@@ -20,7 +20,7 @@ class UniqueProductHrefsController extends Controller
             return $this->errorResponse('수집 및 가공을 진행할 상품들을 선택해주세요.');
         }
 
-        $uniqueProductHrefs = array_unique($productHrefs);
+        $uniqueProductHrefs = array_values(array_unique($productHrefs));
         $existingProductHrefs = $this->getExistingProductHrefs($uniqueProductHrefs);
         $newProductHrefs = array_values(array_diff($uniqueProductHrefs, $existingProductHrefs));
 
