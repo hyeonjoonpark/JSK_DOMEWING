@@ -29,7 +29,9 @@ class GdfController extends Controller
             return $runGdfScriptResult;
         }
         $productHrefs = $runGdfScriptResult['return'];
+        echo count($productHrefs);
         $productCodes = $this->getProductCodes($productHrefs);
+        echo count($productCodes);
         $b2bs = DB::table('vendors')
             ->whereIn('id', self::VENDOR_IDS)
             ->get();
