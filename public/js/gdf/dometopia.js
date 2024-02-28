@@ -8,8 +8,7 @@ const puppeteer = require('puppeteer');
         for (let i = 54; i > 0; i--) {
             const fullUrl = startUrl + i;
             await page.goto(fullUrl, 'domcontentloaded');
-            const tmpProductHrefs = await getProductHrefs(page);
-            productHrefs.push(...tmpProductHrefs);
+            productHrefs.push(...await getProductHrefs(page));
         }
         console.log(JSON.stringify(productHrefs));
     } catch (error) {
@@ -19,5 +18,14 @@ const puppeteer = require('puppeteer');
     }
 })();
 async function getProductHrefs(page) {
-    return page.evaluate(() => Array.from(document.querySelectorAll('td[valign="top"] a'), element => element.href));
+    const productHrefs = await page.evaluate(() => {
+        const productElements = document.querySelectorAll('table.displayTabContentsContainer td[valign="top"]');
+        const productHrefs = [];
+        for (const productElement of productElements) {
+            const productHref = productElement.querySelector('dl > dd.goodsDisplayTitle > div > a').href;
+            productHrefs.push(productHref);
+        }
+        return productHrefs;
+    });
+    return productHrefs;
 }
