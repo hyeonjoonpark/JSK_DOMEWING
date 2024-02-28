@@ -140,7 +140,7 @@ class GdfController extends Controller
         $mergedProductHrefs = array_merge($productHrefs, $tmpProductHrefs);
         $productCodes = DB::table('minewing_products')
             ->whereIn('productHref', $mergedProductHrefs)
-            ->pluck(['productCode'])
+            ->pluck('productCode')
             ->toArray();
         return $productCodes;
     }
