@@ -14,12 +14,12 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error('Error occurred:', error);
     } finally {
-        await browser.close();
+        // await browser.close();
     }
 })();
 async function getProductHrefs(page) {
     const productHrefs = await page.evaluate(() => {
-        const productElements = document.querySelectorAll('table.displayTabContentsContainer td[valign="top"]');
+        const productElements = document.querySelectorAll('dl.goodsDisplayItemWrap');
         const productHrefs = [];
         for (const productElement of productElements) {
             const productHref = productElement.querySelector('dl > dd.goodsDisplayTitle > div > a').href;
