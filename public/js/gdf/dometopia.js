@@ -14,7 +14,7 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error('Error occurred:', error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 async function getProductHrefs(page) {
