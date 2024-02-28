@@ -61,8 +61,8 @@ class FormProductController extends Controller
                     '선결제:기본배송비',
                     $shippingCost,
                     'Y',
-                    '',
-                    '',
+                    'A1705389919',
+                    'A1705389919',
                     $shippingCost,
                     'Y',
                 ];

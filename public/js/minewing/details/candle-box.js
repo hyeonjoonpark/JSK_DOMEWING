@@ -5,8 +5,11 @@ const fs = require('fs');
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        const [username, password] = args;
-        const urls = ['https://candle-box.com/product/%EC%9B%90%ED%98%95%EC%96%91%EB%A9%B4-%ED%85%8C%EC%9D%B4%ED%94%84/1983/category/49/display/1/'];
+        // const [tempFilePath, username, password] = args;
+        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const username = 'jskorea2022';
+        const password = 'Tjddlf88!@#';
+        const urls = ['https://candle-box.com/product/%EC%9A%B0%EB%93%9C%EA%BD%83%EC%8A%A4%ED%8B%B1/3019/category/49/display/1/'];
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -49,311 +52,102 @@ async function signIn(page, username, password) {
     await page.waitForNavigation();
 }
 
-// async function checkedOption(page, productHref, scrapeProductOptions) {
-//     const productOptions = await page.evaluate((productHref, scrapeProductOptions) => {
-//         // const page = window.page;
-//         const page = window.page;
-//         const optionElement = document.querySelector('#product_option_id1');
-//         let hasOption = false;
-//         let options = [];
 
-//         if (optionElement) {
-//             hasOption = true;
-//         }
-
-//         if (hasOption) {
-//             options.push(scrapeProductOptions(page, productHref));
-//         }
-
-//         return { hasOption, options, scrapeProductOptions };
-//     }, productHref);
-
-//     return productOptions;
-// }
-// async function checkedOption(page, productHref) {
-//     const productOptions = await page.evaluate(async (productHref) => {
-//         const optionElement = document.querySelector('#product_option_id1');
-//         let hasOption = false;
-//         let options = [];
-
-//         if (optionElement) {
-//             hasOption = true;
-//         }
-
-//         if (hasOption) {
-//             // options.push(await scrapeProductOptions(page, productHref));
-//             const allSelectElements = page.$$('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > table > tbody:nth-child(2)');
-//             let productOptions = [];
-//             if (allSelectElements.length > 0) {// 옵션이 있다.
-//                 if (allSelectElements.length == 1) {//옵션이 1개
-//                     const optionElements = document.querySelectorAll('#product_option_id1 > optgroup option');
-
-//                     for (let i = 0; i < optionElements.length; i++) {
-//                         const optionElement = optionElements[i];
-//                         const optionText = optionElement.textContent.trim();
-//                         let optionName, optionPrice;
-
-//                         if (optionText.includes('원')) {
-//                             const optionFull = optionText.split(' (');
-//                             optionName = optionFull[0].trim();
-//                             optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
-//                             optionPrice = parseInt(optionPrice, 10);
-//                         } else {
-//                             optionName = optionText.trim();
-//                             optionPrice = 0;
-//                         }
-//                         productOptions.push({ optionName, optionPrice });
-//                         //console.log({ optionName, optionPrice }); //옵션이 1개일때 잘 가져옴
-
-//                     }
-//                 }
-
-//                 if (allSelectElements.length == 2) {//옵션이 2개
-//                     const selectEle = allSelectElements[0].$('tr > td > select');//첫번째 옵션을 고른다.
-//                     const options = selectEle.$$('option');//첫번째 옵션들을 가져온다.
-//                     for (let i = 2; i < options.length; i++) {//첫번째 옵션의 반복문을 돌린다.
-//                         const option = options[i];//첫번째 옵션의 i번째 옵션을 option으로 정의하고
-//                         selectEle.select(option);// 첫번째 옵션의 i번째 옵션 중 첫번째를 선택한다.
-//                         const optionElement = document.querySelector('#product_option_id1 > option')[i].textContent.trim();//첫번째 옵션의 이름을 정의하고
-//                         const secOptions = document.querySelectorAll('#product_option_id2 option');//두번째 옵션들을 가져온다.
-//                         for (let j = 2; j < secOptions.length; j++) {//선택했을때 가져오는 2번째 옵션의 length만큼 반복문을 할거다
-//                             const optionElement2 = document.querySelectorAll('#product_option_id2 > option')[j].textContent;
-//                             const optionText = optionElement + ' ' + optionElement2; //첫번째 옵션과 두번째 옵션의 이름을 합친다.
-
-//                             let optionName, optionPrice;
-
-//                             if (optionText.includes('원')) {
-//                                 const optionFull = optionText.split(' (');
-//                                 optionName = optionFull[0].trim();
-//                                 optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
-//                                 optionPrice = parseInt(optionPrice, 10);
-//                             } else {
-//                                 optionName = optionText.trim();
-//                                 optionPrice = 0;
-//                             }
-//                             productOptions.push({ optionName, optionPrice });
-//                             // console.log({ optionName, optionPrice });
-//                         }
-//                     }
-
-//                 }
-//             }
-//         }
-
-//         return { hasOption, options };
-//     }, productHref);
-
-async function checkedOption(page, productHref) {
-    const productOption = await page.evaluate((productHref) => {
-        const optionElement = document.querySelector('#product_option_id1');
+async function checkedOption(page) {
+    const hasOption = await page.evaluate(() => {
+        const optionElement = document.querySelector('select.ProductOption0');
         let hasOption = false;
-        let options = [];
-
         if (optionElement) {
             hasOption = true;
         }
-
-        if (hasOption) {
-            // options.push(await scrapeProductOptions(page, productHref));
-            const allSelectElements = page.$$('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > table > tbody:nth-child(2)');
-            let productOptions = [];
-            if (allSelectElements.length > 0) {// 옵션이 있다.
-                if (allSelectElements.length == 1) {//옵션이 1개
-                    const optionElements = document.querySelectorAll('#product_option_id1 > optgroup option');
-
-                    for (let i = 0; i < optionElements.length; i++) {
-                        const optionElement = optionElements[i];
-                        const optionText = optionElement.textContent.trim();
-                        let optionName, optionPrice;
-
-                        if (optionText.includes('원')) {
-                            const optionFull = optionText.split(' (');
-                            optionName = optionFull[0].trim();
-                            optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
-                            optionPrice = parseInt(optionPrice, 10);
-                        } else {
-                            optionName = optionText.trim();
-                            optionPrice = 0;
-                        }
-                        productOptions.push({ optionName, optionPrice });
-                        //console.log({ optionName, optionPrice }); //옵션이 1개일때 잘 가져옴
-
-                    }
-                }
-
-                if (allSelectElements.length == 2) {//옵션이 2개
-                    const selectEle = allSelectElements[0].$('tr > td > select');//첫번째 옵션을 고른다.
-                    const options2 = selectEle.$$('option');//첫번째 옵션들을 가져온다.
-                    for (let i = 2; i < options2.length; i++) {//첫번째 옵션의 반복문을 돌린다.
-                        const option = options2[i];//첫번째 옵션의 i번째 옵션을 option으로 정의하고
-                        selectEle.select(option);// 첫번째 옵션의 i번째 옵션 중 첫번째를 선택한다.
-                        const optionElement = document.querySelector('#product_option_id1 > option')[i].textContent.trim();//첫번째 옵션의 이름을 정의하고
-                        const secOptions = document.querySelectorAll('#product_option_id2 option');//두번째 옵션들을 가져온다.
-                        for (let j = 2; j < secOptions.length; j++) {//선택했을때 가져오는 2번째 옵션의 length만큼 반복문을 할거다
-                            const optionElement2 = document.querySelectorAll('#product_option_id2 > option')[j].textContent;
-                            const optionText = optionElement + ' ' + optionElement2; //첫번째 옵션과 두번째 옵션의 이름을 합친다.
-
-                            let optionName, optionPrice;
-
-                            if (optionText.includes('원')) {
-                                const optionFull = optionText.split(' (');
-                                optionName = optionFull[0].trim();
-                                optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
-                                optionPrice = parseInt(optionPrice, 10);
-                            } else {
-                                optionName = optionText.trim();
-                                optionPrice = 0;
-                            }
-                            productOptions.push({ optionName, optionPrice });
-                            // console.log({ optionName, optionPrice });
-                        }
-                    }
-
-                }
-            }
-        }
-
-        return { hasOption, productOptions }; // 변경된 변수명을 리턴
-    }, productHref);
-
-    return productOption;
+        return hasOption;
+    });
+    let options = [];
+    if (hasOption === true) {
+        options = await scrapeProductOptions(page);
+    }
+    const optionSet = { hasOption, options };
+    return optionSet;
 }
 
-// function scrapeProductOptions(page, productHref) {
-//     const allSelectElements = page.$$('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > table > tbody:nth-child(2)');
-//     let productOptions = [];
-//     if (allSelectElements.length > 0) {// 옵션이 있다.
-//         if (allSelectElements.length == 1) {//옵션이 1개
-//             const optionElements = document.querySelectorAll('#product_option_id1 > optgroup option');
 
-//             for (let i = 0; i < optionElements.length; i++) {
-//                 const optionElement = optionElements[i];
-//                 const optionText = optionElement.textContent.trim();
-//                 let optionName, optionPrice;
+async function scrapeProductOptions(page) {
+    const allSelectElements = await page.$$('select.ProductOption0');
 
-//                 if (optionText.includes('원')) {
-//                     const optionFull = optionText.split(' (');
-//                     optionName = optionFull[0].trim();
-//                     optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
-//                     optionPrice = parseInt(optionPrice, 10);
-//                 } else {
-//                     optionName = optionText.trim();
-//                     optionPrice = 0;
-//                 }
-//                 productOptions.push({ optionName, optionPrice });
-//                 //console.log({ optionName, optionPrice }); //옵션이 1개일때 잘 가져옴
+    let productOptions = [];
+    if (allSelectElements.length > 0) {// 옵션이 있다.
+        if (allSelectElements.length == 1) {//옵션이 1개
+            productOptions = await page.evaluate(() => {
+                const optionElements = document.querySelectorAll('#product_option_id1 option');
+                const productOptions = [];
+                for (let i = 2; i < optionElements.length; i++) {
+                    const optionElement = optionElements[i];
+                    const optionText = optionElement.textContent.trim();
+                    let optionName, optionPrice;
 
-//             }
-//         }
+                    if (optionText.includes('원')) {
+                        const optionFull = optionText.split(' (');
+                        optionName = optionFull[0].trim();
+                        optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
+                        optionPrice = parseInt(optionPrice, 10);
+                    } else {
+                        optionName = optionText.trim();
+                        optionPrice = 0;
+                    }
+                    productOptions.push({ optionName, optionPrice });
+                }
+                return productOptions;
+            });
+        }
 
-//         if (allSelectElements.length == 2) {//옵션이 2개
-//             const selectEle = allSelectElements[0].$('tr > td > select');//첫번째 옵션을 고른다.
-//             const options = selectEle.$$('option');//첫번째 옵션들을 가져온다.
-//             for (let i = 2; i < options.length; i++) {//첫번째 옵션의 반복문을 돌린다.
-//                 const option = options[i];//첫번째 옵션의 i번째 옵션을 option으로 정의하고
-//                 selectEle.select(option);// 첫번째 옵션의 i번째 옵션 중 첫번째를 선택한다.
-//                 const optionElement = document.querySelector('#product_option_id1 > option')[i].textContent.trim();//첫번째 옵션의 이름을 정의하고
-//                 const secOptions = document.querySelectorAll('#product_option_id2 option');//두번째 옵션들을 가져온다.
-//                 for (let j = 2; j < secOptions.length; j++) {//선택했을때 가져오는 2번째 옵션의 length만큼 반복문을 할거다
-//                     const optionElement2 = document.querySelectorAll('#product_option_id2 > option')[j].textContent;
-//                     const optionText = optionElement + ' ' + optionElement2; //첫번째 옵션과 두번째 옵션의 이름을 합친다.
+        if (allSelectElements.length == 2) {//옵션이 2개
+            const allSelectElements = await page.$$('select');
+            if (allSelectElements.length > 0) {
+                const firstOptionValues = await page.evaluate(() => {
+                    const firstOptionElements = document.querySelectorAll('#product_option_id1 option');
+                    const firstOptionValues = [];
+                    for (let i = 2; i < firstOptionElements.length; i++) {
+                        const optionValue = firstOptionElements[i].value;
+                        firstOptionValues.push(optionValue);
+                    }
+                    return firstOptionValues;
+                });
 
-//                     let optionName, optionPrice;
-
-//                     if (optionText.includes('원')) {
-//                         const optionFull = optionText.split(' (');
-//                         optionName = optionFull[0].trim();
-//                         optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
-//                         optionPrice = parseInt(optionPrice, 10);
-//                     } else {
-//                         optionName = optionText.trim();
-//                         optionPrice = 0;
-//                     }
-//                     productOptions.push({ optionName, optionPrice });
-//                     // console.log({ optionName, optionPrice });
-//                 }
-//             }
-
-//         }
-//     }
-//     return productOptions;
-// }
-
-//     return productOptions;
-// }
-
-
-
-// async function scrapeProductOptions(page, productHref) {
-//     const allSelectElements = await page.$$('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > table > tbody:nth-child(2)');
-//     let productOptions = [];
-//     if (allSelectElements.length > 0) {// 옵션이 있다.
-//         if (allSelectElements.length == 1) {//옵션이 1개
-//             const optionElements = document.querySelectorAll('#product_option_id1 > optgroup option');
-
-//             for (let i = 0; i < optionElements.length; i++) {
-//                 const optionElement = optionElements[i];
-//                 const optionText = optionElement.textContent.trim();
-//                 let optionName, optionPrice;
-
-//                 if (optionText.includes('원')) {
-//                     const optionFull = optionText.split(' (');
-//                     optionName = optionFull[0].trim();
-//                     optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
-//                     optionPrice = parseInt(optionPrice, 10);
-//                 } else {
-//                     optionName = optionText.trim();
-//                     optionPrice = 0;
-//                 }
-//                 productOptions.push({ optionName, optionPrice });
-//                 //console.log({ optionName, optionPrice }); //옵션이 1개일때 잘 가져옴
-
-//             }
-//         }
-
-//         if (allSelectElements.length == 2) {//옵션이 2개
-//             const selectEle = allSelectElements[0].$('tr > td > select');//첫번째 옵션을 고른다.
-//             const options = selectEle.$$('option');//첫번째 옵션들을 가져온다.
-//             for (let i = 2; i < options.length; i++) {//첫번째 옵션의 반복문을 돌린다.
-//                 const option = options[i];//첫번째 옵션의 i번째 옵션을 option으로 정의하고
-//                 selectEle.select(option);// 첫번째 옵션의 i번째 옵션 중 첫번째를 선택한다.
-//                 const optionElement = document.querySelector('#product_option_id1 > option')[i].textContent.trim();//첫번째 옵션의 이름을 정의하고
-//                 const secOptions = document.querySelectorAll('#product_option_id2 option');//두번째 옵션들을 가져온다.
-//                 for (let j = 2; j < secOptions.length; j++) {//선택했을때 가져오는 2번째 옵션의 length만큼 반복문을 할거다
-//                     const optionElement2 = document.querySelectorAll('#product_option_id2 > option')[j].textContent;
-//                     const optionText = optionElement + ' ' + optionElement2; //첫번째 옵션과 두번째 옵션의 이름을 합친다.
-
-//                     let optionName, optionPrice;
-
-//                     if (optionText.includes('원')) {
-//                         const optionFull = optionText.split(' (');
-//                         optionName = optionFull[0].trim();
-//                         optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
-//                         optionPrice = parseInt(optionPrice, 10);
-//                     } else {
-//                         optionName = optionText.trim();
-//                         optionPrice = 0;
-//                     }
-//                     productOptions.push({ optionName, optionPrice });
-//                     // console.log({ optionName, optionPrice });
-//                 }
-//             }
-
-//         }
-//     }
-//     return productOptions;
-// }
+                let productOptions = [];
+                for (let i = 0; i < firstOptionValues.length; i++) {
+                    const optionValue = firstOptionValues[i];
+                    await page.select('select#product_option_id1', optionValue);
+                    const tmpProductOptions = await page.evaluate(() => {
+                        const firstOptionName = document.querySelector('#product_option_id1').selectedOptions[0].textContent.trim();
+                        const secondOptionElements = document.querySelectorAll('#product_option_id2 option');
+                        const options = Array.from(secondOptionElements).slice(2).map(option => {
+                            const text = option.textContent.trim();
+                            let price = 0;
+                            if (text.includes('원')) {
+                                const [name, priceText] = text.split(' (');
+                                price = parseInt(priceText.replace(/[^\d-+]/g, ''), 10);
+                                return { optionName: firstOptionName + ' ' + name.trim(), optionPrice: price };
+                            }
+                            return { optionName: firstOptionName + ' ' + text, optionPrice: price };
+                        });
+                        return options;
+                    });
+                    productOptions.push(tmpProductOptions);
+                }
+                return productOptions;
+            }
+            return [];
+        }
+    }
+    return productOptions;
+}
 async function scrapeProduct(page, productHref, options) {//여기에 옵션을 넣어주고 있으면 넣어주고 없으면 안넣으면 되겠네?
     const product = await page.evaluate((productHref, options) => {
         const rawName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h2').textContent;
         const productName = removeSoldOutMessage(rawName);
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
         const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').getAttribute('src');
-        const images = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-additional img');
-        const additionalProducts = document.querySelector("#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > div.xans-element-.xans-product.xans-product-addproduct.productSet.additional > div > h3");
-        if (additionalProducts) {
-            return false;
-        }
+        const images = document.querySelectorAll('#prdDetail > div img');
         if (images.length < 1) {
             return false;
         }
@@ -362,7 +156,7 @@ async function scrapeProduct(page, productHref, options) {//여기에 옵션을 
             return src;
         });
         const hasOption = options.hasOption;
-        const productOptions = options.productOptions;
+        const productOptions = options.options;
         return {
             productName: productName,
             productPrice: productPrice,

@@ -5,14 +5,23 @@
 {{-- 서브타이틀 섹션 --}}
 @section('subtitle')
     <p>중복된 상품명들을 관리합니다. 엑셀윙 추출을 위해서는 반드시 네임윙이 선행되어야 합니다.</p>
+    <p>총 <b>{{ $totalDuplicateGroups }}</b>건의 중복 상품들이 존재합니다.</p>
 @endsection
 {{-- 메인 콘텐츠 섹션 --}}
 @section('content')
+    <div class="row g-gs mb-3">
+        <div class="col text-center">
+            <button class="btn btn-danger" onclick="multiSoldOut">일괄품절</button>
+        </div>
+    </div>
     <div class="row g-gs">
         @forelse ($duplicatedProducts as $product)
             <div class="col-12 col-lg-6">
                 <div class="card card-bordered preview">
                     <div class="card-inner text-center">
+                        <div class="text-start">
+                            <input type="checkbox" value="soldOut{{ $product->productCode }}" name="productCodes">
+                        </div>
                         <img src="{{ $product->productImage }}" class="img-fluid col-12 col-lg-6 mx-auto d-block"><br>
                         <a class="btn btn-primary mt-2" href="{{ $product->productHref }}" target="_blank">상세보기</a>
                         <div class="form-group text-start mt-3">
@@ -31,7 +40,8 @@
                         </div>
                         <button class="btn btn-success"
                             onclick="initEditProductName('{{ $product->productCode }}');">수정완료</button>
-                        <button class="btn btn-danger" onclick="initSoldOut(['{{ $product->productCode }}']);">품절처리</button>
+                        <button class="btn btn-danger"
+                            onclick="initSoldOut(['{{ $product->productCode }}']);">품절처리</button>
                     </div>
                 </div>
             </div>
@@ -123,6 +133,13 @@
                     swalError('통신 상에 문제가 발생했습니다.');
                 }
             });
+        }
+
+        function multiSoldOut() {
+            const productCodes = $('input[name="productCodes"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            initSoldOut(productCodes);
         }
     </script>
 @endsection
