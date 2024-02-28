@@ -29,8 +29,9 @@ class GdfController extends Controller
             return $runGdfScriptResult;
         }
         $productHrefs = $runGdfScriptResult['return'];
+        echo count($productHrefs);
         $productCodes = $this->getProductCodes($productHrefs);
-        echo $productCodes;
+        echo count($productCodes);
         $b2bs = DB::table('vendors')
             ->whereIn('id', self::VENDOR_IDS)
             ->get();
@@ -68,10 +69,11 @@ class GdfController extends Controller
         $command = 'node ' . $script;
         exec($command, $output, $resultCode);
         if ($resultCode === 0 && isset($output[0])) {
+            // Node.js 스크립트의 출력을 JSON 문자열로부터 PHP 배열로 변환
             $productHrefs = json_decode($output[0], true);
             return [
                 'status' => true,
-                'return' => $productHrefs
+                'return' => $productHrefs // 이제 배열로 반환됩니다.
             ];
         } else {
             return [
@@ -138,7 +140,8 @@ class GdfController extends Controller
         $mergedProductHrefs = array_merge($productHrefs, $tmpProductHrefs);
         $productCodes = DB::table('minewing_products')
             ->whereIn('productHref', $mergedProductHrefs)
-            ->get(['productCode']);
+            ->pluck(['productCode'])
+            ->toArray();
         return $productCodes;
     }
 }

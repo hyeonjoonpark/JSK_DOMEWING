@@ -14,15 +14,15 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error('Error occurred:', error);
     } finally {
-        await browser.close();
+        // await browser.close();
     }
 })();
 async function getProductHrefs(page) {
     const productHrefs = await page.evaluate(() => {
-        const productElements = document.querySelectorAll('td[valign="top"][width="216px"][style="position: relative;"]');
+        const productElements = document.querySelectorAll('dl.goodsDisplayItemWrap');
         const productHrefs = [];
         for (const productElement of productElements) {
-            const productHref = productElement.querySelector('dl > dd.goodsDisplayTitle > div > a').textContent.trim();
+            const productHref = productElement.querySelector('dl > dd.goodsDisplayTitle > div > a').href;
             productHrefs.push(productHref);
         }
         return productHrefs;
