@@ -30,6 +30,7 @@ const fs = require('fs');
         console.error('Error occurred:', error);
     } finally {
         await browser.close();
+
     }
 })();
 async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
@@ -135,9 +136,7 @@ async function scrapeProductOptions(page) {
                     });
                     productOptions.push(tmpProductOptions);
                 }
-                return productOptions;
             }
-            return [];
         }
     }
     return productOptions;
@@ -149,8 +148,8 @@ async function scrapeProduct(page, productHref, options) {//여기에 옵션을 
         const productName = removeSoldOutMessage(rawName);
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
 
-        const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').src;
-        const baseUrl = window.location.origin;
+
+        const baseUrl = 'https://candle-box.com/';
         const toAbsoluteUrl = (src, baseUrl) => {
             if (src.startsWith('http://') || src.startsWith('https://')) {
                 return src;
@@ -158,12 +157,9 @@ async function scrapeProduct(page, productHref, options) {//여기에 옵션을 
                 return new URL(src, baseUrl).href;
             }
         };
-        const images = document.querySelectorAll('#prdDetail > div.cont > p img');
-        if (images.length < 1) {
-            return false;
-        }
-
-        const productDetail = Array.from(images, img => toAbsoluteUrl(img.src, baseUrl));
+        const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').src;
+        const productDetailImages = document.querySelectorAll('#prdDetail > div.cont img');
+        const productDetail = Array.from(productDetailImages, img => toAbsoluteUrl(img.src, baseUrl));
 
 
         const hasOption = options.hasOption;
