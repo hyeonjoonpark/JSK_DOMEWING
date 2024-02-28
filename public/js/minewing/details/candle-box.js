@@ -9,7 +9,7 @@ const fs = require('fs');
         // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         const username = 'jskorea2022';
         const password = 'Tjddlf88!@#';
-        const urls = ['https://candle-box.com/product/11-%EB%84%93%EC%9D%80%EC%9E%85%EA%B5%AC%EC%8B%9C%EC%95%BD%EB%B3%91-125ml-250ml-%ED%88%AC%EB%AA%85%EA%B7%B8%EB%A6%B0%EB%B8%94%EB%A3%A8%EA%B0%88%EC%83%89-%ED%92%88%EC%A0%88%EC%8B%9C-%EB%8B%A8%EC%A2%85/1681/category/49/display/1/'];
+        const urls = ['https://candle-box.com/product/%EC%9A%B0%EB%93%9C%EA%BD%83%EC%8A%A4%ED%8B%B1/3019/category/49/display/1/'];
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -28,7 +28,7 @@ const fs = require('fs');
     } catch (error) {
         console.error('Error occurred:', error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
