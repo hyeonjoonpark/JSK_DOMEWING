@@ -30,6 +30,19 @@ class GdfController extends Controller
         }
         $productHrefs = $runGdfScriptResult['return'];
         $productCodes = $this->getProductCodes($productHrefs);
+        $b2bs = DB::table('vendors')
+            ->whereIn('id', self::VENDOR_IDS)
+            ->get();
+        foreach ($productCodes as $productCode) {
+            foreach ($b2bs as $b2b) {
+                $b2bId = $b2b->id;
+                $vendorEngName = $b2b->name_eng;
+                $account = $this->processController->getAccount(self::USER_ID, $b2bId);
+                $username = $account->username;
+                $password = $account->password;
+                $this->soldOutController->sendSoldOutRequest($productCode, $vendorEngName, $username, $password);
+            }
+        }
         return $this->inactiveProducts($productCodes);
     }
     private function inactiveProducts($productCodes)
@@ -124,7 +137,7 @@ class GdfController extends Controller
         $mergedProductHrefs = array_merge($productHrefs, $tmpProductHrefs);
         $productCodes = DB::table('minewing_products')
             ->whereIn('productHref', $mergedProductHrefs)
-            ->get(['productCode'])
+            ->pluck(['productCode'])
             ->toArray();
         return $productCodes;
     }
