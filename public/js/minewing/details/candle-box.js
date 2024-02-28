@@ -49,6 +49,7 @@ async function signIn(page, username, password) {
     await page.waitForNavigation();
 }
 
+
 async function checkedOption(page, productHref) {
     const productOption = await page.evaluate(async (productHref) => {
         const optionElement = document.querySelector('#product_option_id1');
@@ -76,9 +77,9 @@ function scrapeProductOptions(page, productHref) {
     let productOptions = [];
     if (allSelectElements.length > 0) {// 옵션이 있다.
         if (allSelectElements.length == 1) {//옵션이 1개
-            const optionElements = document.querySelectorAll('#product_option_id1 > optgroup option');
+            const optionElements = document.querySelectorAll('#product_option_id1 option');
 
-            for (let i = 0; i < optionElements.length; i++) {
+            for (let i = 2; i < optionElements.length; i++) {
                 const optionElement = optionElements[i];
                 const optionText = optionElement.textContent.trim();
                 let optionName, optionPrice;
@@ -92,8 +93,8 @@ function scrapeProductOptions(page, productHref) {
                     optionName = optionText.trim();
                     optionPrice = 0;
                 }
-                productOptions.push({ optionName, optionPrice });
-                //console.log({ optionName, optionPrice }); //옵션이 1개일때 잘 가져옴
+                // productOptions.push({ optionName, optionPrice });
+                console.log({ optionName, optionPrice }); //옵션이 1개일때 잘 가져옴
 
             }
         }
@@ -121,8 +122,8 @@ function scrapeProductOptions(page, productHref) {
                         optionName = optionText.trim();
                         optionPrice = 0;
                     }
-                    productOptions.push({ optionName, optionPrice });
-                    // console.log({ optionName, optionPrice });
+                    // productOptions.push({ optionName, optionPrice });
+                    console.log({ optionName, optionPrice });
                 }
             }
 
@@ -136,7 +137,7 @@ async function scrapeProduct(page, productHref, options) {//여기에 옵션을 
         const productName = removeSoldOutMessage(rawName);
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
         const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').getAttribute('src');
-        const images = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-additional img');
+        const images = document.querySelectorAll('div.cont img');
         const additionalProducts = document.querySelector("#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > div.xans-element-.xans-product.xans-product-addproduct.productSet.additional > div > h3");
         if (additionalProducts) {
             return false;
