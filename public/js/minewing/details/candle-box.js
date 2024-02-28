@@ -9,8 +9,9 @@ const fs = require('fs');
         // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         const username = 'jskorea2022';
         const password = 'Tjddlf88!@#';
-        const urls = ['https://candle-box.com/product/%EC%9A%B0%EB%93%9C%EA%BD%83%EC%8A%A4%ED%8B%B1/3019/category/49/display/1/'];
+        const urls = ['https://candle-box.com/product/%ED%94%84%EB%9E%98%EA%B7%B8%EB%9F%B0%EC%8A%A4%EC%98%A4%EC%9D%BC-%EB%94%A5%EB%94%94-%ED%83%90%EB%8B%A4%EC%98%A4-%EB%B8%8C%EB%9E%9C%EB%93%9C-%ED%83%80%EC%9E%85/4556/category/42/display/1/'];
         await signIn(page, username, password);
+
         const products = [];
         for (const url of urls) {
             const navigateWithRetryResult = await navigateWithRetry(page, url);
@@ -29,6 +30,7 @@ const fs = require('fs');
         console.error('Error occurred:', error);
     } finally {
         await browser.close();
+
     }
 })();
 async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
@@ -134,27 +136,32 @@ async function scrapeProductOptions(page) {
                     });
                     productOptions.push(tmpProductOptions);
                 }
-                return productOptions;
             }
-            return [];
         }
     }
     return productOptions;
 }
 async function scrapeProduct(page, productHref, options) {//여기에 옵션을 넣어주고 있으면 넣어주고 없으면 안넣으면 되겠네?
     const product = await page.evaluate((productHref, options) => {
+
         const rawName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h2').textContent;
         const productName = removeSoldOutMessage(rawName);
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
-        const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').getAttribute('src');
-        const images = document.querySelectorAll('#prdDetail > div img');
-        if (images.length < 1) {
-            return false;
-        }
-        const productDetail = Array.from(images, img => {
-            let src = img.getAttribute('src');
-            return src;
-        });
+
+
+        const baseUrl = 'https://candle-box.com/';
+        const toAbsoluteUrl = (src, baseUrl) => {
+            if (src.startsWith('http://') || src.startsWith('https://')) {
+                return src;
+            } else {
+                return new URL(src, baseUrl).href;
+            }
+        };
+        const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').src;
+        const productDetailImages = document.querySelectorAll('#prdDetail > div.cont img');
+        const productDetail = Array.from(productDetailImages, img => toAbsoluteUrl(img.src, baseUrl));
+
+
         const hasOption = options.hasOption;
         const productOptions = options.options;
         return {
