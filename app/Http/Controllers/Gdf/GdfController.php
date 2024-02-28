@@ -35,6 +35,7 @@ class GdfController extends Controller
             ->whereIn('id', self::VENDOR_IDS)
             ->get();
         foreach ($productCodes as $productCode) {
+            $productCode = $productCode->productCode;
             foreach ($b2bs as $b2b) {
                 $b2bId = $b2b->id;
                 $vendorEngName = $b2b->name_eng;
