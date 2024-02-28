@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer');
     try {
         const startUrl = 'https://dometopia.com/goods/search?search_text=GDF&page=';
         const productHrefs = [];
-        for (let i = 2; i > 0; i--) {
+        for (let i = 54; i > 0; i--) {
             const fullUrl = startUrl + i;
             await page.goto(fullUrl, 'domcontentloaded');
             const tmpProductHrefs = await getProductHrefs(page);
