@@ -138,10 +138,17 @@ class GdfController extends Controller
             "https://dometopia.com/goods/view?no=185704&code=004200130013",
         ];
         $mergedProductHrefs = array_merge($productHrefs, $tmpProductHrefs);
-        $productCodes = DB::table('minewing_products')
-            ->whereIn('productHref', $mergedProductHrefs)
-            ->pluck(['productCode'])
-            ->toArray();
-        return $productCodes;
+        $productCodes = [];
+
+        foreach ($mergedProductHrefs as $productHref) {
+            $codes = DB::table('minewing_products')
+                ->where('productHref', 'like', '%' . $productHref . '%')
+                ->pluck('productCode')
+                ->toArray();
+            $productCodes = array_merge($productCodes, $codes);
+        }
+
+        $productCodes = array_unique($productCodes); // Remove duplicates.
+        return array_values($productCodes); // Re-index the array.
     }
 }

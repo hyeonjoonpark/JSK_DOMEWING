@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer');
     try {
         const startUrl = 'https://dometopia.com/goods/search?search_text=GDF&page=';
         const productHrefs = [];
-        for (let i = 54; i > 0; i--) {
+        for (let i = 1; i > 0; i--) {
             const fullUrl = startUrl + i;
             await page.goto(fullUrl, 'domcontentloaded');
             productHrefs.push(...await getProductHrefs(page));
@@ -22,8 +22,11 @@ async function getProductHrefs(page) {
         const productElements = document.querySelectorAll('dl.goodsDisplayItemWrap');
         const productHrefs = [];
         for (const productElement of productElements) {
-            const productHref = productElement.querySelector('dl > dd.goodsDisplayTitle > div > a').href;
-            productHrefs.push(productHref);
+            const goodsCode = productElement.querySelector('dd.goodsDisplayCode > table > tbody > tr:nth-child(2) > td > label > span').textContent.trim();
+            if (goodsCode.includes('GDF')) {
+                const productHref = productElement.querySelector('dl > dd.goodsDisplayTitle > div > a').href;
+                productHrefs.push(productHref);
+            }
         }
         return productHrefs;
     });
