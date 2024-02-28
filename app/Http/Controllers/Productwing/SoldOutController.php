@@ -118,7 +118,7 @@ class SoldOutController extends Controller
      * @param string $password
      * @return boolean
      */
-    private function sendSoldOutRequest($productCode, $vendorEngName, $username, $password)
+    public function sendSoldOutRequest($productCode, $vendorEngName, $username, $password)
     {
         $script = public_path('js/sold-out/' . $vendorEngName . '.js');
         $command = 'node ' . $script . ' ' . $username . ' ' . $password . ' ' . $productCode;

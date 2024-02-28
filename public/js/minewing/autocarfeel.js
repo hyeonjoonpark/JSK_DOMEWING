@@ -23,7 +23,7 @@ const puppeteer = require('puppeteer');
         console.error(error);
     } finally {
         // 작업이 완료되면 브라우저를 닫습니다.
-        await browser.close();
+        // await browser.close();
     }
 })();
 
@@ -77,18 +77,30 @@ async function scrapeProducts(page) {
 
         // 상품이 품절 상태인지 확인하는 함수입니다.
         function hasStockMethod(productElement) {
-            return !productElement.textContent.includes('품절상품입니다.');
+            const productText = productElement.textContent;
+            let result = true;
+            if (productText.includes('품절상품입니다.')) {
+                result = false;
+            }
+            return result;
         }
 
         const productElements = document.querySelectorAll('td[align="center"][valign="top"][width="25%"]');
         const products = [];
-        productElements.forEach(productElement => {
-            if (hasStockMethod(productElement)) {
+        let index = 0;
+        for (const productElement of productElements) {
+            const hasStockMethodResult = hasStockMethod(productElement);
+            if (hasStockMethodResult === false) {
+                return products;
+            }
+            try {
                 const productInfo = processProduct(productElement);
                 products.push(productInfo);
+                index++;
+            } catch (error) {
+                continue;
             }
-        });
-
+        }
         return products;
     });
 
