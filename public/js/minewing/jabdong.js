@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -17,7 +17,7 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error(error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 
@@ -37,8 +37,8 @@ async function getNumPage(page, listUrl) {
         const numProducts = parseInt(numProductsText.replace(/[^\d]/g, ''));
         return numProducts;
     });
-    const numPerPage = 20;
-    const numPage = Math.ceil(numProducts / numPerPage);
+    const countProductInPage = 20;
+    const numPage = Math.ceil(numProducts / countProductInPage);
     return numPage;
 }
 async function moveToPage(page, listUrl, curPage) {
