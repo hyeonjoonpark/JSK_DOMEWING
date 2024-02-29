@@ -37,8 +37,8 @@ async function getNumPage(page, listUrl) {
         const numProducts = parseInt(numProductsText.replace(/[^\d]/g, ''));
         return numProducts;
     });
-    const numPerPage = 20;
-    const numPage = Math.ceil(numProducts / numPerPage);
+    const countProductInPage = 20;
+    const numPage = Math.ceil(numProducts / countProductInPage);
     return numPage;
 }
 async function moveToPage(page, listUrl, curPage) {
