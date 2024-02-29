@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -17,7 +17,7 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error(error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 
