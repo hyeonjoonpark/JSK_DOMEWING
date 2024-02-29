@@ -144,22 +144,60 @@ async function scrapeProductOptions(page) {
     return productOptions;
 }
 async function scrapeProduct(page, productHref, options) {
+    await page.waitForTimeout(1000);
     await page.evaluate(async () => {
         await new Promise((resolve, reject) => {
-            let totalHeight = 0;
-            const distance = 100; // 한 번에 스크롤할 픽셀 단위
+            const distance = 30;
+            const slowScrollDistance = 10;
+            const scrollInterval = 60;
+            let pauseFlag = false;
+
+            const getTargetScrollTop = (element) => {
+                const elementRect = element.getBoundingClientRect();
+                const offsetTop = elementRect.top + window.scrollY;
+                return offsetTop - slowScrollDistance;
+            };
+
             const timer = setInterval(() => {
                 const scrollHeight = document.body.scrollHeight;
-                window.scrollBy(0, distance);
-                totalHeight += distance;
+                const scrollTop = window.scrollY;
 
-                if (totalHeight >= scrollHeight) {
+                if (pauseFlag) {
                     clearInterval(timer);
-                    resolve();
+                    setTimeout(() => {
+                        pauseFlag = false;
+                        resolve();
+                    }, 2000);
+                } else {
+                    window.scrollBy(0, distance);
+
+                    const prdDetailElement = document.getElementById('prdDetail');
+                    const prdInfoElement = document.getElementById('prdInfo');
+
+                    if (prdDetailElement) {
+                        const targetScrollTop = getTargetScrollTop(prdDetailElement);
+                        if (scrollTop < targetScrollTop) {
+                            window.scrollTo(0, targetScrollTop);
+                        }
+                    } else if (prdInfoElement) {
+                        pauseFlag = true;
+                    }
+
+                    if (scrollTop + window.innerHeight >= scrollHeight) {
+                        clearInterval(timer);
+                        resolve();
+                    }
                 }
-            }, 100); // 100밀리초마다 스크롤
+            }, scrollInterval);
         });
     });
+
+
+
+
+
+    //--------------------ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
     const product = await page.evaluate((productHref, options) => {
 
         const rawName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h2').textContent;
