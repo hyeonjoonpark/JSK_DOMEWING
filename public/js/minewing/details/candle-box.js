@@ -144,6 +144,22 @@ async function scrapeProductOptions(page) {
     return productOptions;
 }
 async function scrapeProduct(page, productHref, options) {
+    await page.evaluate(async () => {
+        await new Promise((resolve, reject) => {
+            let totalHeight = 0;
+            const distance = 100; // 한 번에 스크롤할 픽셀 단위
+            const timer = setInterval(() => {
+                const scrollHeight = document.body.scrollHeight;
+                window.scrollBy(0, distance);
+                totalHeight += distance;
+
+                if (totalHeight >= scrollHeight) {
+                    clearInterval(timer);
+                    resolve();
+                }
+            }, 100); // 100밀리초마다 스크롤
+        });
+    });
     const product = await page.evaluate((productHref, options) => {
 
         const rawName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h2').textContent;
@@ -152,18 +168,14 @@ async function scrapeProduct(page, productHref, options) {
 
 
         const baseUrl = 'https://candle-box.com/';
-        const toAbsoluteUrl = (src, baseUrl) => {
-            if (src.startsWith('http://') || src.startsWith('https://')) {
-                return src;
-            } else {
-                return new URL(src, baseUrl).href;
-            }
-        };
-        const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a img');
+        // Function to convert relative URL to absolute URL
+        const toAbsoluteUrl = (relativeUrl, baseUrl) => new URL(relativeUrl, baseUrl).toString();
+        const getAbsoluteImageUrls = (nodeList, baseUrl) =>
+            [...nodeList].map(img => toAbsoluteUrl(img.src, baseUrl));
+        const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img');
         const productImage = toAbsoluteUrl(productImageElement.src, baseUrl);
-        const productDetailImages = document.querySelectorAll('#prdDetail > div.cont > p img');
-        const productDetail = Array.from(productDetailImages, img => toAbsoluteUrl(img.src, baseUrl));
-
+        const productDetailImageElements = document.querySelectorAll('#prdDetail img');
+        const productDetail = getAbsoluteImageUrls(productDetailImageElements, baseUrl);
         const hasOption = options.hasOption;
         const productOptions = options.options;
 
