@@ -234,7 +234,7 @@
 
                 // 이미지 로딩 완료 이벤트를 위한 이미지 태그에 onload 속성 추가
                 const imgTag =
-                    "<img src='http://www.autocarfeel.co.kr/shop/data/goods/1521424328814s0.jpg' alt='상품 이미지' width='100' height='100' />";
+                    "<img src='" + image + "' alt='상품 이미지' width='100' height='100' />";
 
                 html += "<tr>";
                 html += "<td><input type='checkbox' name='selectedProducts' value='" + i + "'></td>";
