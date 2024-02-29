@@ -88,15 +88,15 @@ class ProcessDataController extends Controller
             'H' => 'postcode',
             'I' => 'address',
             'M' => 'productName',
-            'P' => 'quantity',
-            'Q' => 'productPrice',
-            'R' => 'shippingCost',
-            'T' => 'orderCode',
-            'V' => 'shippingRemark',
+            'Q' => 'quantity',
+            'R' => 'productPrice',
+            'S' => 'shippingCost',
+            'U' => 'orderCode',
+            'W' => 'shippingRemark',
             'Y' => 'productCode',
             'Z' => 'productCodeConditional', // Special handling for LADAM
             'B' => 'orderedAt',
-            'S' => 'amount',
+            'T' => 'amount',
             'A' => 'orderStatus'
             // ... Add more mappings if needed
         ];
@@ -122,6 +122,7 @@ class ProcessDataController extends Controller
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
+            $rowData['amount'] = $rowData['productPrice'] * $rowData['quantity'] + $rowData['shippingCost'];
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);

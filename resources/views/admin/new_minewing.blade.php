@@ -233,7 +233,8 @@
                 const href = products[i].href;
 
                 // 이미지 로딩 완료 이벤트를 위한 이미지 태그에 onload 속성 추가
-                const imgTag = "<img src='" + image + "' alt='상품 이미지' width='100' height='100' onload='imageLoaded(this)'>";
+                const imgTag =
+                    "<img src='" + image + "' alt='상품 이미지' width='100' height='100' />";
 
                 html += "<tr>";
                 html += "<td><input type='checkbox' name='selectedProducts' value='" + i + "'></td>";

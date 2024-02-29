@@ -5,11 +5,11 @@ const fs = require('fs');
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        // const [tempFilePath, username, password] = args;
-        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const username = 'jskorea2022';
-        const password = 'Tjddlf88!@#';
-        const urls = ['https://candle-box.com/product/%ED%94%84%EB%9E%98%EA%B7%B8%EB%9F%B0%EC%8A%A4%EC%98%A4%EC%9D%BC-%EB%94%A5%EB%94%94-%ED%83%90%EB%8B%A4%EC%98%A4-%EB%B8%8C%EB%9E%9C%EB%93%9C-%ED%83%80%EC%9E%85/4556/category/42/display/1/'];
+        const [tempFilePath, username, password] = args;
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // const username = 'jskorea2022';
+        // const password = 'Tjddlf88!@#';
+        // const urls = ['https://candle-box.com/product/11-%EB%84%93%EC%9D%80%EC%9E%85%EA%B5%AC%EC%8B%9C%EC%95%BD%EB%B3%91-125ml-250ml-%ED%88%AC%EB%AA%85%EA%B7%B8%EB%A6%B0%EB%B8%94%EB%A3%A8%EA%B0%88%EC%83%89-%ED%92%88%EC%A0%88%EC%8B%9C-%EB%8B%A8%EC%A2%85/1681/category/79/display/1/'];
         await signIn(page, username, password);
 
         const products = [];
@@ -74,23 +74,23 @@ async function checkedOption(page) {
 
 
 async function scrapeProductOptions(page) {
-    const allSelectElements = await page.$$('select.ProductOption0');
+    const optionCount = await page.$$('select.ProductOption0');
 
     let productOptions = [];
-    if (allSelectElements.length > 0) {// 옵션이 있다.
-        if (allSelectElements.length == 1) {//옵션이 1개
+    if (optionCount.length > 0) {// 옵션이 있다.
+        if (optionCount.length == 1) {//옵션이 1개
             productOptions = await page.evaluate(() => {
-                const optionElements = document.querySelectorAll('#product_option_id1 option');
+                const firstOption = document.querySelectorAll('#product_option_id1 option');
                 const productOptions = [];
-                for (let i = 2; i < optionElements.length; i++) {
-                    const optionElement = optionElements[i];
+                for (let i = 2; i < firstOption.length; i++) {
+                    const optionElement = firstOption[i];
                     const optionText = optionElement.textContent.trim();
                     let optionName, optionPrice;
 
                     if (optionText.includes('원')) {
-                        const optionFull = optionText.split(' (');
-                        optionName = optionFull[0].trim();
-                        optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
+                        const optionOrigin = optionText.split(' (');
+                        optionName = optionOrigin[0].trim();
+                        optionPrice = optionOrigin[1].replace(/[^\d-+]/g, '').trim();
                         optionPrice = parseInt(optionPrice, 10);
                     } else {
                         optionName = optionText.trim();
@@ -102,7 +102,7 @@ async function scrapeProductOptions(page) {
             });
         }
 
-        if (allSelectElements.length == 2) {//옵션이 2개
+        if (optionCount.length == 2) {//옵션이 2개
             const allSelectElements = await page.$$('select');
             if (allSelectElements.length > 0) {
                 const firstOptionValues = await page.evaluate(() => {
@@ -136,12 +136,68 @@ async function scrapeProductOptions(page) {
                     });
                     productOptions.push(tmpProductOptions);
                 }
+                return productOptions;
             }
+            return [];
         }
     }
     return productOptions;
 }
-async function scrapeProduct(page, productHref, options) {//여기에 옵션을 넣어주고 있으면 넣어주고 없으면 안넣으면 되겠네?
+async function scrapeProduct(page, productHref, options) {
+    await page.waitForTimeout(1000);
+    await page.evaluate(async () => {
+        await new Promise((resolve, reject) => {
+            const distance = 30;
+            const slowScrollDistance = 10;
+            const scrollInterval = 60;
+            let pauseFlag = false;
+
+            const getTargetScrollTop = (element) => {
+                const elementRect = element.getBoundingClientRect();
+                const offsetTop = elementRect.top + window.scrollY;
+                return offsetTop - slowScrollDistance;
+            };
+
+            const timer = setInterval(() => {
+                const scrollHeight = document.body.scrollHeight;
+                const scrollTop = window.scrollY;
+
+                if (pauseFlag) {
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        pauseFlag = false;
+                        resolve();
+                    }, 2000);
+                } else {
+                    window.scrollBy(0, distance);
+
+                    const prdDetailElement = document.getElementById('prdDetail');
+                    const prdInfoElement = document.getElementById('prdInfo');
+
+                    if (prdDetailElement) {
+                        const targetScrollTop = getTargetScrollTop(prdDetailElement);
+                        if (scrollTop < targetScrollTop) {
+                            window.scrollTo(0, targetScrollTop);
+                        }
+                    } else if (prdInfoElement) {
+                        pauseFlag = true;
+                    }
+
+                    if (scrollTop + window.innerHeight >= scrollHeight) {
+                        clearInterval(timer);
+                        resolve();
+                    }
+                }
+            }, scrollInterval);
+        });
+    });
+
+
+
+
+
+    //--------------------ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
     const product = await page.evaluate((productHref, options) => {
 
         const rawName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h2').textContent;
@@ -150,20 +206,17 @@ async function scrapeProduct(page, productHref, options) {//여기에 옵션을 
 
 
         const baseUrl = 'https://candle-box.com/';
-        const toAbsoluteUrl = (src, baseUrl) => {
-            if (src.startsWith('http://') || src.startsWith('https://')) {
-                return src;
-            } else {
-                return new URL(src, baseUrl).href;
-            }
-        };
-        const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').src;
-        const productDetailImages = document.querySelectorAll('#prdDetail > div.cont img');
-        const productDetail = Array.from(productDetailImages, img => toAbsoluteUrl(img.src, baseUrl));
-
-
+        // Function to convert relative URL to absolute URL
+        const toAbsoluteUrl = (relativeUrl, baseUrl) => new URL(relativeUrl, baseUrl).toString();
+        const getAbsoluteImageUrls = (nodeList, baseUrl) =>
+            [...nodeList].map(img => toAbsoluteUrl(img.src, baseUrl));
+        const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img');
+        const productImage = toAbsoluteUrl(productImageElement.src, baseUrl);
+        const productDetailImageElements = document.querySelectorAll('#prdDetail img');
+        const productDetail = getAbsoluteImageUrls(productDetailImageElements, baseUrl);
         const hasOption = options.hasOption;
         const productOptions = options.options;
+
         return {
             productName: productName,
             productPrice: productPrice,

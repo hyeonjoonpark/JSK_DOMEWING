@@ -30,7 +30,7 @@ const puppeteer = require('puppeteer');
 // 사용자 로그인을 처리하는 비동기 함수입니다.
 async function login(page, username, password) {
     // 로그인 페이지로 이동합니다.
-    await page.goto('http://www.autocarfeel.co.kr/shop/member/login.php?&', { waitUntil: 'networkidle0' });
+    await page.goto('http://autocarfeel.co.kr/shop/member/login.php?&', { waitUntil: 'networkidle0' });
     // 사용자 이름과 비밀번호 입력 필드에 값을 입력합니다.
     await page.type('#form > table > tbody > tr:nth-child(1) > td:nth-child(2) > input[type=text]', username);
     await page.type('#form > table > tbody > tr:nth-child(2) > td:nth-child(2) > input[type=password]', password);
@@ -63,7 +63,7 @@ async function scrapeProducts(page) {
             const name = productNameElement.textContent.trim();
             const productPriceText = productElement.querySelector('div:nth-child(3) > b').textContent;
             const price = productPriceText.replace(/[^0-9]/g, '').trim();
-            const imageElement = document.querySelector('div:nth-child(1) > a > img');
+            const imageElement = productElement.querySelector('div:nth-child(1) > a > img');
             const image = imageElement.src; // 이미지의 절대 URL을 반환
             const href = productElement.querySelector('div:nth-child(1) > a').href;
             const platform = '오토카필';
