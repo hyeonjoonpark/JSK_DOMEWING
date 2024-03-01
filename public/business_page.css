@@ -7,7 +7,11 @@
     --baby-yellow: #fff3a1;
     --cream: #fffdf0;
     --white: #ffffff;
+    --red: #ff69aa;
     /* Add more colors as needed */
+
+    --min-column-gap-vw: 5vw; /* Minimum column gap in vw */
+    --max-column-gap-vw: 10vw; /* Maximum column gap in vw */
 }
 
 html {
@@ -92,4 +96,19 @@ a h5 {
     border: 2px solid var(--dark-blue);
     background-color: var(--yellow);
     border-radius: 3px;
+}
+
+#contactUsBg {
+    background-image: url("images/business/09_Contact.svg"),
+        linear-gradient(var(--cream), var(--baby-yellow)); /* Specify the path to your image */
+    background-size: contain; /* Adjust as needed */
+    background-position: bottom; /* Adjust as needed */
+    background-repeat: no-repeat;
+}
+
+.contact-us-textbox {
+    border: 2px solid var(--light-blue);
+    font-size: 20px;
+    line-height: 23px;
+    color: var(--dark-blue);
 }
