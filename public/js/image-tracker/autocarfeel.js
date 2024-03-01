@@ -7,10 +7,10 @@ const http = require('http');
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        // const [tempFilePath] = args;
-        // const imageUrls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const imageUrls = ['http://www.autocarfeel.co.kr/shop/data/goods/1303437589m0.jpg', 'http://www.autocarfeel.co.kr/shop/data/goods/1521424328814s0.jpg'];
-        const relativePathToImagesFolder = '../../images/CDN/product';
+        const [tempFilePath] = args;
+        const imageUrls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const relativePathToImagesFolder = '../../images/CDN/tmp';
+        const fileNames = [];
         for (const imageUrl of imageUrls) {
             const parsedUrl = new URL(imageUrl);
             // URL의 경로 부분에서 파일명을 추출합니다.
@@ -18,7 +18,9 @@ const http = require('http');
             const savePath = path.join(__dirname, relativePathToImagesFolder, filename);
             await page.goto(imageUrl, { waitUntil: 'domcontentloaded' });
             await downloadImage(imageUrl, savePath);
+            fileNames.push(filename);
         }
+        console.log(JSON.stringify(fileNames));
     } catch (error) {
         console.error('Error occurred:', error);
     } finally {

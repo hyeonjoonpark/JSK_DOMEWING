@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use Exception;
 use DOMDocument;

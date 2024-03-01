@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Product\NameController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDO;
 
 class SaveController extends Controller
 {
@@ -38,6 +39,7 @@ class SaveController extends Controller
         }
         $nameController = new NameController();
         $productImageController = new ProductImageController();
+        $controller = new Controller();
         foreach ($products as $product) {
             $hasOption = $product['hasOption'];
             $byte = 50;
@@ -46,8 +48,15 @@ class SaveController extends Controller
             }
             $productName = $nameController->index($product['productName'], $byte);
             $sellerID = $product['sellerID'];
-            $hasWatermark = $this->getHasWatermark($sellerID);
-            $productImage = $productImageController->index($product['productImage'], $hasWatermark)['return'];
+            $seller = $controller->getSeller($sellerID);
+            $hasWatermark = $seller->has_watermark;
+            $imageScraper = $seller->image_scraper;
+            if ($imageScraper === 'Y') {
+                $productImageSrc = $this->runImageScraper();
+            } else {
+                $productImageSrc = $product['productImage'];
+            }
+            $productImage = $productImageController->index($productImageSrc, $hasWatermark)['return'];
             $headerImage = DB::table('product_search')
                 ->where('vendor_id', $product['sellerID'])
                 ->select('header_image')
