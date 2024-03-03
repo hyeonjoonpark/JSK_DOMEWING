@@ -1,14 +1,14 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         // const [username, password] = args;
-        // const urls = ['http://autocarfeel.co.kr/shop/goods/goods_view.php?goodsno=11277&category=018'];
+        // const urls = ['http://autocarfeel.co.kr/shop/goods/goods_view.php?goodsno=9836&category=029'];
         await login(page, username, password);
         const products = [];
         for (const url of urls) {
