@@ -132,11 +132,11 @@
 
                 @foreach ($partners as $index => $partner)
                     @if ($index % 4 == 0)
-                        <div class="row pb-3 px-2 justify-content-{{ $row % 2 == 1 ? 'start' : 'end' }} align-items-center"
+                        <div class="row pb-2 pb-lg-4 px-2 justify-content-{{ $row % 2 == 1 ? 'start' : 'end' }} align-items-center"
                             style="column-gap: clamp(var(--min-column-gap-vw), 1vw, var(--max-column-gap-vw));">
                     @endif
                     <div class="col-2 text-center p-0">
-                        <img src="{{ $partner }}" class="img img-fluid"
+                        <img src="{{ asset('images/business/partnership/' . $partner->image) }}" class="img img-fluid"
                             style="object-fit: contain; min-height:10vh; min-width:10vw; max-height:150px;">
                     </div>
                     @if (($index + 1) % 4 == 0 || $index == $total - 1)
@@ -156,6 +156,27 @@
                     style="font-size:32px; color: var(--dark-blue); line-height:30px;">
                     사용후기
                 </p>
+                <div class="row flex-nowrap overflow-auto pb-4 testimonial-scroll" style="row-gap: 30px;">
+
+
+                    @foreach ($testimonials as $record)
+                        <div class="col-11 col-md-6 col-lg-5 col-xl-4 testimonial-row">
+                            <div class="testimonial-card d-flex flex-column justify-content-between">
+                                <p class="font-medium flex-grow-1 m-0"
+                                    style="color: var(--dark-blue); font-size:20px; line-height: 23px;">
+                                    {{ $record->message }}
+                                </p>
+
+                                <p class="font-medium m-0 pb-3"
+                                    style="color: var(--dark-blue); font-size:20px; line-height: 23px;">
+                                    {{ $record->message_by }}</p>
+                                <p class="font-medium m-0"
+                                    style="color: var(--light-blue); font-size:16px; line-height: 19px;">
+                                    {{ $record->formatted_date }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </section>
         </div>
     </div>
