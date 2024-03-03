@@ -112,3 +112,34 @@ a h5 {
     line-height: 23px;
     color: var(--dark-blue);
 }
+
+.testimonial-scroll::-webkit-scrollbar {
+    height: 15px;
+    /* Adjust the width of the scrollbar */
+    background-color: var(--light-blue);
+    border-radius: 100px;
+}
+
+/* Change the color of the scrollbar thumb (handle) */
+.testimonial-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--blue);
+    /* Set the desired color */
+    border-radius: 100px;
+}
+
+/* Change the color on hover */
+.testimonial-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: var(--dark-blue);
+    /* Set the desired hover color */
+}
+
+.testimonial-card {
+    min-height: 400px;
+    background: var(--white);
+    border: 2px solid var(--light-blue);
+    padding: 35px 20px;
+}
+
+.testimonial-row:nth-child(even) {
+    margin-top: 20px;
+}
