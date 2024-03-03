@@ -52,7 +52,13 @@ class SaveController extends Controller
             $hasWatermark = $seller->has_watermark;
             $imageScraper = $seller->image_scraper;
             if ($imageScraper === 'Y') {
-                $productImageSrc = $this->runImageScraper();
+                $runImageScraperResult = $this->runImageScraper([$product['productImage']]);
+                if ($runImageScraperResult['status'] === false) {
+                    return $runImageScraperResult;
+                }
+                $imageFileName = $runImageScraperResult['return'][0]['newFileName'];
+                $filePath = public_path("images/CDN/tmp/");
+                $productImageSrc = $filePath . $imageFileName;
             } else {
                 $productImageSrc = $product['productImage'];
             }
@@ -98,6 +104,34 @@ class SaveController extends Controller
             'status' => true,
             'return' => '"상품셋을 성공적으로 저장했어요!"'
         ];
+    }
+    private function runImageScraper($imageSrcArr)
+    {
+        $imageMap = [];
+        foreach ($imageSrcArr as $imageSrc) {
+            $extension = pathinfo(parse_url($imageSrc, PHP_URL_PATH), PATHINFO_EXTENSION);
+            $newFileName = uniqid() . "." . $extension;
+            $imageMap[] = [
+                "newFileName" => $newFileName,
+                "imageSrc" => $imageSrc
+            ];
+        }
+        $tempFilePath = storage_path('app/public/image-src/' . uniqid() . '.json');
+        file_put_contents($tempFilePath, json_encode($imageMap));
+        $script = public_path('js/image-tracker/main.js');
+        $command = "node {$script} {$tempFilePath}";
+        exec($command, $output, $resultCode);
+        if ($resultCode === 0) {
+            return [
+                'status' => true,
+                'return' => $imageMap
+            ];
+        }
+        return [
+            'status' => false,
+            'return' => "이미지 스크래핑에 실패했습니다."
+        ];
+        unlink($tempFilePath);
     }
     public function validateElements($categoryID, $productKeywords)
     {

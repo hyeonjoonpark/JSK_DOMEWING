@@ -10,17 +10,13 @@ const http = require('http');
         const [tempFilePath] = args;
         const imageUrls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         const relativePathToImagesFolder = '../../images/CDN/tmp';
-        const fileNames = [];
-        for (const imageUrl of imageUrls) {
-            const parsedUrl = new URL(imageUrl);
-            // URL의 경로 부분에서 파일명을 추출합니다.
-            const filename = path.basename(parsedUrl.pathname);
-            const savePath = path.join(__dirname, relativePathToImagesFolder, filename);
-            await page.goto(imageUrl, { waitUntil: 'domcontentloaded' });
-            await downloadImage(imageUrl, savePath);
-            fileNames.push(filename);
+        for (const { newFileName, imageSrc } of imageUrls) {
+            const savePath = path.join(__dirname, relativePathToImagesFolder, newFileName);
+            // Ensure the correct URL is used for navigation and downloading
+            // await page.goto(imageSrc, { waitUntil: 'domcontentloaded' });
+            await downloadImage(imageSrc, savePath);
         }
-        console.log(JSON.stringify(fileNames));
+        console.log(true);
     } catch (error) {
         console.error('Error occurred:', error);
     } finally {
