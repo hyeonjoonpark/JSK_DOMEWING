@@ -21,7 +21,7 @@
         </div>
     </div>
     </div>
-    <div class="nk-content pt-0" style="background-color: var(--white);">
+    <div class="nk-content py-0" style="background-color: var(--white);">
         <div class="container-sm">
             <section id="sectionAboutUs" class="py-5">
                 <div class="row m-0 align-items-center d-flex">
@@ -125,29 +125,38 @@
                     style="font-size:32px; color: var(--dark-blue); line-height:30px;">
                     우리의 파트너십
                 </p>
-                @php
+                {{-- @php
                     $total = count($partners);
                     $row = 1;
                 @endphp
 
                 @foreach ($partners as $index => $partner)
-                    @if ($index % 4 == 0)
+                    @if ($index % 5 == 0)
                         <div class="row pb-2 pb-lg-4 px-2 justify-content-{{ $row % 2 == 1 ? 'start' : 'end' }} align-items-center"
-                            style="column-gap: clamp(var(--min-column-gap-vw), 1vw, var(--max-column-gap-vw));">
+                            style="margin-bottom: 30px; column-gap: clamp(var(--min-column-gap-vw), 1vw, var(--max-column-gap-vw));">
                     @endif
                     <div class="col-2 text-center p-0">
                         <img src="{{ asset('images/business/partnership/' . $partner->image) }}" class="img img-fluid"
                             style="object-fit: contain; min-height:10vh; min-width:10vw; max-height:150px;">
                     </div>
-                    @if (($index + 1) % 4 == 0 || $index == $total - 1)
+                    @if (($index + 1) % 5 == 0 || $index == $total - 1)
         </div>
         @php
             $row++;
         @endphp
         @endif
-        @endforeach
-        </section>
-    </div>
+        @endforeach --}}
+                <div class="row pb-2 pb-lg-4 px-2 justify-content-center align-items-center"
+                    style="column-gap: clamp(var(--min-column-gap-vw), 1vw, var(--max-column-gap-vw)); row-gap:30px;">
+                    @foreach ($partners as $index => $partner)
+                        <div class="col-3 col-md-3 col-lg-2 text-center p-0">
+                            <img src="{{ asset('images/business/partnership/' . $partner->image) }}" class="img img-fluid"
+                                style="object-fit: contain; min-height:10vh; min-width:10vw; max-height:150px;">
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        </div>
     </div>
     <div class="nk-content pt-0" style="background-image: linear-gradient(var(--white), var(--cream));">
         <div class="container-sm">
@@ -160,7 +169,7 @@
 
 
                     @foreach ($testimonials as $record)
-                        <div class="col-11 col-md-6 col-lg-5 col-xl-4 testimonial-row">
+                        <div class="col-11 col-md-6 col-lg-5 col-xl-3 testimonial-row">
                             <div class="testimonial-card d-flex flex-column justify-content-between">
                                 <p class="font-medium flex-grow-1 m-0"
                                     style="color: var(--dark-blue); font-size:20px; line-height: 23px;">
