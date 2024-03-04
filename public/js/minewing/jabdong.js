@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -63,7 +63,7 @@ async function scrapeProducts(page) {
             const nameElement = productElement.querySelector('div > p > a > span:nth-child(2)');
 
             const imageElement = productElement.querySelector('div.box > a img');
-            const priceElement = productElement.querySelector('div > ul > li:nth-child(1) > span:nth-child(2)');
+            const priceElement = productElement.querySelector('div > ul > li:nth-child(2) > span:nth-child(2)');
             const hrefElement = productElement.querySelector('div > p > a');
 
             const name = nameElement ? nameElement.textContent.trim() : 'Name not found';
