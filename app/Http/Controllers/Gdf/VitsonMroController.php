@@ -32,7 +32,6 @@ class VitsonMroController extends Controller
             $tempFilePath = $this->genHrefsJsonFile($chunk);
             $trackOverAmountProducts = $this->trackOverAmountProducts($tempFilePath);
             if ($trackOverAmountProducts === false) {
-                unlink($tempFilePath);
                 return false;
             }
             $productCodes = array_merge($productCodes, $trackOverAmountProducts);
