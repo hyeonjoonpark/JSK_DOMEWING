@@ -28,8 +28,8 @@ class VitsonMroController extends Controller
         $products = $this->getVitsonMroProducts();
         $productsChunks = $products->chunk(100);
         $productCodes = [];
-        foreach ($productsChunks as $chunk) {
-            $tempFilePath = $this->genHrefsJsonFile($chunk);
+        foreach ($productsChunks as $index => $chunk) {
+            $tempFilePath = $this->genHrefsJsonFile($chunk, $index);
             $trackOverAmountProducts = $this->trackOverAmountProducts($tempFilePath);
             if ($trackOverAmountProducts === false) {
                 return false;
@@ -61,9 +61,9 @@ class VitsonMroController extends Controller
             ->where('isActive', 'Y')
             ->get(['productCode', 'productHref']);
     }
-    private function genHrefsJsonFile($products)
+    private function genHrefsJsonFile($products, $index)
     {
-        $tempFilePath = storage_path('app/public/gdf/' . uniqid() . '.json');
+        $tempFilePath = storage_path('app/public/gdf/sibal' . $index . '.json');
         file_put_contents($tempFilePath, json_encode($products));
         return $tempFilePath;
     }
