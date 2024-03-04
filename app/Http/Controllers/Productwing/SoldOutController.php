@@ -120,8 +120,8 @@ class SoldOutController extends Controller
      */
     public function sendSoldOutRequest($productCode, $vendorEngName, $username, $password)
     {
-        $script = public_path('js/sold-out/' . $vendorEngName . '.js');
-        $command = "node {$script} {$username} $password {$productCode}";
+        $scriptPath = public_path('js/sold-out/' . $vendorEngName . '.js');
+        $command = "node {$scriptPath} {$username} {$password} {$productCode}";
         exec($command, $output, $resultCode);
         if ($resultCode === 0 && $output[0] === 'true') {
             return true;

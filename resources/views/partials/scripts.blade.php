@@ -135,6 +135,7 @@
         const b2bs = $('input[name="b2bs"]:checked').map(function() {
             return $(this).val();
         }).get();
+        console.log(b2bs);
         const isSellwingChecked = $('#sellwing').prop('checked');
         console.log(isSellwingChecked);
         $.ajax({
