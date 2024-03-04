@@ -22,7 +22,8 @@ const puppeteer = require('puppeteer');
 })();
 async function getNumPage(page, url) {
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
-    await page.click('body > div.container > div > div.content > div.area_wrap > div.ken_td_wrap > div.td_bar > div.bar_right > div > button.fir.k-button');
+    await page.click('body > div.container > div > div.content > div.area_wrap > div.ken_td_wrap > div.td_bar > div.bar_right > div > button.fir.k-button.k-state-active');
+    await new Promise((page) => setTimeout(page, 3000));
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
     await new Promise((page) => setTimeout(page, 3000));
     const numProducts = await page.evaluate(() => {
