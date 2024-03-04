@@ -79,6 +79,11 @@ async function moveToPage(page, curPage) {
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         function processProduct(productElement) {
+            const eachAmountText = productElement.querySelector('span[name="eachAmount"]').textContent;
+            const eachAmount = parseInt(eachAmountText.replace(/[^0-9]/g, '').trim());
+            if (eachAmount > 1) {
+                return false;
+            }
             const stockText = productElement.querySelector('td:nth-child(9) > span.hdsp_bot').textContent.trim();
             if (stockText !== '재고보유') {
                 return false;
