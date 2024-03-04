@@ -1,16 +1,12 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [username, password, productCode] = args;
-        await page.goto('https://www.sellingkok.com/shop/partner/login.php', { waitUntil: 'networkidle0' });
-        await page.type('#login_id', username);
-        await page.type('#login_pw', password);
-        await page.click('#sub-wrapper > div > div.box-block > form > div.foot > button');
-        await new Promise((page) => setTimeout(page, 3000));
+        await login(page, username, password);
         await page.goto('https://www.sellingkok.com/shop/partner/?ap=list', { waitUntil: 'networkidle0' });
         await page.select('#cd_search', 'pt_it_cd');
         await page.type('body > div:nth-child(2) > div.page-content > div.well > form > div:nth-child(16) > div.col-sm-4.col-xs-6 > div > textarea', productCode);
@@ -42,3 +38,10 @@ const puppeteer = require('puppeteer');
         await browser.close();
     }
 })();
+async function login(page, username, password) {
+    await page.goto('https://www.sellingkok.com/shop/partner/login.php', { waitUntil: 'networkidle0' });
+    await page.type('#login_id', username);
+    await page.type('#login_pw', password);
+    await page.click('#sub-wrapper > div > div.box-block > form > div.foot > button');
+    await new Promise((page) => setTimeout(page, 3000));
+}

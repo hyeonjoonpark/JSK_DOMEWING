@@ -7,14 +7,14 @@ const fs = require('fs');
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const [username, password] = args;
-        // const urls = ['http://autocarfeel.co.kr/shop/goods/goods_view.php?goodsno=9836&category=029'];
         await login(page, username, password);
         const products = [];
         for (const url of urls) {
             await page.goto(url, { waitUntil: 'domcontentloaded' });
             const product = await scrapeProduct(page, url);
-            products.push(product);
+            if (product !== false) {
+                products.push(product);
+            }
         }
         console.log(JSON.stringify(products));
     } catch (error) {
@@ -42,33 +42,37 @@ async function scrapeProduct(page, productHref) {
         productOptions = await getProductOptions(page);
     }
     const product = await page.evaluate((productHref, productOptions, hasOption) => {
-        // productName
-        const productNameElement = document.querySelector('#goods_spec > form > div:nth-child(4) > b');
-        productNameElement.querySelectorAll('font[color="red"]').forEach(el => el.remove());
-        const productName = productNameElement.textContent.trim();
-        // productPrice
-        const productPriceText = document.querySelector('#price').textContent.trim();
-        const productPrice = parseInt(productPriceText.replace(/[^\d]/g, ''));
-        // productImage
-        const imageElement = document.querySelector('#objImg');
-        const productImage = imageElement.src; // 이미지의 절대 URL을 반환
-        // productDetail
-        const productDetailElements = document.querySelectorAll('#contents img');
-        const productDetail = [];
-        for (const productDetailElement of productDetailElements) {
-            const productDetailImage = productDetailElement.src
-            productDetail.push(productDetailImage);
+        try {
+            // productName
+            const productNameElement = document.querySelector('b[style="font:bold 12pt 돋움;"]');
+            productNameElement.querySelectorAll('font[color="red"]').forEach(el => el.remove());
+            const productName = productNameElement.textContent.trim();
+            // productPrice
+            const productPriceText = document.querySelector('#price').textContent.trim();
+            const productPrice = parseInt(productPriceText.replace(/[^\d]/g, ''));
+            // productImage
+            const imageElement = document.querySelector('#objImg');
+            const productImage = imageElement.src; // 이미지의 절대 URL을 반환
+            // productDetail
+            const productDetailElements = document.querySelectorAll('#contents img');
+            const productDetail = [];
+            for (const productDetailElement of productDetailElements) {
+                const productDetailImage = productDetailElement.src
+                productDetail.push(productDetailImage);
+            }
+            return {
+                productName: productName,
+                productPrice: productPrice,
+                productImage: productImage,
+                productDetail: productDetail,
+                hasOption: hasOption,
+                productOptions: productOptions,
+                productHref: productHref,
+                sellerID: 20
+            };
+        } catch (error) {
+            return false;
         }
-        return {
-            productName: productName,
-            productPrice: productPrice,
-            productImage: productImage,
-            productDetail: productDetail,
-            hasOption: hasOption,
-            productOptions: productOptions,
-            productHref: productHref,
-            sellerID: 20
-        };
     }, productHref, productOptions, hasOption);
     return product;
 }
