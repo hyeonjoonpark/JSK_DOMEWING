@@ -79,15 +79,8 @@ async function scrapeProducts(page) {
             return productName;
         }
         function checkSkipProduct(promotionElement) {
-            // const thirtyPerDiscount = "/web/upload/custom_13.gif";
-            // const tenPerDiscount = "/web/upload/custom_24.gif";
-            // const flashDeal = "//img.echosting.cafe24.com/icon/product/ko_KR/icon_05_01.gif";
             const soldOut = "//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif";
-            // const newProductDiscount = "/web/upload/custom_3.gif";
             const promotionSrc = promotionElement.getAttribute('src');
-            // if (promotionSrc == thirtyPerDiscount || promotionSrc == tenPerDiscount || promotionSrc == flashDeal || promotionSrc == soldOut || promotionSrc == newProductDiscount) {
-            //     return true;
-            // }
             if (promotionSrc == soldOut) {
                 return true;
             }
