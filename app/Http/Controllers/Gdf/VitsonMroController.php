@@ -32,9 +32,11 @@ class VitsonMroController extends Controller
             $tempFilePath = $this->genHrefsJsonFile($chunk);
             $trackOverAmountProducts = $this->trackOverAmountProducts($tempFilePath);
             if ($trackOverAmountProducts === false) {
+                unlink($tempFilePath);
                 return false;
             }
             $productCodes = array_merge($productCodes, $trackOverAmountProducts);
+            unlink($tempFilePath);
         }
         $productCodesJsonFile = storage_path('app/public/gdf/' . uniqid() . '.json');
         file_put_contents($productCodesJsonFile, json_encode($productCodes));
@@ -51,7 +53,6 @@ class VitsonMroController extends Controller
                 $this->soldOutController->sendSoldOutRequest($productCode, $vendorEngName, $username, $password);
             }
         }
-        unlink($tempFilePath);
         return $this->gdfController->inactiveProducts($productCodes);
     }
     private function getVitsonMroProducts()
