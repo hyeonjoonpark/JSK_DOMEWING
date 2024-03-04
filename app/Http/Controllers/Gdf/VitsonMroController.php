@@ -26,12 +26,16 @@ class VitsonMroController extends Controller
         ini_set('memory_allow', '-1');
         $account = $this->processController->getSeller(self::USER_ID, self::VENDOR_ID);
         $products = $this->getVitsonMroProducts();
-        $tempFilePath = $this->genHrefsJsonFile($products);
-        $trackOverAmountProducts = $this->trackOverAmountProducts($tempFilePath);
-        if ($trackOverAmountProducts === false) {
-            return false;
+        $productsChunks = $products->chunk(100);
+        $productCodes = [];
+        foreach ($productsChunks as $chunk) {
+            $tempFilePath = $this->genHrefsJsonFile($chunk);
+            $trackOverAmountProducts = $this->trackOverAmountProducts($tempFilePath);
+            if ($trackOverAmountProducts === false) {
+                return false;
+            }
+            $productCodes = array_merge($productCodes, $trackOverAmountProducts);
         }
-        $productCodes = $trackOverAmountProducts;
         $productCodesJsonFile = storage_path('app/public/gdf/' . uniqid() . '.json');
         file_put_contents($productCodesJsonFile, json_encode($productCodes));
         $b2bs = DB::table('vendors')
