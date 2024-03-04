@@ -10,7 +10,7 @@
     --red: #ff69aa;
     /* Add more colors as needed */
 
-    --min-column-gap-vw: 5vw; /* Minimum column gap in vw */
+    --min-column-gap-vw: 3vw; /* Minimum column gap in vw */
     --max-column-gap-vw: 10vw; /* Maximum column gap in vw */
 }
 
