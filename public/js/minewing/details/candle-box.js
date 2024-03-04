@@ -1,17 +1,13 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const username = 'jskorea2022';
-        // const password = 'Tjddlf88!@#';
-        // const urls = ['https://candle-box.com/product/%EB%8D%B0%EC%BD%94%EC%9A%A9-%EC%9D%B8%EC%A1%B0-%ED%92%80/2634/category/49/display/1/'];
         await signIn(page, username, password);
-
         const products = [];
         for (const url of urls) {
             const navigateWithRetryResult = await navigateWithRetry(page, url);
@@ -77,8 +73,8 @@ async function scrapeProductOptions(page) {
     const optionCount = await page.$$('select.ProductOption0');
 
     let productOptions = [];
-    if (optionCount.length > 0) {// 옵션이 있다.
-        if (optionCount.length == 1) {//옵션이 1개
+    if (optionCount.length > 0) {
+        if (optionCount.length == 1) {
             productOptions = await page.evaluate(() => {
                 const firstOption = document.querySelectorAll('#product_option_id1 option');
                 const productOptions = [];
@@ -102,7 +98,7 @@ async function scrapeProductOptions(page) {
             });
         }
 
-        if (optionCount.length == 2) {//옵션이 2개
+        if (optionCount.length == 2) {
             const allSelectElements = await page.$$('select');
             if (allSelectElements.length > 0) {
                 const firstOptionValues = await page.evaluate(() => {
@@ -144,24 +140,14 @@ async function scrapeProductOptions(page) {
     return productOptions;
 }
 async function scrapeProduct(page, productHref, options) {
-    await page.waitForTimeout(1000);
     await page.evaluate(async () => {
-        const distance = 30;
-        const scrollInterval = 80;
+        const distance = 45;
+        const scrollInterval = 50;
         while (true) {
             const scrollTop = window.scrollY;
             const prdDetailElement = document.getElementById('prdDetail');
             const prdInfoElement = document.getElementById('prdInfo');
-            const getTargetScrollTop = (element) => {
-                const elementRect = element.getBoundingClientRect();
-                const offsetTop = elementRect.top + window.scrollY;
-                return offsetTop;
-            };
             if (prdDetailElement) {
-                const targetScrollTop = getTargetScrollTop(prdDetailElement);
-                if (scrollTop < targetScrollTop) {
-                    window.scrollTo(0, targetScrollTop);
-                }
                 const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
                 if (scrollTop < targetScrollBottom) {
                     window.scrollBy(0, distance);
@@ -179,7 +165,7 @@ async function scrapeProduct(page, productHref, options) {
         }
     });
 
-    await page.waitForTimeout(1500);
+    await new Promise((page) => setTimeout(page, 1500));
 
     const product = await page.evaluate((productHref, options) => {
 
@@ -187,9 +173,7 @@ async function scrapeProduct(page, productHref, options) {
         const productName = removeSoldOutMessage(rawName);
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
 
-
         const baseUrl = 'https://candle-box.com/';
-        // Function to convert relative URL to absolute URL
         const toAbsoluteUrl = (relativeUrl, baseUrl) => new URL(relativeUrl, baseUrl).toString();
         const getAbsoluteImageUrls = (nodeList, baseUrl) =>
             [...nodeList].map(img => toAbsoluteUrl(img.src, baseUrl));
