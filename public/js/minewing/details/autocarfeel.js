@@ -1,12 +1,14 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // const [username, password] = args;
+        // const urls = ['http://autocarfeel.co.kr/shop/goods/goods_view.php?goodsno=9836&category=029'];
         await login(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -48,7 +50,7 @@ async function scrapeProduct(page, productHref) {
         const productPriceText = document.querySelector('#price').textContent.trim();
         const productPrice = parseInt(productPriceText.replace(/[^\d]/g, ''));
         // productImage
-        const imageElement = document.querySelector('body > table > tbody > tr > td > table > tbody > tr:nth-child(2) > td > table > tbody > tr > td.outline_side > div.indiv > form:nth-child(1) > table:nth-child(8) > tbody > tr:nth-child(5) > td > table > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(1) > a > img');
+        const imageElement = document.querySelector('#objImg');
         const productImage = imageElement.src; // 이미지의 절대 URL을 반환
         // productDetail
         const productDetailElements = document.querySelectorAll('#contents img');

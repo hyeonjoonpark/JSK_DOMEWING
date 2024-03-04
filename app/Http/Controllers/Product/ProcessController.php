@@ -52,7 +52,7 @@ class ProcessController extends Controller
         $products = [];
         foreach ($productHrefsChunk as $index => $productHrefs) {
             // 임시 파일에 URL 배열 저장
-            $tempFilePath = storage_path('app/' . uniqid() . '.json');
+            $tempFilePath = storage_path('app/public/urls/' . uniqid() . '.json');
             file_put_contents($tempFilePath, json_encode($productHrefs));
             // Node.js 스크립트 실행
             $scriptPath = public_path('js/minewing/details/' . $sellerEngName . '.js');
