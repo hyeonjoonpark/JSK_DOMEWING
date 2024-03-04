@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [username, password, productCode] = args;
-        await page.goto('https://www.sellingkok.com/shop/partner/login.php');
+        await page.goto('https://www.sellingkok.com/shop/partner/login.php', { waitUntil: 'networkidle0' });
         await page.type('#login_id', username);
         await page.type('#login_pw', password);
         await page.click('#sub-wrapper > div > div.box-block > form > div.foot > button');

@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -22,7 +22,25 @@ const puppeteer = require('puppeteer');
 })();
 async function getNumPage(page, url) {
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
-    await page.click('body > div.container > div > div.content > div.area_wrap > div.ken_td_wrap > div.td_bar > div.bar_right > div > button.fir.k-button.k-state-active');
+    await page.evaluate(() => {
+        // iframe 요소 숨기기를 위한 함수 정의
+        const hideIframeBySelector = (selector) => {
+            const iframe = document.querySelector(selector);
+            if (iframe) {
+                iframe.style.display = 'none';
+            }
+        };
+
+        // 특정 iframe 요소들을 숨김
+        hideIframeBySelector('body > iframe.sc-fKFyDc.nwOmR.enter.done');
+        hideIframeBySelector('body > iframe.sc-iBaPrD.gdARiY.sc-eggNIi.JiLrb.enter.done');
+
+        // 첫 번째 버튼을 클릭
+        const firstButton = document.querySelector('body > div.container > div > div.content > div.area_wrap > div.ken_td_wrap > div.td_bar > div.bar_right > div button');
+        if (firstButton) {
+            firstButton.click();
+        }
+    });
     await new Promise((page) => setTimeout(page, 3000));
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
     await new Promise((page) => setTimeout(page, 3000));
@@ -81,8 +99,11 @@ async function moveToPage(page, curPage) {
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         function processProduct(productElement) {
-            const eachAmountText = productElement.querySelector('span[name="eachAmount"]').textContent;
-            const eachAmount = parseInt(eachAmountText.replace(/[^0-9]/g, '').trim());
+            const eachAmountElement = productElement.querySelector('td:nth-child(13) > span.hdsp_bot.price_tt');
+            if (!eachAmountElement) {
+                return false;
+            }
+            const eachAmount = parseInt(eachAmountElement.textContent.replace(/[^0-9]/g, '').trim(), 10);
             if (eachAmount > 1) {
                 return false;
             }
