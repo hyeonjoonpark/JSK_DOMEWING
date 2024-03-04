@@ -21,7 +21,7 @@
         </div>
     </div>
     </div>
-    <div class="nk-content pt-0" style="background-color: var(--white);">
+    <div class="nk-content py-0" style="background-color: var(--white);">
         <div class="container-sm">
             <section id="sectionAboutUs" class="py-5">
                 <div class="row m-0 align-items-center d-flex">
@@ -125,12 +125,121 @@
                     style="font-size:32px; color: var(--dark-blue); line-height:30px;">
                     우리의 파트너십
                 </p>
+
+                <div class="row pb-2 pb-lg-4 px-2 justify-content-center align-items-center"
+                    style="column-gap: clamp(var(--min-column-gap-vw), 1vw, var(--max-column-gap-vw)); row-gap:30px;">
+                    @foreach ($partners as $index => $partner)
+                        <div class="col-3 col-md-3 col-lg-2 text-center p-0">
+                            <img src="{{ asset('images/business/partnership/' . $partner->image) }}" class="img img-fluid"
+                                style="object-fit: contain; min-height:10vh; min-width:10vw; max-height:150px;">
+                        </div>
+                    @endforeach
+                </div>
             </section>
-            <section id="sectionTestimonials" style="height:600px;">
-                <p>sectionTestimonials</p>
+        </div>
+    </div>
+    <div class="nk-content pt-0" style="background-image: linear-gradient(var(--white), var(--cream));">
+        <div class="container-sm">
+            <section id="sectionTestimonials" class="py-5">
+                <p class="font-bold m-0 text-center pb-5"
+                    style="font-size:32px; color: var(--dark-blue); line-height:30px;">
+                    사용후기
+                </p>
+                <div class="row flex-nowrap overflow-auto pb-4 testimonial-scroll" style="row-gap: 30px;">
+
+
+                    @foreach ($testimonials as $record)
+                        <div class="col-11 col-md-6 col-lg-5 col-xl-3 testimonial-row">
+                            <div class="testimonial-card d-flex flex-column justify-content-between">
+                                <p class="font-medium flex-grow-1 m-0"
+                                    style="color: var(--dark-blue); font-size:20px; line-height: 23px;">
+                                    {{ $record->message }}
+                                </p>
+
+                                <p class="font-medium m-0 pb-3"
+                                    style="color: var(--dark-blue); font-size:20px; line-height: 23px;">
+                                    {{ $record->message_by }}</p>
+                                <p class="font-medium m-0"
+                                    style="color: var(--light-blue); font-size:16px; line-height: 19px;">
+                                    {{ $record->formatted_date }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </section>
-            <section id="sectionContactUs" style="height:600px;">
-                <p>sectionContactUs</p>
+        </div>
+    </div>
+    <div class="nk-content pt-0" id="contactUsBg">
+        <div class="container-sm">
+            <section id="sectionContactUs" class="py-5">
+                <div class="row m-0">
+                    <div class="col col-lg-6">
+                        <p class="font-bold m-0 text-center pb-5"
+                            style="font-size:32px; color: var(--dark-blue); line-height:30px;">
+                            문의하기
+                        </p>
+                        <div class="form-group mb-gs">
+                            <label class="form-label font-medium m-0 mb-1" for="name"
+                                style="font-size: 15px; line-height:17px; color: var(--blue);">이름<span
+                                    style="color: var(--red);">*</span></label>
+                            <div class="form-control-wrap" style="height:37px;">
+                                <input type="text" class="form-control font-medium contact-us-textbox" id="name"
+                                    name="name" placeholder="제인">
+                                <span id="nameError" class="invalid font-medium" style="display: none;">This field is
+                                    required.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-gs">
+                            <label class="form-label font-medium m-0 mb-1" for="email"
+                                style="font-size: 15px; line-height:17px; color: var(--blue);">이메일<span
+                                    style="color: var(--red);">*</span></label>
+                            <div class="form-control-wrap" style="height:37px;">
+                                <input type="text" class="form-control font-medium contact-us-textbox" id="email"
+                                    name="email" placeholder="janedoe@gmail.com">
+                                <span id="emailError" class="invalid font-medium" style="display: none;">This field is
+                                    required.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-gs">
+                            <label class="form-label font-medium m-0 mb-1" for="contact"
+                                style="font-size: 15px; line-height:17px; color: var(--blue);">전화 번호<span
+                                    style="color: var(--red);">*</span></label>
+                            <div class="form-control-wrap" style="height:37px;">
+                                <input type="text" class="form-control font-medium contact-us-textbox" id="contact"
+                                    name="contact" placeholder="1055538203">
+                                <span id="contactError" class="invalid font-medium" style="display: none;">This field is
+                                    required.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-gs">
+                            <label class="form-label font-medium m-0 mb-1" for="message"
+                                style="font-size: 15px; line-height:17px; color: var(--blue);">귀하의 메시지<span
+                                    style="color: var(--red);">*</span></label>
+                            <div class="form-control-wrap">
+                                <textarea type="text" class="form-control font-medium contact-us-textbox" id="message" name="message"
+                                    placeholder="testing"></textarea>
+                                <span id="messageError" class="invalid font-medium" style="display: none;">This field is
+                                    required.</span>
+                            </div>
+                        </div>
+
+                        <div class="text-left text-lg-end pb-5 pb-xl-0">
+                            <a href="#" type="button" class="btn btn-sellwing py-2 px-5">
+                                <p class="font-bold m-0"
+                                    style="font-size:16px; color: var(--dark-blue); line-height:23px;">
+                                    보내기</p>
+                            </a>
+                        </div>
+
+                        <div class="py-0 py-md-5 py-lg-0"></div>
+                        <div class="py-5 py-lg-0"></div>
+
+                    </div>
+                </div>
+
             </section>
         </div>
     </div>

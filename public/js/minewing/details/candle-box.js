@@ -1,17 +1,13 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const username = 'jskorea2022';
-        // const password = 'Tjddlf88!@#';
-        // const urls = ['https://candle-box.com/product/11-%EB%84%93%EC%9D%80%EC%9E%85%EA%B5%AC%EC%8B%9C%EC%95%BD%EB%B3%91-125ml-250ml-%ED%88%AC%EB%AA%85%EA%B7%B8%EB%A6%B0%EB%B8%94%EB%A3%A8%EA%B0%88%EC%83%89-%ED%92%88%EC%A0%88%EC%8B%9C-%EB%8B%A8%EC%A2%85/1681/category/79/display/1/'];
         await signIn(page, username, password);
-
         const products = [];
         for (const url of urls) {
             const navigateWithRetryResult = await navigateWithRetry(page, url);
@@ -71,23 +67,22 @@ async function checkedOption(page) {
     const optionSet = { hasOption, options };
     return optionSet;
 }
-
-
 async function scrapeProductOptions(page) {
     const optionCount = await page.$$('select.ProductOption0');
 
     let productOptions = [];
-    if (optionCount.length > 0) {// 옵션이 있다.
-        if (optionCount.length == 1) {//옵션이 1개
+
+    if (optionCount.length > 0) {
+        if (optionCount.length == 1) {
             productOptions = await page.evaluate(() => {
                 const firstOption = document.querySelectorAll('#product_option_id1 option');
-                const productOptions = [];
+                const options = [];
                 for (let i = 2; i < firstOption.length; i++) {
                     const optionElement = firstOption[i];
                     const optionText = optionElement.textContent.trim();
                     let optionName, optionPrice;
 
-                    if (optionText.includes('원')) {
+                    if (optionText.includes('원)')) {
                         const optionOrigin = optionText.split(' (');
                         optionName = optionOrigin[0].trim();
                         optionPrice = optionOrigin[1].replace(/[^\d-+]/g, '').trim();
@@ -96,13 +91,13 @@ async function scrapeProductOptions(page) {
                         optionName = optionText.trim();
                         optionPrice = 0;
                     }
-                    productOptions.push({ optionName, optionPrice });
+                    options.push({ optionName, optionPrice });
                 }
-                return productOptions;
+                return options;
             });
         }
 
-        if (optionCount.length == 2) {//옵션이 2개
+        if (optionCount.length == 2) {
             const allSelectElements = await page.$$('select');
             if (allSelectElements.length > 0) {
                 const firstOptionValues = await page.evaluate(() => {
@@ -115,7 +110,6 @@ async function scrapeProductOptions(page) {
                     return firstOptionValues;
                 });
 
-                let productOptions = [];
                 for (let i = 0; i < firstOptionValues.length; i++) {
                     const optionValue = firstOptionValues[i];
                     await page.select('select#product_option_id1', optionValue);
@@ -125,7 +119,7 @@ async function scrapeProductOptions(page) {
                         const options = Array.from(secondOptionElements).slice(2).map(option => {
                             const text = option.textContent.trim();
                             let price = 0;
-                            if (text.includes('원')) {
+                            if (text.includes('원)')) {
                                 const [name, priceText] = text.split(' (');
                                 price = parseInt(priceText.replace(/[^\d-+]/g, ''), 10);
                                 return { optionName: firstOptionName + ' ' + name.trim(), optionPrice: price };
@@ -134,69 +128,42 @@ async function scrapeProductOptions(page) {
                         });
                         return options;
                     });
-                    productOptions.push(tmpProductOptions);
+                    productOptions = productOptions.concat(tmpProductOptions);
                 }
-                return productOptions;
             }
-            return [];
         }
     }
+
     return productOptions;
 }
+
 async function scrapeProduct(page, productHref, options) {
-    await page.waitForTimeout(1000);
     await page.evaluate(async () => {
-        await new Promise((resolve, reject) => {
-            const distance = 30;
-            const slowScrollDistance = 10;
-            const scrollInterval = 60;
-            let pauseFlag = false;
-
-            const getTargetScrollTop = (element) => {
-                const elementRect = element.getBoundingClientRect();
-                const offsetTop = elementRect.top + window.scrollY;
-                return offsetTop - slowScrollDistance;
-            };
-
-            const timer = setInterval(() => {
-                const scrollHeight = document.body.scrollHeight;
-                const scrollTop = window.scrollY;
-
-                if (pauseFlag) {
-                    clearInterval(timer);
-                    setTimeout(() => {
-                        pauseFlag = false;
-                        resolve();
-                    }, 2000);
-                } else {
+        const distance = 45;
+        const scrollInterval = 50;
+        while (true) {
+            const scrollTop = window.scrollY;
+            const prdDetailElement = document.getElementById('prdDetail');
+            const prdInfoElement = document.getElementById('prdInfo');
+            if (prdDetailElement) {
+                const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
+                if (scrollTop < targetScrollBottom) {
                     window.scrollBy(0, distance);
-
-                    const prdDetailElement = document.getElementById('prdDetail');
-                    const prdInfoElement = document.getElementById('prdInfo');
-
-                    if (prdDetailElement) {
-                        const targetScrollTop = getTargetScrollTop(prdDetailElement);
-                        if (scrollTop < targetScrollTop) {
-                            window.scrollTo(0, targetScrollTop);
-                        }
-                    } else if (prdInfoElement) {
-                        pauseFlag = true;
-                    }
-
-                    if (scrollTop + window.innerHeight >= scrollHeight) {
-                        clearInterval(timer);
-                        resolve();
-                    }
+                } else {
+                    break;
                 }
-            }, scrollInterval);
-        });
+            } else if (prdInfoElement) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                break;
+            } else {
+                window.scrollBy(0, distance);
+            }
+
+            await new Promise(resolve => setTimeout(resolve, scrollInterval));
+        }
     });
 
-
-
-
-
-    //--------------------ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    await new Promise((page) => setTimeout(page, 1500));
 
     const product = await page.evaluate((productHref, options) => {
 
@@ -204,17 +171,21 @@ async function scrapeProduct(page, productHref, options) {
         const productName = removeSoldOutMessage(rawName);
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
 
-
         const baseUrl = 'https://candle-box.com/';
-        // Function to convert relative URL to absolute URL
         const toAbsoluteUrl = (relativeUrl, baseUrl) => new URL(relativeUrl, baseUrl).toString();
-        const getAbsoluteImageUrls = (nodeList, baseUrl) =>
-            [...nodeList].map(img => toAbsoluteUrl(img.src, baseUrl));
-        const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img');
-        const productImage = toAbsoluteUrl(productImageElement.src, baseUrl);
+
+        const getAbsoluteImageUrls = (nodeList, baseUrl, ...excludedPaths) =>
+            [...nodeList]
+                .filter(img => !excludedPaths.some(path => img.src.includes(path)))
+                .map(img => toAbsoluteUrl(img.src, baseUrl));
+
         const productDetailImageElements = document.querySelectorAll('#prdDetail img');
-        const productDetail = getAbsoluteImageUrls(productDetailImageElements, baseUrl);
-        const hasOption = options.hasOption;
+        const excludedPaths = ['/web/img/start', '/web/img/event'];
+        const productDetail = getAbsoluteImageUrls(productDetailImageElements, baseUrl, ...excludedPaths);
+
+
+        const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img');
+        const productImage = toAbsoluteUrl(productImageElement.src, baseUrl); const hasOption = options.hasOption;
         const productOptions = options.options;
 
         return {

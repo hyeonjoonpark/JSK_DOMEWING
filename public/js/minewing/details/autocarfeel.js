@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -12,7 +12,9 @@ const fs = require('fs');
         for (const url of urls) {
             await page.goto(url, { waitUntil: 'domcontentloaded' });
             const product = await scrapeProduct(page, url);
-            products.push(product);
+            if (product !== false) {
+                products.push(product);
+            }
         }
         console.log(JSON.stringify(products));
     } catch (error) {
@@ -41,14 +43,14 @@ async function scrapeProduct(page, productHref) {
     }
     const product = await page.evaluate((productHref, productOptions, hasOption) => {
         // productName
-        const productNameElement = document.querySelector('#goods_spec > form > div:nth-child(4) > b');
+        const productNameElement = document.querySelector('b[style="font:bold 12pt 돋움;"]');
         productNameElement.querySelectorAll('font[color="red"]').forEach(el => el.remove());
         const productName = productNameElement.textContent.trim();
         // productPrice
         const productPriceText = document.querySelector('#price').textContent.trim();
         const productPrice = parseInt(productPriceText.replace(/[^\d]/g, ''));
         // productImage
-        const imageElement = document.querySelector('body > table > tbody > tr > td > table > tbody > tr:nth-child(2) > td > table > tbody > tr > td.outline_side > div.indiv > form:nth-child(1) > table:nth-child(8) > tbody > tr:nth-child(5) > td > table > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(1) > a > img');
+        const imageElement = document.querySelector('#objImg');
         const productImage = imageElement.src; // 이미지의 절대 URL을 반환
         // productDetail
         const productDetailElements = document.querySelectorAll('#contents img');

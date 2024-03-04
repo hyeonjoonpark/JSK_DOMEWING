@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use Exception;
 use DOMDocument;
@@ -141,44 +140,38 @@ class ProductImageController extends Controller
         // 에러가 발생한 이미지를 필터링하여 제거
         return array_filter($hostedImages, fn ($url) => $url !== null);
     }
-    // 이미지를 서버에 저장하고 새로운 호스팅 URL 반환
     public function saveImageAndGetNewUrl($url)
     {
         try {
-            // Encode the URL to handle spaces and special characters correctly
-            $encodedUrl = $this->encodeUrl($url);
+            // URL 인코딩
+            $img_link = iconv('utf-8', 'euc-kr', $url);
+            // 확장자 추출
+            $ext = strtolower(pathinfo($img_link, PATHINFO_EXTENSION));
+            // 저장할 이미지명 생성
+            $img = uniqid() . '.' . $ext;
+            $savePath = public_path('images/CDN/detail/' . $img); // 저장 위치 및 파일명
 
-            // Initialize cURL session
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $encodedUrl);
+            curl_setopt($ch, CURLOPT_URL, $img_link);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Bypass SSL verification, consider the security implications
-            $imageData = curl_exec($ch);
-            $curlError = curl_error($ch);
+            $contents = curl_exec($ch);
+            if ($contents === false) {
+                throw new Exception('cURL error: ' . curl_error($ch));
+            }
             curl_close($ch);
 
-            if ($curlError) {
-                throw new Exception("cURL error: $curlError");
+            // 파일 저장
+            if (file_put_contents($savePath, $contents) === false) {
+                throw new Exception("Failed to save the image.");
             }
 
-            if ($imageData === false) {
-                throw new Exception("Failed to get image data from URL: $url");
-            }
-
-            $extension = $this->getFileExtension($url);
-            $imageName = uniqid() . '.' . $extension;
-            $savePath = public_path('images/CDN/detail/' . $imageName);
-            if (file_put_contents($savePath, $imageData) === false) {
-                throw new Exception("Failed to save image to disk.");
-            }
-
-            return 'https://www.sellwing.kr/images/CDN/detail/' . $imageName;
-        } catch (\Exception $e) {
-            // Log the exception or handle it as needed
-            return null; // 예외 발생시 null 반환
+            // 새 이미지 URL 반환
+            return 'https://www.sellwing.kr/images/CDN/detail/' . $img;
+        } catch (Exception $e) {
+            // 예외 처리: 로깅 또는 사용자 정의 오류 메시지 반환
+            return null;
         }
     }
-
     protected function encodeUrl($url)
     {
         // Only encode the path part of the URL

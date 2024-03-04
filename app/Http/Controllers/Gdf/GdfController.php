@@ -47,7 +47,7 @@ class GdfController extends Controller
         }
         return $this->inactiveProducts($productCodes);
     }
-    private function inactiveProducts($productCodes)
+    public function inactiveProducts($productCodes)
     {
         try {
             DB::table('minewing_products')

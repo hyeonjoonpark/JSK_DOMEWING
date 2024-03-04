@@ -23,61 +23,62 @@ const puppeteer = require('puppeteer');
 
 
 async function signIn(page, username, password) {
-    await page.goto('https://candle-box.com/member/login.html', { waitUntil: 'networkidle0' });
-    await page.type('#member_id', username);
-    await page.type('#member_passwd', password);
-    await page.click('a[class="btnLogin"]');
+    await page.goto('https://www.domecall.net/member/login.php', { waitUntil: 'networkidle0' });
+    await page.type('#loginId', username);
+    await page.type('#loginPwd', password);
+    await page.click('#formLogin > div.login > button');
     await page.waitForNavigation();
 }
+
 async function getNumPage(page, listUrl) {
     await page.goto(listUrl, { waitUntil: 'domcontentloaded' });
+    await new Promise((page) => setTimeout(page, 3000));
+    await page.select('#content > div.contents > div > div.cg-main > div.goods-list > form > fieldset > div > div > div > select > option:nth-child(4)', '40');
+    await new Promise((page) => setTimeout(page, 3000));
     const numProducts = await page.evaluate(() => {
-        const numProductsText = document.querySelector('#Product_ListMenu > p').textContent.trim();
+        const numProductsText = document.querySelector('#content > div.contents > div > div.cg-main > div.goods-list > span > strong').textContent.trim();
         const numProducts = parseInt(numProductsText.replace(/[^\d]/g, ''));
         return numProducts;
     });
-    const countProductInPage = 20;
+    const countProductInPage = 40;
     const numPage = Math.ceil(numProducts / countProductInPage);
     return numPage;
 }
+
 async function moveToPage(page, listUrl, curPage) {
     curPage = parseInt(curPage);
-    listUrl += '?page=' + curPage;
+    listUrl += '&page=' + curPage;
     await page.goto(listUrl, { waitUntil: 'domcontentloaded' });
 }
+
+
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         const products = [];
-        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div.xans-element-.xans-product.xans-product-listnormal.ec-base-product > ul > li');
+        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div.xans-element-.xans-product.xans-product-listnormal > ul > li');
         for (const productElement of productElements) {
 
-            const promotionElement = productElement.querySelector('.description .promotion img');
+            const promotionElement = productElement.querySelector('div.box > div.status > div.icon img');
             if (promotionElement) {
                 if (checkSkipProduct(promotionElement)) {
                     continue;
                 }
             }
+            const nameElement = productElement.querySelector('div > p > a > span:nth-child(2)');
 
-            const nameElement = productElement.querySelector('div.description > strong > a > span:nth-child(2)');
-            const imageElement = productElement.querySelector('div.thumbnail > div.prdImg > a > img');
-            const priceElement = productElement.querySelector('div.description > ul > li > span:nth-child(2)');
-            const hrefElement = productElement.querySelector('div.description > strong > a');
+            const imageElement = productElement.querySelector('div.box > a img');
+            const priceElement = productElement.querySelector('div > ul > li:nth-child(2) > span:nth-child(2)');
+            const hrefElement = productElement.querySelector('div > p > a');
 
-            const name = nameElement ? removeSoldOutMessage(nameElement.textContent) : 'Name not found';
+            const name = nameElement ? nameElement.textContent.trim() : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
             const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
-            const platform = "캔들아트";
+            const platform = "잡동산이";
             products.push({ name, price, image, href, platform });
         }
         return products;
-        function removeSoldOutMessage(nameElement) {
-            const productName = nameElement.trim();
-            if (productName.includes('-품절시 단종')) {
-                return productName.replace('-품절시 단종', '');
-            }
-            return productName;
-        }
+
         function checkSkipProduct(promotionElement) {
             const soldOut = "//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif";
             const promotionSrc = promotionElement.getAttribute('src');
