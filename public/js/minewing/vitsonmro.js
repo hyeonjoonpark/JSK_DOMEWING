@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -22,14 +22,6 @@ const puppeteer = require('puppeteer');
 })();
 async function getNumPage(page, url) {
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 0 });
-    await new Promise((page) => setTimeout(page, 3000));
-    await page.evaluate(() => {
-        const isPopup = document.querySelector('#groobeeWrap');
-        if (isPopup) {
-            isPopup.style.display = 'none';
-            document.querySelector('body > div.grbDim.grbLayer').style.display = 'none';
-        }
-    });
     await page.select('#grid > div.k-pager-wrap.k-grid-pager.k-widget.k-floatwrap > span.k-pager-sizes.k-label > span > select', '60');
     await new Promise((page) => setTimeout(page, 3000));
     const numProducts = await page.evaluate(() => {
@@ -56,6 +48,14 @@ async function goToWithRepeat(page, url, index, wiatUntilType) {
 }
 async function signIn(page, username, password) {
     await goToWithRepeat(page, 'https://vitsonmro.com/mro/login.do', 0, 'networkidle0');
+    await new Promise((page) => setTimeout(page, 3000));
+    await page.evaluate(() => {
+        const isPopup = document.querySelector('#groobeeWrap');
+        if (isPopup) {
+            isPopup.style.display = 'none';
+            document.querySelector('body > div.grbDim.grbLayer').style.display = 'none';
+        }
+    });
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');
