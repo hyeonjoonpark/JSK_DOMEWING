@@ -7,9 +7,6 @@ const fs = require('fs');
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const username = 'jskorea2022';
-        // const password = 'Tjddlf8812';
-        // const urls = ['https://www.jabdong.co.kr/product/detail.html?product_no=877&cate_no=44&display_group=1'];
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
