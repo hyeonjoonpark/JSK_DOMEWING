@@ -22,6 +22,8 @@ class VitsonMroController extends Controller
     }
     public function main()
     {
+        set_time_limit(0);
+        ini_set('memory_allow', '-1');
         $account = $this->processController->getSeller(self::USER_ID, self::VENDOR_ID);
         $products = $this->getVitsonMroProducts();
         $tempFilePath = $this->genHrefsJsonFile($products);
