@@ -78,7 +78,7 @@ async function scrapeProduct(page, productHref) {
                 const optionElement = optionElements[i];
                 const optionText = optionElement.textContent.trim();
                 let optionName, optionPrice;
-                if (optionText.includes('원')) {
+                if (optionText.includes('원)')) {
                     const optionFull = optionText.split(' (');
                     optionName = optionFull[0].trim();
                     optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
