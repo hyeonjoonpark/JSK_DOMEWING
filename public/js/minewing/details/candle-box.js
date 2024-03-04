@@ -83,7 +83,7 @@ async function scrapeProductOptions(page) {
                     const optionText = optionElement.textContent.trim();
                     let optionName, optionPrice;
 
-                    if (optionText.includes('원')) {
+                    if (optionText.includes('원)')) {
                         const optionOrigin = optionText.split(' (');
                         optionName = optionOrigin[0].trim();
                         optionPrice = optionOrigin[1].replace(/[^\d-+]/g, '').trim();
@@ -121,7 +121,7 @@ async function scrapeProductOptions(page) {
                         const options = Array.from(secondOptionElements).slice(2).map(option => {
                             const text = option.textContent.trim();
                             let price = 0;
-                            if (text.includes('원')) {
+                            if (text.includes('원)')) {
                                 const [name, priceText] = text.split(' (');
                                 price = parseInt(priceText.replace(/[^\d-+]/g, ''), 10);
                                 return { optionName: firstOptionName + ' ' + name.trim(), optionPrice: price };

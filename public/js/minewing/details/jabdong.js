@@ -5,11 +5,8 @@ const fs = require('fs');
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        // const [tempFilePath, username, password] = args;
-        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const username = 'jskorea2022';
-        const password = 'Tjddlf8812';
-        const urls = ['https://jabdong.co.kr/product/detail.html?product_no=1388&cate_no=89&display_group=1'];
+        const [tempFilePath, username, password] = args;
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -52,29 +49,33 @@ async function signIn(page, username, password) {
 }
 
 async function scrapeProduct(page, productHref) {
+    await new Promise((page) => setTimeout(page, 1000));
     const product = await page.evaluate((productHref) => {
-        const productName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img').getAttribute('alt');
+        const productName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img').getAttribute('alt').trim();
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
-        const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img').getAttribute('src');
+        const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img').getAttribute('src').trim();
+        const productImage = `https:${productImageElement}`;
         const images = document.querySelectorAll('#prdDetail > div.cont img');
-        const productDetail = [images[1].getAttribute('src')];
+        const productDetailImageElement = [];
+        images.forEach((image) => {
+            const imageUrl = image.getAttribute('src').trim();
+            if (!imageUrl.includes('Brand') && !imageUrl.includes('Notice')) {
+                productDetailImageElement.push(`https:${imageUrl}`);
+            }
+        });
+        const productDetail = productDetailImageElement.length > 0 ? productDetailImageElement : 'productDetailImage not found';
 
         const optionElement = document.querySelector('#product_option_id1');
         let hasOption = false;
         let productOptions = [];
-
         if (optionElement) {
             hasOption = true;
-        }
-
-        if (hasOption) {
             const optionElements = document.querySelectorAll('#product_option_id1 option');
             for (let i = 2; i < optionElements.length; i++) {
                 const optionElement = optionElements[i];
                 const optionText = optionElement.textContent.trim();
                 let optionName, optionPrice;
-
-                if (optionText.includes('원')) {
+                if (optionText.includes('원)')) {
                     const optionFull = optionText.split(' (');
                     optionName = optionFull[0].trim();
                     optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
@@ -83,6 +84,7 @@ async function scrapeProduct(page, productHref) {
                     optionName = optionText.trim();
                     optionPrice = 0;
                 }
+                optionName = removeSoldOutOption(optionName);
                 productOptions.push({ optionName, optionPrice });
             }
         }
@@ -96,6 +98,13 @@ async function scrapeProduct(page, productHref) {
             productHref: productHref,
             sellerID: 21
         };
+        function removeSoldOutOption(optionName) {
+            if (optionName.includes(' [품절]')) {
+                return optionName.replace(' [품절]', '');
+            }
+            return optionName;
+        }
     }, productHref);
     return product;
+
 }
