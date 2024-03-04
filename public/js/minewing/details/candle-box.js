@@ -67,17 +67,16 @@ async function checkedOption(page) {
     const optionSet = { hasOption, options };
     return optionSet;
 }
-
-
 async function scrapeProductOptions(page) {
     const optionCount = await page.$$('select.ProductOption0');
 
     let productOptions = [];
+
     if (optionCount.length > 0) {
         if (optionCount.length == 1) {
             productOptions = await page.evaluate(() => {
                 const firstOption = document.querySelectorAll('#product_option_id1 option');
-                const productOptions = [];
+                const options = [];
                 for (let i = 2; i < firstOption.length; i++) {
                     const optionElement = firstOption[i];
                     const optionText = optionElement.textContent.trim();
@@ -92,9 +91,9 @@ async function scrapeProductOptions(page) {
                         optionName = optionText.trim();
                         optionPrice = 0;
                     }
-                    productOptions.push({ optionName, optionPrice });
+                    options.push({ optionName, optionPrice });
                 }
-                return productOptions;
+                return options;
             });
         }
 
@@ -111,7 +110,6 @@ async function scrapeProductOptions(page) {
                     return firstOptionValues;
                 });
 
-                let productOptions = [];
                 for (let i = 0; i < firstOptionValues.length; i++) {
                     const optionValue = firstOptionValues[i];
                     await page.select('select#product_option_id1', optionValue);
@@ -130,15 +128,15 @@ async function scrapeProductOptions(page) {
                         });
                         return options;
                     });
-                    productOptions.push(tmpProductOptions);
+                    productOptions = productOptions.concat(tmpProductOptions);
                 }
-                return productOptions;
             }
-            return [];
         }
     }
+
     return productOptions;
 }
+
 async function scrapeProduct(page, productHref, options) {
     await page.evaluate(async () => {
         const distance = 45;
@@ -175,13 +173,19 @@ async function scrapeProduct(page, productHref, options) {
 
         const baseUrl = 'https://candle-box.com/';
         const toAbsoluteUrl = (relativeUrl, baseUrl) => new URL(relativeUrl, baseUrl).toString();
-        const getAbsoluteImageUrls = (nodeList, baseUrl) =>
-            [...nodeList].map(img => toAbsoluteUrl(img.src, baseUrl));
-        const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img');
-        const productImage = toAbsoluteUrl(productImageElement.src, baseUrl);
+
+        const getAbsoluteImageUrls = (nodeList, baseUrl, ...excludedPaths) =>
+            [...nodeList]
+                .filter(img => !excludedPaths.some(path => img.src.includes(path)))
+                .map(img => toAbsoluteUrl(img.src, baseUrl));
+
         const productDetailImageElements = document.querySelectorAll('#prdDetail img');
-        const productDetail = getAbsoluteImageUrls(productDetailImageElements, baseUrl);
-        const hasOption = options.hasOption;
+        const excludedPaths = ['/web/img/start', '/web/img/event'];
+        const productDetail = getAbsoluteImageUrls(productDetailImageElements, baseUrl, ...excludedPaths);
+
+
+        const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img');
+        const productImage = toAbsoluteUrl(productImageElement.src, baseUrl); const hasOption = options.hasOption;
         const productOptions = options.options;
 
         return {
