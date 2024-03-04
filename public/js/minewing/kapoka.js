@@ -12,10 +12,15 @@ const puppeteer = require('puppeteer');
     try {
         // 로그인 함수를 호출하여 사용자 인증을 수행합니다.
         await sign(page, username, password);
+        // 몇 페이지까지 반복할 건데? 마지막 페이지잖아. 그럼 마지막 페이지 숫자를 구해오면 총 페이지 숫자겠지?
+        const numPages = await getNumPage(page, listURL);
+        const products = [];
+        for (let i = numPages; i > 0; i--) {
+            await moveToPage(page, listURL, i);
+            const tmpProducts = await scrapeProducts(page);
+            products.push(...tmpProducts);
+        }
         // 지정된 URL에서 상품 목록 페이지 처리를 수행합니다.
-        await processPage(page, listURL);
-        // 상품 데이터를 스크래핑합니다.
-        const products = await scrapeProducts(page);
         // 스크래핑된 상품 데이터를 JSON 형식으로 콘솔에 출력합니다.
         console.log(JSON.stringify(products));
     } catch (error) {
@@ -23,10 +28,21 @@ const puppeteer = require('puppeteer');
         console.error(error);
     } finally {
         // 작업이 완료되면 브라우저를 닫습니다.
-        // await browser.close();
+        await browser.close();
     }
 })();
-
+// 총 페이지 숫자를 구하는 함수.
+async function getNumPage(page, url) {
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    const numPages = await page.evaluate(() => {
+        const paginationElements = document.querySelectorAll('body > table > tbody > tr:nth-child(2) > td > table > tbody > tr > td.outline_side > table > tbody > tr > td > table > tbody > tr:nth-child(10) > td a');
+        const lastPageElement = paginationElements[paginationElements.length - 1];
+        const lastPageText = lastPageElement.textContent.trim();
+        const numPages = parseInt(lastPageText.replace(/[^0-9]/g, ''));
+        return numPages;
+    });
+    return numPages;
+}
 // 사용자 로그인을 처리하는 비동기 함수입니다.
 async function sign(page, username, password) {
     // 로그인 페이지로 이동합니다.
@@ -39,66 +55,62 @@ async function sign(page, username, password) {
     // 페이지 내비게이션이 완료될 때까지 기다립니다.
     await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
 }
-
 // 상품 목록 페이지를 처리하는 함수입니다.
-async function processPage(page, listURL) {
-    await page.goto(listURL, { waitUntil: 'domcontentloaded' });
-    // 상품 개수를 페이지에서 추출합니다.
-    const numProducts = await page.evaluate(() => {
-        const numProductsText = document.querySelector('body > table > tbody > tr:nth-child(2) > td > table > tbody > tr > td.outline_side > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td > table > tbody > tr > td:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(1) > a').textContent;
-        return parseInt(numProductsText.replace(/[^0-9]/g, '').trim());
-    });
-    // 상품 개수를 기반으로 최종 URL을 구성합니다.
-    listURL += '&page_num=' + numProducts;
-    await page.goto(listURL, { waitUntil: 'domcontentloaded' });
+async function moveToPage(page, initialURL, curPage) {
+    // 현재 페이지의 전체 URL을 생성합니다.
+    const fullUrl = initialURL + '&page=' + curPage;
+    // 초기 URL로 페이지로 이동합니다. 페이지 로딩이 완료될 때까지 기다립니다.
+    await page.goto(fullUrl, { waitUntil: 'domcontentloaded' });
 }
-
-// 상품 정보를 스크래핑하는 함수입니다.
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         // 상품 정보를 처리하여 추출하는 함수입니다.
         function processProduct(productElement) {
-            const productNameElement = productElement.querySelector('#goods_spec > div > b');
-            // productNameElement.querySelectorAll('font[color="red"]').forEach(el => el.remove());
-            const name = productNameElement.textContent.trim();
-            const productPriceText = productElement.querySelector('#price').textContent;
-            const price = productPriceText.replace(/[^0-9]/g, '').trim();
-            const imageElement = document.querySelector('div:nth-child(1) > a > img');
-            const image = imageElement.src; // 이미지의 절대 URL을 반환
-            const href = productElement.querySelector('#objImg').href;
-            const platform = '카포카';
+            try {
+                const productNameElement = productElement.querySelector('div:nth-child(2) > a');
+                const name = productNameElement.textContent.trim();
+                // const nameText = productNameElement.textContent.trim();
+                // const regexPattern = /\[[^\]]*\]/g;
+                // const name = nameText.replace(regexPattern, '');
+                const productPriceText = productElement.querySelector('div:nth-child(3) > b').textContent;
+                const price = productPriceText.replace(/[^0-9]/g, '').trim();
+                const imageElement = productElement.querySelector('div:nth-child(1) > a > img');
+                const image = imageElement.src;
+                const href = productNameElement.href;
+                const platform = '카포카';
 
-            return { name, price, image, href, platform };
+                return { name, price, image, href, platform };
+            } catch (error) {
+                return false;
+            }
         }
 
-        // 상품이 품절 상태인지 확인하는 함수입니다.
-        // function hasStockMethod(productElement) {
-        //     const productText = productElement.textContent;
-        //     let result = true;
-        //     if (productText.includes('품절상품입니다.')) {
-        //         result = false;
-        //     }
-        //     return result;
-        // }
+        // 품절 상품 이미지를 확인하는 함수입니다.
+        function hasSoldOutImage(productElement) {
+            return productElement.querySelector('img[src="/shop/data/skin/apple_tree/img/icon/good_icon_soldout.gif"]') !== null;
+        }
 
-        // const productElements = document.querySelectorAll('td[align="center"][valign="top"][width="25%"]');
-        // const products = [];
-        // let index = 0;
-        // for (const productElement of productElements) {
-        //     const hasStockMethodResult = hasStockMethod(productElement);
-        //     if (hasStockMethodResult === false) {
-        //         return products;
-        //     }
-        //     try {
-        //         const productInfo = processProduct(productElement);
-        //         products.push(productInfo);
-        //         index++;
-        //     } catch (error) {
-        //         continue;
-        //     }
-        // }
+        // 스크랩된 상품을 저장할 배열입니다.
+        const products = [];
+
+        // 상품 요소들을 선택합니다.
+        const productElements = document.querySelectorAll('td[align="center"][valign="top"][width="25%"]');
+
+        // 각 상품 요소에 대해 상품 정보를 스크랩합니다.
+        productElements.forEach(productElement => {
+            // 품절 상품인지 확인하고 아닌 경우 상품 정보를 스크랩합니다.
+            if (!hasSoldOutImage(productElement)) {
+                const productInfo = processProduct(productElement);
+                if (productInfo !== false) {
+                    products.push(productInfo);
+                }
+            }
+        });
+
         return products;
     });
 
     return products;
 }
+
+
