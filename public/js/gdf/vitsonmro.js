@@ -24,7 +24,8 @@ const fs = require('fs');
     }
 })();
 async function isOverAmount(page, productHref) {
-    await page.goto(productHref, { waitUntil: 'domcontentloaded' });
+    await page.goto(productHref);
+    await page.waitForSelector('#eachAmount');
     const isOverAmount = await page.evaluate(() => {
         try {
             const amountText = document.querySelector('#eachAmount').textContent.trim();
