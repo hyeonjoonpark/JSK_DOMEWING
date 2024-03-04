@@ -125,27 +125,7 @@
                     style="font-size:32px; color: var(--dark-blue); line-height:30px;">
                     우리의 파트너십
                 </p>
-                {{-- @php
-                    $total = count($partners);
-                    $row = 1;
-                @endphp
 
-                @foreach ($partners as $index => $partner)
-                    @if ($index % 5 == 0)
-                        <div class="row pb-2 pb-lg-4 px-2 justify-content-{{ $row % 2 == 1 ? 'start' : 'end' }} align-items-center"
-                            style="margin-bottom: 30px; column-gap: clamp(var(--min-column-gap-vw), 1vw, var(--max-column-gap-vw));">
-                    @endif
-                    <div class="col-2 text-center p-0">
-                        <img src="{{ asset('images/business/partnership/' . $partner->image) }}" class="img img-fluid"
-                            style="object-fit: contain; min-height:10vh; min-width:10vw; max-height:150px;">
-                    </div>
-                    @if (($index + 1) % 5 == 0 || $index == $total - 1)
-        </div>
-        @php
-            $row++;
-        @endphp
-        @endif
-        @endforeach --}}
                 <div class="row pb-2 pb-lg-4 px-2 justify-content-center align-items-center"
                     style="column-gap: clamp(var(--min-column-gap-vw), 1vw, var(--max-column-gap-vw)); row-gap:30px;">
                     @foreach ($partners as $index => $partner)
