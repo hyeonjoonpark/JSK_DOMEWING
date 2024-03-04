@@ -9,7 +9,7 @@ const fs = require('fs');
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         // const username = 'jskorea2022';
         // const password = 'Tjddlf88!@#';
-        // const urls = ['https://candle-box.com/product/11-%EB%84%93%EC%9D%80%EC%9E%85%EA%B5%AC%EC%8B%9C%EC%95%BD%EB%B3%91-125ml-250ml-%ED%88%AC%EB%AA%85%EA%B7%B8%EB%A6%B0%EB%B8%94%EB%A3%A8%EA%B0%88%EC%83%89-%ED%92%88%EC%A0%88%EC%8B%9C-%EB%8B%A8%EC%A2%85/1681/category/79/display/1/'];
+        // const urls = ['https://candle-box.com/product/%EB%8D%B0%EC%BD%94%EC%9A%A9-%EC%9D%B8%EC%A1%B0-%ED%92%80/2634/category/49/display/1/'];
         await signIn(page, username, password);
 
         const products = [];
@@ -146,57 +146,40 @@ async function scrapeProductOptions(page) {
 async function scrapeProduct(page, productHref, options) {
     await page.waitForTimeout(1000);
     await page.evaluate(async () => {
-        await new Promise((resolve, reject) => {
-            const distance = 30;
-            const slowScrollDistance = 10;
-            const scrollInterval = 60;
-            let pauseFlag = false;
-
+        const distance = 30;
+        const scrollInterval = 80;
+        while (true) {
+            const scrollTop = window.scrollY;
+            const prdDetailElement = document.getElementById('prdDetail');
+            const prdInfoElement = document.getElementById('prdInfo');
             const getTargetScrollTop = (element) => {
                 const elementRect = element.getBoundingClientRect();
                 const offsetTop = elementRect.top + window.scrollY;
-                return offsetTop - slowScrollDistance;
+                return offsetTop;
             };
-
-            const timer = setInterval(() => {
-                const scrollHeight = document.body.scrollHeight;
-                const scrollTop = window.scrollY;
-
-                if (pauseFlag) {
-                    clearInterval(timer);
-                    setTimeout(() => {
-                        pauseFlag = false;
-                        resolve();
-                    }, 2000);
-                } else {
-                    window.scrollBy(0, distance);
-
-                    const prdDetailElement = document.getElementById('prdDetail');
-                    const prdInfoElement = document.getElementById('prdInfo');
-
-                    if (prdDetailElement) {
-                        const targetScrollTop = getTargetScrollTop(prdDetailElement);
-                        if (scrollTop < targetScrollTop) {
-                            window.scrollTo(0, targetScrollTop);
-                        }
-                    } else if (prdInfoElement) {
-                        pauseFlag = true;
-                    }
-
-                    if (scrollTop + window.innerHeight >= scrollHeight) {
-                        clearInterval(timer);
-                        resolve();
-                    }
+            if (prdDetailElement) {
+                const targetScrollTop = getTargetScrollTop(prdDetailElement);
+                if (scrollTop < targetScrollTop) {
+                    window.scrollTo(0, targetScrollTop);
                 }
-            }, scrollInterval);
-        });
+                const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
+                if (scrollTop < targetScrollBottom) {
+                    window.scrollBy(0, distance);
+                } else {
+                    break;
+                }
+            } else if (prdInfoElement) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                break;
+            } else {
+                window.scrollBy(0, distance);
+            }
+
+            await new Promise(resolve => setTimeout(resolve, scrollInterval));
+        }
     });
 
-
-
-
-
-    //--------------------ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    await page.waitForTimeout(1500);
 
     const product = await page.evaluate((productHref, options) => {
 

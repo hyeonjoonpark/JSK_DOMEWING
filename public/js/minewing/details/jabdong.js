@@ -5,8 +5,11 @@ const fs = require('fs');
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        const [tempFilePath, username, password] = args;
-        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // const [tempFilePath, username, password] = args;
+        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const username = 'jskorea2022';
+        const password = 'Tjddlf8812';
+        const urls = ['https://jabdong.co.kr/product/detail.html?product_no=1388&cate_no=89&display_group=1'];
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -54,9 +57,7 @@ async function scrapeProduct(page, productHref) {
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
         const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img').getAttribute('src');
         const images = document.querySelectorAll('#prdDetail > div.cont img');
-        const productDetail = Array.from(images)
-            .slice(1, 2)  // 두 번째 요소만 가져오기
-            .map(img => img.getAttribute('src'));
+        const productDetail = [images[1].getAttribute('src')];
 
         const optionElement = document.querySelector('#product_option_id1');
         let hasOption = false;
