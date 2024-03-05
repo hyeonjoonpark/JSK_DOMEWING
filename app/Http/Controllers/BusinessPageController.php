@@ -42,7 +42,7 @@ class BusinessPageController extends Controller
 
     public function getAllPhoneCode()
     {
-        $phoneCodes = DB::table('country_codes')->where('status', 'Y')->get();
+        $phoneCodes = DB::table('country_codes')->where('status', 'Y')->orderBy('phone_code')->get();
         return $phoneCodes;
     }
 

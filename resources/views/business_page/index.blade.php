@@ -374,7 +374,6 @@
                     }
                 },
                 error: function(response) {
-                    console.log(response);
                     if (response.status === 422) {
                         // Validation failed, handle the errors
                         const errors = response.responseJSON.errors;
