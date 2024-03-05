@@ -178,61 +178,103 @@
                             style="font-size:32px; color: var(--dark-blue); line-height:30px;">
                             문의하기
                         </p>
-                        <div class="form-group mb-gs">
-                            <label class="form-label font-medium m-0 mb-1" for="name"
-                                style="font-size: 15px; line-height:17px; color: var(--blue);">이름<span
-                                    style="color: var(--red);">*</span></label>
-                            <div class="form-control-wrap" style="height:37px;">
-                                <input type="text" class="form-control font-medium contact-us-textbox" id="name"
-                                    name="name" placeholder="제인">
-                                <span id="nameError" class="invalid font-medium" style="display: none;">This field is
-                                    required.</span>
-                            </div>
-                        </div>
 
-                        <div class="form-group mb-gs">
-                            <label class="form-label font-medium m-0 mb-1" for="email"
-                                style="font-size: 15px; line-height:17px; color: var(--blue);">이메일<span
-                                    style="color: var(--red);">*</span></label>
-                            <div class="form-control-wrap" style="height:37px;">
-                                <input type="text" class="form-control font-medium contact-us-textbox" id="email"
-                                    name="email" placeholder="janedoe@gmail.com">
-                                <span id="emailError" class="invalid font-medium" style="display: none;">This field is
-                                    required.</span>
+                        <form onsubmit="submitContactUs(event)">
+                            <div class="form-group mb-gs">
+                                <label class="form-label font-medium m-0 mb-1" for="name"
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">이름<span
+                                        style="color: var(--red);">*</span></label>
+                                <div class="form-control-wrap" style="height:37px;">
+                                    <input type="text" class="form-control font-medium contact-us-textbox"
+                                        id="name" name="name" placeholder="제인" value="{{ old('name') }}">
+                                    <span id="nameError" class="invalid font-medium"
+                                        style="display: none; color: var(--red);"></span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group mb-gs">
-                            <label class="form-label font-medium m-0 mb-1" for="contact"
-                                style="font-size: 15px; line-height:17px; color: var(--blue);">전화 번호<span
-                                    style="color: var(--red);">*</span></label>
-                            <div class="form-control-wrap" style="height:37px;">
-                                <input type="text" class="form-control font-medium contact-us-textbox" id="contact"
-                                    name="contact" placeholder="1055538203">
-                                <span id="contactError" class="invalid font-medium" style="display: none;">This field is
-                                    required.</span>
+                            <div class="form-group mb-gs">
+                                <label class="form-label font-medium m-0 mb-1" for="email"
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">이메일<span
+                                        style="color: var(--red);">*</span></label>
+                                <div class="form-control-wrap" style="height:37px;">
+                                    <input type="text" class="form-control font-medium contact-us-textbox"
+                                        id="email" name="email" placeholder="janedoe@gmail.com"
+                                        value="{{ old('email') }}">
+                                    <span id="emailError" class="invalid font-medium"
+                                        style="display: none; color: var(--red);"></span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group mb-gs">
-                            <label class="form-label font-medium m-0 mb-1" for="message"
-                                style="font-size: 15px; line-height:17px; color: var(--blue);">귀하의 메시지<span
-                                    style="color: var(--red);">*</span></label>
-                            <div class="form-control-wrap">
-                                <textarea type="text" class="form-control font-medium contact-us-textbox" id="message" name="message"
-                                    placeholder="testing"></textarea>
-                                <span id="messageError" class="invalid font-medium" style="display: none;">This field is
-                                    required.</span>
+                            <div class="form-group mb-gs">
+                                <label class="form-label font-medium m-0 mb-1" for="contact"
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">전화 번호<span
+                                        style="color: var(--red);">*</span></label>
+                                <input type="hidden" id="countryId" name="countryId" value="">
+                                <div class="form-control-wrap">
+                                    <div class="form-control font-medium contact-us-textbox p-0">
+                                        <div class="input-group-prepend">
+                                            <button class="btn dropdown-toggle" data-bs-toggle="dropdown">
+                                                <p id="txtPhoneCodeLg" class="m-0"
+                                                    style="font-size: 20px; line-height: 23px; color: var(--dark-blue);">
+                                                    선택하다
+                                                </p>
+                                            </button>
+                                            <div class="dropdown-menu" data-search="on">
+                                                <ul class="link-list-opt phone-code-list no-bdr"
+                                                    style="height: 200px; overflow-y:auto;">
+                                                    @foreach ($phoneCodes as $phoneCode)
+                                                        <li>
+                                                            <a onclick="selectCode(this)"
+                                                                data-phonecode="{{ $phoneCode->phone_code }}"
+                                                                data-country="{{ $phoneCode->id }}"
+                                                                style="cursor: pointer;">
+                                                                {{ $phoneCode->phone_code . ' ' . $phoneCode->country_name }}
+                                                            </a>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                            <div class="vr m-0 my-auto h-70"
+                                                style=" color:var(--dark-blue); width:3px; opacity:1;">
+                                            </div>
+
+                                            <input type="number" class="form-control form-control-lg py-2"
+                                                style="border:none; font-size: 20px; line-height: 23px; color: var(--dark-blue);"
+                                                id="phoneNumber" placeholder="12345678" value="{{ old('phoneNumber') }}"
+                                                name="phoneNumber">
+                                        </div>
+
+                                    </div>
+                                    <span id="phoneCodeError" class="invalid ff-italic font-medium"
+                                        style="color: var(--red); display:none"></span>
+                                    <span id="phoneNumberError" class="invalid ff-italic font-medium"
+                                        style="color: var(--red); display:none"></span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="text-left text-lg-end pb-5 pb-xl-0">
-                            <a href="#" type="button" class="btn btn-sellwing py-2 px-5">
-                                <p class="font-bold m-0"
-                                    style="font-size:16px; color: var(--dark-blue); line-height:23px;">
-                                    보내기</p>
-                            </a>
-                        </div>
+                            <div class="form-group mb-gs">
+                                <label class="form-label font-medium m-0 mb-1" for="message"
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">귀하의 메시지<span
+                                        style="color: var(--red);">*</span></label>
+                                <div class="form-control-wrap">
+                                    <textarea type="text" class="form-control font-medium contact-us-textbox" id="message" name="message"
+                                        placeholder="여기에 당신의 메시지" value="{{ old('message') }}"></textarea>
+                                    <span id="messageError" class="invalid font-medium"
+                                        style="display: none; color: var(--red);"></span>
+                                </div>
+                            </div>
+
+                            <div class="text-left text-lg-end pb-5 pb-xl-0">
+                                <button id="btnSubmit" type="submit" class="btn btn-sellwing py-2 px-5">
+                                    <span class="spinner-border spinner-border-sm"
+                                        style="display:none; font-size:16px; color: var(--dark-blue);" id="spinnerSubmit"
+                                        role="status" aria-hidden="true"></span>
+                                    <p class="font-bold m-0"
+                                        style="font-size:16px; color: var(--dark-blue); line-height:23px;">
+                                        보내기</p>
+                                </button>
+                            </div>
+                        </form>
 
                         <div class="py-0 py-md-5 py-lg-0"></div>
                         <div class="py-5 py-lg-0"></div>
@@ -246,5 +288,116 @@
 @endsection
 
 @section('scripts')
-    <script></script>
+    <script>
+        const txtPhoneCodeLg = document.getElementById('txtPhoneCodeLg');
+        const countryCode = document.getElementById('countryId');
+
+        function selectCode(element) {
+            var phoneCode = element.dataset.phonecode;
+            var countryId = element.dataset.country;
+            txtPhoneCodeLg.innerText = phoneCode;
+            countryCode.value = countryId;
+
+            var elementsWithClass = document.querySelectorAll('.active');
+            elementsWithClass.forEach(function(el) {
+                el.classList.remove('active');
+            });
+
+            // Add the 'active' class to the current element
+            element.classList.add('active');
+        }
+
+        function submitContactUs(event) {
+            event.preventDefault();
+            $('#spinnerSubmit').show();
+            $('#btnSubmit').prop('disabled', true);
+
+            var name = $('#name').val().trim();
+            var email = $('#email').val().trim();
+            var phoneCode = $('#countryId').val().trim();
+            var phoneNumber = $('#phoneNumber').val().trim();
+            var message = $('#message').val().trim();
+
+            const errorIds = [
+                'nameError',
+                'emailError',
+                'phoneCodeError',
+                'phoneNumberError',
+                'messageError'
+            ];
+
+            // Clear all validation
+            errorIds.forEach((errorId) => {
+                const errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.textContent = '';
+                    errorElement.style.display = 'none';
+                }
+            });
+
+            $.ajax({
+                url: '/api/submit-contact-us',
+                method: 'POST',
+                data: {
+                    name: name,
+                    email: email,
+                    phoneCode: phoneCode,
+                    phoneNumber: phoneNumber,
+                    message: message
+                },
+                success: function(response) {
+                    const status = parseInt(response.status);
+                    if (status == 1) {
+                        toastr.clear();
+                        NioApp.Toast(
+                            '<h5 class="font-medium m-0">귀하의 문의가 성공적으로 전송되었습니다</h5>',
+                            'success');
+
+                        $('#name').val('');
+                        $('#email').val('');
+                        $('#phoneNumber').val('');
+                        $('#message').val('');
+                    } else {
+                        toastr.clear();
+                        NioApp.Toast(
+                            '<h5 class="font-medium m-0">문의사항을 보내지 못했습니다. 나중에 다시 시도 해주십시오.</h5>',
+                            'error');
+                    }
+                },
+                error: function(response) {
+                    console.log(response);
+                    if (response.status === 422) {
+                        // Validation failed, handle the errors
+                        const errors = response.responseJSON.errors;
+
+                        // Display errors to the user
+                        for (let fieldName in errors) {
+                            if (errors.hasOwnProperty(fieldName)) {
+                                const errorMessage = errors[fieldName][0];
+                                const errorElement = document.getElementById(
+                                    `${fieldName}Error`);
+
+                                if (errorElement) {
+                                    errorElement.textContent = errorMessage;
+                                    errorElement.style.display = 'block';
+                                }
+                            }
+                        }
+                    } else {
+                        toastr.clear();
+                        NioApp.Toast(
+                            '<h5 class="font-medium m-0">이런, 문제가 발생했습니다. 나중에 다시 시도 해주십시오.</h5>',
+                            'error');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 3000);
+                    }
+                },
+                complete: function() {
+                    $('#spinnerSubmit').hide();
+                    $('#btnSubmit').prop('disabled', false);
+                }
+            });
+        }
+    </script>
 @endsection
