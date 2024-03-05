@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Product\NameController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PDO;
 
 class SaveController extends Controller
 {
@@ -44,7 +43,7 @@ class SaveController extends Controller
             $hasOption = $product['hasOption'];
             $byte = 50;
             if ($hasOption === 'true' && isset($product['productOptions'])) {
-                $byte = 40;
+                $byte = 41;
             }
             $productName = $nameController->index($product['productName'], $byte);
             $sellerID = $product['sellerID'];
