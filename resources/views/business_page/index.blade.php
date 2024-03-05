@@ -49,7 +49,7 @@
             </section>
             <section id="sectionFeatures" class="py-5">
                 <p class="font-bold m-0 text-center d-block d-md-none pb-5"
-                    style="font-size:32px; color: var(--dark-blue); line-height:30px;">특색
+                    style="font-size:32px; color: var(--dark-blue); line-height:30px;">프로그램 특징
                 </p>
                 <div class="row m-0 d-flex justify-content-between px-4 px-md-0" style="column-gap: 44px;">
                     <div class="col-md p-0 col-sm-12">
@@ -78,7 +78,7 @@
                     </div>
                     <div class="col-md p-0 col-sm-12">
                         <p class="font-bold m-0 text-center d-none d-md-block"
-                            style="font-size:32px; color: var(--dark-blue); line-height:30px; padding: 80px 0px;">특색
+                            style="font-size:32px; color: var(--dark-blue); line-height:30px; padding: 80px 0px;">프로그램 특징
                         </p>
                         <div class="text-center" style="border: 2px solid var(--dark-blue);">
                             <img src="{{ asset('images/business/05_Product_Delivery.svg') }}" class="img img-fluid p-4">
@@ -132,7 +132,7 @@
             <section id="sectionPartnerships" class="py-5">
                 <p class="font-bold m-0 text-center pb-5"
                     style="font-size:32px; color: var(--dark-blue); line-height:30px;">
-                    우리의 파트너십
+                    연동 오픈마켓
                 </p>
 
                 <div class="row pb-2 pb-lg-4 px-2 justify-content-center align-items-center"
@@ -143,6 +143,58 @@
                                 style="object-fit: contain; min-height:10vh; min-width:10vw; max-height:150px;">
                         </div>
                     @endforeach
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="nk-content pt-0" style="background-color: var(--white);">
+        <div class="container-sm">
+            <section class="py-5">
+                <p class="font-bold m-0 text-center pb-5"
+                    style="font-size:32px; color: var(--dark-blue); line-height:30px;">
+                    프로그램 이용료
+                </p>
+                <div class="row">
+                    <div class="col">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>상품</th>
+                                    <th>무료</th>
+                                    <th>프리미엄</th>
+                                    <th>프리미엄+</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>요금제</td>
+                                    <td>오늘만 무료</td>
+                                    <td>오늘만 10주 연속</td>
+                                    <td>오늘만 10주 연속</td>
+                                </tr>
+                                <tr>
+                                    <td>조향료</td>
+                                    <td>-</td>
+                                    <td>조향료 10주 연속</td>
+                                    <td>조향료 30주 연속</td>
+                                </tr>
+                                <tr>
+                                    <td>자사통</td>
+                                    <td>현장시 외 99,000원</td>
+                                    <td>자사통 1개 연속</td>
+                                    <td>자사통 1개 연속</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>가격</td>
+                                    <td>무료</td>
+                                    <td>월 499,000원</td>
+                                    <td>월 799,000원</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
             </section>
         </div>
