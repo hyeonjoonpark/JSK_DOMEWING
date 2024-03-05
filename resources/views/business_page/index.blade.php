@@ -159,30 +159,30 @@
                         <table class="styled-table">
                             <thead>
                                 <tr>
-                                    <th>상품</th>
+                                    <th>종류</th>
                                     <th>무료</th>
+                                    <th>플러스</th>
                                     <th>프리미엄</th>
-                                    <th>프리미엄+</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>요금제</td>
-                                    <td>오늘만 무료</td>
-                                    <td>오늘만 10주 연속</td>
-                                    <td>오늘만 10주 연속</td>
+                                    <td>오픈마켓</td>
+                                    <td>오픈마켓 10곳 연동</td>
+                                    <td>오픈마켓 10곳 연동</td>
+                                    <td>오픈마켓 10곳 연동</td>
                                 </tr>
                                 <tr>
-                                    <td>조향료</td>
+                                    <td>종합몰</td>
                                     <td>-</td>
-                                    <td>조향료 10주 연속</td>
-                                    <td>조향료 30주 연속</td>
+                                    <td>종합몰 10곳 연동</td>
+                                    <td>종합몰 30곳 연동</td>
                                 </tr>
                                 <tr>
-                                    <td>자사통</td>
-                                    <td>현장시 외 99,000원</td>
-                                    <td>자사통 1개 연속</td>
-                                    <td>자사통 1개 연속</td>
+                                    <td>자사몰</td>
+                                    <td>희망시 월 99,000원</td>
+                                    <td>자사몰 1개 연동</td>
+                                    <td>자사몰 1개 연동</td>
                                 </tr>
                             </tbody>
                             <tfoot>
@@ -190,7 +190,9 @@
                                     <td>가격</td>
                                     <td>무료</td>
                                     <td>월 499,000원</td>
-                                    <td>월 799,000원</td>
+                                    <td>
+                                        <a href="#sectionContactUs" class="btn btn-primary">문의하기</a>
+                                    </td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -247,7 +249,7 @@
                                         style="color: var(--red);">*</span></label>
                                 <div class="form-control-wrap" style="height:37px;">
                                     <input type="text" class="form-control font-medium contact-us-textbox"
-                                        id="name" name="name" placeholder="제인" value="{{ old('name') }}">
+                                        id="name" name="name" placeholder="홍길동" value="{{ old('name') }}">
                                     <span id="nameError" class="invalid font-medium"
                                         style="display: none; color: var(--red);"></span>
                                 </div>
@@ -268,41 +270,16 @@
 
                             <div class="form-group mb-gs">
                                 <label class="form-label font-medium m-0 mb-1" for="contact"
-                                    style="font-size: 15px; line-height:17px; color: var(--blue);">전화 번호<span
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">연락처<span
                                         style="color: var(--red);">*</span></label>
                                 <input type="hidden" id="countryId" name="countryId" value="">
                                 <div class="form-control-wrap">
                                     <div class="form-control font-medium contact-us-textbox p-0">
                                         <div class="input-group-prepend">
-                                            <button class="btn dropdown-toggle" data-bs-toggle="dropdown">
-                                                <p id="txtPhoneCodeLg" class="m-0"
-                                                    style="font-size: 20px; line-height: 23px; color: var(--dark-blue);">
-                                                    선택하다
-                                                </p>
-                                            </button>
-                                            <div class="dropdown-menu" data-search="on">
-                                                <ul class="link-list-opt phone-code-list no-bdr"
-                                                    style="height: 200px; overflow-y:auto;">
-                                                    @foreach ($phoneCodes as $phoneCode)
-                                                        <li>
-                                                            <a onclick="selectCode(this)"
-                                                                data-phonecode="{{ $phoneCode->phone_code }}"
-                                                                data-country="{{ $phoneCode->id }}"
-                                                                style="cursor: pointer;">
-                                                                {{ $phoneCode->phone_code . ' ' . $phoneCode->country_name }}
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                            <div class="vr m-0 my-auto h-70"
-                                                style=" color:var(--dark-blue); width:3px; opacity:1;">
-                                            </div>
-
                                             <input type="number" class="form-control form-control-lg py-2"
                                                 style="border:none; font-size: 20px; line-height: 23px; color: var(--dark-blue);"
-                                                id="phoneNumber" placeholder="12345678" value="{{ old('phoneNumber') }}"
-                                                name="phoneNumber">
+                                                id="phoneNumber" placeholder="01012345678"
+                                                value="{{ old('phoneNumber') }}" name="phoneNumber">
                                         </div>
 
                                     </div>
@@ -315,11 +292,11 @@
 
                             <div class="form-group mb-gs">
                                 <label class="form-label font-medium m-0 mb-1" for="message"
-                                    style="font-size: 15px; line-height:17px; color: var(--blue);">귀하의 메시지<span
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">내용<span
                                         style="color: var(--red);">*</span></label>
                                 <div class="form-control-wrap">
                                     <textarea type="text" class="form-control font-medium contact-us-textbox" id="message" name="message"
-                                        placeholder="여기에 당신의 메시지" value="{{ old('message') }}"></textarea>
+                                        placeholder="내용을 기입해주세요." value="{{ old('message') }}"></textarea>
                                     <span id="messageError" class="invalid font-medium"
                                         style="display: none; color: var(--red);"></span>
                                 </div>
@@ -350,24 +327,6 @@
 
 @section('scripts')
     <script>
-        const txtPhoneCodeLg = document.getElementById('txtPhoneCodeLg');
-        const countryCode = document.getElementById('countryId');
-
-        function selectCode(element) {
-            var phoneCode = element.dataset.phonecode;
-            var countryId = element.dataset.country;
-            txtPhoneCodeLg.innerText = phoneCode;
-            countryCode.value = countryId;
-
-            var elementsWithClass = document.querySelectorAll('.active');
-            elementsWithClass.forEach(function(el) {
-                el.classList.remove('active');
-            });
-
-            // Add the 'active' class to the current element
-            element.classList.add('active');
-        }
-
         function submitContactUs(event) {
             event.preventDefault();
             $('#spinnerSubmit').show();
@@ -375,14 +334,12 @@
 
             var name = $('#name').val().trim();
             var email = $('#email').val().trim();
-            var phoneCode = $('#countryId').val().trim();
             var phoneNumber = $('#phoneNumber').val().trim();
             var message = $('#message').val().trim();
 
             const errorIds = [
                 'nameError',
                 'emailError',
-                'phoneCodeError',
                 'phoneNumberError',
                 'messageError'
             ];
@@ -402,7 +359,6 @@
                 data: {
                     name: name,
                     email: email,
-                    phoneCode: phoneCode,
                     phoneNumber: phoneNumber,
                     message: message
                 },
