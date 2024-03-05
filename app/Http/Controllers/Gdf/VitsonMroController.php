@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Gdf;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Product\ProcessController;
 use App\Http\Controllers\Productwing\SoldOutController;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class VitsonMroController extends Controller
@@ -29,16 +30,18 @@ class VitsonMroController extends Controller
         $productsChunks = $products->chunk(100);
         $productCodes = [];
         foreach ($productsChunks as $index => $chunk) {
-            $tempFilePath = $this->genHrefsJsonFile($chunk, $index);
-            $trackOverAmountProducts = $this->trackOverAmountProducts($tempFilePath);
-            if ($trackOverAmountProducts === false) {
-                return false;
+            if ($index > 51) {
+                $tempFilePath = $this->genHrefsJsonFile($chunk, $index);
+                $trackOverAmountProducts = $this->trackOverAmountProducts($tempFilePath);
+                if ($trackOverAmountProducts === false) {
+                    return false;
+                }
+                $productCodesJsonFile = storage_path('app/public/gdf/' . uniqid() . '.json');
+                file_put_contents($productCodesJsonFile, json_encode($trackOverAmountProducts));
+                $productCodes = array_merge($productCodes, $trackOverAmountProducts);
+                unlink($tempFilePath);
             }
-            $productCodes = array_merge($productCodes, $trackOverAmountProducts);
-            unlink($tempFilePath);
         }
-        $productCodesJsonFile = storage_path('app/public/gdf/' . uniqid() . '.json');
-        file_put_contents($productCodesJsonFile, json_encode($productCodes));
         $b2bs = DB::table('vendors')
             ->where('is_active', 'Y')
             ->get();
@@ -59,12 +62,19 @@ class VitsonMroController extends Controller
         return DB::table('minewing_products')
             ->where('sellerID', self::VENDOR_ID)
             ->where('isActive', 'Y')
+            ->orderBy('createdAt', 'asc')
             ->get(['productCode', 'productHref']);
     }
     private function genHrefsJsonFile($products, $index)
     {
+        if ($products instanceof Collection) {
+            $productsArray = $products->values()->toArray();
+        } else {
+            // 이미 배열인 경우, 직접 사용
+            $productsArray = $products;
+        }
         $tempFilePath = storage_path('app/public/gdf/sibal' . $index . '.json');
-        file_put_contents($tempFilePath, json_encode($products));
+        file_put_contents($tempFilePath, json_encode($productsArray));
         return $tempFilePath;
     }
     private function trackOverAmountProducts($tempFilePath)

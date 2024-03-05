@@ -6,9 +6,9 @@
                 <div class="col-lg-3 col-md-4 col-12 my-auto">
                     <p class="font-bold m-0 pb-gs" style="font-size:32px; color: var(--dark-blue); line-height:30px;">셀윙</p>
                     <p class="font-medium m-0 pb-3 px-5 px-md-0"
-                        style="font-size:20px; color: var(--dark-blue); line-height:30px;">이익은
-                        극대화하고
-                        노력은 최소화하세요: 기업가의 이점
+                        style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                        주문부터 송장입력까지 모두 자동화<br>
+                        다양한 채널에 상품등록하여 매출을 극대화하세요
                     </p>
                     <a href="{{ route('auth.login') }}" type="button" class="btn btn-sellwing py-2 px-5">
                         <p class="font-bold m-0" style="font-size:16px; color: var(--dark-blue); line-height:23px;">로그인</p>
@@ -30,10 +30,19 @@
                     </div>
                     <div class="col-12 col-md-6 text-center px-0 px-lg-4">
                         <p class="font-bold m-0 pb-gs" style="font-size:32px; color: var(--dark-blue); line-height:30px;">
-                            회사소개</p>
-                        <p class="font-medium m-0 px-4 px-md-0"
-                            style="font-size:20px; color: var(--dark-blue); line-height:30px;">다양한 도매
-                            웹사이트에서 제품 데이터를 효율적으로 수집하고 이를 전자상거래 사이트나 온라인 소매점으로 원활하게 전송하여 유연성과 확장성을 보장하는 엔진입니다.
+                            프로그램 소개</p>
+                        <p class="font-medium px-4 px-md-0 text-start"
+                            style="font-size:18px; color: var(--dark-blue); line-height:30px;">
+                            <i class="fa-solid fa-truck-fast"></i> 셀윙은 주문 수집부터 품절 관리, 송장 입력에 이르기까지 모든 과정을 자동화한 프로그램입니다.
+                        </p>
+                        <p class="font-medium px-4 px-md-0 text-start"
+                            style="font-size:18px; color: var(--dark-blue); line-height:30px;">
+                            <i class="fa-solid fa-arrow-up-right-dots"></i> 오픈 마켓부터 종합몰에 이르는 다양한 유통 채널에 상품을 등록해 매출을 증대시킬 수
+                            있습니다.
+                        </p>
+                        <p class="font-medium px-4 px-md-0 text-start"
+                            style="font-size:18px; color: var(--dark-blue); line-height:30px;">
+                            <i class="fa-solid fa-users"></i> 고객 지원만 관리하면서 판매에 집중함으로써 사업주님들이 매출 효율성을 극대화할 수 있도록 돕습니다.
                         </p>
                     </div>
                 </div>
@@ -51,8 +60,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">상품수집
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">제품 업로드를 처리하는 보다 효율적인 방법을
-                                찾고 계십니까? 우리 엔진은 URL만으로 모든 데이터를 데이터베이스로 자동 전송하므로 시간과 노력이 절약됩니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 연동되어있는 B2B 사이트에서 원하는 상품을 수집할 수 있습니다.
                             </p>
                         </div>
                         <div class="my-5 text-center" style="border: 2px solid var(--dark-blue);">
@@ -62,8 +71,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">자동송장
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">모든 제품 세부정보를 수동으로 컴파일하고
-                                구성하는 데 지치셨나요? “Excel Wing”으로 쉽게 문서화하세요. 한 번만 클릭하면 제품 목록이 Excel 시트로 생성됩니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 주문된 상품이 출고처리가 되면 자동으로 송장번호가 프로그램으로 통하여 마켓에 등록할 수 있습니다.
                             </p>
                         </div>
                     </div>
@@ -78,8 +87,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">상품관리
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">주문윙에서는 주문처리부터 상품배송현황 확인까지
-                                쉽게 접근할 수 있습니다. 이 기능을 사용하면 모든 주문에 신속하게 대응하고 배송 문제를 처리할 수 있습니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 품절,가격변동,재입고처리등 모든 기능이 자동화가 되어있습니다.
                             </p>
                         </div>
                         <div class="my-5 mb-md-0 text-center" style="border: 2px solid var(--dark-blue);">
@@ -89,8 +98,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">상품가공
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">여기에서 업로드된 제품 상태를 관리하세요.
-                                품절, 마지막 몇 개 단위까지 또는 일시적으로 사용할 수 없는 경우 고객에게 제품에 대한 최신 정보를 제공하십시오.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 원하는 방식대로 상품을 직접 가공하여 연동되어있는 마켓에 등록할 수 있도록 되어있습니다.
                             </p>
                         </div>
                     </div>
@@ -102,8 +111,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">상품등록
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">제품의 바다에 빠져들고 있나요? 매핑윙이
-                                처리해 드리겠습니다. 귀하의 제품은 귀하가 지정한 기준에 따라 자동으로 분류되므로 늘어나는 재고 관리가 간소화됩니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 연동되어있는 마켓들에 손쉽게 상품을 등록할 수 있는 기능으로 구현되어있습니다.
                             </p>
                         </div>
                         <div class="mt-5 text-center" style="border: 2px solid var(--dark-blue);">
@@ -113,8 +122,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">자동주문
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">제품에 대한 API를 생성하는 데 도움이
-                                필요하십니까? API Wing을 사용하여 쉽게 생성하세요. 귀하의 비즈니스가 처리하는 모든 전자상거래 사이트로 내보내고 업로드할 수 있습니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 주문이 들어오면 매시간마다 자동으로 주문수집을하여 B2B사이트에 주문서가 등록이되며, 충전되어있는 예치금이 자동차감되어집니다.
                             </p>
                         </div>
                     </div>
