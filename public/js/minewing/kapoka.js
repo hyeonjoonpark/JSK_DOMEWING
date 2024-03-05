@@ -28,7 +28,7 @@ const puppeteer = require('puppeteer');
         console.error(error);
     } finally {
         // 작업이 완료되면 브라우저를 닫습니다.
-        await browser.close();
+        // await browser.close();
     }
 })();
 // 총 페이지 숫자를 구하는 함수.
@@ -68,10 +68,10 @@ async function scrapeProducts(page) {
         function processProduct(productElement) {
             try {
                 const productNameElement = productElement.querySelector('div:nth-child(2) > a');
-                const name = productNameElement.textContent.trim();
+                // const name = productNameElement.textContent.trim();
                 // const nameText = productNameElement.textContent.trim();
                 // const regexPattern = /\[[^\]]*\]/g;
-                // const name = nameText.replace(regexPattern, '');
+                const name = nameText.replace(regexPattern, '');
                 const productPriceText = productElement.querySelector('div:nth-child(3) > b').textContent;
                 const price = productPriceText.replace(/[^0-9]/g, '').trim();
                 const imageElement = productElement.querySelector('div:nth-child(1) > a > img');
@@ -112,5 +112,3 @@ async function scrapeProducts(page) {
 
     return products;
 }
-
-
