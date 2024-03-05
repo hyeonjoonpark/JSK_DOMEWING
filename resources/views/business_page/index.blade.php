@@ -156,46 +156,48 @@
                 </p>
                 <div class="row">
                     <div class="col">
-                        <table class="styled-table">
-                            <thead>
-                                <tr>
-                                    <th>종류</th>
-                                    <th>무료</th>
-                                    <th>플러스</th>
-                                    <th>프리미엄</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>오픈마켓</td>
-                                    <td>오픈마켓 10곳 연동</td>
-                                    <td>오픈마켓 10곳 연동</td>
-                                    <td>오픈마켓 10곳 연동</td>
-                                </tr>
-                                <tr>
-                                    <td>종합몰</td>
-                                    <td>-</td>
-                                    <td>종합몰 10곳 연동</td>
-                                    <td>종합몰 30곳 연동</td>
-                                </tr>
-                                <tr>
-                                    <td>자사몰</td>
-                                    <td>희망시 월 99,000원</td>
-                                    <td>자사몰 1개 연동</td>
-                                    <td>자사몰 1개 연동</td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td>가격</td>
-                                    <td>무료</td>
-                                    <td><a href="#sectionContactUs" class="btn btn-primary">문의하기</a></td>
-                                    <td>
-                                        <a href="#sectionContactUs" class="btn btn-primary">문의하기</a>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="styled-table text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>종류</th>
+                                        <th>무료</th>
+                                        <th>플러스</th>
+                                        <th>프리미엄</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>오픈마켓</td>
+                                        <td>오픈마켓 10곳 연동</td>
+                                        <td>오픈마켓 10곳 연동</td>
+                                        <td>오픈마켓 10곳 연동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>종합몰</td>
+                                        <td>-</td>
+                                        <td>종합몰 10곳 연동</td>
+                                        <td>종합몰 30곳 연동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>자사몰</td>
+                                        <td>희망시 월 99,000원</td>
+                                        <td>자사몰 1개 연동</td>
+                                        <td>자사몰 1개 연동</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>가격</td>
+                                        <td>무료</td>
+                                        <td><a href="#sectionContactUs" class="btn btn-primary">문의하기</a></td>
+                                        <td>
+                                            <a href="#sectionContactUs" class="btn btn-primary">문의하기</a>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>

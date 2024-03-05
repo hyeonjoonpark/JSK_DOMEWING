@@ -28,10 +28,10 @@
                     <div class="nk-block nk-block-middle nk-auth-body  wide-xs">
                         <div class="brand-logo pb-4 text-center">
                             <a href="{{ route('business_page') }}" class="logo-link">
-                                <img class="logo-light logo-img logo-img-lg" src="{{ asset('assets/images/logo.png') }}"
-                                    srcset="{{ asset('assets/images/logo.png') }} 2x" alt="logo">
-                                <img class="logo-dark logo-img logo-img-lg" src="{{ asset('assets/images/logo.png') }}"
-                                    srcset="{{ asset('assets/images/logo.png') }} 2x" alt="logo-dark">
+                                <h3 class="font-bold fw-bold m-0"
+                                    style="color: var(--dark-blue); line-height:44px; font-size:30px;">
+                                    SELLWING
+                                </h3>
                             </a>
                         </div>
                         <div class="card card-bordered">
