@@ -189,7 +189,7 @@
                                 <tr>
                                     <td>가격</td>
                                     <td>무료</td>
-                                    <td>월 499,000원</td>
+                                    <td><a href="#sectionContactUs" class="btn btn-primary">문의하기</a></td>
                                     <td>
                                         <a href="#sectionContactUs" class="btn btn-primary">문의하기</a>
                                     </td>
