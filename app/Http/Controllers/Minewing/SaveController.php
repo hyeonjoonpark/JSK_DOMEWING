@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Product\NameController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PDO;
 
 class SaveController extends Controller
 {
@@ -44,7 +43,7 @@ class SaveController extends Controller
             $hasOption = $product['hasOption'];
             $byte = 50;
             if ($hasOption === 'true' && isset($product['productOptions'])) {
-                $byte = 42;
+                $byte = 41;
             }
             $productName = $nameController->index($product['productName'], $byte);
             $sellerID = $product['sellerID'];
@@ -69,21 +68,6 @@ class SaveController extends Controller
                 ->first()
                 ->header_image;
             if (isset($product['productDetail'])) {
-                // if ($imageScraper === 'Y') {
-                //     $runImageScraperResult = $this->runImageScraper($product['productDetail']);
-                //     if ($runImageScraperResult['status'] === false) {
-                //         return $runImageScraperResult;
-                //     }
-                //     $imageMap = $runImageScraperResult['return'];
-                //     $filePath = public_path("images/CDN/tmp/");
-                //     $productDetailSrcs = [];
-                //     foreach ($imageMap as $imageInfo) {
-                //         $productDetailSrcs[] = $filePath . $imageInfo['newFileName'];
-                //     }
-                //     $productDetail = $productImageController->processImages($productDetailSrcs, $headerImage);
-                // } else {
-                //     $productDetail = $productImageController->processImages($product['productDetail'], $headerImage);
-                // }
                 $productDetail = $productImageController->processImages($product['productDetail'], $headerImage);
             } else {
                 $productDetail = '<center><img src="https://www.sellwing.kr/images/CDN/' . $headerImage . '"></center>';

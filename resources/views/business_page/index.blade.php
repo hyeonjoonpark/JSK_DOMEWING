@@ -6,9 +6,9 @@
                 <div class="col-lg-3 col-md-4 col-12 my-auto">
                     <p class="font-bold m-0 pb-gs" style="font-size:32px; color: var(--dark-blue); line-height:30px;">셀윙</p>
                     <p class="font-medium m-0 pb-3 px-5 px-md-0"
-                        style="font-size:20px; color: var(--dark-blue); line-height:30px;">이익은
-                        극대화하고
-                        노력은 최소화하세요: 기업가의 이점
+                        style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                        주문부터 송장입력까지 모두 자동화<br>
+                        다양한 채널에 상품등록하여 매출을 극대화하세요
                     </p>
                     <a href="{{ route('auth.login') }}" type="button" class="btn btn-sellwing py-2 px-5">
                         <p class="font-bold m-0" style="font-size:16px; color: var(--dark-blue); line-height:23px;">로그인</p>
@@ -30,17 +30,26 @@
                     </div>
                     <div class="col-12 col-md-6 text-center px-0 px-lg-4">
                         <p class="font-bold m-0 pb-gs" style="font-size:32px; color: var(--dark-blue); line-height:30px;">
-                            회사소개</p>
-                        <p class="font-medium m-0 px-4 px-md-0"
-                            style="font-size:20px; color: var(--dark-blue); line-height:30px;">다양한 도매
-                            웹사이트에서 제품 데이터를 효율적으로 수집하고 이를 전자상거래 사이트나 온라인 소매점으로 원활하게 전송하여 유연성과 확장성을 보장하는 엔진입니다.
+                            프로그램 소개</p>
+                        <p class="font-medium px-4 px-md-0 text-start"
+                            style="font-size:18px; color: var(--dark-blue); line-height:30px;">
+                            <i class="fa-solid fa-truck-fast"></i> 셀윙은 주문 수집부터 품절 관리, 송장 입력에 이르기까지 모든 과정을 자동화한 프로그램입니다.
+                        </p>
+                        <p class="font-medium px-4 px-md-0 text-start"
+                            style="font-size:18px; color: var(--dark-blue); line-height:30px;">
+                            <i class="fa-solid fa-arrow-up-right-dots"></i> 오픈 마켓부터 종합몰에 이르는 다양한 유통 채널에 상품을 등록해 매출을 증대시킬 수
+                            있습니다.
+                        </p>
+                        <p class="font-medium px-4 px-md-0 text-start"
+                            style="font-size:18px; color: var(--dark-blue); line-height:30px;">
+                            <i class="fa-solid fa-users"></i> 고객 지원만 관리하면서 판매에 집중함으로써 사업주님들이 매출 효율성을 극대화할 수 있도록 돕습니다.
                         </p>
                     </div>
                 </div>
             </section>
             <section id="sectionFeatures" class="py-5">
                 <p class="font-bold m-0 text-center d-block d-md-none pb-5"
-                    style="font-size:32px; color: var(--dark-blue); line-height:30px;">특색
+                    style="font-size:32px; color: var(--dark-blue); line-height:30px;">프로그램 특징
                 </p>
                 <div class="row m-0 d-flex justify-content-between px-4 px-md-0" style="column-gap: 44px;">
                     <div class="col-md p-0 col-sm-12">
@@ -51,8 +60,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">상품수집
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">제품 업로드를 처리하는 보다 효율적인 방법을
-                                찾고 계십니까? 우리 엔진은 URL만으로 모든 데이터를 데이터베이스로 자동 전송하므로 시간과 노력이 절약됩니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 연동되어있는 B2B 사이트에서 원하는 상품을 수집할 수 있습니다.
                             </p>
                         </div>
                         <div class="my-5 text-center" style="border: 2px solid var(--dark-blue);">
@@ -62,14 +71,14 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">자동송장
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">모든 제품 세부정보를 수동으로 컴파일하고
-                                구성하는 데 지치셨나요? “Excel Wing”으로 쉽게 문서화하세요. 한 번만 클릭하면 제품 목록이 Excel 시트로 생성됩니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 주문된 상품이 출고처리가 되면 자동으로 송장번호가 프로그램으로 통하여 마켓에 등록할 수 있습니다.
                             </p>
                         </div>
                     </div>
                     <div class="col-md p-0 col-sm-12">
                         <p class="font-bold m-0 text-center d-none d-md-block"
-                            style="font-size:32px; color: var(--dark-blue); line-height:30px; padding: 80px 0px;">특색
+                            style="font-size:32px; color: var(--dark-blue); line-height:30px; padding: 80px 0px;">프로그램 특징
                         </p>
                         <div class="text-center" style="border: 2px solid var(--dark-blue);">
                             <img src="{{ asset('images/business/05_Product_Delivery.svg') }}" class="img img-fluid p-4">
@@ -78,8 +87,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">상품관리
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">주문윙에서는 주문처리부터 상품배송현황 확인까지
-                                쉽게 접근할 수 있습니다. 이 기능을 사용하면 모든 주문에 신속하게 대응하고 배송 문제를 처리할 수 있습니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 품절,가격변동,재입고처리등 모든 기능이 자동화가 되어있습니다.
                             </p>
                         </div>
                         <div class="my-5 mb-md-0 text-center" style="border: 2px solid var(--dark-blue);">
@@ -89,8 +98,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">상품가공
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">여기에서 업로드된 제품 상태를 관리하세요.
-                                품절, 마지막 몇 개 단위까지 또는 일시적으로 사용할 수 없는 경우 고객에게 제품에 대한 최신 정보를 제공하십시오.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 원하는 방식대로 상품을 직접 가공하여 연동되어있는 마켓에 등록할 수 있도록 되어있습니다.
                             </p>
                         </div>
                     </div>
@@ -102,8 +111,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">상품등록
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">제품의 바다에 빠져들고 있나요? 매핑윙이
-                                처리해 드리겠습니다. 귀하의 제품은 귀하가 지정한 기준에 따라 자동으로 분류되므로 늘어나는 재고 관리가 간소화됩니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 연동되어있는 마켓들에 손쉽게 상품을 등록할 수 있는 기능으로 구현되어있습니다.
                             </p>
                         </div>
                         <div class="mt-5 text-center" style="border: 2px solid var(--dark-blue);">
@@ -113,8 +122,8 @@
                                 style="font-size:24px; color: var(--dark-blue); line-height:28px;">자동주문
                             </p>
                             <p class="font-medium m-0 px-2 pb-2 text-start"
-                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">제품에 대한 API를 생성하는 데 도움이
-                                필요하십니까? API Wing을 사용하여 쉽게 생성하세요. 귀하의 비즈니스가 처리하는 모든 전자상거래 사이트로 내보내고 업로드할 수 있습니다.
+                                style="font-size:20px; color: var(--dark-blue); line-height:30px;">
+                                - 주문이 들어오면 매시간마다 자동으로 주문수집을하여 B2B사이트에 주문서가 등록이되며, 충전되어있는 예치금이 자동차감되어집니다.
                             </p>
                         </div>
                     </div>
@@ -123,7 +132,7 @@
             <section id="sectionPartnerships" class="py-5">
                 <p class="font-bold m-0 text-center pb-5"
                     style="font-size:32px; color: var(--dark-blue); line-height:30px;">
-                    우리의 파트너십
+                    연동 오픈마켓
                 </p>
 
                 <div class="row pb-2 pb-lg-4 px-2 justify-content-center align-items-center"
@@ -134,6 +143,62 @@
                                 style="object-fit: contain; min-height:10vh; min-width:10vw; max-height:150px;">
                         </div>
                     @endforeach
+                </div>
+            </section>
+        </div>
+    </div>
+    <div class="nk-content pt-0" style="background-color: var(--white);">
+        <div class="container-sm">
+            <section class="py-5">
+                <p class="font-bold m-0 text-center pb-5"
+                    style="font-size:32px; color: var(--dark-blue); line-height:30px;">
+                    프로그램 이용료
+                </p>
+                <div class="row">
+                    <div class="col">
+                        <div class="table-responsive">
+                            <table class="styled-table text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>종류</th>
+                                        <th>무료</th>
+                                        <th>플러스</th>
+                                        <th>프리미엄</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>오픈마켓</td>
+                                        <td>오픈마켓 10곳 연동</td>
+                                        <td>오픈마켓 10곳 연동</td>
+                                        <td>오픈마켓 10곳 연동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>종합몰</td>
+                                        <td>-</td>
+                                        <td>종합몰 10곳 연동</td>
+                                        <td>종합몰 30곳 연동</td>
+                                    </tr>
+                                    <tr>
+                                        <td>자사몰</td>
+                                        <td>희망시 월 99,000원</td>
+                                        <td>자사몰 1개 연동</td>
+                                        <td>자사몰 1개 연동</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>가격</td>
+                                        <td>무료</td>
+                                        <td><a href="#sectionContactUs" class="btn btn-primary">문의하기</a></td>
+                                        <td>
+                                            <a href="#sectionContactUs" class="btn btn-primary">문의하기</a>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
@@ -178,61 +243,78 @@
                             style="font-size:32px; color: var(--dark-blue); line-height:30px;">
                             문의하기
                         </p>
-                        <div class="form-group mb-gs">
-                            <label class="form-label font-medium m-0 mb-1" for="name"
-                                style="font-size: 15px; line-height:17px; color: var(--blue);">이름<span
-                                    style="color: var(--red);">*</span></label>
-                            <div class="form-control-wrap" style="height:37px;">
-                                <input type="text" class="form-control font-medium contact-us-textbox" id="name"
-                                    name="name" placeholder="제인">
-                                <span id="nameError" class="invalid font-medium" style="display: none;">This field is
-                                    required.</span>
-                            </div>
-                        </div>
 
-                        <div class="form-group mb-gs">
-                            <label class="form-label font-medium m-0 mb-1" for="email"
-                                style="font-size: 15px; line-height:17px; color: var(--blue);">이메일<span
-                                    style="color: var(--red);">*</span></label>
-                            <div class="form-control-wrap" style="height:37px;">
-                                <input type="text" class="form-control font-medium contact-us-textbox" id="email"
-                                    name="email" placeholder="janedoe@gmail.com">
-                                <span id="emailError" class="invalid font-medium" style="display: none;">This field is
-                                    required.</span>
+                        <form onsubmit="submitContactUs(event)">
+                            <div class="form-group mb-gs">
+                                <label class="form-label font-medium m-0 mb-1" for="name"
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">이름<span
+                                        style="color: var(--red);">*</span></label>
+                                <div class="form-control-wrap" style="height:37px;">
+                                    <input type="text" class="form-control font-medium contact-us-textbox"
+                                        id="name" name="name" placeholder="홍길동" value="{{ old('name') }}">
+                                    <span id="nameError" class="invalid font-medium"
+                                        style="display: none; color: var(--red);"></span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group mb-gs">
-                            <label class="form-label font-medium m-0 mb-1" for="contact"
-                                style="font-size: 15px; line-height:17px; color: var(--blue);">전화 번호<span
-                                    style="color: var(--red);">*</span></label>
-                            <div class="form-control-wrap" style="height:37px;">
-                                <input type="text" class="form-control font-medium contact-us-textbox" id="contact"
-                                    name="contact" placeholder="1055538203">
-                                <span id="contactError" class="invalid font-medium" style="display: none;">This field is
-                                    required.</span>
+                            <div class="form-group mb-gs">
+                                <label class="form-label font-medium m-0 mb-1" for="email"
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">이메일<span
+                                        style="color: var(--red);">*</span></label>
+                                <div class="form-control-wrap" style="height:37px;">
+                                    <input type="text" class="form-control font-medium contact-us-textbox"
+                                        id="email" name="email" placeholder="janedoe@gmail.com"
+                                        value="{{ old('email') }}">
+                                    <span id="emailError" class="invalid font-medium"
+                                        style="display: none; color: var(--red);"></span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group mb-gs">
-                            <label class="form-label font-medium m-0 mb-1" for="message"
-                                style="font-size: 15px; line-height:17px; color: var(--blue);">귀하의 메시지<span
-                                    style="color: var(--red);">*</span></label>
-                            <div class="form-control-wrap">
-                                <textarea type="text" class="form-control font-medium contact-us-textbox" id="message" name="message"
-                                    placeholder="testing"></textarea>
-                                <span id="messageError" class="invalid font-medium" style="display: none;">This field is
-                                    required.</span>
+                            <div class="form-group mb-gs">
+                                <label class="form-label font-medium m-0 mb-1" for="contact"
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">연락처<span
+                                        style="color: var(--red);">*</span></label>
+                                <input type="hidden" id="countryId" name="countryId" value="">
+                                <div class="form-control-wrap">
+                                    <div class="form-control font-medium contact-us-textbox p-0">
+                                        <div class="input-group-prepend">
+                                            <input type="number" class="form-control form-control-lg py-2"
+                                                style="border:none; font-size: 20px; line-height: 23px; color: var(--dark-blue);"
+                                                id="phoneNumber" placeholder="01012345678"
+                                                value="{{ old('phoneNumber') }}" name="phoneNumber">
+                                        </div>
+
+                                    </div>
+                                    <span id="phoneCodeError" class="invalid ff-italic font-medium"
+                                        style="color: var(--red); display:none"></span>
+                                    <span id="phoneNumberError" class="invalid ff-italic font-medium"
+                                        style="color: var(--red); display:none"></span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="text-left text-lg-end pb-5 pb-xl-0">
-                            <a href="#" type="button" class="btn btn-sellwing py-2 px-5">
-                                <p class="font-bold m-0"
-                                    style="font-size:16px; color: var(--dark-blue); line-height:23px;">
-                                    보내기</p>
-                            </a>
-                        </div>
+                            <div class="form-group mb-gs">
+                                <label class="form-label font-medium m-0 mb-1" for="message"
+                                    style="font-size: 15px; line-height:17px; color: var(--blue);">내용<span
+                                        style="color: var(--red);">*</span></label>
+                                <div class="form-control-wrap">
+                                    <textarea type="text" class="form-control font-medium contact-us-textbox" id="message" name="message"
+                                        placeholder="내용을 기입해주세요." value="{{ old('message') }}"></textarea>
+                                    <span id="messageError" class="invalid font-medium"
+                                        style="display: none; color: var(--red);"></span>
+                                </div>
+                            </div>
+
+                            <div class="text-left text-lg-end pb-5 pb-xl-0">
+                                <button id="btnSubmit" type="submit" class="btn btn-sellwing py-2 px-5">
+                                    <span class="spinner-border spinner-border-sm"
+                                        style="display:none; font-size:16px; color: var(--dark-blue);" id="spinnerSubmit"
+                                        role="status" aria-hidden="true"></span>
+                                    <p class="font-bold m-0"
+                                        style="font-size:16px; color: var(--dark-blue); line-height:23px;">
+                                        보내기</p>
+                                </button>
+                            </div>
+                        </form>
 
                         <div class="py-0 py-md-5 py-lg-0"></div>
                         <div class="py-5 py-lg-0"></div>
@@ -246,5 +328,94 @@
 @endsection
 
 @section('scripts')
-    <script></script>
+    <script>
+        function submitContactUs(event) {
+            event.preventDefault();
+            $('#spinnerSubmit').show();
+            $('#btnSubmit').prop('disabled', true);
+
+            var name = $('#name').val().trim();
+            var email = $('#email').val().trim();
+            var phoneNumber = $('#phoneNumber').val().trim();
+            var message = $('#message').val().trim();
+
+            const errorIds = [
+                'nameError',
+                'emailError',
+                'phoneNumberError',
+                'messageError'
+            ];
+
+            // Clear all validation
+            errorIds.forEach((errorId) => {
+                const errorElement = document.getElementById(errorId);
+                if (errorElement) {
+                    errorElement.textContent = '';
+                    errorElement.style.display = 'none';
+                }
+            });
+
+            $.ajax({
+                url: '/api/submit-contact-us',
+                method: 'POST',
+                data: {
+                    name: name,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    message: message
+                },
+                success: function(response) {
+                    const status = parseInt(response.status);
+                    if (status == 1) {
+                        toastr.clear();
+                        NioApp.Toast(
+                            '<h5 class="font-medium m-0">귀하의 문의가 성공적으로 전송되었습니다</h5>',
+                            'success');
+
+                        $('#name').val('');
+                        $('#email').val('');
+                        $('#phoneNumber').val('');
+                        $('#message').val('');
+                    } else {
+                        toastr.clear();
+                        NioApp.Toast(
+                            '<h5 class="font-medium m-0">문의사항을 보내지 못했습니다. 나중에 다시 시도 해주십시오.</h5>',
+                            'error');
+                    }
+                },
+                error: function(response) {
+                    if (response.status === 422) {
+                        // Validation failed, handle the errors
+                        const errors = response.responseJSON.errors;
+
+                        // Display errors to the user
+                        for (let fieldName in errors) {
+                            if (errors.hasOwnProperty(fieldName)) {
+                                const errorMessage = errors[fieldName][0];
+                                const errorElement = document.getElementById(
+                                    `${fieldName}Error`);
+
+                                if (errorElement) {
+                                    errorElement.textContent = errorMessage;
+                                    errorElement.style.display = 'block';
+                                }
+                            }
+                        }
+                    } else {
+                        toastr.clear();
+                        NioApp.Toast(
+                            '<h5 class="font-medium m-0">이런, 문제가 발생했습니다. 나중에 다시 시도 해주십시오.</h5>',
+                            'error');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 3000);
+                    }
+                },
+                complete: function() {
+                    $('#spinnerSubmit').hide();
+                    $('#btnSubmit').prop('disabled', false);
+                }
+            });
+        }
+    </script>
 @endsection

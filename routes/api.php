@@ -45,6 +45,9 @@ use App\Http\Controllers\Product\ValidateProductNamesController;
 use App\Http\Controllers\Productwing\RestockController;
 use App\Http\Controllers\Productwing\SoldOutController;
 
+use App\Http\Controllers\BusinessPageController;
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -129,3 +132,5 @@ Route::post('member/submit-review', [ToRateController::class, 'submitReview']);
 Route::post('member/edit-review', [ToRateController::class, 'editReview']);
 
 Route::post('apiwing/get-unset-categories', [IndexController::class, 'getUnsetCategories']);
+
+Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);

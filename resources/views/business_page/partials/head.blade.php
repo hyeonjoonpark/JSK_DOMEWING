@@ -18,3 +18,49 @@
 <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-solid.css">
 <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-regular.css">
 <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.5.1/css/sharp-light.css">
+<style>
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 1.2rem;
+        font-family: sans-serif;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .styled-table tfoot {
+        color: #18A8F1;
+        font-weight: bold;
+    }
+
+    .styled-table thead tr {
+        background-color: #18A8F1;
+        color: #ffffff;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 12px 15px;
+        border: 1px solid #dddddd;
+        width: 25%;
+        /* Adjust color as needed */
+    }
+
+    .styled-table tbody tr {
+        border-bottom: 1px solid #dddddd;
+    }
+
+    .styled-table tbody tr:nth-of-type(even) {
+        background-color: #f3f3f3;
+    }
+
+    .styled-table tbody tr:last-of-type {
+        border-bottom: 2px solid #18A8F1;
+    }
+
+    .styled-table tbody tr.active-row {
+        font-weight: bold;
+        color: #18A8F1;
+    }
+</style>
