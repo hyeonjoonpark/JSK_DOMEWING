@@ -1,10 +1,15 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        const [listURL, username, password] = args;
+        // const [listURL, username, password] = args;
+        // await signIn(page, username, password);
+        const username = 'sungil2022';
+        const password = 'tjddlf88!@';
+        const listURL = 'https://www.domecall.net/goods/goods_list.php?cateCd=076';
+
         await signIn(page, username, password);
         const numPage = await getNumPage(page, listURL);
         const products = [];
@@ -17,7 +22,7 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error(error);
     } finally {
-        await browser.close();
+        // await browser.close();
     }
 })();
 
@@ -32,9 +37,6 @@ async function signIn(page, username, password) {
 
 async function getNumPage(page, listUrl) {
     await page.goto(listUrl, { waitUntil: 'domcontentloaded' });
-    await new Promise((page) => setTimeout(page, 3000));
-    await page.select('#content > div.contents > div > div.cg-main > div.goods-list > form > fieldset > div > div > div > select > option:nth-child(4)', '40');
-    await new Promise((page) => setTimeout(page, 3000));
     const numProducts = await page.evaluate(() => {
         const numProductsText = document.querySelector('#content > div.contents > div > div.cg-main > div.goods-list > span > strong').textContent.trim();
         const numProducts = parseInt(numProductsText.replace(/[^\d]/g, ''));
@@ -47,48 +49,47 @@ async function getNumPage(page, listUrl) {
 
 async function moveToPage(page, listUrl, curPage) {
     curPage = parseInt(curPage);
-    listUrl += '&page=' + curPage;
-    await page.goto(listUrl, { waitUntil: 'domcontentloaded' });
+    const listUrlSplit = listUrl.split('?');
+    const newUrl = listUrlSplit[0] + '?page=' + curPage + '&' + listUrlSplit[1] + '&sort=g.regDt%20desc&pageNum=40';
+    await page.goto(newUrl, { waitUntil: 'domcontentloaded' });
 }
 
 
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         const products = [];
-        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div.xans-element-.xans-product.xans-product-listnormal > ul > li');
+        const productElements = document.querySelectorAll('#content > div.contents > div > div.cg-main > div.goods-list > div > div > ul li');
         for (const productElement of productElements) {
-
-            const promotionElement = productElement.querySelector('div.box > div.status > div.icon img');
-            if (promotionElement) {
-                if (checkSkipProduct(promotionElement)) {
-                    continue;
-                }
+            const soldOut = productElement.querySelector('div > div.thumbnail > a > span.soldout-img');
+            if (soldOut) {
+                continue;
             }
-            const nameElement = productElement.querySelector('div > p > a > span:nth-child(2)');
-
-            const imageElement = productElement.querySelector('div.box > a img');
-            const priceElement = productElement.querySelector('div > ul > li:nth-child(2) > span:nth-child(2)');
-            const hrefElement = productElement.querySelector('div > p > a');
-
+            const nameElement = productElement.querySelector('div > div.txt > a > strong');
+            const imageElement = productElement.querySelector('div > div.thumbnail > a > img');
+            const priceElement = productElement.querySelector('div > div.price.gd-default > span > strong');
+            const hrefElement = productElement.querySelector('div > div.txt > a').href.trim();
+            const baseUrl = 'https://www.domecall.net';
             const name = nameElement ? nameElement.textContent.trim() : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
-            const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
+            const href = hrefElement ? makeSafetyUrl(baseUrl, hrefElement) : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
-            const platform = "잡동산이";
+            const platform = "도매콜";
             products.push({ name, price, image, href, platform });
         }
         return products;
 
-        function checkSkipProduct(promotionElement) {
-            const soldOut = "//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif";
-            const promotionSrc = promotionElement.getAttribute('src');
-            if (promotionSrc == soldOut) {
-                return true;
+        function makeSafetyUrl(baseUrl, href) {
+            let safetyUrl = '';
+            if (href.startsWith('../')) {
+                hrefElement = href.slice(2);
+                safetyUrl = baseUrl + hrefElement;
             }
-            return false;
+            else safetyUrl = baseUrl + href;
+            return safetyUrl;
         }
     });
-    return products;
+
+
 }
 
 
