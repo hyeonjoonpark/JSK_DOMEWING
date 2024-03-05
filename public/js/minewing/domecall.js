@@ -1,15 +1,10 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        // const [listURL, username, password] = args;
-        // await signIn(page, username, password);
-        const username = 'sungil2022';
-        const password = 'tjddlf88!@';
-        const listURL = 'https://www.domecall.net/goods/goods_list.php?cateCd=076';
-
+        const [listURL, username, password] = args;
         await signIn(page, username, password);
         const numPage = await getNumPage(page, listURL);
         const products = [];
@@ -22,7 +17,7 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error(error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 
@@ -60,36 +55,64 @@ async function scrapeProducts(page) {
         const products = [];
         const productElements = document.querySelectorAll('#content > div.contents > div > div.cg-main > div.goods-list > div > div > ul li');
         for (const productElement of productElements) {
-            const soldOut = productElement.querySelector('div > div.thumbnail > a > span.soldout-img');
-            if (soldOut) {
+            const nameElement = productElement.querySelector('div > div.txt > a > strong').textContent.trim();
+            if (checkSkipProduct(productElement, nameElement)) {
                 continue;
             }
-            const nameElement = productElement.querySelector('div > div.txt > a > strong');
             const imageElement = productElement.querySelector('div > div.thumbnail > a > img');
             const priceElement = productElement.querySelector('div > div.price.gd-default > span > strong');
             const hrefElement = productElement.querySelector('div > div.txt > a').href.trim();
-            const baseUrl = 'https://www.domecall.net';
-            const name = nameElement ? nameElement.textContent.trim() : 'Name not found';
+
+            const name = nameElement ? removeABMInProductName(nameElement) : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
-            const href = hrefElement ? makeSafetyUrl(baseUrl, hrefElement) : 'Detail page URL not found';
+            const href = hrefElement ? makeSafetyUrl(hrefElement) : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
             const platform = "도매콜";
             products.push({ name, price, image, href, platform });
         }
         return products;
 
-        function makeSafetyUrl(baseUrl, href) {
+
+        function makeSafetyUrl(href) {
             let safetyUrl = '';
             if (href.startsWith('../')) {
                 hrefElement = href.slice(2);
-                safetyUrl = baseUrl + hrefElement;
+                safetyUrl = hrefElement;
             }
-            else safetyUrl = baseUrl + href;
+            else safetyUrl = href;
             return safetyUrl;
         }
+        function checkSkipProduct(productElement, nameElement) {
+            if (nameElement.includes('매장판매') || nameElement.includes('차량배송')) {
+                return true;
+            }
+            const seasonProductImage = "https://cdn-pro-web-134-253.cdn-nhncommerce.com/alllatr4832_godomall_com/data/icon/goods_icon/my_icon_160282633410.jpg";
+            const noReturnProductImage = "https://cdn-pro-web-134-253.cdn-nhncommerce.com/alllatr4832_godomall_com/data/icon/goods_icon/my_icon_16028262519.jpg";
+            const deliverProductImage = "/data/icon/goods_icon/차량배송.jpg"
+            const soldOut = productElement.querySelector('div > div.thumbnail > a > span.soldout-img');
+
+            const productSkipImages = productElement.querySelectorAll('div > div.thumbnail > a > span > img');
+            for (const productSkipImage of productSkipImages) {
+                const productimage = productSkipImage.src.trim();
+                if (soldOut || (productimage == seasonProductImage) || (productimage == noReturnProductImage) || (productimage == deliverProductImage)) {
+                    return true;
+                }
+            }
+
+        }
+        function removeABMInProductName(nameElement) {
+            let name = nameElement;
+            if (name.includes('ABM')) {
+                name = nameElement.replace('ABM', '');
+            }
+            if (name.includes('abm')) {
+                name = nameElement.replace('abm', '');
+            }
+            return name;
+        }
+
     });
-
-
+    return products;
 }
 
 
