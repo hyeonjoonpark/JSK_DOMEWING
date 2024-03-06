@@ -113,10 +113,13 @@ async function scrapeProducts(page) {
             }
             const tagElements = productElement.querySelectorAll('td:nth-child(5) > span.hdsp_bot > div span');
             const sameDayShipping = '당일출고';
-            // NodeList를 배열로 변환하고, some() 함수를 사용하여 '당일출고' 태그가 있는지 확인
-            const isValid = Array.from(tagElements).some(tagElement => tagElement.textContent.trim() === sameDayShipping);
-            // '당일출고' 태그가 없으면 false 반환
-            if (!isValid) {
+            const forbidden = '인터넷판매불가';
+            const hasSameDayShipping = Array.from(tagElements).some(tagElement => tagElement.textContent.trim() === sameDayShipping);
+            const hasForbidden = Array.from(tagElements).some(tagElement => tagElement.textContent.trim() === forbidden);
+            if (hasForbidden) {
+                return false;
+            }
+            if (!hasSameDayShipping) {
                 return false;
             }
             const productName = productElement.querySelector('td:nth-child(6) > span.hdsp_top.link > a').textContent.trim();

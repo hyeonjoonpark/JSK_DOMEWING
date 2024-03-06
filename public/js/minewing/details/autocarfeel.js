@@ -36,41 +36,45 @@ async function login(page, username, password) {
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
 }
 async function scrapeProduct(page, productHref) {
-    const hasOption = await getHasOption(page);
-    let productOptions = [];
-    if (hasOption === true) {
-        productOptions = await getProductOptions(page);
-    }
-    const product = await page.evaluate((productHref, productOptions, hasOption) => {
-        // productName
-        const productNameElement = document.querySelector('b[style="font:bold 12pt 돋움;"]');
-        productNameElement.querySelectorAll('font[color="red"]').forEach(el => el.remove());
-        const productName = productNameElement.textContent.trim();
-        // productPrice
-        const productPriceText = document.querySelector('#price').textContent.trim();
-        const productPrice = parseInt(productPriceText.replace(/[^\d]/g, ''));
-        // productImage
-        const imageElement = document.querySelector('#objImg');
-        const productImage = imageElement.src; // 이미지의 절대 URL을 반환
-        // productDetail
-        const productDetailElements = document.querySelectorAll('#contents img');
-        const productDetail = [];
-        for (const productDetailElement of productDetailElements) {
-            const productDetailImage = productDetailElement.src
-            productDetail.push(productDetailImage);
+    try {
+        const hasOption = await getHasOption(page);
+        let productOptions = [];
+        if (hasOption === true) {
+            productOptions = await getProductOptions(page);
         }
-        return {
-            productName: productName,
-            productPrice: productPrice,
-            productImage: productImage,
-            productDetail: productDetail,
-            hasOption: hasOption,
-            productOptions: productOptions,
-            productHref: productHref,
-            sellerID: 20
-        };
-    }, productHref, productOptions, hasOption);
-    return product;
+        const product = await page.evaluate((productHref, productOptions, hasOption) => {
+            // productName
+            const productNameElement = document.querySelector('b[style="font:bold 12pt 돋움;"]');
+            productNameElement.querySelectorAll('font[color="red"]').forEach(el => el.remove());
+            const productName = productNameElement.textContent.trim();
+            // productPrice
+            const productPriceText = document.querySelector('#price').textContent.trim();
+            const productPrice = parseInt(productPriceText.replace(/[^\d]/g, ''));
+            // productImage
+            const imageElement = document.querySelector('#objImg');
+            const productImage = imageElement.src; // 이미지의 절대 URL을 반환
+            // productDetail
+            const productDetailElements = document.querySelectorAll('#contents img');
+            const productDetail = [];
+            for (const productDetailElement of productDetailElements) {
+                const productDetailImage = productDetailElement.src
+                productDetail.push(productDetailImage);
+            }
+            return {
+                productName: productName,
+                productPrice: productPrice,
+                productImage: productImage,
+                productDetail: productDetail,
+                hasOption: hasOption,
+                productOptions: productOptions,
+                productHref: productHref,
+                sellerID: 20
+            };
+        }, productHref, productOptions, hasOption);
+        return product;
+    } catch (error) {
+        return false;
+    }
 }
 async function getProductOptions(page) {
     // Retrieve all select elements.

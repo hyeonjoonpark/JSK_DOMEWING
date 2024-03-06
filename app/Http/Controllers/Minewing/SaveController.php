@@ -15,7 +15,6 @@ class SaveController extends Controller
     {
         set_time_limit(0);
         ini_set('memory_limit', '-1');
-        ini_set('max_input_vars', '100000');
         $rememberToken = $request->rememberToken;
         $products = $request->products;
         $categoryID = $request->categoryID;
@@ -41,11 +40,7 @@ class SaveController extends Controller
         $controller = new Controller();
         foreach ($products as $product) {
             $hasOption = $product['hasOption'];
-            $byte = 50;
-            if ($hasOption === 'true' && isset($product['productOptions'])) {
-                $byte = 41;
-            }
-            $productName = $nameController->index($product['productName'], $byte);
+            $productName = $product['productName'];
             $sellerID = $product['sellerID'];
             $seller = $controller->getSeller($sellerID);
             $hasWatermark = $seller->has_watermark;

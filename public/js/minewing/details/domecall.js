@@ -55,10 +55,11 @@ async function scrapeProduct(page, productHref) {
         const productName = removeABMInProductName(productNameEl)
         const productPrice = document.querySelector('#frmView > div > div.item > ul > li.price > div > strong').textContent.trim().replace(/[^\d]/g, '');
 
-        let productImage = document.querySelector('#content > div.goods-view > div.goods > div > div.more-thumbnail > div.slide > div > div > div > span:nth-child(4) > a > img').getAttribute('src').trim();
+        const productImage = getProductImage();
         if (!productImage) {
-            productImage = document.querySelector('#content > div.goods-view > div.goods > div > div.more-thumbnail > div.slide > div > div > div > span.swiper-slide.slick-slide.slick-current.slick-active > a > img').getAttribute('src').trim();
+            return false;
         }
+
         const images = document.querySelectorAll('#detail > div.txt-manual img');
         const productDetailImageElement = [];
         images.forEach((image) => {
@@ -89,6 +90,19 @@ async function scrapeProduct(page, productHref) {
                 name = nameElement.replace('abm', '');
             }
             return name;
+        }
+        function getProductImage() {
+            const selectors = [
+                '#content > div.goods-view > div.goods > div > div.more-thumbnail > div.slide > div > div > div > span:nth-child(4) > a > img',
+                '#content > div.goods-view > div.goods > div > div.more-thumbnail > div.slide > div > div > div > span.swiper-slide.slick-slide.slick-current.slick-active > a > img'
+            ];
+            for (const selector of selectors) {
+                const imgElement = document.querySelector(selector);
+                if (imgElement) {
+                    return imgElement.getAttribute('src').trim();
+                }
+            }
+            return null;
         }
     }, productHref);
     return product;
