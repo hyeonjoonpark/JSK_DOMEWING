@@ -14,8 +14,7 @@ class UniqueProductHrefsController extends Controller
     public function index(Request $request)
     {
         $this->setEnvironment();
-        $requestedProductHrefs = array_map('trim', $request->productHrefs);
-        $productHrefs = $this->getValidatedProductHrefs($requestedProductHrefs);
+        $productHrefs = $this->getValidatedProductHrefs($request->productHrefs);
         if ($productHrefs === false) {
             return $this->errorResponse('수집 및 가공을 진행할 상품들을 선택해주세요.');
         }
