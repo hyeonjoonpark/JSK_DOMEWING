@@ -37,7 +37,6 @@ async function processDelProduct(page, browser) {
         const productElement = document.querySelector('#main > table > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(2) > input');
         if (productElement) {
             productElement.checked = true;
-            document.querySelector('#btn_total_sold').click();
             return true;
         }
         return false;
@@ -47,7 +46,7 @@ async function processDelProduct(page, browser) {
     }
     const [newPage] = await Promise.all([
         new Promise(resolve => browser.once('targetcreated', target => resolve(target.page()))),
-        page.click('body > table > tbody > tr:nth-child(3) > td > input')
+        page.click('#btn_total_sold')
     ]);
     if (newPage) {
         await newPage.waitForSelector('body > table > tbody > tr:nth-child(2) > td > div:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(4)');

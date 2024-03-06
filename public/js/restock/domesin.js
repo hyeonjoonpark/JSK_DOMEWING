@@ -37,7 +37,6 @@ async function processDelProduct(page) {
         const productElement = document.querySelector('#main > table > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(2) > input');
         if (productElement) {
             productElement.checked = true;
-            document.querySelector('#btn_total_sold').click();
             return true;
         }
         return false;
@@ -52,7 +51,7 @@ async function processDelProduct(page) {
     if (newPage) {
         await newPage.waitForSelector('body > table > tbody > tr:nth-child(2) > td > div:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(4)');
         const textContent = await newPage.$eval('body > table > tbody > tr:nth-child(2) > td > div:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(4)', element => element.textContent);
-        if (textContent.includes('삭제')) {
+        if (textContent.includes('판매')) {
             return true;
         }
         return false;
