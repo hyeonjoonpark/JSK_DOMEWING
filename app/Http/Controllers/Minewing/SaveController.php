@@ -17,6 +17,7 @@ class SaveController extends Controller
         ini_set('memory_limit', '-1');
         $rememberToken = $request->rememberToken;
         $products = $request->products;
+        $products = $this->uniqueProducts($products);
         $categoryID = $request->categoryID;
         $productKeywords = $request->productKeywords;
         $isValid = $this->validateElements($categoryID, $productKeywords);
@@ -102,6 +103,16 @@ class SaveController extends Controller
             'status' => true,
             'return' => '"상품셋을 성공적으로 저장했어요!"'
         ];
+    }
+    private function uniqueProducts($products)
+    {
+        $productHrefs = array_column($products, 'productHref');
+        $uniqueProductHrefs = array_unique($productHrefs);
+        $uniqueProducts = array_filter($products, function ($product) use ($uniqueProductHrefs) {
+            return in_array($product['productHref'], $uniqueProductHrefs);
+        });
+        $uniqueProducts = array_values($uniqueProducts);
+        return $uniqueProducts;
     }
     private function runImageScraper($imageSrcArr)
     {
