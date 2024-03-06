@@ -208,7 +208,7 @@
             <section id="sectionTestimonials" class="py-5">
                 <p class="font-bold m-0 text-center pb-5"
                     style="font-size:32px; color: var(--dark-blue); line-height:30px;">
-                    사용후기
+                    제품후기
                 </p>
                 <div class="row flex-nowrap overflow-auto pb-4 testimonial-scroll" style="row-gap: 30px;">
 
@@ -216,10 +216,9 @@
                     @foreach ($testimonials as $record)
                         <div class="col-11 col-md-6 col-lg-5 col-xl-3 testimonial-row">
                             <div class="testimonial-card d-flex flex-column justify-content-between">
-                                <p class="font-medium flex-grow-1 m-0"
-                                    style="color: var(--dark-blue); font-size:20px; line-height: 23px;">
-                                    {{ $record->message }}
-                                </p>
+                                <?php
+                                echo $record->message;
+                                ?>
 
                                 <p class="font-medium m-0 pb-3"
                                     style="color: var(--dark-blue); font-size:20px; line-height: 23px;">

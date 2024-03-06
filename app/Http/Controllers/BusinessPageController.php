@@ -29,12 +29,13 @@ class BusinessPageController extends Controller
         $testimonials = DB::table('testimonial')->where('status', 'Y')->get();
 
         foreach ($testimonials as $record) {
+            // DateTime 객체를 생성합니다.
             $dateTime = new DateTime($record->created_at);
 
-            // Format the date
-            $record->formatted_date = $dateTime->format('Y년 m월 d일, ');
-            $record->formatted_date .= ($dateTime->format('A') === 'AM' ? '오전' : '오후') . $dateTime->format('h시 i분');
+            // 날짜를 포맷합니다.
+            $record->formatted_date = $dateTime->format('Y년 m월 d일');
         }
+
 
         return $testimonials;
     }
