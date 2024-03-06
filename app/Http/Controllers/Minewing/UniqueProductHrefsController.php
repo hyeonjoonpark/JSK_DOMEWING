@@ -22,12 +22,12 @@ class UniqueProductHrefsController extends Controller
         $uniqueProductHrefs = array_values(array_unique($productHrefs));
         $existingProductHrefs = $this->getExistingProductHrefs($uniqueProductHrefs);
         $newProductHrefs = array_values(array_diff($uniqueProductHrefs, $existingProductHrefs));
-
+        $numDuplicated = count($productHrefs) - count($existingProductHrefs);
         if (empty($newProductHrefs)) {
             return $this->errorResponse('이미 수집된 상품셋입니다.');
         }
 
-        return $this->successResponse($newProductHrefs, count($existingProductHrefs));
+        return $this->successResponse($newProductHrefs, $numDuplicated);
     }
 
     private function setEnvironment()

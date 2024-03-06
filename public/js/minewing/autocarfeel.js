@@ -65,7 +65,7 @@ async function scrapeProducts(page) {
             const price = productPriceText.replace(/[^0-9]/g, '').trim();
             const imageElement = productElement.querySelector('div:nth-child(1) > a > img');
             const image = imageElement.src; // 이미지의 절대 URL을 반환
-            const href = productElement.querySelector('div:nth-child(1) > a').href;
+            const href = productElement.querySelector('div:nth-child(1) > a').href.trim();
             const platform = '오토카필';
 
             return { name, price, image, href, platform };
