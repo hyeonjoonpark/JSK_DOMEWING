@@ -15,7 +15,6 @@ class SaveController extends Controller
     {
         set_time_limit(0);
         ini_set('memory_limit', '-1');
-        ini_set('max_input_vars', '100000');
         $rememberToken = $request->rememberToken;
         $products = $request->products;
         $categoryID = $request->categoryID;
