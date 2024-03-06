@@ -86,19 +86,25 @@ async function scrapeProducts(page) {
             if (nameElement.includes('매장판매') || nameElement.includes('차량배송')) {
                 return true;
             }
-            const seasonProductImage = "https://cdn-pro-web-134-253.cdn-nhncommerce.com/alllatr4832_godomall_com/data/icon/goods_icon/my_icon_160282633410.jpg";
-            const noReturnProductImage = "https://cdn-pro-web-134-253.cdn-nhncommerce.com/alllatr4832_godomall_com/data/icon/goods_icon/my_icon_16028262519.jpg";
-            const deliverProductImage = "/data/icon/goods_icon/차량배송.jpg"
-            const soldOut = productElement.querySelector('div > div.thumbnail > a > span.soldout-img');
+            const seasonImage = "https://cdn-pro-web-134-253.cdn-nhncommerce.com/alllatr4832_godomall_com/data/icon/goods_icon/my_icon_160282633410.jpg";
+            const noReturnImage = "https://cdn-pro-web-134-253.cdn-nhncommerce.com/alllatr4832_godomall_com/data/icon/goods_icon/my_icon_16028262519.jpg";
+            const deliverImage = "/data/icon/goods_icon/차량배송.jpg"
+            const expirationDateImage = "/data/icon/goods_icon/유통기한.jpg";
+
+            const soldOutImage = productElement.querySelector('div > div.thumbnail > a > span.soldout-img');
+            const soldOut = soldOutImage ? soldOutImage.textContent.trim() : null;
+            if (soldOut !== null) {
+                return true;
+            }
 
             const productSkipImages = productElement.querySelectorAll('div > div.thumbnail > a > span > img');
             for (const productSkipImage of productSkipImages) {
                 const productimage = productSkipImage.src.trim();
-                if (soldOut || (productimage == seasonProductImage) || (productimage == noReturnProductImage) || (productimage == deliverProductImage)) {
+                if ((productimage == seasonImage) || (productimage == noReturnImage) || (productimage == deliverImage) || (productimage == expirationDateImage)) {
                     return true;
                 }
             }
-
+            return false;
         }
         function removeABMInProductName(nameElement) {
             let name = nameElement;

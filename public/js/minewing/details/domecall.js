@@ -56,7 +56,7 @@ async function scrapeProduct(page, productHref) {
         const productPrice = document.querySelector('#frmView > div > div.item > ul > li.price > div > strong').textContent.trim().replace(/[^\d]/g, '');
 
         let productImage = document.querySelector('#content > div.goods-view > div.goods > div > div.more-thumbnail > div.slide > div > div > div > span:nth-child(4) > a > img').getAttribute('src').trim();
-        if (!productImage) {
+        if (!productImage) { //4번째 대표 이미지를 가져오는데 없을때를 대비하여 없으면 첫번째 대표이미지를 선택
             productImage = document.querySelector('#content > div.goods-view > div.goods > div > div.more-thumbnail > div.slide > div > div > div > span.swiper-slide.slick-slide.slick-current.slick-active > a > img').getAttribute('src').trim();
         }
         const images = document.querySelectorAll('#detail > div.txt-manual img');
