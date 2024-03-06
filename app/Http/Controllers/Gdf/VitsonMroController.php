@@ -46,7 +46,6 @@ class VitsonMroController extends Controller
             ->where('v.is_active', 'ACTIVE')
             ->where('pr.vendor_id', 6)
             ->get();
-        return $b2bs;
         foreach ($allProductCodes as $productCode) {
             if ($productCode === 'OGNYJ') {
                 break;
