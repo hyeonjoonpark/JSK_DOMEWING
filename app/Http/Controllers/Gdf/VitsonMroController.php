@@ -25,27 +25,27 @@ class VitsonMroController extends Controller
     {
         set_time_limit(0);
         ini_set('memory_allow', '-1');
-        $account = $this->processController->getSeller(self::USER_ID, self::VENDOR_ID);
-        $products = $this->getVitsonMroProducts();
-        $productsChunks = $products->chunk(100);
-        $productCodes = [];
-        foreach ($productsChunks as $index => $chunk) {
-            if ($index > 51) {
-                $tempFilePath = $this->genHrefsJsonFile($chunk, $index);
-                $trackOverAmountProducts = $this->trackOverAmountProducts($tempFilePath);
-                if ($trackOverAmountProducts === false) {
-                    return false;
-                }
-                $productCodesJsonFile = storage_path('app/public/gdf/' . uniqid() . '.json');
-                file_put_contents($productCodesJsonFile, json_encode($trackOverAmountProducts));
-                $productCodes = array_merge($productCodes, $trackOverAmountProducts);
-                unlink($tempFilePath);
+        $directoryPath = storage_path('app/public/gdf/'); // JSON 파일들이 위치한 디렉토리 경로
+        $pattern = $directoryPath . '/*.json'; // JSON 파일들에 대한 검색 패턴
+        // 지정된 패턴과 일치하는 모든 파일의 경로를 가져옵니다.
+        $jsonFiles = glob($pattern);
+        $allProductCodes = []; // 모든 상품 코드를 저장할 배열
+        foreach ($jsonFiles as $file) {
+            // 파일의 내용을 읽어옵니다.
+            $content = file_get_contents($file);
+            // JSON 문자열을 PHP 배열로 변환합니다.
+            $productCodes = json_decode($content, true);
+            // 배열이 유효한 경우, 통합 배열에 병합합니다.
+            if (is_array($productCodes)) {
+                $allProductCodes = array_merge($allProductCodes, $productCodes);
             }
         }
-        $b2bs = DB::table('vendors')
-            ->where('is_active', 'Y')
+        $b2bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('pr.is_active', 'Y')
+            ->where('v.is_active', 'ACTIVE')
             ->get();
-        foreach ($productCodes as $productCode) {
+        foreach ($allProductCodes as $productCode) {
             foreach ($b2bs as $b2b) {
                 $b2bId = $b2b->id;
                 $vendorEngName = $b2b->name_eng;
