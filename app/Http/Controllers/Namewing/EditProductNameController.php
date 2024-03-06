@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Namewing;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Product\NameController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,9 +11,11 @@ use Illuminate\Support\Facades\DB;
 class EditProductNameController extends Controller
 {
     private $userController;
+    private $nameController;
     public function __construct()
     {
         $this->userController = new UserController();
+        $this->nameController = new NameController();
     }
     public function index(Request $request)
     {
@@ -26,7 +29,8 @@ class EditProductNameController extends Controller
         }
         $productCode = $request->productCode;
         $newProductName = $request->newProductName;
-        return $this->updateNewProductName($productCode, $newProductName);
+        $processedProductName = $this->nameController->index($newProductName);
+        return $this->updateNewProductName($productCode, $processedProductName);
     }
     private function updateNewProductName($productCode, $newProductName)
     {
