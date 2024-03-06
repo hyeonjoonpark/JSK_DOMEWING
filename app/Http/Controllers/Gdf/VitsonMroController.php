@@ -49,14 +49,14 @@ class VitsonMroController extends Controller
         foreach ($allProductCodes as $productCode) {
             if ($productCode === 'OGNYJ') {
                 break;
-                foreach ($b2bs as $b2b) {
-                    $b2bId = $b2b->id;
-                    $vendorEngName = $b2b->name_eng;
-                    $account = $this->processController->getAccount(self::USER_ID, $b2bId);
-                    $username = $account->username;
-                    $password = $account->password;
-                    $this->soldOutController->sendSoldOutRequest($productCode, $vendorEngName, $username, $password);
-                }
+            }
+            foreach ($b2bs as $b2b) {
+                $b2bId = $b2b->id;
+                $vendorEngName = $b2b->name_eng;
+                $account = $this->processController->getAccount(self::USER_ID, $b2bId);
+                $username = $account->username;
+                $password = $account->password;
+                $this->soldOutController->sendSoldOutRequest($productCode, $vendorEngName, $username, $password);
             }
         }
         return $this->gdfController->inactiveProducts($productCodes);
