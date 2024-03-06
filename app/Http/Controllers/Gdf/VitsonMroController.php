@@ -40,6 +40,9 @@ class VitsonMroController extends Controller
                 $allProductCodes = array_merge($allProductCodes, $productCodes);
             }
         }
+        $tempFilePath = storage_path('app/public/gdf/all_product_codes.json');
+        file_put_contents($tempFilePath, json_encode($allProductCodes));
+        return;
         $b2bs = DB::table('product_register AS pr')
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where('pr.is_active', 'Y')
