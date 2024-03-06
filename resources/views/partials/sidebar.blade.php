@@ -127,12 +127,22 @@
                                 <span class="nk-menu-text">Seller CMS</span>
                             </a>
                         </li> --}}
-                        <li class="nk-menu-item">
-                            <a href="/admin/account-setting" class="nk-menu-link">
+                        <li class="nk-menu-item has-sub">
+                            <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-gear"></em></span>
                                 <span class="nk-menu-text">환경설정</span>
                             </a>
-                        </li>
+                            <ul class="nk-menu-sub">
+                                <li class="nk-menu-item">
+                                    <a href="/admin/account-setting" class="nk-menu-link"><span
+                                            class="nk-menu-text">업체 별 환경설정</span></a>
+                                </li>
+                                <li class="nk-menu-item">
+                                    <a href="/admin/edit-testmonials" class="nk-menu-link"><span
+                                            class="nk-menu-text">제품후기</span></a>
+                                </li>
+                            </ul><!-- .nk-menu-sub -->
+                        </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item">
                             <a href="/auth/logout" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em

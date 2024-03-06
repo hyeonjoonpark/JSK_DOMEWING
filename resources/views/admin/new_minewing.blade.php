@@ -280,7 +280,7 @@
                         const vendorID = $('input[name="sellers"]:checked').val();
                         runScrape(productHrefs, vendorID);
                     } else {
-                        const message = response.return.message;
+                        const message = response.return;
                         swalError(message);
                     }
                 },

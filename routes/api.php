@@ -46,7 +46,7 @@ use App\Http\Controllers\Productwing\RestockController;
 use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
-
+use App\Http\Controllers\Testmonial\TestmonialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,7 +102,11 @@ Route::post('/mappingwing/select-category', [SelectCategoryController::class, 'r
 Route::post('/mappingwing/category-search', [CategorySearchController::class, 'index']);
 Route::post('/mappingwing/request-mapping', [RequestMappingController::class, 'index']);
 Route::post('/mappingwing/get-mapped', [SelectCategoryController::class, 'mappedRequest']);
-
+// Testmonials
+Route::post('/testmonials/add', [TestmonialController::class, 'add']);
+Route::post('/testmonials/del', [TestmonialController::class, 'del']);
+Route::post('/testmonials/edt', [TestmonialController::class, 'edt']);
+//
 Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
 Route::get('/admin/get-domain', [DomainController::class, 'getDomain']);
 Route::post('admin/edit-domain', [DomainController::class, 'editDomain']);

@@ -9,9 +9,9 @@
     if ($(_basic).exists()) {
       $(_basic).each(function () {
         $(this).summernote({
-          placeholder: 'Hello stand alone ui',
+          placeholder: '내용을 기입해주세요...',
           tabsize: 2,
-          height: 120,
+          height: 400,
           toolbar: [['style', ['style']], ['font', ['bold', 'underline', 'strikethrough', 'clear']], ['font', ['superscript', 'subscript']], ['color', ['color']], ['fontsize', ['fontsize', 'height']], ['para', ['ul', 'ol', 'paragraph']], ['table', ['table']], ['insert', ['link', 'picture', 'video']], ['view', ['fullscreen', 'codeview', 'help']]]
         });
       });
@@ -20,9 +20,9 @@
     if ($(_minimal).exists()) {
       $(_minimal).each(function () {
         $(this).summernote({
-          placeholder: 'Hello stand alone ui',
+          placeholder: '내용을 기입해주세요...',
           tabsize: 2,
-          height: 120,
+          height: 400,
           toolbar: [['style', ['style']], ['font', ['bold', 'underline', 'clear']], ['para', ['ul', 'ol', 'paragraph']], ['table', ['table']], ['view', ['fullscreen']]]
         });
       });
