@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 // 비동기 함수를 사용하여 스크립트의 주 실행 흐름을 정의합니다.
 (async () => {
     // Puppeteer를 사용하여 브라우저 인스턴스를 생성합니다. headless 모드를 false로 설정하여 GUI를 사용합니다.
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     // 새 탭 페이지를 엽니다.
     const page = await browser.newPage();
     // 커맨드 라인에서 입력된 인자들을 배열로 가져옵니다. 첫 두 인자는 무시합니다.
