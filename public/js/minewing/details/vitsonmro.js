@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -26,7 +26,7 @@ const fs = require('fs');
     } catch (error) {
         console.error('Error occurred:', error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 async function goToWithRepeat(page, url, index, wiatUntilType) {
