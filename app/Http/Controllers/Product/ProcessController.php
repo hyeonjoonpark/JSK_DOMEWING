@@ -51,6 +51,9 @@ class ProcessController extends Controller
         $productHrefsChunk = array_chunk($productHrefs, 100);
         $products = [];
         foreach ($productHrefsChunk as $index => $productHrefs) {
+            $tmpProducts = null;
+            $output = null;
+            $returnCode = null;
             // 임시 파일에 URL 배열 저장
             $tempFilePath = storage_path('app/public/urls/' . uniqid() . '.json');
             file_put_contents($tempFilePath, json_encode($productHrefs));

@@ -44,8 +44,12 @@ class VitsonMroController extends Controller
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where('pr.is_active', 'Y')
             ->where('v.is_active', 'ACTIVE')
+            ->where('pr.vendor_id', 6)
             ->get();
         foreach ($allProductCodes as $productCode) {
+            if ($productCode === 'OGNYJ') {
+                break;
+            }
             foreach ($b2bs as $b2b) {
                 $b2bId = $b2b->id;
                 $vendorEngName = $b2b->name_eng;

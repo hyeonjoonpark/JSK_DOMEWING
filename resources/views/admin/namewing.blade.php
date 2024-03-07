@@ -11,7 +11,8 @@
 @section('content')
     <div class="row g-gs mb-3">
         <div class="col text-center">
-            <button class="btn btn-danger" onclick="multiSoldOut">일괄품절</button>
+            <button class="btn btn-success" onclick="selectAllExceptFirst();">첫 번째 상품 제외 전체선택</button>
+            <button class="btn btn-danger" onclick="multiSoldOut();">일괄품절</button>
         </div>
     </div>
     <div class="row g-gs">
@@ -20,7 +21,7 @@
                 <div class="card card-bordered preview">
                     <div class="card-inner text-center">
                         <div class="text-start">
-                            <input type="checkbox" value="soldOut{{ $product->productCode }}" name="productCodes">
+                            <input type="checkbox" value="{{ $product->productCode }}" name="productCodes">
                         </div>
                         <img src="{{ $product->productImage }}" class="img-fluid col-12 col-lg-6 mx-auto d-block"><br>
                         <a class="btn btn-primary mt-2" href="{{ $product->productHref }}" target="_blank">상세보기</a>
@@ -104,6 +105,15 @@
 {{-- 추가 스크립트 섹션 --}}
 @section('scripts')
     <script>
+        function selectAllExceptFirst() {
+            // 첫 번째 체크박스를 제외하고 모든 체크박스의 상태를 설정
+            $('input[name="productCodes"]').each(function(index) {
+                if (index > 0) { // 첫 번째 체크박스를 제외
+                    $(this).prop('checked', true);
+                }
+            });
+        }
+
         var rememberToken = '{{ Auth::user()->remember_token }}';
 
         function initEditProductName(productCode) {

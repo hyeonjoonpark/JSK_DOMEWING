@@ -11,7 +11,6 @@ class ManufactureController extends Controller
 {
     const OPTION_BYTE = 42;
     const DEFAULT_BYTE = 50;
-
     public function index(Request $request)
     {
         ini_set('max_input_vars', '100000');
@@ -30,7 +29,6 @@ class ManufactureController extends Controller
 
         return ['status' => true, 'return' => $products];
     }
-
     private function processProductName(&$product, $index, $productNames)
     {
         $nameController = new NameController();
@@ -43,29 +41,6 @@ class ManufactureController extends Controller
 
         return $productName;
     }
-
-    private function createErrorResponse($productNames, $products, $index)
-    {
-        $productName = $products[$index]['productName'];
-        $duplicateIndex = array_search($productName, $productNames);
-        $isDuplicated = $this->isDuplicated($productName);
-
-        $errorType = $isDuplicated ? 'FROM_DB' : 'FROM_ARRAY';
-        $duplicatedProduct = $isDuplicated ?: null;
-
-        return [
-            'status' => false,
-            'return' => [
-                'type' => $errorType,
-                'duplicatedProductName' => $productName,
-                'duplicatedIndex' => $duplicateIndex,
-                'index' => $index,
-                'products' => $products,
-                'duplicatedProduct' => $duplicatedProduct,
-            ],
-        ];
-    }
-
     public function isDuplicated($productName)
     {
         return DB::table('minewing_products')

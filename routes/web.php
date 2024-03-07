@@ -29,6 +29,7 @@ use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
 use App\Http\Controllers\Domewing\FAQController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\ProductEditor\ViewController;
+use App\Http\Controllers\Testmonial\TestmonialController;
 
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
@@ -57,6 +58,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('apiwing', [AdminController::class, 'apiwing']);
     Route::get('product-editor', [ViewController::class, 'index']);
     Route::get('namewing', [NamewingController::class, 'main']);
+    Route::get('edit-testmonials', [TestmonialController::class, 'index']);
 
     //ving kong
     Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');

@@ -20,7 +20,7 @@ class MiningController extends Controller
             return $apiwingMainController->index($vendor->vendor_id);
         }
         $listURL = $request->listURL;
-        $account = $this->getAccount($rememberToken, $vendorID);
+        $account = $this->getAccount($rememberToken, $vendorID); // DTO
         if (!$account) {
             return [
                 'status' => false,
