@@ -1,12 +1,15 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // const urls = ['https://www.domecall.net/goods/goods_view.php?goodsNo=1472215809'];
+        // const username = 'sungil2022';
+        // const password = 'tjddlf88!@';
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -24,7 +27,7 @@ const fs = require('fs');
     } catch (error) {
         console.error('Error occurred:', error);
     } finally {
-        await browser.close();
+        // await browser.close();
     }
 })();
 async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
@@ -56,7 +59,7 @@ async function scrapeProduct(page, productHref) {
         const productPrice = document.querySelector('#frmView > div > div.item > ul > li.price > div > strong').textContent.trim().replace(/[^\d]/g, '');
 
         const productImage = getProductImage();
-        if (!productImage) {
+        if (productImage == null) {
             return false;
         }
 
