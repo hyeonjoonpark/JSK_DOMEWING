@@ -12,6 +12,10 @@
     <div class="row g-gs">
         <div class="col">
             <button class="btn btn-primary mb-5" onclick="initOrderwing();">오더윙 가동</button>
+            <div class="form-group">
+                <label class="form-label">금일 총 매출액</label>
+                <h5 class="card-title" id="totalAmt"></h5>
+            </div>
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">신규 주문</h6>
@@ -104,6 +108,8 @@
                 </td>
             </tr>
             `).join('');
+            const totalAmount = response.reduce((accumulator, order) => accumulator + parseInt(order.amount), 0);
+            $('#totalAmt').html(numberFormat(totalAmount) + '원');
             $('#orderwingResult').html(html);
             closePopup();
         }

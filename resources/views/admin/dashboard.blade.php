@@ -16,21 +16,22 @@
                     </p>
                     <div class="form-group">
                         <label class="form-label">B2B 업체 리스트</label>
-                        <div class="flex">
-                            @foreach ($b2Bs as $b2B)
+                        <div class="d-flex">
+                            @foreach ($b2bs as $b2B)
                                 <a href="{{ $b2B->vendor_href }}" target="_blank">{{ $b2B->name }}</a> /
                             @endforeach
                         </div>
+                        <button class="btn btn-primary" onclick="initNaviwing('b2b');">B2B 네비윙</button>
                     </div>
                     <div class="form-group">
                         <label class="form-label">원청사 리스트</label>
-                        <div class="flex">
+                        <div class="d-flex">
                             @foreach ($vendors as $vendor)
                                 <a href="{{ $vendor->vendor_href }}" target="_blank">{{ $vendor->name }}</a> /
                             @endforeach
                         </div>
+                        <button class="btn btn-primary" onclick="initNaviwing('seller');">원청사 네비윙</button>
                     </div>
-                    <button class="btn btn-primary" onclick="initNaviwing();">네비윙</button>
                 </div>
             </div>
         </div>
@@ -38,11 +39,16 @@
 @endsection
 @section('scripts')
     <script>
-        var hrefs = @json($hrefs);
+        var sellers = @json($vendors);
+        var b2bs = @json($b2bs)
 
-        function initNaviwing() {
+        function initNaviwing(type) {
+            let hrefs = sellers;
+            if (type === 'b2b') {
+                hrefs = b2bs;
+            }
             for (var href of hrefs) {
-                window.open(href, '_blank');
+                window.open(href.vendor_href, '_blank');
             }
         }
     </script>

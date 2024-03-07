@@ -30,7 +30,7 @@ class AdminController extends Controller
         }, $vendors->toArray());
         $hrefs = array_merge($b2BHrefs, $vendorHrefs);
         return view('admin/dashboard', [
-            'b2Bs' => $b2Bs,
+            'b2bs' => $b2Bs,
             'hrefs' => $hrefs,
             'vendors' => $vendors
         ]);
