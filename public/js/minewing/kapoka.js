@@ -68,10 +68,10 @@ async function scrapeProducts(page) {
         function processProduct(productElement) {
             try {
                 const productNameElement = productElement.querySelector('div:nth-child(2) > a');
-                // const name = productNameElement.textContent.trim();
-                const nameText = productNameElement.textContent.trim();
-                const regexPattern = /\[[^\]]*\]/g;
-                const name = nameText.replace(regexPattern, '');
+                const name = productNameElement.textContent.trim();
+                // const nameText = productNameElement.textContent.trim();
+                // const regexPattern = /\[[^\]]*\]/g;
+                // const name = nameText.replace(regexPattern, '');
                 const productPriceText = productElement.querySelector('div:nth-child(3) > b').textContent;
                 const price = productPriceText.replace(/[^0-9]/g, '').trim();
                 const imageElement = productElement.querySelector('div:nth-child(1) > a > img');
