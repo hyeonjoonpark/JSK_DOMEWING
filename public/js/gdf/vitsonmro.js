@@ -5,6 +5,7 @@ async function main() {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
+        const args = process.argv.slice(2);
         const [tempFilePath] = args;
         const products = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         const forbiddenProductCodes = await filterForbiddenProducts(page, products);
