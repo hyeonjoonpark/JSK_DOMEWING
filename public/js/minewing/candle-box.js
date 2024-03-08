@@ -42,9 +42,11 @@ async function getNumPage(page, listUrl) {
 }
 async function moveToPage(page, listUrl, curPage) {
     curPage = parseInt(curPage);
-    listUrl += '?page=' + curPage;
-    await page.goto(listUrl, { waitUntil: 'domcontentloaded' });
+    let baseUrl = listUrl.split('?')[0];
+    let newUrl = `${baseUrl}?page=${curPage}`;
+    await page.goto(newUrl, { waitUntil: 'domcontentloaded' });
 }
+
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         const products = [];

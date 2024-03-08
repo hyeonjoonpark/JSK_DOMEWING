@@ -17,7 +17,7 @@ const puppeteer = require('puppeteer');
     } catch (error) {
         console.error(error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 
@@ -51,49 +51,54 @@ async function moveToPage(page, listUrl, curPage) {
 
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
-        // 상품 정보를 처리하여 추출하는 함수입니다.
-        function processProduct(productElement) {
-            try {
-                const productNameElement = productElement.querySelector('div.description > strong > a > span:nth-child(2)');
-                const nameText = productNameElement.textContent.trim();
-                const regexPattern = /\([^)]*(판매|품절)[^)]*\)/g;
-                const name = nameText.replace(regexPattern, '');
-                const productPriceText = productElement.querySelector('div.description > ul > li:nth-child(1) > span:nth-child(2)').textContent;
-                const price = productPriceText.replace(/[^0-9]/g, '').trim();
-                const imageElement = productElement.querySelector('div.thumbnail > div.prdImg');
-                const image = imageElement.src;
-                const href = productNameElement.href;
-                const platform = '하우스모어';
-
-                return { name, price, image, href, platform };
-            } catch (error) {
-                return false;
-            }
-        }
-
+        // 판매 또는 품절 상태인 상품을 확인하는 함수
         function hasSoldOutImage(productElement) {
             return productElement.querySelector('div.thumbnail > div.icon > div.promotion > img') !== null;
         }
 
-        const products = [];
+        // 상품 정보를 처리하여 추출하는 함수
+        function processProduct(productElement) {
+            try {
+                const productNameElement = productElement.querySelector('div.description > strong > a > span:nth-child(2)');
+                let name = productNameElement.textContent.trim();
 
-        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div.xans-element-.xans-product.xans-product-listnormal.ec-base-product > ul > li');
+                const productPriceText = productElement.querySelector('div.description > ul > li:nth-child(1) > span:nth-child(2)').textContent;
+                const price = productPriceText.replace(/[^0-9]/g, '').trim();
+
+                const imageElement = productElement.querySelector('div.thumbnail > div.prdImg > a > img');
+                const image = imageElement.src;
+
+                // href 값을 추출하는 부분을 수정
+                const hrefElement = productElement.querySelector('#prdDetail > div > img');
+                const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
+
+                const platform = '하우스모어';
+
+                // 정의된 href 값을 반환 객체에 포함
+                return { name, price, image, href, platform };
+            } catch (error) {
+                console.error('Error processing product:', error);
+                return null;
+            }
+        }
+
+
+        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div.xans-element-.xans-product.xans-product-listnormal > ul > li');
+        const processedProducts = [];
 
         productElements.forEach(productElement => {
             if (!hasSoldOutImage(productElement)) {
                 const productInfo = processProduct(productElement);
-                if (productInfo !== false) {
-                    products.push(productInfo);
+                if (productInfo) {
+                    processedProducts.push(productInfo);
                 }
             }
         });
 
-        return products;
+        return processedProducts;
     });
 
-    return products;
+    return products; // 스크레이핑된 상품 정보 반환
 }
-
-
 
 
