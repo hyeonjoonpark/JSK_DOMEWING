@@ -40,7 +40,7 @@ class SaveController extends Controller
         $controller = new Controller();
         foreach ($products as $product) {
             $hasOption = $product['hasOption'];
-            $productName = $product['productName'];
+            $productName = $nameController->index($product['productName']);
             $sellerID = $product['sellerID'];
             $seller = $controller->getSeller($sellerID);
             $hasWatermark = $seller->has_watermark;
