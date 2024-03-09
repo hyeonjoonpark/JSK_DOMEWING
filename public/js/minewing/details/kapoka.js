@@ -5,11 +5,8 @@ const fs = require('fs'); // 파일 시스템 모듈을 가져옵니다.
     const browser = await puppeteer.launch({ headless: true }); // 헤드리스 모드로 Puppeteer를 실행합니다.
     const page = await browser.newPage(); // 새 페이지를 생성합니다.
     try {
-        // const [tempFilePath, username, password] = process.argv.slice(2); // 명령줄 인수를 가져옵니다.
-        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8')); // JSON 파일에서 URL 목록을 읽어옵니다.
-        const urls = ['https://www.kapoka.co.kr/shop/goods/goods_view.php?goodsno=3542&category=033010'];
-        const username = 'sungiltradekorea';
-        const password = 'tjddlf88!@#';
+        const [tempFilePath, username, password] = process.argv.slice(2); // 명령줄 인수를 가져옵니다.
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8')); // JSON 파일에서 URL 목록을 읽어옵니다.
         await sign(page, username, password); // 웹사이트에 로그인합니다.
         const products = []; // 제품 데이터를 수집할 배열을 초기화합니다.
         for (const url of urls) { // URL 목록을 반복하며
@@ -54,7 +51,7 @@ async function scrapeProduct(page, productHref) {
         // 페이지의 DOM을 직접 조작하여 제품 정보를 추출합니다.
         return await page.evaluate((productHref, hasOption, productOptions, productPrice) => {
             // 제품 이름을 가져옵니다.
-            const productNameElement = document.querySelector('div:nth-child(2) > a');
+            const productNameElement = document.querySelector('#goods_spec > div > b');
             const nameText = productNameElement.textContent.trim();
             const productName = nameText.replace(/\[[^\]]*\]/g, ''); // 불필요한 태그를 제거한 상품명
 
