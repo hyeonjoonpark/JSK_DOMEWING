@@ -5,11 +5,11 @@ const fs = require('fs'); // 파일 시스템 모듈을 가져옵니다.
     const browser = await puppeteer.launch({ headless: false }); // 헤드리스 모드로 Puppeteer를 실행합니다.
     const page = await browser.newPage(); // 새 페이지를 생성합니다.
     try {
-        // const [tempFilePath, username, password] = process.argv.slice(2); // 명령줄 인수를 가져옵니다.
-        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8')); // JSON 파일에서 URL 목록을 읽어옵니다.
-        const urls = ['https://www.kapoka.co.kr/shop/goods/goods_view.php?goodsno=3188&category=033010'];
-        const username = 'sungiltradekorea';
-        const password = 'tjddlf88!@#';
+        const [tempFilePath, username, password] = process.argv.slice(2); // 명령줄 인수를 가져옵니다.
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8')); // JSON 파일에서 URL 목록을 읽어옵니다.
+        // const urls = ['https://www.kapoka.co.kr/shop/goods/goods_view.php?goodsno=3188&category=033010'];
+        // const username = 'sungiltradekorea';
+        // const password = 'tjddlf88!@#';
         await sign(page, username, password); // 웹사이트에 로그인합니다.
         const products = []; // 제품 데이터를 수집할 배열을 초기화합니다.
         for (const url of urls) { // URL 목록을 반복하며
