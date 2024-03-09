@@ -39,8 +39,14 @@ async function sign(page, username, password) {
 
 async function scrapeProduct(page, productHref) {
     try {
+        const productPrice = await page.evaluate(() => {
+            // 제품 가격을 가져옵니다.
+            const productPriceText = document.querySelector('#price').textContent.trim();
+            const productPrice = parseInt(productPriceText.replace(/[^\d]/g, '')); // 숫자로만 이루어진 가격
+            return productPrice;
+        });
         // getHasOption 함수를 통해 옵션 관련 정보를 가져옵니다.
-        const { hasOption, productOptions } = await getHasOption(page);
+        const { hasOption, productOptions } = await getHasOption(page, productPrice);
 
         // 페이지의 DOM을 직접 조작하여 제품 정보를 추출합니다.
         return await page.evaluate((productHref, hasOption, productOptions) => {
@@ -48,9 +54,7 @@ async function scrapeProduct(page, productHref) {
             const productNameElement = document.querySelector('div:nth-child(2) > a');
             const nameText = productNameElement.textContent.trim();
             const productName = nameText.replace(/\[[^\]]*\]/g, ''); // 불필요한 태그를 제거한 상품명
-            // 제품 가격을 가져옵니다.
-            const productPriceText = document.querySelector('#price').textContent.trim();
-            const productPrice = parseInt(productPriceText.replace(/[^\d]/g, '')); // 숫자로만 이루어진 가격
+
             // 제품 이미지 URL을 가져옵니다.
             const imageElement = document.querySelector('#objImg');
             const productImage = imageElement.src;
@@ -83,7 +87,8 @@ async function scrapeProduct(page, productHref) {
     }
 }
 
-async function getHasOption(page) {
+async function getHasOption(page, productPrice) {
+    productPrice = parseInt(productPrice, 10);
     try {
         const productOptions = [];
         const optionGroups = await page.$$('#goods_spec > form > table:nth-child(8) > tbody > tr:nth-child(2) > td > div select');
@@ -104,6 +109,7 @@ async function getHasOption(page) {
                 if (matches) {
                     optionName = matches[1].trim();
                     optionPrice = parseInt(matches[2].replace(/[^\d-+]/g, ''), 10);
+                    optionPrice = productPrice - optionPrice;
                 } else {
                     optionName = optionText.trim();
                     optionPrice = 0;
