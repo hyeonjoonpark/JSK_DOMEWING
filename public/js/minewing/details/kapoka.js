@@ -5,8 +5,11 @@ const fs = require('fs'); // 파일 시스템 모듈을 가져옵니다.
     const browser = await puppeteer.launch({ headless: false }); // 헤드리스 모드로 Puppeteer를 실행합니다.
     const page = await browser.newPage(); // 새 페이지를 생성합니다.
     try {
-        const [tempFilePath, username, password] = process.argv.slice(2); // 명령줄 인수를 가져옵니다.
-        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8')); // JSON 파일에서 URL 목록을 읽어옵니다.
+        // const [tempFilePath, username, password] = process.argv.slice(2); // 명령줄 인수를 가져옵니다.
+        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8')); // JSON 파일에서 URL 목록을 읽어옵니다.
+        const urls = ['https://www.kapoka.co.kr/shop/goods/goods_view.php?goodsno=3188&category=033010'];
+        const username = 'sungiltradekorea';
+        const password = 'tjddlf88!@#';
         await sign(page, username, password); // 웹사이트에 로그인합니다.
         const products = []; // 제품 데이터를 수집할 배열을 초기화합니다.
         for (const url of urls) { // URL 목록을 반복하며
@@ -49,7 +52,7 @@ async function scrapeProduct(page, productHref) {
         const { hasOption, productOptions } = await getHasOption(page, productPrice);
 
         // 페이지의 DOM을 직접 조작하여 제품 정보를 추출합니다.
-        return await page.evaluate((productHref, hasOption, productOptions) => {
+        return await page.evaluate((productHref, hasOption, productOptions, productPrice) => {
             // 제품 이름을 가져옵니다.
             const productNameElement = document.querySelector('div:nth-child(2) > a');
             const nameText = productNameElement.textContent.trim();
@@ -80,7 +83,7 @@ async function scrapeProduct(page, productHref) {
                 productHref: productHref,
                 sellerID: 22
             };
-        }, productHref, hasOption, productOptions);
+        }, productHref, hasOption, productOptions, productPrice);
     } catch (error) {
         console.error('Error occurred while scraping product:', error);
         return null;
@@ -91,12 +94,14 @@ async function getHasOption(page, productPrice) {
     productPrice = parseInt(productPrice, 10);
     try {
         const productOptions = [];
-        const optionGroups = await page.$$('#goods_spec > form > table:nth-child(8) > tbody > tr:nth-child(2) > td > div select');
+        const optionGroups = await page.$$('div > select');
 
         for (const group of optionGroups) {
             const options = await group.$$('option');
 
-            for (const option of options) {
+            // 첫 번째 옵션을 건너뛰기 위해 인덱스를 사용한 for 루프로 변경
+            for (let i = 1; i < options.length; i++) { // 0 대신 1부터 시작하여 첫 번째 옵션을 건너뜁니다.
+                const option = options[i]; // 현재 옵션
                 const optionText = await (await option.getProperty('textContent')).jsonValue();
 
                 if (optionText.includes('품절')) {
@@ -109,7 +114,7 @@ async function getHasOption(page, productPrice) {
                 if (matches) {
                     optionName = matches[1].trim();
                     optionPrice = parseInt(matches[2].replace(/[^\d-+]/g, ''), 10);
-                    optionPrice = productPrice - optionPrice;
+                    optionPrice = optionPrice - productPrice;
                 } else {
                     optionName = optionText.trim();
                     optionPrice = 0;
@@ -125,5 +130,3 @@ async function getHasOption(page, productPrice) {
         return { hasOption: true, productOptions: [] };
     }
 }
-
-
