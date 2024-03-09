@@ -11,11 +11,15 @@ const fs = require('fs');
         const products = [];
         let index = 0;
         for (const url of urls) {
+            let goToWithRepeatResult = null;
             if (index === 0) {
-                await goToWithRepeat(page, url, 0, 'networkidle0');
+                goToWithRepeatResult = await goToWithRepeat(page, url, 0, 'networkidle0');
                 index++;
             } else {
-                await goToWithRepeat(page, url, 0, 'domcontentloaded');
+                goToWithRepeatResult = await goToWithRepeat(page, url, 0, 'domcontentloaded');
+            }
+            if (goToWithRepeatResult === false) {
+                continue;
             }
             const product = await scrapeProduct(page, url);
             if (product !== false) {
