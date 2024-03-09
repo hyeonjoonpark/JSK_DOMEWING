@@ -71,8 +71,10 @@ class SaveController extends Controller
             if ($hasOption === 'true' && isset($product['productOptions'])) {
                 $productOptions = $product['productOptions'];
                 $optionPriceType = $this->getOptionPriceType($sellerID);
-                $type = '1';
-                $productName = $nameController->index($product['productName'], 41);
+                $type = 1;
+                $numberOfOptions = count($productOptions);
+                $productNameBytes = 6 + $numberOfOptions;
+                $productName = $nameController->index($product['productName'], $productNameBytes);
                 foreach ($productOptions as $productOption) {
                     $newProductName = $productName . ' 옵션 ' . $type;
                     $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:2rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1><br><br>' . $productDetail;
