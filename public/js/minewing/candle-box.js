@@ -42,7 +42,10 @@ async function getNumPage(page, listUrl) {
 }
 async function moveToPage(page, listUrl, curPage) {
     curPage = parseInt(curPage);
-    let baseUrl = listUrl.split('?')[0];
+    let baseUrl = listUrl;
+    if(listUrl.includes('?p')){
+        baseUrl = listUrl.split('?p')[0];
+    }
     let newUrl = `${baseUrl}?page=${curPage}`;
     await page.goto(newUrl, { waitUntil: 'domcontentloaded' });
 }

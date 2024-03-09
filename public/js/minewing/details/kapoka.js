@@ -49,7 +49,7 @@ async function scrapeProduct(page, productHref) {
             const nameText = productNameElement.textContent.trim();
             const productName = nameText.replace(/\[[^\]]*\]/g, ''); // 불필요한 태그를 제거한 상품명
             // 제품 가격을 가져옵니다.
-            const productPriceText = document.querySelector('div:nth-child(3) > b').textContent.trim();
+            const productPriceText = document.querySelector('#price').textContent.trim();
             const productPrice = parseInt(productPriceText.replace(/[^\d]/g, '')); // 숫자로만 이루어진 가격
             // 제품 이미지 URL을 가져옵니다.
             const imageElement = document.querySelector('#objImg');
