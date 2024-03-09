@@ -41,6 +41,7 @@ class SaveController extends Controller
         foreach ($products as $product) {
             $hasOption = $product['hasOption'];
             $sellerID = $product['sellerID'];
+            $productName = $product['productName'];
             $seller = $controller->getSeller($sellerID);
             $hasWatermark = $seller->has_watermark;
             $imageScraper = $seller->image_scraper;
@@ -75,7 +76,7 @@ class SaveController extends Controller
                 $numberOfOptions = count($productOptions);
                 $numberOfDigits = strlen((string)$numberOfOptions);
                 $productNameBytes = 50 - (6 + $numberOfDigits);
-                $productName = $nameController->index($product['productName'], $productNameBytes);
+                $productName = $nameController->index($productName, $productNameBytes);
                 foreach ($productOptions as $productOption) {
                     $newProductName = $productName . ' 옵션 ' . $type;
                     $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:2rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1><br><br>' . $productDetail;
@@ -91,7 +92,7 @@ class SaveController extends Controller
                     $type++;
                 }
             } else {
-                $productName = $nameController->index($product['productName']);
+                $productName = $nameController->index($productName);
                 $response = $this->insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref);
                 if (!$response['status']) {
                     return $response;
