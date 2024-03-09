@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer'); // Puppeteer 모듈을 가져옵니다.
 const fs = require('fs'); // 파일 시스템 모듈을 가져옵니다.
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false }); // 헤드리스 모드로 Puppeteer를 실행합니다.
+    const browser = await puppeteer.launch({ headless: true }); // 헤드리스 모드로 Puppeteer를 실행합니다.
     const page = await browser.newPage(); // 새 페이지를 생성합니다.
     try {
         const [tempFilePath, username, password] = process.argv.slice(2); // 명령줄 인수를 가져옵니다.
