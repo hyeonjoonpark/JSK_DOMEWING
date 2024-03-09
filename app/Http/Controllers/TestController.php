@@ -4,52 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Product\NameController;
 use Illuminate\Support\Facades\DB;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class TestController extends Controller
 {
-    public function index()
+    private $nameController;
+    public function __construct()
     {
-        $spreadsheet = IOFactory::load(public_path('assets/excel/product_name_edit.xlsx'));
-        $sheet = $spreadsheet->getSheet(0);
-        $fails = [];
-        foreach ($sheet->getRowIterator() as $row) {
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false); // 빈 셀도 반복
-            $cells = [];
-            foreach ($cellIterator as $cell) {
-                $cells[] = $cell->getValue();
-            }
-            // A열(상품코드)과 B열(상품명) 추출
-            $productCode = $cells[0]; // A열 값
-            $productName = $cells[1]; // B열 값
-            // 상품코드와 상품명이 모두 있는 경우만 배열에 추가
-            if (!empty($productCode) && !empty($productName)) {
-                $response = $this->updateProductName($productCode, $productName);
-                if ($response['status'] === false) {
-                    $fails[] = $productCode;
-                }
-            } else {
-                $fails[] = $productCode;
-            }
-        }
-        return $fails;
+        $this->nameController = new NameController();
     }
-    public function updateProductName($productCode, $productName)
+    public function main()
     {
+        $products = $this->getTargetProducts();
+        $newProductName = [];
+        foreach ($products as $product) {
+            $updateProductNameResult = $this->updateProductName($product);
+            if ($updateProductNameResult['status'] === false) {
+                return $updateProductNameResult['return'];
+            }
+            $productId[] = $updateProductNameResult['return'];
+        }
+        return $productId;
+    }
+    private function getTargetProducts()
+    {
+        return DB::table('minewing_products')
+            ->where('createdAt', '>', '2024-02-29')
+            ->get(['productName', 'id']);
+    }
+    private function updateProductName($product)
+    {
+        $productId = $product->id;
+        $productName = $product->productName;
+        $pattern = '/옵션 (\d+)/';
+        if (preg_match($pattern, $productName, $matches)) {
+            $safeProductName = trim(str_replace($matches[0], '', $productName));
+            $newProductName = $this->nameController->index($safeProductName);
+            $newProductName .= ' 옵션 ' . $matches[1];
+        } else {
+            $newProductName = $this->nameController->index($productName);
+        }
         try {
             DB::table('minewing_products')
-                ->where('productCode', $productCode)
+                ->where('id', $productId)
                 ->update([
-                    'productName' => $productName
+                    'productName' => $newProductName,
+                    'updatedAt' => now()
                 ]);
             return [
                 'status' => true,
+                'return' => $productId
             ];
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                'return' => $e->getMessage(),
+                'return' => $e->getMessage()
             ];
         }
     }

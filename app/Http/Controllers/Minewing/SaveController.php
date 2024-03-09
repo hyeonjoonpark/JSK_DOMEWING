@@ -40,7 +40,6 @@ class SaveController extends Controller
         $controller = new Controller();
         foreach ($products as $product) {
             $hasOption = $product['hasOption'];
-            $productName = $product['productName'];
             $sellerID = $product['sellerID'];
             $seller = $controller->getSeller($sellerID);
             $hasWatermark = $seller->has_watermark;
@@ -74,6 +73,7 @@ class SaveController extends Controller
                 $optionPriceType = $this->getOptionPriceType($sellerID);
                 $type = '1';
                 foreach ($productOptions as $productOption) {
+                    $productName = $nameController->index($product['productName'], 41);
                     $newProductName = $productName . ' 옵션 ' . $type;
                     $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:2rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1><br><br>' . $productDetail;
                     if ($optionPriceType == 'ADD') {
@@ -88,6 +88,7 @@ class SaveController extends Controller
                     $type++;
                 }
             } else {
+                $productName = $nameController->index($product['productName']);
                 $response = $this->insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref);
                 if (!$response['status']) {
                     return $response;
