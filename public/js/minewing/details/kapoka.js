@@ -50,36 +50,40 @@ async function scrapeProduct(page, productHref) {
 
         // 페이지의 DOM을 직접 조작하여 제품 정보를 추출합니다.
         return await page.evaluate((productHref, hasOption, productOptions, productPrice) => {
-            // 제품 이름을 가져옵니다.
-            const productNameElement = document.querySelector('#goods_spec > div > b');
-            const nameText = productNameElement.textContent.trim();
-            const productName = nameText.replace(/\[[^\]]*\]/g, ''); // 불필요한 태그를 제거한 상품명
+            try {
+                // 제품 이름을 가져옵니다.
+                const productNameElement = document.querySelector('#goods_spec > div > b');
+                const nameText = productNameElement.textContent.trim();
+                const productName = nameText.replace(/\[[^\]]*\]/g, ''); // 불필요한 태그를 제거한 상품명
 
-            // 제품 이미지 URL을 가져옵니다.
-            const imageElement = document.querySelector('#objImg');
-            const productImage = imageElement.src;
-            // 제품 상세 설명 이미지 URL을 가져옵니다.
-            const productDetailElements = document.querySelectorAll('#contents > table > tbody > tr > td > p img');
-            const productDetail = [];
-            for (const productdetailElement of productDetailElements) {
-                const productDetailSrc = productdetailElement.src;
-                if (!productDetailSrc.includes('img_02') && !productDetailSrc.includes('img_03') && !productDetailSrc.includes('info_01')) {
-                    productDetail.push(productDetailSrc);
+                // 제품 이미지 URL을 가져옵니다.
+                const imageElement = document.querySelector('#objImg');
+                const productImage = imageElement.src;
+                // 제품 상세 설명 이미지 URL을 가져옵니다.
+                const productDetailElements = document.querySelectorAll('#contents > table > tbody > tr > td > p img');
+                const productDetail = [];
+                for (const productdetailElement of productDetailElements) {
+                    const productDetailSrc = productdetailElement.src;
+                    if (!productDetailSrc.includes('img_02') && !productDetailSrc.includes('img_03') && !productDetailSrc.includes('info_01')) {
+                        productDetail.push(productDetailSrc);
+                    }
                 }
+
+
+                // 제품 정보를 객체로 반환합니다.
+                return {
+                    productName: productName,
+                    productPrice: productPrice,
+                    productImage: productImage,
+                    productDetail: productDetail,
+                    hasOption: hasOption,
+                    productOptions: productOptions,
+                    productHref: productHref,
+                    sellerID: 22
+                };
+            } catch (error) {
+                return false;
             }
-
-
-            // 제품 정보를 객체로 반환합니다.
-            return {
-                productName: productName,
-                productPrice: productPrice,
-                productImage: productImage,
-                productDetail: productDetail,
-                hasOption: hasOption,
-                productOptions: productOptions,
-                productHref: productHref,
-                sellerID: 22
-            };
         }, productHref, hasOption, productOptions, productPrice);
     } catch (error) {
         console.error('Error occurred while scraping product:', error);
