@@ -73,7 +73,8 @@ class SaveController extends Controller
                 $optionPriceType = $this->getOptionPriceType($sellerID);
                 $type = 1;
                 $numberOfOptions = count($productOptions);
-                $productNameBytes = 6 + $numberOfOptions;
+                $numberOfDigits = strlen((string)$numberOfOptions);
+                $productNameBytes = 50 - (6 + $numberOfDigits);
                 $productName = $nameController->index($product['productName'], $productNameBytes);
                 foreach ($productOptions as $productOption) {
                     $newProductName = $productName . ' 옵션 ' . $type;
