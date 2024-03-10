@@ -115,76 +115,71 @@ async function scrapeProductOptions(page) {
 
     // 옵션 2개짜리 수정해야함
     if (optionCount.length == 2) {
-        const firstSelectElement = await page.$('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > select');
-        const firstOptionElements = await firstSelectElement.$$('option');
-        let index = 0;
-        for (const firstOptionElement of firstOptionElements) {
-            if (index != 0) {
-                firstSelectElement.select(firstOptionElement.value);
+        await page.click('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > div > a');
+        // const allSelectElements = await page.$$('a[class^="chosen-single]');
+        const firstOptionValues = await page.evaluate(() => {
+            const firstOptionElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > div > div > ul li');
+            const firstOptionValues = [];
+            for (let i = 1; i < firstOptionElements.length; i++) {
+                const optionValue = firstOptionElements[i].textContent.trim();
+                firstOptionValues.push(optionValue);
             }
-            index++;
-        }
-        const allSelectElements = await page.$$('a[class^="chosen-single');
-        if (allSelectElements.length > 0) {
-            const firstOptionValues = await page.evaluate(() => {
-                const firstOptionElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > div > div > ul li');
-                const firstOptionValues = [];
-                for (let i = 1; i < firstOptionElements.length; i++) {
-                    const optionValue = firstOptionElements[i].value;
-                    firstOptionValues.push(optionValue);
-                }
-                return firstOptionValues;
-            });
-
-            for (let i = 1; i < firstOptionValues.length; i++) {
-                const optionValue = firstOptionValues[i];
-                await page.select('select#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > select', optionValue);
-                await page.click('#frmView > div > div > div.item_detail_list > div > dl:nth-child(5) > dd > div');
+            return firstOptionValues;
+        });
 
 
-                const tmpProductOptions = await page.evaluate(() => {
-                    const firstOptionName = firstOptionValues[i].textContent.trim();
-                    const secondOptionElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > div > dl:nth-child(5) > dd > div > div > ul li');
-                    const options = [];
-                    const secondOptionElementsArray = Array.from(secondOptionElements).slice(1);
 
-                    for (let j = 0; j < secondOptionElementsArray.length; j++) {
-                        const option = secondOptionElementsArray[j];
-                        const sumOption = firstOptionName + option.textContent;
-                        const optionText = sumOption.trim().replace(/\n/g, '');
-                        let optionName, optionPrice;
 
-                        if (optionText.includes('품절')) {
-                            continue;
-                        }
+        for (let i = 1; i < firstOptionValues.length; i++) {
+            const optionValue = firstOptionValues[i];
+            await page.waitForSelector('select#frmView');//select를 못함
+            await page.select('select#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd', optionValue);
+            await page.click('#frmView > div > div > div.item_detail_list > div > dl:nth-child(5) > dd > div > a');
 
-                        const optionElements = optionText.split(' : ');
-                        if (optionElements.length > 1 && optionElements[1].includes('개')) {
-                            const productOptionAmount = parseInt(optionElements[1].replace(/\D/g, ''), 10);
-                            if (productOptionAmount < 10) {
-                                continue;
-                            }
-                            optionName = optionElements[0];
-                            optionPrice = 0;
-                        } else if (optionElements.length > 2 && optionElements[1].includes('원')) {
-                            const productOptionAmount = parseInt(optionElements[2].replace(/\D/g, ''), 10);
-                            if (productOptionAmount < 10) {
-                                continue;
-                            }
-                            optionName = optionElements[0];
-                            optionPrice = parseInt(optionElements[1].replace(/[^\d-+]/g, ''), 10);
-                        } else {
-                            continue;
-                        }
-                        options.push({ optionName, optionPrice });
+
+            const tmpProductOptions = await page.evaluate(() => {
+                const firstOptionName = firstOptionValues[i].textContent.trim();
+                const secondOptionElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > div > dl:nth-child(5) > dd > div > div > ul li');
+                const options = [];
+                const secondOptionElementsArray = Array.from(secondOptionElements).slice(1);
+
+                for (let j = 0; j < secondOptionElementsArray.length; j++) {
+                    const option = secondOptionElementsArray[j];
+                    const sumOption = firstOptionName + option.textContent;
+                    const optionText = sumOption.trim().replace(/\n/g, '');
+                    let optionName, optionPrice;
+
+                    if (optionText.includes('품절')) {
+                        continue;
                     }
-                    return options; // 수정된 부분: 각 조건에 따라 생성된 옵션 객체들을 담고 있는 배열을 반환합니다.
 
-                });
-                return tmpProductOptions;
-            };
-            productOptions.push(...tmpProductOptions);
-        }
+                    const optionElements = optionText.split(' : ');
+                    if (optionElements.length > 1 && optionElements[1].includes('개')) {
+                        const productOptionAmount = parseInt(optionElements[1].replace(/\D/g, ''), 10);
+                        if (productOptionAmount < 10) {
+                            continue;
+                        }
+                        optionName = optionElements[0];
+                        optionPrice = 0;
+                    } else if (optionElements.length > 2 && optionElements[1].includes('원')) {
+                        const productOptionAmount = parseInt(optionElements[2].replace(/\D/g, ''), 10);
+                        if (productOptionAmount < 10) {
+                            continue;
+                        }
+                        optionName = optionElements[0];
+                        optionPrice = parseInt(optionElements[1].replace(/[^\d-+]/g, ''), 10);
+                    } else {
+                        continue;
+                    }
+                    options.push({ optionName, optionPrice });
+                }
+                return options;
+
+            });
+            return tmpProductOptions;
+        };
+        productOptions.push(...tmpProductOptions);
+
     }
     return productOptions;
 }
