@@ -1,15 +1,12 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        // const [tempFilePath, username, password] = args;
-        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const urls = ['https://www.unionpet.co.kr/goods/goods_view.php?goodsNo=13065'];
-        const username = 'jskorea2023';
-        const password = 'Tjddlf88!@';
+        const [tempFilePath, username, password] = args;
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
 
         await signIn(page, username, password);
         const products = [];
@@ -29,7 +26,7 @@ const fs = require('fs');
     } catch (error) {
         console.error('Error occurred:', error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
@@ -115,6 +112,7 @@ async function scrapeProductOptions(page) {
 
     if (optionCount.length == 2) {
         await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.click('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > div > a > span');
         const allSelectElements = await page.$$('a[class^="chosen-single"]');
         if (allSelectElements.length > 0) {
             await page.click('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > div > a > span');
@@ -125,31 +123,25 @@ async function scrapeProductOptions(page) {
                     const optionValue = firstOptionElements[i].value;
                     firstOptionValues.push(optionValue);
                 }
+                console.log(firstOptionValues);
                 return firstOptionValues;
-            });//위에 까지 확인 완료
+            });
 
             for (let i = 0; i < firstOptionValues.length; i++) {
                 const optionValue = firstOptionValues[i];
+                await page.select('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > select', optionValue);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                await page.click('#frmView > div > div > div.item_detail_list > div > dl:nth-child(5) > dd > div > a > span');
 
-                // await page.select('select#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > select', optionValue);
-                //#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > select
-                await page.click('#frmView > div > div > div.item_detail_list > div > dl:nth-child(5) > dd > div');
-
-
-                const tmpProductOptions = await page.evaluate((firstOptionValues) => {
-                    const selector = document.querySelector('select#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > select');
-                    if (selector) {
-                        selector.value = optionValue; // 옵션의 value로 설정
-                        selector.dispatchEvent(new Event('change')); // 변경 사항을 반영하기 위해 change 이벤트 발생
-                    }
-                    const firstOptionName = firstOptionValues[i].textContent.trim();
-                    const secondOptionElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > div > dl:nth-child(5) > dd > div > div > ul li');
+                const tmpProductOptions = await page.evaluate((firstOptionValues, i) => {
+                    const firstOptionName = firstOptionValues[i];
+                    const secondOptionElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > div > dl:nth-child(5) > dd > select option');
                     const options = [];
                     const secondOptionElementsArray = Array.from(secondOptionElements).slice(1);
 
                     for (let j = 0; j < secondOptionElementsArray.length; j++) {
-                        const option = secondOptionElementsArray[j];
-                        const sumOption = firstOptionName + option.textContent;
+                        const option = secondOptionElementsArray[j].textContent;
+                        const sumOption = firstOptionName + option;
                         const optionText = sumOption.trim().replace(/\n/g, '');
                         let optionName, optionPrice;
 
@@ -165,7 +157,7 @@ async function scrapeProductOptions(page) {
                             }
                             optionName = optionElements[0];
                             optionPrice = 0;
-                        } else if (optionElements.length > 2 && optionElements[1].includes('원')) {
+                        } else if (optionElements.length > 2 && optionElements[2].includes('개')) {
                             const productOptionAmount = parseInt(optionElements[2].replace(/\D/g, ''), 10);
                             if (productOptionAmount < 10) {
                                 continue;
@@ -177,12 +169,12 @@ async function scrapeProductOptions(page) {
                         }
                         options.push({ optionName, optionPrice });
                     }
-                    return options; // 수정된 부분: 각 조건에 따라 생성된 옵션 객체들을 담고 있는 배열을 반환합니다.
+                    return options;
 
-                }, firstOptionValues);
-                return tmpProductOptions;
-            };
-            productOptions.push(...tmpProductOptions);
+                }, firstOptionValues, i);
+
+                productOptions.push(...tmpProductOptions);
+            }
         }
     }
     return productOptions;
@@ -193,16 +185,16 @@ async function scrapeProduct(page, productHref, options) {
     await new Promise((page) => setTimeout(page, 1000));
     const product = await page.evaluate((productHref, options) => {
         const productAmountElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > dl > dd');
-        const productAmount = countProductAmount(productAmountElements); //상품 재고 세기
+        const productAmount = countProductAmount(productAmountElements);
         if (productAmount < 10) {
             return false;
         }
         const productName = document.querySelector('#frmView > div > div > div.item_detail_tit > h3').textContent.trim();
         const productPrice = document.querySelector('#frmView > div > div > div.item_detail_list > dl.item_price > dd > strong > strong').textContent.trim().replace(/[^\d]/g, '');
         const productImage = document.querySelector('#mainImage > img').getAttribute('src').trim();
-        const images = document.querySelectorAll('#detail > div.detail_cont > div > div.txt-manual > p img');
+        const images = document.querySelectorAll('#detail > div.detail_cont > div > div.txt-manual img');
         let productDetail = [];
-        if (images.length > 0) { //에러이미지는 하나도 읽지를 못함
+        if (images.length > 0) {
             const productDetailImageElement = [];
             if (images.length > 0) {
                 images.forEach((image) => {
@@ -212,8 +204,12 @@ async function scrapeProduct(page, productHref, options) {
             }
             productDetail = productDetailImageElement;
         }
+
         const hasOption = options.hasOption;
         const productOptions = options.options;
+        if (hasOption == true && productOptions.length == 0) {
+            return false;
+        }
 
         return {
             productName: productName,
