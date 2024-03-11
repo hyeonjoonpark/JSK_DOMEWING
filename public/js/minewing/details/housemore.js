@@ -84,7 +84,7 @@ async function scrapeProduct(page, productHref) {
         const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').getAttribute('src').trim();
         const productImage = productImageElement.startsWith('http') ? productImageElement : `https:${productImageElement}`;
 
-        const baseUrl = 'https://candle-box.com/';
+        const baseUrl = 'https://housemore.co.kr/';
         const toAbsoluteUrl = (relativeUrl, baseUrl) => new URL(relativeUrl, baseUrl).toString();
 
         const getAbsoluteImageUrls = (nodeList, baseUrl, ...excludedPaths) =>
