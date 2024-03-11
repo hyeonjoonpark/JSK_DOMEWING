@@ -49,13 +49,13 @@ async function goToWithRepeat(page, url, index, wiatUntilType) {
 async function signIn(page, username, password) {
     await goToWithRepeat(page, 'https://vitsonmro.com/mro/login.do', 0, 'networkidle0');
     await new Promise((page) => setTimeout(page, 3000));
-    await page.evaluate(() => {
-        const isPopup = document.querySelector('#groobeeWrap');
-        if (isPopup) {
-            isPopup.style.display = 'none';
-            document.querySelector('body > div.grbDim.grbLayer').style.display = 'none';
-        }
-    });
+    // await page.evaluate(() => {
+    //     const isPopup = document.querySelector('#groobeeWrap');
+    //     if (isPopup) {
+    //         isPopup.style.display = 'none';
+    //         document.querySelector('body > div.grbDim.grbLayer').style.display = 'none';
+    //     }
+    // });
     await page.type('#custId', username);
     await page.type('#custPw', password);
     await page.click('#loginForm > div > a:nth-child(3)');

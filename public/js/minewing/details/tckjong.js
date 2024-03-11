@@ -41,35 +41,27 @@ async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
     return false;
 }
 async function signIn(page, username, password) {
-    await page.goto('https://www.domecall.net/member/login.php', { waitUntil: 'networkidle0' });
-    await page.type('#loginId', username);
-    await page.type('#loginPwd', password);
-    await page.click('#formLogin > div.login > button');
+    await page.goto('https://www.tckjong.com/member/login.php', { waitUntil: 'networkidle0' });
+    await page.type('#login_id', username);
+    await page.type('#login_pwd', password);
+    await page.click('#login > div.inner > div.login_form > form > span > input[type=submit]');
     await page.waitForNavigation();
 }
 
 async function scrapeProduct(page, productHref) {
-    await new Promise((page) => setTimeout(page, 1000));
     const product = await page.evaluate((productHref) => {
-        const productName = document.querySelector('#frmView > div > div.goods-header > div.top > div > h2').textContent.trim();
-        const productPrice = document.querySelector('#frmView > div > div.item > ul > li.price > div > strong').textContent.trim().replace(/[^\d]/g, '');
-
-        const productImage = getProductImage();
-        if (!productImage) {
-            return false;
-        }
-
-        const images = document.querySelectorAll('#detail > div.txt-manual img');
+        const productName = document.querySelector('#detail > form > div > div.list_btn > h3').textContent.trim();
+        const productPrice = document.querySelector('#sell_prc_str').textContent.trim().replace(/[^\d]/g, '');
+        const productImage = document.querySelector('#mainImg').getAttribute('src').trim();
+        const images = document.querySelectorAll('#detail > div > div.detail_info img');
         const productDetailImageElement = [];
         images.forEach((image) => {
             const imageUrl = image.getAttribute('src').trim();
-            if (!imageUrl.includes('warning')) {
-                productDetailImageElement.push(imageUrl);
-            }
+            productDetailImageElement.push(imageUrl);
         });
         const productDetail = productDetailImageElement.length > 0 ? productDetailImageElement : 'productDetailImage not found';
-        let hasOption = false;
-        let productOptions = [];
+        const hasOption = false;
+        const productOptions = [];
         return {
             productName: productName,
             productPrice: productPrice,
@@ -78,21 +70,8 @@ async function scrapeProduct(page, productHref) {
             hasOption: hasOption,
             productOptions: productOptions,
             productHref: productHref,
-            sellerID: 23
+            sellerID: 26
         };
-        function getProductImage() {
-            const selectors = [
-                '#content > div.goods-view > div.goods > div > div.more-thumbnail > div.slide > div > div > div > span:nth-child(4) > a > img',
-                '#content > div.goods-view > div.goods > div > div.more-thumbnail > div.slide > div > div > div > span.swiper-slide.slick-slide.slick-current.slick-active > a > img'
-            ];
-            for (const selector of selectors) {
-                const imgElement = document.querySelector(selector);
-                if (imgElement) {
-                    return imgElement.getAttribute('src').trim();
-                }
-            }
-            return null;
-        }
     }, productHref);
     return product;
 }
