@@ -24,7 +24,7 @@ class NameController extends Controller
             $productName = str_replace($word, 'JS', $productName);
         }
         foreach ($forbiddenWords as $word) {
-            $productName = str_replace($word, ' ', $productName);
+            $productName = str_replace($word, '', $productName);
         }
         $productName = str_replace(['Ø', 'Ф', 'Φ',], 'Fi', $productName);
         $productName = str_replace(['×', '*'], 'X', $productName);
