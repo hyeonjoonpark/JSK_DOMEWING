@@ -5,9 +5,6 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [listURL, username, password] = args;
-        // const listURL = 'https://www.tckjong.com/shop/big_section.php?cno1=1051';
-        // const username = 'jskorea2023';
-        // const password = 'Tjddlf88!@';
 
         await signIn(page, username, password);
         const numPage = await getNumPage(page, listURL);

@@ -49,7 +49,6 @@ async function signIn(page, username, password) {
 }
 
 async function scrapeProduct(page, productHref) {
-    await new Promise((page) => setTimeout(page, 1000));
     const product = await page.evaluate((productHref) => {
         const productName = document.querySelector('#detail > form > div > div.list_btn > h3').textContent.trim();
         const productPrice = document.querySelector('#sell_prc_str').textContent.trim().replace(/[^\d]/g, '');
