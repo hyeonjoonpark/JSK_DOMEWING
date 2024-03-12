@@ -31,7 +31,7 @@ class AuthController extends Controller
                 'return' => '유효한 계정이 아닙니다.'
             ];
         }
-        return true;
+        return $isValidAccountResult;
     }
     private function isValidAccount($email, $password)
     {
@@ -40,8 +40,10 @@ class AuthController extends Controller
             ->first();
         $hashedPassword = $user->password;
         if (Hash::check($password, $hashedPassword)) {
+            $rememberToken = $user->remember_token;
             return [
-                'status' => true
+                'status' => true,
+                'return' => $rememberToken
             ];
         }
         return [
