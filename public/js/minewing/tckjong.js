@@ -54,9 +54,9 @@ async function moveToPage(page, listUrl, curPage) {
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         const products = [];
-        const productElements = document.querySelectorAll('#big_section > div.list_section > div > table > tbody > tr > td');
+        const productElements = document.querySelectorAll('#big_section > div.list_section > div > table > tbody > tr td');
         for (const productElement of productElements) {
-            const skipChecks = document.querySelectorAll('div > div.wrap_img > div.icon img');
+            const skipChecks = productElement.querySelectorAll('div > div.wrap_img > div.icon img');
             if (skipChecks) {
                 if (checkSkipProduct(skipChecks)) {
                     continue;
