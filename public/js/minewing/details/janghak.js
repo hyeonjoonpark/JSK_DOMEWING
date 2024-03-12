@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer'); // Puppeteer 모듈을 불러옵니다.
 const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true }); // 브라우저 인스턴스를 headless 모드로 실행합니다.
+    const browser = await puppeteer.launch({ headless: false }); // 브라우저 인스턴스를 headless 모드로 실행합니다.
     const page = await browser.newPage(); // 새로운 페이지(탭)을 엽니다.
     try {
         const args = process.argv.slice(2); // 커맨드 라인 인자를 가져옵니다.
@@ -44,50 +44,27 @@ async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
     return false;
 }
 async function signIn(page, username, password) {
-    await page.goto('https://housemore.co.kr/member/login.html', { waitUntil: 'networkidle0' });
-    await page.type('#member_id', username);
-    await page.type('#member_passwd', password);
-    await page.click('div > div > fieldset > a');
+    await page.goto('https://www.jhmungu.com/shop/login.php', { waitUntil: 'networkidle0' });
+    await page.type('#memberLogin > div > div:nth-child(1) > form > div:nth-child(2) > input[type=text]:nth-child(1)', username);
+    await page.type('#memberLogin > div > div:nth-child(1) > form > div:nth-child(2) > input.mt-2', password);
+    await page.click('#memberLogin > div > div:nth-child(1) > form > div.form-group.row.text-center > div.col-12.col-md > button');
     await page.waitForNavigation();
 }
 
 async function scrapeProduct(page, productHref) {
-    await page.evaluate(async () => {
-        const distance = 45;
-        const scrollInterval = 50;
-        while (true) {
-            const scrollTop = window.scrollY;
-            const prdDetailElement = document.getElementById('prdDetail');
-            const prdInfoElement = document.getElementById('prdInfo');
-            if (prdDetailElement) {
-                const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
-                if (scrollTop < targetScrollBottom) {
-                    window.scrollBy(0, distance);
-                } else {
-                    break;
-                }
-            } else if (prdInfoElement) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                break;
-            } else {
-                window.scrollBy(0, distance);
-            }
 
-            await new Promise(resolve => setTimeout(resolve, scrollInterval));
-        }
-    });
     await new Promise(resolve => setTimeout(resolve, 1000)); // 페이지 로드 후 1초 대기
     const product = await page.evaluate((productHref) => {
         const regex = /\([^()]*\)/g;
-        const productNameText = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.headingArea > h2').textContent.trim();
+        const productNameText = document.querySelector('body > div.container.goods_detail_skin > div.g_skin_head.mt-lg-3.mb-3.mb-md-4.row.px-2.px-lg-0 > div.goods_info.col-12.col-lg.pl-lg-3 > h5 > span').textContent.trim();
         const productName = productNameText.replace(regex, '');
 
-        const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
+        const productPrice = document.querySelector('body > div.container.goods_detail_skin > div.g_skin_head.mt-lg-3.mb-3.mb-md-4.row.px-2.px-lg-0 > div.goods_info.col-12.col-lg.pl-lg-3 > div.row.align-items-center.detail-price-info.justify-content-end > div.col-md.col-7 > div > div:nth-child(2) > span > span').textContent.trim().replace(/[^\d]/g, '');
 
-        const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').getAttribute('src').trim();
+        const productImageElement = document.querySelector('#goodsDetailImage').getAttribute('src').trim();
         const productImage = productImageElement.startsWith('http') ? productImageElement : `https:${productImageElement}`;
 
-        const baseUrl = 'https://housemore.co.kr/';
+        const baseUrl = 'https://www.jhmungu.com/shop/';
         const toAbsoluteUrl = (relativeUrl, baseUrl) => new URL(relativeUrl, baseUrl).toString();
 
         const getAbsoluteImageUrls = (nodeList, baseUrl, ...excludedPaths) =>
@@ -95,25 +72,32 @@ async function scrapeProduct(page, productHref) {
                 .filter(img => !excludedPaths.some(path => img.src.includes(path)))
                 .map(img => toAbsoluteUrl(img.src, baseUrl));
 
-        const productDetailImageElements = document.querySelectorAll('#prdDetail img');
+        const productDetailImageElements = document.querySelectorAll('#menu_explain > div:nth-child(3) img');
         const excludedPaths = ['/web/img/start', '/web/img/event'];
         const productDetail = getAbsoluteImageUrls(productDetailImageElements, baseUrl, ...excludedPaths);
 
         let hasOption = false;
         let productOptions = [];
-        const optionElement = document.querySelector('#product_option_id1');
+        const optionElement = document.querySelector('body > div.container.goods_detail_skin > div.g_skin_head.mt-lg-3.mb-3.mb-md-4.row.px-2.px-lg-0 > div.goods_info.col-12.col-lg.pl-lg-3 > dl > dd > select');
         if (optionElement) {
             hasOption = true;
             // 모든 옵션을 선택합니다.
             let optionElements;
-            const optionType = document.querySelector('#product_option_id1 > optgroup');
+            const optionType = document.querySelector('body > div.container.goods_detail_skin > div.g_skin_head.mt-lg-3.mb-3.mb-md-4.row.px-2.px-lg-0 > div.goods_info.col-12.col-lg.pl-lg-3 > dl > dd > select > option');
             if (optionType) {
-                optionElements = document.querySelectorAll('#product_option_id1 > optgroup option');
+                optionElements = document.querySelectorAll('body > div.container.goods_detail_skin > div.g_skin_head.mt-lg-3.mb-3.mb-md-4.row.px-2.px-lg-0 > div.goods_info.col-12.col-lg.pl-lg-3 > dl > dd > select option');
             } else {
-                optionElements = document.querySelectorAll('#product_option_id1 option');
+                optionElements = document.querySelectorAll('body > div.container.goods_detail_skin > div.g_skin_head.mt-lg-3.mb-3.mb-md-4.row.px-2.px-lg-0 > div.goods_info.col-12.col-lg.pl-lg-3 > dl > dd option');
                 optionElements = Array.from(optionElements).filter(option => !option.value.includes('*'));
             }
+
+            let isFirstOption = true; // 첫 번째 옵션을 추적하기 위한 변수
             for (const optionElement of optionElements) {
+                if (isFirstOption) {
+                    isFirstOption = false; // 첫 번째 옵션을 처리했으므로, 플래그를 false로 설정
+                    continue; // 첫 번째 옵션을 건너뜁니다.
+                }
+
                 const optionText = optionElement.textContent.trim();
                 // '품절' 텍스트가 포함되어 있다면, 이 옵션을 건너뜁니다.
                 if (optionText.includes('품절')) {
@@ -133,6 +117,7 @@ async function scrapeProduct(page, productHref) {
                 productOptions.push({ optionName, optionPrice });
             }
         }
+
 
 
         return {

@@ -51,14 +51,31 @@ async function moveToPage(page, listUrl, curPage) {
 
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
-        // 판매 또는 품절 상태인 상품을 확인하는 함수
-        function hasSoldOutImage(productElement) {
-            return productElement.querySelector('div.col-lg-28w.col-10.py-lg-1 > div > div > div > div.col-lg-12.text-left > p:nth-child(2) > span') !== null;
+        // 특정 셀렉터의 텍스트에 제외할 문자열들 중 하나라도 포함되어 있는지 확인하는 함수
+        function containsExcludedText(productElement, selector, excludedTexts) {
+            const element = productElement.querySelector(selector);
+            if (element) {
+                const textContent = element.textContent;
+                return excludedTexts.some(excludedText => textContent.includes(excludedText));
+            }
+            return false;
         }
 
         // 상품 정보를 처리하여 추출하는 함수
         function processProduct(productElement) {
+            // 검사하고자 하는 셀렉터
+            const checkSelector = 'div.col-lg-28w.col-10.py-lg-1 > div > div > div > div:nth-child(2) > p:nth-child(2) > span';
+            // 제외하고자 하는 텍스트 목록
+            const excludedTexts = ["택배배송불가", "취급안함", "일시품절", "입고미정", "단종"];
+
+            // 해당 셀렉터의 텍스트에 제외할 문자열이 포함되어 있는지 확인
+            if (containsExcludedText(productElement, checkSelector, excludedTexts)) {
+                // 조건을 만족하면, 이 상품은 결과 목록에서 제외
+                return null;
+            }
+
             try {
+                // 상품 정보 추출 로직
                 const productNameElement = productElement.querySelector('div.col-lg-28w.col-10.py-lg-1 > div > div > div > div.col-lg-12.text-left > p:nth-child(1)');
                 let name = productNameElement.textContent.trim();
 
@@ -68,13 +85,11 @@ async function scrapeProducts(page) {
                 const imageElement = productElement.querySelector('div.col-lg-1.col-2 > div > div > a > img');
                 const image = imageElement.src;
 
-                // href 값을 추출하는 부분을 수정
                 const hrefElement = productElement.querySelector('div.col-lg-28w.col-10.py-lg-1 > div > div > div > div.col-lg-12.text-left > p:nth-child(1) > a');
                 const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
 
                 const platform = '장학문구사';
 
-                // 정의된 href 값을 반환 객체에 포함
                 return { name, price, image, href, platform };
             } catch (error) {
                 console.error('Error processing product:', error);
@@ -82,16 +97,14 @@ async function scrapeProducts(page) {
             }
         }
 
-
-        const productElements = document.querySelectorAll('#data-style > div  div');
+        // 상품 요소들을 순회하며 정보 추출
+        const productElements = document.querySelectorAll('#data-style > div div');
         const processedProducts = [];
 
         productElements.forEach(productElement => {
-            if (!hasSoldOutImage(productElement)) {
-                const productInfo = processProduct(productElement);
-                if (productInfo) {
-                    processedProducts.push(productInfo);
-                }
+            const productInfo = processProduct(productElement);
+            if (productInfo) {
+                processedProducts.push(productInfo);
             }
         });
 
@@ -100,5 +113,7 @@ async function scrapeProducts(page) {
 
     return products; // 스크레이핑된 상품 정보 반환
 }
+
+
 
 
