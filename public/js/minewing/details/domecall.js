@@ -67,7 +67,7 @@ async function scrapeProduct(page, productHref) {
                 productDetailImageElement.push(imageUrl);
             }
         });
-        const productDetail = productDetailImageElement.length > 0 ? productDetailImageElement : 'productDetailImage not found';
+        const productDetail = productDetailImageElement;
         let hasOption = false;
         let productOptions = [];
         return {
