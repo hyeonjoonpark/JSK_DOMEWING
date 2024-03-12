@@ -63,7 +63,7 @@ async function scrapeProducts(page) {
             const priceElement = productElement.querySelector('div > div.price.gd-default > span > strong');
             const hrefElement = productElement.querySelector('div > div.txt > a').href.trim();
 
-            const name = nameElement ? imageElement : 'Name not found';
+            const name = nameElement ? nameElement : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
             const href = hrefElement ? makeSafetyUrl(hrefElement) : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
