@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function index(Request $request)
+    public function main(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -39,7 +39,7 @@ class AuthController extends Controller
             ->where('email', $email)
             ->first();
         $hashedPassword = $user->password;
-        if (Hash::check($password, $user->password)) {
+        if (Hash::check($password, $hashedPassword)) {
             return [
                 'status' => true
             ];
