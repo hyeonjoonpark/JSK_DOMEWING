@@ -184,6 +184,10 @@ async function scrapeProductOptions(page) {
 async function scrapeProduct(page, productHref, options) {
     await new Promise((page) => setTimeout(page, 1000));
     const product = await page.evaluate((productHref, options) => {
+        const soldOutProduct = document.querySelector('#frmView > div > div > div.btn_choice_box.btn_restock_box > button');
+        if (soldOutProduct) {
+            return false;
+        }
         const productAmountElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > dl > dd');
         const productAmount = countProductAmount(productAmountElements);
         if (productAmount < 10) {
