@@ -5,9 +5,6 @@ const puppeteer = require('puppeteer');
     try {
         const args = process.argv.slice(2);
         const [listURL, username, password] = args;
-        // const listURL = 'https://www.unionpet.co.kr/goods/goods_list.php?cateCd=104003';
-        // const username = 'jskorea2023';
-        // const password = 'Tjddlf88!@';
         await signIn(page, username, password);
         const numPage = await getNumPage(page, listURL);
         const products = [];
@@ -96,10 +93,12 @@ async function scrapeProducts(page) {
         }
         function checkSoldOutProduct(productElement) {
             const soldOutSrc = "https://cdn-pro-web-212-222.cdn-nhncommerce.com/unionptr8532_godomall_com/data/icon/goods_icon/icon_soldout.gif";
-            const soldOutImage = productElement.querySelector('div > div.item_info_cont > div.item_icon_box > img');
-            const soldOut = soldOutImage ? soldOutImage.src : null;
-            if (soldOut === soldOutSrc) {
-                return true;
+            const soldOutImages = productElement.querySelectorAll('div > div.item_info_cont > div.item_icon_box > img');
+            for (const soldOutImage of soldOutImages) {
+                soldOut = soldOutImage.src;
+                if (soldOut === soldOutSrc) {
+                    return true;
+                }
             }
             return false;
         }

@@ -1,30 +1,33 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
+const puppeteer = require('puppeteer'); // Puppeteer 모듈을 불러옵니다.
+const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
+
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
+    const browser = await puppeteer.launch({ headless: true }); // 브라우저 인스턴스를 headless 모드로 실행합니다.
+    const page = await browser.newPage(); // 새로운 페이지(탭)을 엽니다.
     try {
-        const args = process.argv.slice(2);
-        const [tempFilePath, username, password] = args;
-        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        await signIn(page, username, password);
-        const products = [];
-        for (const url of urls) {
-            const navigateWithRetryResult = await navigateWithRetry(page, url);
+        const args = process.argv.slice(2); // 커맨드 라인 인자를 가져옵니다.
+        const [tempFilePath, username, password] = args; // 인자에서 파일 경로, 사용자 이름, 비밀번호를 추출합니다.
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8')); // URL 목록이 담긴 파일을 읽어서 파싱합니다.
+
+        await signIn(page, username, password); // 로그인 함수를 호출합니다.
+
+        const products = []; // 스크래핑된 상품 정보를 저장할 배열을 초기화합니다.
+        for (const url of urls) { // URL 목록을 순회합니다.
+            const navigateWithRetryResult = await navigateWithRetry(page, url); // 페이지 이동 시도합니다. 실패하면 다음 URL로 넘어갑니다.
             if (navigateWithRetryResult === false) {
                 continue;
             }
-            const product = await scrapeProduct(page, url);
-            if (product === false) {
+            const product = await scrapeProduct(page, url); // 현재 URL에서 상품 정보를 스크래핑합니다.
+            if (product === false) { // 스크래핑이 실패하면 다음 URL로 넘어갑니다.
                 continue;
             }
-            products.push(product);
+            products.push(product); // 스크래핑 성공 시 상품 정보를 배열에 추가합니다.
         }
-        console.log(JSON.stringify(products));
+        console.log(JSON.stringify(products)); // 모든 상품 정보를 JSON 형식으로 출력합니다.
     } catch (error) {
-        console.error('Error occurred:', error);
+        console.error('Error occurred:', error); // 오류 발생 시 오류 메시지를 출력합니다.
     } finally {
-        await browser.close();
+        await browser.close(); // 작업이 끝나면 브라우저를 닫습니다.
     }
 })();
 async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {

@@ -63,7 +63,7 @@ async function scrapeProduct(page, productHref) {
                 productDetailImageElement.push(`https:${imageUrl}`);
             }
         });
-        const productDetail = productDetailImageElement.length > 0 ? productDetailImageElement : 'productDetailImage not found';
+        const productDetail = productDetailImageElement;
 
         const optionElement = document.querySelector('#product_option_id1');
         let hasOption = false;

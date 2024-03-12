@@ -49,21 +49,17 @@ async function signIn(page, username, password) {
 }
 
 async function scrapeProduct(page, productHref) {
-    await new Promise((page) => setTimeout(page, 1000));
     const product = await page.evaluate((productHref) => {
-        const productName = document.querySelector('#detail > form > div > div.list_btn > h3').getAttribute('alt').trim();
+        const productName = document.querySelector('#detail > form > div > div.list_btn > h3').textContent.trim();
         const productPrice = document.querySelector('#sell_prc_str').textContent.trim().replace(/[^\d]/g, '');
         const productImage = document.querySelector('#mainImg').getAttribute('src').trim();
-        const images = document.querySelectorAll('#detail > div > div.detail_info > div img');
+        const images = document.querySelectorAll('#detail > div > div.detail_info img');
         const productDetailImageElement = [];
         images.forEach((image) => {
             const imageUrl = image.getAttribute('src').trim();
-            //if (!imageUrl.includes('Brand') && !imageUrl.includes('Notice')) {
-           //     productDetailImageElement.push(`https:${imageUrl}`);
-            //}
             productDetailImageElement.push(imageUrl);
         });
-        const productDetail = productDetailImageElement.length > 0 ? productDetailImageElement : 'productDetailImage not found';
+        const productDetail = productDetailImageElement;
         const hasOption = false;
         const productOptions = [];
         return {
@@ -78,5 +74,4 @@ async function scrapeProduct(page, productHref) {
         };
     }, productHref);
     return product;
-
 }

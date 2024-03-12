@@ -51,8 +51,7 @@ async function signIn(page, username, password) {
 async function scrapeProduct(page, productHref) {
     await new Promise((page) => setTimeout(page, 1000));
     const product = await page.evaluate((productHref) => {
-        const productNameEl = document.querySelector('#frmView > div > div.goods-header > div.top > div > h2').textContent.trim();
-        const productName = removeABMInProductName(productNameEl)
+        const productName = document.querySelector('#frmView > div > div.goods-header > div.top > div > h2').textContent.trim();
         const productPrice = document.querySelector('#frmView > div > div.item > ul > li.price > div > strong').textContent.trim().replace(/[^\d]/g, '');
 
         const productImage = getProductImage();
@@ -68,7 +67,7 @@ async function scrapeProduct(page, productHref) {
                 productDetailImageElement.push(imageUrl);
             }
         });
-        const productDetail = productDetailImageElement.length > 0 ? productDetailImageElement : 'productDetailImage not found';
+        const productDetail = productDetailImageElement;
         let hasOption = false;
         let productOptions = [];
         return {
@@ -81,16 +80,6 @@ async function scrapeProduct(page, productHref) {
             productHref: productHref,
             sellerID: 23
         };
-        function removeABMInProductName(nameElement) {
-            let name = nameElement;
-            if (name.includes('ABM')) {
-                name = nameElement.replace('ABM', '');
-            }
-            if (name.includes('abm')) {
-                name = nameElement.replace('abm', '');
-            }
-            return name;
-        }
         function getProductImage() {
             const selectors = [
                 '#content > div.goods-view > div.goods > div > div.more-thumbnail > div.slide > div > div > div > span:nth-child(4) > a > img',
