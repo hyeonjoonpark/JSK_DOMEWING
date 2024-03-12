@@ -1,15 +1,12 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const urls = ['https://www.unionpet.co.kr/goods/goods_view.php?goodsNo=12682'];
-        // const username = 'jskorea2023';
-        // const password = 'Tjddlf88!@';
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
