@@ -7,7 +7,6 @@ const fs = require('fs');
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -32,7 +31,7 @@ const fs = require('fs');
 async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
     for (let i = 0; i < attempts; i++) {
         try {
-            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            await page.goto(url, { waitUntil: 'networkidle0' });
             return true;
         } catch (error) {
             if (i < attempts - 1) {
@@ -189,9 +188,11 @@ async function scrapeProduct(page, productHref, options) {
             return false;
         }
         const productAmountElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > dl > dd');
-        const productAmount = countProductAmount(productAmountElements);
-        if (productAmount < 10) {
-            return false;
+        if (productAmountElements) {
+            const productAmount = countProductAmount(productAmountElements);
+            if (productAmount < 10) {
+                return false;
+            }
         }
         const productName = document.querySelector('#frmView > div > div > div.item_detail_tit > h3').textContent.trim();
         const productPrice = document.querySelector('#frmView > div > div > div.item_detail_list > dl.item_price > dd > strong > strong').textContent.trim().replace(/[^\d]/g, '');
@@ -226,10 +227,17 @@ async function scrapeProduct(page, productHref, options) {
             sellerID: 24
         };
         function countProductAmount(productAmountElements) {
+            if (productAmountElements.length === 0) {
+                return 0;
+            }
             const productAmountElement = productAmountElements[productAmountElements.length - 1];
+            if (!productAmountElement) {
+                return 0;
+            }
             const productAmount = parseInt(productAmountElement.textContent.trim().replace(/\D/g, ''), 10);
             return productAmount;
         }
+
     }, productHref, options);
     return product;
 }
