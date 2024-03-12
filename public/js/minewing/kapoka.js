@@ -36,10 +36,16 @@ async function getNumPage(page, url) {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     const numPages = await page.evaluate(() => {
         const paginationElements = document.querySelectorAll('body > table > tbody > tr:nth-child(2) > td > table > tbody > tr > td.outline_side > table > tbody > tr > td > table > tbody > tr:nth-child(10) > td a');
+        if (paginationElements.length === 0) {
+            return 1; // 페이지네이션이 발견되지 않으면 최소한 한 페이지는 있다고 가정
+        }
         const lastPageElement = paginationElements[paginationElements.length - 1];
+        if (!lastPageElement) {
+            return 1; // 마지막 페이지 요소를 찾을 수 없는 경우 기본값으로 한 페이지로 설정
+        }
         const lastPageText = lastPageElement.textContent.trim();
         const numPages = parseInt(lastPageText.replace(/[^0-9]/g, ''));
-        return numPages;
+        return numPages || 1; // 숫자 변환에 실패한 경우 최소한 1을 반환하도록 보장
     });
     return numPages;
 }
@@ -87,7 +93,7 @@ async function scrapeProducts(page) {
 
         // 품절 상품 이미지를 확인하는 함수입니다.
         function hasSoldOutImage(productElement) {
-            return productElement.querySelector('img[src="/shop/data/skin/apple_tree/img/icon/good_icon_soldout.gif"]') !== null;
+            return productElement.querySelector('div:nth-child(2) > img') !== null;
         }
 
         // 스크랩된 상품을 저장할 배열입니다.
