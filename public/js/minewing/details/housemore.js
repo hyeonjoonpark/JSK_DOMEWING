@@ -75,9 +75,11 @@ async function scrapeProduct(page, productHref) {
     });
     await new Promise(resolve => setTimeout(resolve, 1000)); // 페이지 로드 후 1초 대기
     const product = await page.evaluate((productHref) => {
+        const regexForBrackets = /\[[^\]]*\]/g;
         const regex = /\([^()]*\)/g;
         const productNameText = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.headingArea > h2').textContent.trim();
-        const productName = productNameText.replace(regex, '');
+        let productName = productNameText.replace(regex, '');
+        productName = productName.replace(regexForBrackets, '');
 
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
 
