@@ -7,7 +7,6 @@ const fs = require('fs');
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -32,7 +31,7 @@ const fs = require('fs');
 async function navigateWithRetry(page, url, attempts = 3, delay = 2000) {
     for (let i = 0; i < attempts; i++) {
         try {
-            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            await page.goto(url, { waitUntil: 'networkidle0' });
             return true;
         } catch (error) {
             if (i < attempts - 1) {
