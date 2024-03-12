@@ -46,6 +46,8 @@ use App\Http\Controllers\Productwing\RestockController;
 use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
+use App\Http\Controllers\SellwingApis\AuthController;
+use App\Http\Controllers\SellwingApis\VendorListController;
 use App\Http\Controllers\Testmonial\TestmonialController;
 
 /*
@@ -62,79 +64,85 @@ use App\Http\Controllers\Testmonial\TestmonialController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::post('/webhook', [WebhookController::class, 'webhook']);
-Route::post('/set-post-confirmed', [DashboardController::class, 'setPostConfirmed']);
-Route::post('/delete-post', [DashboardController::class, 'deletePost']);
-Route::post('/product/search', [ProductSearchController::class, 'index']);
-Route::post('/product/category', [ProductRegisterController::class, 'categorySearch']);
-Route::post('/product/register', [ProductRegisterController::class, 'handle']);
-Route::post('/product/upload', [FormController::class, 'index']);
-Route::post('/product/keywords', [ProductKeywordController::class, 'index']);
-Route::post('/product/data-validity', [ProductDataValidityController::class, 'index']);
-Route::post('/product/mining', [MiningController::class, 'index']);
-Route::post('/product/process', [ProcessController::class, 'index']);
-Route::post('/product/unique', [FilterDuplicatesController::class, 'index']);
-Route::post('/product/manufacture', [ManufactureController::class, 'index']);
-Route::post('/product/validate-product-names', [ValidateProductNamesController::class, 'index']);
-Route::post('/product/insert', [InsertController::class, 'index']);
-Route::post('/product/get-product', [GetProductController::class, 'index']);
-Route::post('/product/excelwing', [ExcelwingController::class, 'index']);
-Route::post('/product/category-mapping', [CategoryMappingController::class, 'index']);
-Route::post('/product/sold-out', [SoldOutController::class, 'index']);
-Route::post('/product/restock', [RestockController::class, 'index']);
-Route::post('/product/new-minewing', [NewMinewingMiningController::class, 'index']);
-Route::post('/product/edit-name', [EditProductNameController::class, 'index']);
-// account-setting
-Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
-Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);
-// minewing
-Route::post('/minewing/unique-product-hrefs', [UniqueProductHrefsController::class, 'index']);
-Route::post('/minewing/manufacture', [MinewingManufactureController::class, 'index']);
-Route::post('/minewing/save-products', [SaveController::class, 'index']);
-// orderwing
-Route::post('/orderwing', [CollectOrderController::class, 'index']);
-// Load product details
-Route::post('/product/load-product-detail', [ProductDetailController::class, 'index']);
-Route::post('/product/collect', [ProductCollectController::class, 'index']);
-Route::post('/product/load-bulk-details', [ProductDetailController::class, 'bulk']);
-Route::post('/product/insert-bulk-products', [ProductCollectController::class, 'bulk']);
-Route::post('/mappingwing/select-category', [SelectCategoryController::class, 'request']);
-Route::post('/mappingwing/category-search', [CategorySearchController::class, 'index']);
-Route::post('/mappingwing/request-mapping', [RequestMappingController::class, 'index']);
-Route::post('/mappingwing/get-mapped', [SelectCategoryController::class, 'mappedRequest']);
-// Testmonials
-Route::post('/testmonials/add', [TestmonialController::class, 'add']);
-Route::post('/testmonials/del', [TestmonialController::class, 'del']);
-Route::post('/testmonials/edt', [TestmonialController::class, 'edt']);
-//
-Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
-Route::get('/admin/get-domain', [DomainController::class, 'getDomain']);
-Route::post('admin/edit-domain', [DomainController::class, 'editDomain']);
-Route::post('admin/upload-image-banner', [DomainController::class, 'uploadImageBanner']);
-Route::post('admin/change-image-status', [DomainController::class, 'changeImageStatus']);
-Route::post('admin/remove-image-banner', [DomainController::class, 'removeImage']);
-Route::post('admin/change-theme-color', [DomainController::class, 'changeThemeColor']);
-Route::post('seller/edit-domain-name', [CMSController::class, 'editDomainName']);
-Route::post('seller/upload-image-banner', [CMSController::class, 'uploadImageBanner']);
-Route::post('seller/change-image-status', [CMSController::class, 'changeImageStatus']);
-Route::post('seller/remove-image-banner', [CMSController::class, 'removeImage']);
-Route::post('seller/change-theme-color', [CMSController::class, 'changeThemeColor']);
+Route::middleware(['auth.custom'])->group(function () {
+    Route::post('/webhook', [WebhookController::class, 'webhook']);
+    Route::post('/set-post-confirmed', [DashboardController::class, 'setPostConfirmed']);
+    Route::post('/delete-post', [DashboardController::class, 'deletePost']);
+    Route::post('/product/search', [ProductSearchController::class, 'index']);
+    Route::post('/product/category', [ProductRegisterController::class, 'categorySearch']);
+    Route::post('/product/register', [ProductRegisterController::class, 'handle']);
+    Route::post('/product/upload', [FormController::class, 'index']);
+    Route::post('/product/keywords', [ProductKeywordController::class, 'index']);
+    Route::post('/product/data-validity', [ProductDataValidityController::class, 'index']);
+    Route::post('/product/mining', [MiningController::class, 'index']);
+    Route::post('/product/process', [ProcessController::class, 'index']);
+    Route::post('/product/unique', [FilterDuplicatesController::class, 'index']);
+    Route::post('/product/manufacture', [ManufactureController::class, 'index']);
+    Route::post('/product/validate-product-names', [ValidateProductNamesController::class, 'index']);
+    Route::post('/product/insert', [InsertController::class, 'index']);
+    Route::post('/product/get-product', [GetProductController::class, 'index']);
+    Route::post('/product/excelwing', [ExcelwingController::class, 'index']);
+    Route::post('/product/category-mapping', [CategoryMappingController::class, 'index']);
+    Route::post('/product/sold-out', [SoldOutController::class, 'index']);
+    Route::post('/product/restock', [RestockController::class, 'index']);
+    Route::post('/product/new-minewing', [NewMinewingMiningController::class, 'index']);
+    Route::post('/product/edit-name', [EditProductNameController::class, 'index']);
+    // account-setting
+    Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
+    Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);
+    // minewing
+    Route::post('/minewing/unique-product-hrefs', [UniqueProductHrefsController::class, 'index']);
+    Route::post('/minewing/manufacture', [MinewingManufactureController::class, 'index']);
+    Route::post('/minewing/save-products', [SaveController::class, 'index']);
+    // orderwing
+    Route::post('/orderwing', [CollectOrderController::class, 'index']);
+    // Load product details
+    Route::post('/product/load-product-detail', [ProductDetailController::class, 'index']);
+    Route::post('/product/collect', [ProductCollectController::class, 'index']);
+    Route::post('/product/load-bulk-details', [ProductDetailController::class, 'bulk']);
+    Route::post('/product/insert-bulk-products', [ProductCollectController::class, 'bulk']);
+    Route::post('/mappingwing/select-category', [SelectCategoryController::class, 'request']);
+    Route::post('/mappingwing/category-search', [CategorySearchController::class, 'index']);
+    Route::post('/mappingwing/request-mapping', [RequestMappingController::class, 'index']);
+    Route::post('/mappingwing/get-mapped', [SelectCategoryController::class, 'mappedRequest']);
+    // Testmonials
+    Route::post('/testmonials/add', [TestmonialController::class, 'add']);
+    Route::post('/testmonials/del', [TestmonialController::class, 'del']);
+    Route::post('/testmonials/edt', [TestmonialController::class, 'edt']);
+    //
+    Route::post('/admin/remove-domain', [DomainController::class, 'removeDomain']);
+    Route::get('/admin/get-domain', [DomainController::class, 'getDomain']);
+    Route::post('admin/edit-domain', [DomainController::class, 'editDomain']);
+    Route::post('admin/upload-image-banner', [DomainController::class, 'uploadImageBanner']);
+    Route::post('admin/change-image-status', [DomainController::class, 'changeImageStatus']);
+    Route::post('admin/remove-image-banner', [DomainController::class, 'removeImage']);
+    Route::post('admin/change-theme-color', [DomainController::class, 'changeThemeColor']);
+    Route::post('seller/edit-domain-name', [CMSController::class, 'editDomainName']);
+    Route::post('seller/upload-image-banner', [CMSController::class, 'uploadImageBanner']);
+    Route::post('seller/change-image-status', [CMSController::class, 'changeImageStatus']);
+    Route::post('seller/remove-image-banner', [CMSController::class, 'removeImage']);
+    Route::post('seller/change-theme-color', [CMSController::class, 'changeThemeColor']);
 
-Route::post('member/add-to-cart', [ProductDetailsController::class, 'addToCart']);
-Route::post('member/remove-all-cart', [ProductDetailsController::class, 'removeAllCartItem']);
-Route::post('member/add-to-wishlist', [ProductDetailsController::class, 'addToWishlist']);
-Route::post('member/remove-cart-item', [ShoppingCartController::class, 'removeCartItem']);
-Route::post('member/update-quantity', [ShoppingCartController::class, 'updateQuantity']);
-Route::post('member/create-order', [OrderController::class, 'createOrder']);
-Route::post('member/create-single-order', [OrderController::class, 'createSingleOrder']);
-Route::post('member/checkout-order', [CheckoutController::class, 'checkoutOrder']);
+    Route::post('member/add-to-cart', [ProductDetailsController::class, 'addToCart']);
+    Route::post('member/remove-all-cart', [ProductDetailsController::class, 'removeAllCartItem']);
+    Route::post('member/add-to-wishlist', [ProductDetailsController::class, 'addToWishlist']);
+    Route::post('member/remove-cart-item', [ShoppingCartController::class, 'removeCartItem']);
+    Route::post('member/update-quantity', [ShoppingCartController::class, 'updateQuantity']);
+    Route::post('member/create-order', [OrderController::class, 'createOrder']);
+    Route::post('member/create-single-order', [OrderController::class, 'createSingleOrder']);
+    Route::post('member/checkout-order', [CheckoutController::class, 'checkoutOrder']);
 
-Route::post('member/update-profile', [MemberController::class, 'updateProfile']);
-Route::get('member/get-transaction-details/{id}', [MemberController::class, 'getTransactionDetails']);
-Route::post('member/order-received', [ToReceiveController::class, 'confirmReceived']);
-Route::post('member/submit-review', [ToRateController::class, 'submitReview']);
-Route::post('member/edit-review', [ToRateController::class, 'editReview']);
+    Route::post('member/update-profile', [MemberController::class, 'updateProfile']);
+    Route::get('member/get-transaction-details/{id}', [MemberController::class, 'getTransactionDetails']);
+    Route::post('member/order-received', [ToReceiveController::class, 'confirmReceived']);
+    Route::post('member/submit-review', [ToRateController::class, 'submitReview']);
+    Route::post('member/edit-review', [ToRateController::class, 'editReview']);
 
-Route::post('apiwing/get-unset-categories', [IndexController::class, 'getUnsetCategories']);
+    Route::post('apiwing/get-unset-categories', [IndexController::class, 'getUnsetCategories']);
 
-Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
+    Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
+    Route::prefix('sellwing-api')->group(function () {
+        Route::post('vendor-list', [VendorListController::class, 'main']);
+    });
+});
+Route::post('sellwing-api/auth', [AuthController::class, 'main']);

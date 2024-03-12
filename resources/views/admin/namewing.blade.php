@@ -126,7 +126,7 @@
                 data: {
                     productCode,
                     newProductName,
-                    rememberToken
+                    rememberToken: rememberToken
                 },
                 success: function(response) {
                     closePopup();

@@ -27,7 +27,7 @@
                                         <div class="custom-control custom-radio">
                                             <input type="radio" id="seller{{ $seller->vendor_id }}" name="sellers"
                                                 value="{{ $seller->vendor_id }}" class="custom-control-input"
-                                                @if ($loop->first) checked @endif>
+                                                @if ($seller->vendor_id === 23) checked @endif>
                                             <label class="custom-control-label"
                                                 for="seller{{ $seller->vendor_id }}">{{ $seller->name }}</label>
                                         </div>
@@ -267,7 +267,8 @@
                 type: "POST",
                 dataType: "JSON",
                 data: {
-                    productHrefs: productHrefs
+                    productHrefs: productHrefs,
+                    rememberToken: rememberToken
                 },
                 success: function(response) {
                     console.log(response);
@@ -338,7 +339,8 @@
                 type: 'post',
                 dataType: 'json',
                 data: {
-                    keyword: keyword
+                    keyword: keyword,
+                    rememberToken: rememberToken
                 },
                 success: function(result) {
                     console.log(result);
@@ -384,7 +386,7 @@
                     categoryID,
                     productKeywords,
                     products,
-                    rememberToken
+                    rememberToken: rememberToken
                 },
                 success: successHandle,
                 error: errorHandle

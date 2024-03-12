@@ -79,7 +79,7 @@
                 dataType: "JSON",
                 data: {
                     marginRate: marginRate,
-                    remember_token: '{{ Auth::user()->remember_token }}',
+                    rememberToken: rememberToken,
                     mrID: mrID
                 },
                 success: function(response) {
@@ -115,7 +115,7 @@
                 type: "POST",
                 dataType: "JSON",
                 data: {
-                    rememberToken: '{{ Auth::user()->remember_token }}',
+                    rememberToken: rememberToken,
                     vendorID: vendorID,
                     shippingFee: shippingFee
                 },

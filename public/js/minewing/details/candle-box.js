@@ -185,7 +185,8 @@ async function scrapeProduct(page, productHref, options) {
 
 
         const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img');
-        const productImage = toAbsoluteUrl(productImageElement.src, baseUrl); const hasOption = options.hasOption;
+        const productImage = toAbsoluteUrl(productImageElement.src, baseUrl);
+        const hasOption = options.hasOption;
         const productOptions = options.options;
 
         return {

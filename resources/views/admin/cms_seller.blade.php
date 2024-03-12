@@ -214,7 +214,7 @@
                 data: {
                     domain_name: domain_name,
                     domain_id: domain_id,
-                    remember_token: remember_token
+                    rememberToken: remember_token
                 },
                 success: function(response) {
                     const status = parseInt(response.status);
@@ -285,7 +285,7 @@
         function prepareUpload(domain_id) {
             var formData = new FormData($('#uploadForm')[0]);
             formData.append('domain_id', domain_id);
-            formData.append('remember_token', '{{ Auth::user()->remember_token }}');
+            formData.append('rememberToken', '{{ Auth::user()->remember_token }}');
 
             $.ajax({
                 url: '../../../api/seller/upload-image-banner',
@@ -333,7 +333,7 @@
                 data: {
                     color: color,
                     domain_id: domain_id,
-                    remember_token: remember_token
+                    rememberToken: remember_token
                 },
                 success: function(response) {
                     const status = parseInt(response.status);
@@ -376,7 +376,7 @@
                 dataType: 'json',
                 data: {
                     image_id: image_id,
-                    remember_token: remember_token,
+                    rememberToken: remember_token,
                 },
                 success: function(response) {
                     const status = parseInt(response.status);
@@ -416,7 +416,7 @@
                 dataType: 'json',
                 data: {
                     image_id: image_id,
-                    remember_token: remember_token,
+                    rememberToken: remember_token,
                 },
                 success: function(response) {
                     const status = parseInt(response.status);

@@ -63,7 +63,7 @@ async function scrapeProducts(page) {
             const priceElement = productElement.querySelector('div > div.price.gd-default > span > strong');
             const hrefElement = productElement.querySelector('div > div.txt > a').href.trim();
 
-            const name = nameElement ? imageElement : 'Name not found';
+            const name = nameElement ? nameElement : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
             const href = hrefElement ? makeSafetyUrl(hrefElement) : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
@@ -83,7 +83,7 @@ async function scrapeProducts(page) {
             return safetyUrl;
         }
         function checkSkipProduct(productElement, nameElement) {
-            if (nameElement.includes('매장판매') || nameElement.includes('차량배송')) {
+            if (nameElement.includes('매장판매') || nameElement.includes('차량배송') || nameElement.includes('반품')) {
                 return true;
             }
             const seasonImage = "https://cdn-pro-web-134-253.cdn-nhncommerce.com/alllatr4832_godomall_com/data/icon/goods_icon/my_icon_160282633410.jpg";

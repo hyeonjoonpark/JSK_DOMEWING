@@ -1,13 +1,10 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [listURL, username, password] = args;
-        // const listURL = 'https://thepetmart.co.kr/product/list.html?cate_no=37&page=3';
-        // const username = 'jskorea2022';
-        // const password = 'Tjddlf88!@#';
 
         await signIn(page, username, password);
         const numPage = await getNumPage(page, listURL);
