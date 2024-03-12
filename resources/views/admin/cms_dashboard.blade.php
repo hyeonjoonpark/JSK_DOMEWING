@@ -149,7 +149,8 @@
                 type: 'get',
                 dataType: 'json',
                 data: {
-                    domainId: domainId
+                    domainId: domainId,
+                    rememberToken: rememberToken
                 },
                 success: function(response) {
                     const status = parseInt(response.status);
@@ -186,7 +187,7 @@
                     data: {
                         domainName: domainName,
                         domainId: domainId,
-                        remember_token: remember_token,
+                        rememberToken: remember_token,
                     },
                     success: function(response) {
                         const status = parseInt(response.status);
@@ -235,7 +236,7 @@
                 dataType: 'json',
                 data: {
                     domainId: domainId,
-                    remember_token: remember_token,
+                    rememberToken: remember_token,
                 },
                 success: function(response) {
                     const status = parseInt(response.status);

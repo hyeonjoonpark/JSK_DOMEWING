@@ -57,7 +57,8 @@
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    ownerclanCategoryID: ownerclanCategoryID
+                    ownerclanCategoryID: ownerclanCategoryID,
+                    rememberToken: rememberToken
                 },
                 success: function(response) {
                     closePopup();
@@ -133,7 +134,8 @@
                 dataType: "JSON",
                 data: {
                     ownerclanCategoryID: ownerclanCategoryID,
-                    mappedCategory: mappedCategory
+                    mappedCategory: mappedCategory,
+                    rememberToken: rememberToken
                 },
                 success: function(response) {
                     closePopup();
@@ -163,7 +165,8 @@
                 dataType: "JSON",
                 data: {
                     vendorID: vendorID,
-                    keyword: keyword
+                    keyword: keyword,
+                    rememberToken: rememberToken
                 },
                 success: function(response) {
                     let options = '';

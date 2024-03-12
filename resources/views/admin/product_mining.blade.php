@@ -258,7 +258,8 @@
                 type: "POST",
                 dataType: "JSON",
                 data: {
-                    productHrefs: productHrefs
+                    productHrefs: productHrefs,
+                    rememberToken: rememberToken
                 },
                 success: function(response) {
                     closePopup();
@@ -318,7 +319,8 @@
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    products
+                    products,
+                    rememberToken: rememberToken
                 },
                 success: handleManufactureSuccess,
                 error: errorHandle
@@ -420,7 +422,8 @@
                 type: 'post',
                 dataType: 'json',
                 data: {
-                    keyword: keyword
+                    keyword: keyword,
+                    rememberToken: rememberToken
                 },
                 success: function(result) {
                     console.log(result);
@@ -467,7 +470,7 @@
                     categoryID,
                     productKeywords,
                     products,
-                    rememberToken
+                    rememberToken: rememberToken
                 },
                 success: successHandle,
                 error: errorHandle
