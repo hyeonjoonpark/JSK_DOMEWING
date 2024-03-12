@@ -83,7 +83,7 @@ async function scrapeProducts(page) {
             return safetyUrl;
         }
         function checkSkipProduct(productElement, nameElement) {
-            if (nameElement.includes('매장판매') || nameElement.includes('차량배송') || nameElement.includes('반품불가')) {
+            if (nameElement.includes('매장판매') || nameElement.includes('차량배송') || nameElement.includes('반품')) {
                 return true;
             }
             const seasonImage = "https://cdn-pro-web-134-253.cdn-nhncommerce.com/alllatr4832_godomall_com/data/icon/goods_icon/my_icon_160282633410.jpg";
