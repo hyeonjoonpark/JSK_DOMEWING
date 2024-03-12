@@ -103,7 +103,7 @@ async function scrapeProducts(page) {
             return false;
         }
         function checkSkipProduct(productName) {
-            const imminentDiscount = "임박할인";
+            const imminentDiscount = "임박";
             const outOfStock = "소진";
             const nonReturnable = "반품불가";
             const directShipping = "직배송";
