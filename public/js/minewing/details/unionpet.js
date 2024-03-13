@@ -72,7 +72,7 @@ async function scrapeProductOptions(page) {
     const optionCount = await page.$$('#frmView > div > div > div > div > dl > dd > div');
     const productOptions = [];
     if (optionCount.length == 1) {
-        await page.click('#frmView > div > div > div.item_detail_list > div > dl > dd > div');
+        await page.click('#frmView > div > div > div.item_detail_list > div > dl > dd > div > a');
         const productOptionsEl = await page.evaluate(() => {
             const firstOption = document.querySelectorAll('#frmView > div > div > div.item_detail_list > div > dl > dd > div > div > ul li');
             const options = [];
