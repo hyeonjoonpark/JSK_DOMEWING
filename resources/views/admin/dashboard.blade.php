@@ -16,7 +16,7 @@
                     </p>
                     <div class="form-group">
                         <label class="form-label">B2B 업체 리스트</label>
-                        <div class="d-flex">
+                        <div>
                             @foreach ($b2bs as $b2B)
                                 <a href="{{ $b2B->vendor_href }}" target="_blank">{{ $b2B->name }}</a> /
                             @endforeach
@@ -25,7 +25,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">원청사 리스트</label>
-                        <div class="d-flex">
+                        <div>
                             @foreach ($vendors as $vendor)
                                 <a href="{{ $vendor->vendor_href }}" target="_blank">{{ $vendor->name }}</a> /
                             @endforeach
