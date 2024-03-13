@@ -70,7 +70,8 @@
                 dataType: "JSON",
                 data: {
                     b2BID: b2BID,
-                    sellerID: sellerID
+                    sellerID: sellerID,
+                    rememberToken: rememberToken
                 },
                 success: function(response) {
                     console.log(response);
