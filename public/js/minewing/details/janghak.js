@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer'); // Puppeteer 모듈을 불러옵니다.
 const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false }); // 브라우저 인스턴스를 headless 모드로 실행합니다.
+    const browser = await puppeteer.launch({ headless: true }); // 브라우저 인스턴스를 headless 모드로 실행합니다.
     const page = await browser.newPage(); // 새로운 페이지(탭)을 엽니다.
     try {
         const args = process.argv.slice(2); // 커맨드 라인 인자를 가져옵니다.
