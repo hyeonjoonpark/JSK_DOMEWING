@@ -114,11 +114,10 @@ async function scrapeProductOptions(page) {
     }
 
     if (optionCount.length == 2) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 500));
         await page.click('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > div > a > span');
         const allSelectElements = await page.$$('a[class^="chosen-single"]');
         if (allSelectElements.length > 0) {
-            await page.click('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > div > a > span');
             const firstOptionValues = await page.evaluate(() => {
                 const firstOptionElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > div > dl:nth-child(3) > dd > select option');
                 const firstOptionValues = [];
