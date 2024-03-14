@@ -144,7 +144,7 @@
             dataType: 'JSON',
             data: {
                 productCodes,
-                rememberToken,
+                rememberToken: rememberToken,
                 b2bs,
                 isSellwingChecked
             },
