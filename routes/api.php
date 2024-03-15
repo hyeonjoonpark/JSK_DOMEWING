@@ -47,6 +47,7 @@ use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\SellwingApis\AuthController;
+use App\Http\Controllers\SellwingApis\CategoryListController;
 use App\Http\Controllers\SellwingApis\VendorListController;
 use App\Http\Controllers\Testmonial\TestmonialController;
 
@@ -143,6 +144,7 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
     Route::prefix('sellwing-api')->group(function () {
         Route::post('vendor-list', [VendorListController::class, 'main']);
+        Route::post('category-list', [CategoryListController::class, 'index']);
     });
 });
 Route::post('sellwing-api/auth', [AuthController::class, 'main']);
