@@ -10,9 +10,11 @@ class CategoryListController extends Controller
 {
     public function index(Request $request)
     {
+        $categories = DB::table('ownerclan_category')
+            ->get(['id', 'name']);
         return [
             'status' => true,
-            'return' => DB::table('ownerclan_category')->get()
+            'return' => $categories
         ];
     }
 }
