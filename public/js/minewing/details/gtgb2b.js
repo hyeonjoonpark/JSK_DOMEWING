@@ -75,43 +75,96 @@ async function scrapeProduct(page, productHref) {
         return false;
     }
 }
+// 페이지에서 상품의 가격 정보와 옵션 가격 정보를 추출하는 함수입니다.
+async function scrapeProduct(page) {
+    try {
+        // 페이지에서 기본 가격 정보를 추출합니다.
+        const price = await extractPrice(page);
+        // 페이지에 옵션이 있는지 확인합니다.
+        const hasOptions = await checkOptions(page);
+        let optionPrices = [];
 
-async function scrapePrices(page) {
-    const hasOptions = await page.evaluate(() => {
-        return document.querySelectorAll('select[name="opt[]"]').length > 0;
-    });
-
-    if (!hasOptions) {
-        console.log("No options available.");
-        return;
-    }
-
-    const selectElements = await page.$$('select[name="opt[]"]');
-    for (const select of selectElements) {
-        const optionValues = await select.evaluate(select => 
-            Array.from(select.options)
-                .filter((option, index) => option.value.trim() !== '' && index > 0)
-                .map(option => option.value)
-        );
-
-        for (const optionValue of optionValues) {
-            await select.select(optionValue);
-            await page.waitForTimeout(1000);
-
-            const finalPrice = await page.evaluate(() => {
-                const priceElement = document.querySelector('.final-price');
-                return priceElement ? priceElement.innerText.trim() : null;
-            });
-
-            // 필요한 경우 추가적인 작업 수행
+        // 옵션이 있다면, 각 옵션별 가격을 추출합니다.
+        if (hasOptions) {
+            optionPrices = await extractOptionPrices(page);
         }
+
+        // 추출된 기본 가격과 옵션별 가격 정보를 반환합니다.
+        return {
+            price,
+            optionPrices
+        };
+    } catch (error) {
+        // 오류 발생 시 콘솔에 오류를 출력하고 null을 반환합니다.
+        console.error('Error during scraping product:', error);
+        return null;
     }
 }
 
-(async () => {
-    const browser = await puppeteer.launch({ headless: false });
-    const page = await browser.newPage();
-    await page.goto('Your Product Page URL');
-    await scrapePrices(page);
-    await browser.close();
-})();
+// 페이지에서 기본 가격 또는 할인 가격(있을 경우)을 추출하는 함수입니다.
+async function extractPrice(page) {
+    return page.evaluate(() => {
+        // 할인 가격 요소와 최종 가격 요소를 찾습니다.
+        const salePriceElement = document.querySelector('#frmView > div > div.item > ul > li.benefits > div > p.sale > strong');
+        const finalPriceElement = document.querySelector('div.end-price > ul > li.total > strong');
+        // 기본 가격 요소를 찾습니다.
+        const basePriceElement = document.querySelector('#frmView > div > div.item > ul > li.price > div > strong');
+
+        // 할인 가격이 있으면 최종 가격을, 없으면 기본 가격을 추출합니다.
+        if (salePriceElement && finalPriceElement) {
+            return parseInt(finalPriceElement.textContent.replace(/[^\d]/g, ''));
+        } else if (basePriceElement) {
+            return parseInt(basePriceElement.textContent.replace(/[^\d]/g, ''));
+        }
+        // 가격 정보가 없으면 null을 반환합니다.
+        return null;
+    });
+}
+
+// 페이지에 옵션이 있는지 확인하는 함수입니다.
+async function checkOptions(page) {
+    return page.evaluate(() => {
+        // 옵션 요소들을 찾아서 옵션의 존재 여부를 확인합니다.
+        const optionElements = document.querySelectorAll('#frmView > div > div:nth-child(5) > div > div > div > div > ul li, #frmView > div > div:nth-child(7) > div > div > div > div > ul li');
+        return optionElements.length > 0;
+    });
+}
+
+// 옵션별 가격 정보를 추출하고 선택된 옵션을 초기화하는 함수입니다.
+async function extractOptionPrices(page) {
+    const options = await page.evaluate(() => {
+        const options = [];
+        // 두 번째 옵션 선택자에서 옵션 요소들을 찾습니다.
+        const optionElements = document.querySelectorAll('#frmView > div > div:nth-child(7) > div > div > div > div > ul li');
+        // 첫 번째 옵션을 제외하고 각 옵션의 값을 배열에 추가합니다.
+        optionElements.forEach((option, index) => {
+            if (index > 0) { // 첫 번째 옵션은 건너뜁니다.
+                options.push(option.value);
+            }
+        });
+        return options;
+    });
+
+    let optionPrices = [];
+    for (const optionValue of options) {
+        // 선택된 옵션에 대한 가격을 추출합니다.
+        await page.select('select[name="option2"]', optionValue);
+        // 옵션 선택 후 가격 정보가 갱신될 때까지 기다립니다.
+        await page.waitForSelector('div.end-price > ul > li.total > strong');
+
+        const optionPrice = await page.evaluate(() => {
+            // 최종 가격 요소를 찾아 값을 추출합니다.
+            const priceElement = document.querySelector('div.end-price > ul > li.total > strong');
+            return priceElement ? parseInt(priceElement.textContent.replace(/[^\d]/g, '')) : null;
+        });
+        optionPrices.push(optionPrice);
+
+        // 선택된 옵션을 초기화합니다. 여기서는 페이지를 새로고침하는 방법을 사용했습니다.
+        await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+        // 페이지가 완전히 로드될 때까지 기다립니다.
+        await page.waitForSelector('#frmView');
+    }
+
+    return optionPrices; // 추출된 옵션별 가격 정보를 반환합니다.
+}
+
