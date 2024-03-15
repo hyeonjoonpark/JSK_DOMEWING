@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductEditor\IndexController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class SoldOutController extends Controller
 {
@@ -70,12 +71,22 @@ class SoldOutController extends Controller
      */
     private function runSoldOut($productCodes, $b2bIds, $rememberToken)
     {
-        $html = '상품 코드 및 실패한 업체 리스트<br><br><br>';
-        foreach ($productCodes as $productCode) {
-            $loopB2bIds = $this->loopB2bIds($productCode, $b2bIds, $rememberToken);
-            $html .= $productCode . ': ' . $loopB2bIds . '<br><br>';
+        $tempDirPath = storage_path('app/public/product-codes');
+        $tempFilePath = $tempDirPath . '/' . uniqid() . '.json';
+        if (!file_exists($tempDirPath)) {
+            mkdir($tempDirPath, 0777, true);
         }
-        return $html;
+        $productCodesChunks = array_chunk($productCodes, 50);
+        foreach ($b2bIds as $b2bId) {
+            $account = $this->controller->getVendorAccount($rememberToken, $b2bId);
+            $vendorEngName = DB::table('vendors')
+                ->where('id', $b2bId)
+                ->first('name_eng');
+            foreach ($productCodesChunks as $chunk) {
+                file_put_contents($tempFilePath, json_encode($chunk));
+                $this->sendSoldOutRequest($tempFilePath, $vendorEngName, $account->username, $account->password);
+            }
+        }
     }
     /**
      * 선택된 업체들을 위한 반복문
@@ -118,10 +129,10 @@ class SoldOutController extends Controller
      * @param string $password
      * @return boolean
      */
-    public function sendSoldOutRequest($productCode, $vendorEngName, $username, $password)
+    public function sendSoldOutRequest($tempJsonFilePath, $vendorEngName, $username, $password)
     {
         $scriptPath = public_path('js/sold-out/' . $vendorEngName . '.js');
-        $command = "node {$scriptPath} {$username} {$password} {$productCode}";
+        $command = "node {$scriptPath} {$username} {$password} {$tempJsonFilePath}";
         exec($command, $output, $resultCode);
         if ($resultCode === 0 && $output[0] === 'true') {
             return true;
