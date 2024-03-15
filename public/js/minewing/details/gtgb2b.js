@@ -75,73 +75,43 @@ async function scrapeProduct(page, productHref) {
         return false;
     }
 }
-// async function getProductOptions(page) {
 
-//     const selectElements = await page.$$('select[name="opt[]"]');
+async function scrapePrices(page) {
+    const hasOptions = await page.evaluate(() => {
+        return document.querySelectorAll('select[name="opt[]"]').length > 0;
+    });
 
-//     let productOptions = [];
+    if (!hasOptions) {
+        console.log("No options available.");
+        return;
+    }
 
-//     if (selectElements.length > 1) {
+    const selectElements = await page.$$('select[name="opt[]"]');
+    for (const select of selectElements) {
+        const optionValues = await select.evaluate(select => 
+            Array.from(select.options)
+                .filter((option, index) => option.value.trim() !== '' && index > 0)
+                .map(option => option.value)
+        );
 
-//         const firstOptionValues = await selectElements[0].evaluate(select =>
-//             Array.from(select.options)
-//                 .filter(option => option.value.trim() !== '')
-//                 .map(option => ({ value: option.value, text: option.textContent.trim() }))
-//         );
+        for (const optionValue of optionValues) {
+            await select.select(optionValue);
+            await page.waitForTimeout(1000);
 
-//         for (const { value: firstOptionValue, text: firstOptionText } of firstOptionValues) {
-//             await selectElements[0].select(firstOptionValue);
-//             await new Promise((page) => setTimeout(page, 1000));
+            const finalPrice = await page.evaluate(() => {
+                const priceElement = document.querySelector('.final-price');
+                return priceElement ? priceElement.innerText.trim() : null;
+            });
 
-//             const secondSelectOptions = await selectElements[1].evaluate(select =>
-//                 Array.from(select.options)
-//                     .filter(option => option.value.trim() !== '') // 빈 값이 아닌 모든 옵션을 포함
-//                     .map(option => {
-//                         const text = option.textContent.trim();
-//                         let name = text, price = 0; // 기본적으로 가격을 0으로 설정
-//                         // 가격 정보가 있는 경우, 이름과 가격을 분리
-//                         if (text.includes('(')) {
-//                             const parts = text.split('(');
-//                             name = parts[0].trim();
-//                             const pricePart = parts[1];
-//                             if (pricePart && pricePart.includes('원')) {
-//                                 price = parseInt(pricePart.replace(/[^\d-+]/g, ''), 10);
-//                             }
-//                         }
-//                         return { name, price };
-//                     })
-//             );
-//             secondSelectOptions.forEach(({ name: secondOptionName, price }) => {
-//                 productOptions.push({
-//                     optionName: `${firstOptionText} ${secondOptionName}`,
-//                     optionPrice: price,
-//                 });
-//             });
-//         }
-//     } else {
-//         productOptions = await selectElements[0].evaluate(select =>
-//             Array.from(select.options)
-//                 .filter(option => option.value.trim() !== '') // 빈 값이 아닌 모든 옵션을 포함
-//                 .map(option => {
-//                     const text = option.textContent.trim();
-//                     let optionName = text, optionPrice = 0; // 기본적으로 가격을 0으로 설정
-//                     // 가격 정보가 있는 경우, 이름과 가격을 분리
-//                     if (text.includes('(')) {
-//                         const parts = text.split('(');
-//                         optionName = parts[0].trim();
-//                         const pricePart = parts[1];
-//                         if (pricePart && pricePart.includes('원')) {
-//                             optionPrice = parseInt(pricePart.replace(/[^\d-+]/g, ''), 10);
-//                         }
-//                     }
-//                     return { optionName, optionPrice };
-//                 })
-//         );
-//     }
+            // 필요한 경우 추가적인 작업 수행
+        }
+    }
+}
 
-//     return productOptions;
-// }
-// async function getHasOption(page) {
-//     // Directly return the evaluation result.
-//     return page.evaluate(() => document.querySelectorAll('select[name="opt[]"]').length > 0);
-// }
+(async () => {
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
+    await page.goto('Your Product Page URL');
+    await scrapePrices(page);
+    await browser.close();
+})();
