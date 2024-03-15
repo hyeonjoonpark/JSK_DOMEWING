@@ -12,7 +12,7 @@ class CategoryListController extends Controller
     {
         return [
             'status' => true,
-            'return' => DB::table('ownerclan_category')
+            'return' => DB::table('ownerclan_category')->get()
         ];
     }
 }
