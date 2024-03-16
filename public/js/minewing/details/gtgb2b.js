@@ -140,6 +140,10 @@ async function getProductName(page) {
 }
 async function getHasOption(page) {
     return await page.evaluate(() => {
-        return document.querySelector('select.tune');
+        const selectElements = document.querySelectorAll('select.tune');
+        if (selectElements.length > 0) {
+            return true;
+        }
+        return false;
     });
 }
