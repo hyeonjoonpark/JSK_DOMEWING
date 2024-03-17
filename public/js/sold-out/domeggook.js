@@ -1,54 +1,66 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
-(async () => {
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+
+const navigateAndWait = async (page, url, waitUntil = 'networkidle0') => {
+    await page.goto(url, { waitUntil });
+};
+
+async function main() {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+
     try {
-        const args = process.argv.slice(2);
-        const [username, password, productCode] = args;
-        await page.setViewport({
-            width: 1920,
-            height: 1080
-        });
-        await page.goto('https://domeggook.com/sc/?login=pc', { waitUntil: 'networkidle2' });
+        const [username, password, tempFilePath] = process.argv.slice(2);
+        const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const searchStr = productCodes.join(',');
+
+        await page.setViewport({ width: 1920, height: 1080 });
+
+        // Simplify navigation and form interactions with reusable functions
+        await navigateAndWait(page, 'https://domeggook.com/sc/?login=pc');
         await page.type('#idInput', username);
         await page.type('#pwInput', password);
         await page.click('#formLogin > input.formSubmit');
         await page.waitForNavigation();
-        await page.goto('https://domeggook.com/sc/item/lstAll', { waitUntil: 'networkidle2' });
+
+        await navigateAndWait(page, 'https://domeggook.com/sc/item/lstAll');
         await page.click('input[value="code"]');
-        await page.type('textarea[name="nos"]', productCode);
+        await page.type('textarea[name="nos"]', searchStr);
+        await page.select('select[name="sz"]', '500');
         await page.click('input[value="검색"]');
-        await new Promise((page) => setTimeout(page, 3000));
-        let status = await page.evaluate(() => {
-            const checkbox = document.querySelector('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody > tr > td.tui-grid-cell.tui-grid-cell-has-input.tui-grid-cell-row-header > div > input[type=checkbox]');
-            if (checkbox) {
-                checkbox.click();
-                return true;
-            } else {
-                return false;
-            }
-        });
-        if (status === false) {
-            console.log(status);
+        await delay(5000); // Corrected delay usage
+
+        const allCheckInput = await page.$('input[name="_checked"]');
+        if (!allCheckInput) {
+            console.log(false);
             return;
         }
-        const selectSelector = await page.waitForSelector('#lList > div.pFunctions > select');
-        const buttonSelector = await page.waitForSelector('#lList > div.pFunctions > a:nth-child(4)');
-        await selectSelector.select('N');
-        status = page.on('dialog', async dialog => {
+        await allCheckInput.click();
+        await delay(1000);
+
+        await page.select('#lList > div.pFunctions > select', 'N');
+
+        // Properly handle dialog messages
+        let status = true;
+        page.on('dialog', async dialog => {
             const message = dialog.message();
-            if (message.includes('상품수정이 모두 완료')) {
+            await dialog.accept();
+            if (message.includes('완료') || message.includes('정보')) {
                 console.log(true);
             }
-            await dialog.accept();
             return;
         });
+
+        const buttonSelector = await page.waitForSelector('#lList > div.pFunctions > a:nth-child(4)');
         await buttonSelector.click();
-        await new Promise((page) => setTimeout(page, 3000));
+        await delay(5000); // Wait for the dialog and actions to complete
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        await browser.close();
+        await browser.close(); // Ensure the browser is closed
     }
-})();
+}
+
+main().catch(console.error);

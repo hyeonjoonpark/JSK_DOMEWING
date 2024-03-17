@@ -26,6 +26,15 @@
                             <button type="submit" class="btn btn-primary">검색</button>
                         </form>
                     </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">상품 키워드 검색</label>
+                        <form class="d-flex text-nowrap" method="POST" action="/admin/product/minewing">
+                            @csrf
+                            <input type="text" class="form-control" placeholder="쉼표(,)로 구분해서 여러 상품 코드를 기입할 수 있습니다."
+                                name="productCodes" value="{{ $productCodesStr }}">
+                            <button type="submit" class="btn btn-primary">검색</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -126,7 +135,8 @@
                                             <div class="custom-control custom-checkbox">
                                                 <div class="custom-control custom-checkbox">
                                                     <input type="checkbox" id="b2b{{ $b2b->vendor_id }}" name="b2bs"
-                                                        value="{{ $b2b->vendor_id }}" class="custom-control-input" checked>
+                                                        value="{{ $b2b->vendor_id }}" class="custom-control-input"
+                                                        checked>
                                                     <label class="custom-control-label"
                                                         for="b2b{{ $b2b->vendor_id }}">{{ $b2b->name }}</label>
                                                 </div>

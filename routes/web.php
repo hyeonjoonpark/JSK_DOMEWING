@@ -46,6 +46,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('account-setting', [AdminController::class, 'accountSetting']);
     Route::get('product/mining', [AdminController::class, 'productMining']);
     Route::get('product/minewing', [AdminController::class, 'minewing'])->name('admin.minewing');
+    Route::post('product/minewing', [AdminController::class, 'searchProductCodes']);
     Route::get('product/new-minewing', [AdminController::class, 'newMinewing']);
     Route::get('product/sold-out', [AdminController::class, 'soldOut']);
     Route::post('product/sold-out', [AdminController::class, 'soldOut']);

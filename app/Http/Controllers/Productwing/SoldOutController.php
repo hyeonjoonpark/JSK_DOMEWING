@@ -76,17 +76,29 @@ class SoldOutController extends Controller
         if (!file_exists($tempDirPath)) {
             mkdir($tempDirPath, 0777, true);
         }
-        $productCodesChunks = array_chunk($productCodes, 50);
+        $productCodesChunks = array_chunk($productCodes, 100);
+        $errorHtml = '요청에 실패한 업체 및 상품 코드<br><br>';
         foreach ($b2bIds as $b2bId) {
             $account = $this->controller->getVendorAccount($rememberToken, $b2bId);
-            $vendorEngName = DB::table('vendors')
+            $vendor = DB::table('vendors')
                 ->where('id', $b2bId)
-                ->first('name_eng');
+                ->first(['name_eng', 'name']);
+            $vendorEngName = $vendor->name_eng;
+            $vendorName = $vendor->name;
+            $username = $account->username;
+            $password = $account->password;
             foreach ($productCodesChunks as $chunk) {
                 file_put_contents($tempFilePath, json_encode($chunk));
-                $this->sendSoldOutRequest($tempFilePath, $vendorEngName, $account->username, $account->password);
+                $soldOutResult = $this->sendSoldOutRequest($tempFilePath, $vendorEngName, $username, $password);
+                if ($soldOutResult === false) {
+                    foreach ($chunk as $productCode) {
+                        $errorHtml .= $vendorName . ': ' . $productCode . ' / ';
+                    }
+                }
+                unlink($tempFilePath);
             }
         }
+        return $errorHtml;
     }
     /**
      * 선택된 업체들을 위한 반복문

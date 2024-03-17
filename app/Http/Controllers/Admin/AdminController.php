@@ -181,6 +181,29 @@ class AdminController extends Controller
         return view('admin/product_minewing', [
             'products' => $products,
             'searchKeyword' => $searchKeyword,
+            'productCodesStr' => '',
+            'b2bs' => $b2bs
+        ]);
+    }
+    public function searchProductCodes(Request $request)
+    {
+        $productCodesStr = $request->productCodes;
+        $productCodesArr = explode(',', $productCodesStr);
+        $productCodesArr = array_map('trim', $productCodesArr);
+        $products = DB::table('minewing_products AS mp')
+            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
+            ->whereIn('mp.productCode', $productCodesArr)
+            ->orderBy('mp.createdAt', 'DESC')->paginate(500);;
+        $b2bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('pr.is_active', 'Y')
+            ->get();
+
+        return view('admin/product_minewing', [
+            'products' => $products,
+            'productCodesStr' => $productCodesStr,
+            'searchKeyword' => '',
             'b2bs' => $b2bs
         ]);
     }

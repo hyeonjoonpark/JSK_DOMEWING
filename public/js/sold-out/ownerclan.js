@@ -1,20 +1,21 @@
 const puppeteer = require('puppeteer');
-
+const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
-        const args = process.argv.slice(2);
-        const [username, password, productCode] = args;
-        await page.goto('https://ownerclan.com/vender/', { waitUntil: 'networkidle2' });
+        const [username, password, tempFilePath] = process.argv.slice(2);
+        const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const searchStr = productCodes.join(',');
+        await page.goto('https://ownerclan.com/vender/', { waitUntil: 'networkidle0' });
         const frame = page.frames().find(f => f.name() === 'vmainframe');
         await frame.type('body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(1) > input', username);
         await frame.type('body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(2) > input', password);
         await frame.evaluate(() => {
             document.querySelector("body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(3) > input[type=submit]").click();
         });
-        await frame.waitForNavigation({ waitUntil: 'networkidle2' });
-        await page.goto('https://ownerclan.com/vender/product_myprd.php', { waitUntil: 'networkidle2' });
+        await frame.waitForNavigation({ waitUntil: 'networkidle0' });
+        await page.goto('https://ownerclan.com/vender/product_myprd.php', { waitUntil: 'domcontentloaded' });
         await page.select('select[name="s_check"]', 'vcode');
         await page.evaluate(() => {
             const closeBtn = document.querySelector('#Notice10 > table > tbody > tr:nth-child(2) > td > div');
@@ -22,27 +23,31 @@ const puppeteer = require('puppeteer');
                 closeBtn.click();
             }
         });
-        await page.click('#idx_saletype1');
-        await page.click('#idx_statustype1');
-        await page.type('input[name="search"]', productCode);
-        await page.click('#sForm > table > tbody > tr:nth-child(9) > td > table > tbody > tr > td > a');
-        await new Promise((page) => setTimeout(page, 3000));
-        const checkboxSelector = 'body > table:nth-child(1) > tbody > tr:nth-child(6) > td > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td > table:nth-child(2) > tbody > tr:nth-child(5) > td > table > tbody > tr:nth-child(2) > td:nth-child(1) > input[type=checkbox]';
-        // 요소가 있는지 확인합니다.
-        const checkbox = await page.$(checkboxSelector);
-        if (checkbox) {
-            await checkbox.click(); // 요소가 있으면 클릭
-        } else {
-            console.log(false);
-            return;
+        await page.type('input[name="search"]', searchStr);
+        await page.select('select[name="display_count"]', '500');
+        await new Promise((page) => setTimeout(page, 5000));
+        const products = await page.$$('tr[height="40"]');
+        for (const product of products) {
+            const productStatus = await product.evaluate(() => {
+                const productStatus = document.querySelector('td:nth-child(9) > span').textContent.trim();
+                if (productStatus.includes('정상')) {
+                    return true;
+                }
+                return false;
+            });
+            if (productStatus === true) {
+                const productCheckbox = await product.$('input[type=checkbox]');
+                await productCheckbox.click();
+            }
         }
+        await new Promise((page) => setTimeout(page, 1000));
         page.on('dialog', async dialog => {
             const message = dialog.message();
             await dialog.accept();
-            if (message.includes('이미 품절') || message.includes('정상적으로 수정')) {
+            if (message.includes('이미 품절') || message.includes('정상적으로 수정') || message.includes("일괄")) {
                 console.log(true);
+                return;
             }
-            return;
         });
         await page.click('body > table:nth-child(1) > tbody > tr:nth-child(6) > td > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td > table:nth-child(2) > tbody > tr:nth-child(2) > td > table > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(2) > input[type=button]:nth-child(2)');
         await new Promise((page) => setTimeout(page, 3000));
