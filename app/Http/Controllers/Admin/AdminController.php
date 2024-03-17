@@ -193,6 +193,7 @@ class AdminController extends Controller
         $products = DB::table('minewing_products AS mp')
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->whereIn('mp.productCode', $productCodesArr)
+            ->where('isActive', 'Y')
             ->orderBy('mp.createdAt', 'DESC')->paginate(500);;
         $b2bs = DB::table('product_register AS pr')
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')

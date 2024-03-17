@@ -27,7 +27,7 @@
                         </form>
                     </div>
                     <div class="form-group">
-                        <label for="" class="form-label">상품 키워드 검색</label>
+                        <label for="" class="form-label">상품 코드 대량 검색</label>
                         <form class="d-flex text-nowrap" method="POST" action="/admin/product/minewing">
                             @csrf
                             <input type="text" class="form-control" placeholder="쉼표(,)로 구분해서 여러 상품 코드를 기입할 수 있습니다."
