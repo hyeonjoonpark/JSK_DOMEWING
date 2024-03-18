@@ -16,12 +16,12 @@ const path = require('path');
     try {
         const args = process.argv.slice(2);
         const [username, password] = args;
-        await page.goto('https://www.wholesaledepot.co.kr/wms/member/login.php', { waitUntil: 'networkidle2' });
+        await page.goto('https://www.wholesaledepot.co.kr/wms/member/login.php', { waitUntil: 'networkidle0' });
         await page.type('#id', username);
         await page.type('#passwd', password);
         await page.click('#frm > div > div > button');
         await page.waitForNavigation();
-        await page.goto('https://www.wholesaledepot.co.kr/wms/order/order_list.php', { waitUntil: 'networkidle2' });
+        await page.goto('https://www.wholesaledepot.co.kr/wms/order/order_list.php', { waitUntil: 'domcontentloaded' });
         await page.click('#istep2');
         await page.click('#btn_indb');
         await new Promise((page) => setTimeout(page, 3000));

@@ -6,7 +6,7 @@ const path = require('path');
     const page = await browser.newPage();
     const client = await page.target().createCDPSession();
 
-    const downloadPath = path.resolve('C:\\xampp\\htdocs\\sellwing\\public\\assets\\excel\\orderwing\\sellingkok'); // Update your download path
+    const downloadPath = path.resolve('C:\\xampp\\htdocs\\sellwing\\public\\assets\\excel\\orderwing\\specialoffer'); // Update your download path
 
     // Setting up Chrome to allow downloads
     await client.send('Page.setDownloadBehavior', {
@@ -16,23 +16,25 @@ const path = require('path');
     try {
         const args = process.argv.slice(2);
         const [username, password] = args;
-        await page.goto('https://www.sellingkok.com/shop/partner/login.php');
+        await page.goto('https://specialoffer.kr/bbs/login.php?url=/mypage/page.php?code=seller_main');
         await page.type('#login_id', username);
         await page.type('#login_pw', password);
-        await page.click('#sub-wrapper > div > div.box-block > form > div.foot > button');
+        await page.click('#login_fld > dl > dd:nth-child(5) > button');
         await page.waitForNavigation({ waitUntil: 'load' });
-        await page.goto('https://www.sellingkok.com/shop/partner/?ap=saleitem&status=1', { waitUntil: 'domcontentloaded' });
-        await page.click('#list_chk_all');
+        await page.goto('https://specialoffer.kr/mypage/page.php?code=seller_odr_2', { waitUntil: 'networkidle0' });
+        await page.select('#page_rows', '150');
+        await new Promise((page) => setTimeout(page, 3000));
         page.on('dialog', async dialog => {
             const message = dialog.message();
-            if (message.includes('주문내역이 없습니다')) {
+            if (message.includes('없습니다')) {
                 console.log(false);
             }
             await dialog.accept();
             return;
         });
-        await page.click('body > div:nth-child(2) > div.page-content > div.well > form > div:nth-child(6) > div.col-sm-3.col-xs-6 > div > a');
+        await page.click('#forderlist > div.local_frm02 > a:nth-child(2)');
         await new Promise((page) => setTimeout(page, 3000));
+        console.log(true);
     } catch (error) {
         console.error('Error:', error);
     } finally {

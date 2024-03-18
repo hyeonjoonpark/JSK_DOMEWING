@@ -20,12 +20,12 @@ const path = require('path');
             width: 1920,
             height: 1080
         });
-        await page.goto('https://www.domeatoz.com/seller-login', { waitUntil: 'networkidle2' });
+        await page.goto('https://www.domeatoz.com/seller-login', { waitUntil: 'networkidle0' });
         await page.type('#UserId', username);
         await page.type('#UserPass', password);
         await page.click('#loginForm > div.d-flex.align-items-center.justify-content-between.mt-4.mb-0 > button');
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
-        await page.goto('https://www.domeatoz.com/vendor-order', { waitUntil: 'networkidle2' });
+        await page.goto('https://www.domeatoz.com/vendor-order', { waitUntil: 'domcontentloaded' });
         await page.select('#listBox > div > div.col-md-4.w-100.d-flex.mb-3 > select:nth-child(1)', '300');
         await new Promise((page) => setTimeout(page, 3000));
         await page.click('#orderIngType1');

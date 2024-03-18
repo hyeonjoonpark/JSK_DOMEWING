@@ -16,12 +16,12 @@ const path = require('path');
     try {
         const args = process.argv.slice(2);
         const [username, password] = args;
-        await page.goto('https://domeggook.com/sc/?login=pc', { waitUntil: 'networkidle2' });
+        await page.goto('https://domeggook.com/sc/?login=pc', { waitUntil: 'networkidle0' });
         await page.type('#idInput', username);
         await page.type('#pwInput', password);
         await page.click('#formLogin > input.formSubmit');
         await page.waitForNavigation();
-        await page.goto('https://domeggook.com/sc/excel/getOrderList', { waitUntil: 'networkidle2' });
+        await page.goto('https://domeggook.com/sc/excel/getOrderList', { waitUntil: 'networkidle0' });
         await page.click('#lGrid > div > div.tui-grid-content-area.tui-grid-no-scroll-x > div.tui-grid-rside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody > tr:nth-child(1) > td:nth-child(3) > div > a');
         await new Promise((page) => setTimeout(page, 3000));
         console.log(true);
