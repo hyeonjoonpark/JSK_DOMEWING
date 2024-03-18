@@ -1,0 +1,60 @@
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+(async () => {
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+
+    try {
+        const [username, password, tempFilePath] = process.argv.slice(2);
+        const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const searchStr = productCodes.join(',');
+
+        await login(page, username, password);
+
+        await page.goto('https://specialoffer.kr/mypage/page.php?code=seller_goods_change', { waitUntil: 'networkidle0' });
+        await page.select('select[name="sfl"]', 'seller_gcode');
+        await delay(1000);
+        await page.type('input[name="stx"]', searchStr);
+        await page.click('input[value="검색"]');
+        await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
+
+        await page.evaluate(() => {
+            const inputElement = document.querySelector('input[name="checkall"]');
+            inputElement?.click();
+        });
+
+        setupListeners(page);
+        const [newPage] = await Promise.all([
+            new Promise(resolve => browser.once('targetcreated', target => resolve(target.page()))),
+            page.click('#fgoodslist > div.local_frm01 > button:nth-child(2)')
+        ]);
+        if (newPage) {
+            await newPage.waitForSelector('#form-memo > div.tbl_frm01.mt-10 > div > input');
+            await newPage.click('#form-memo > div.tbl_frm01.mt-10 > div > input');
+            await delay(1000);
+            await newPage.click('body > div.swal2-container.swal2-center.swal2-backdrop-show.swal2-noanimation > div > div.swal2-actions > button.swal2-confirm.swal2-styled');
+        }
+        await delay(3000);
+        console.log(true);
+    } catch (error) {
+        console.error('Error:', error);
+    } finally {
+        await browser.close();
+    }
+})();
+
+const delay = (time) => new Promise(resolve => setTimeout(resolve, time));
+
+const login = async (page, username, password) => {
+    await page.goto('https://specialoffer.kr/bbs/login.php?url=/mypage/page.php?code=seller_main', { waitUntil: 'networkidle0' });
+    await page.type('#login_id', username);
+    await page.type('#login_pw', password);
+    await page.click('#login_fld > dl > dd:nth-child(5) > button');
+    await page.waitForNavigation({ waitUntil: 'load' });
+};
+
+const setupListeners = (page) => {
+    page.on('dialog', async dialog => {
+        await dialog.accept();
+    });
+};

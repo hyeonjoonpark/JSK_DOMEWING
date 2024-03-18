@@ -9,18 +9,44 @@
 @endsection
 
 @section('content')
+    <div class="row g-gs mb-3">
+        <div class="col">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <div class="form-group">
+                        <label class="form-label">B2B 업체 리스트 ({{ count($b2bs) }})</label>
+                        <div>
+                            @foreach ($b2bs as $b2B)
+                                <a href="{{ $b2B->vendor_href }}" target="_blank">{{ $b2B->name }}</a> /
+                            @endforeach
+                        </div>
+                        <button class="btn btn-primary" onclick="initNaviwing('b2b');">B2B 네비윙</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">원청사 리스트 ({{ count($vendors) }})</label>
+                        <div>
+                            @foreach ($vendors as $vendor)
+                                <a href="{{ $vendor->vendor_href }}" target="_blank">{{ $vendor->name }}</a> /
+                            @endforeach
+                        </div>
+                        <button class="btn btn-primary" onclick="initNaviwing('seller');">원청사 네비윙</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row g-gs">
         <div class="col">
-            <button class="btn btn-primary mb-5" onclick="initOrderwing();">오더윙 가동</button>
-            <div class="form-group">
-                <label class="form-label">금일 총 매출액</label>
-                <h5 class="card-title" id="totalAmt"></h5>
-            </div>
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">신규 주문</h6>
                     <p>상품 정보를 클릭하면 해당 상품의 상세 페이지로 이동합니다.</p>
+                    <button class="btn btn-primary mb-5" onclick="initOrderwing();">오더윙 가동</button>
                     <p>총 <span id="numOrders">0</span>개의 주문이 접수되었습니다.</p>
+                    <div class="form-group">
+                        <label class="form-label">금일 총 매출액</label>
+                        <h5 class="card-title" id="totalAmt"></h5>
+                    </div>
                     <div class="table-responsive">
                         <table class="table align-middle custom-table">
                             <thead>
@@ -44,6 +70,18 @@
 @section('scripts')
     <script>
         var rememberToken = '{{ Auth::user()->remember_token }}';
+        var sellers = @json($vendors);
+        var b2bs = @json($b2bs)
+
+        function initNaviwing(type) {
+            let hrefs = sellers;
+            if (type === 'b2b') {
+                hrefs = b2bs;
+            }
+            for (var href of hrefs) {
+                window.open(href.vendor_href, '_blank');
+            }
+        }
 
         function initOrderwing() {
             popupLoader(0, '"신규 주문 내역을 B2B 업체로부터 추출하겠습니다."');
