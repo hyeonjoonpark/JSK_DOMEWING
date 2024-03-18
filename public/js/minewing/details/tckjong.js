@@ -50,6 +50,16 @@ async function signIn(page, username, password) {
 
 async function scrapeProduct(page, productHref) {
     const product = await page.evaluate((productHref) => {
+
+        const allProducts = document.querySelectorAll('#detail > form > div > div.list_btn > table > tbody > tr > td');
+
+        let checkSkip = true;
+        for (let element of allProducts) {
+            const textContent = element.textContent.trim();
+            if (textContent === '1개') checkSkip = false;
+        }
+        if (checkSkip) return false;
+
         const productName = document.querySelector('#detail > form > div > div.list_btn > h3').textContent.trim();
         const productPrice = document.querySelector('#sell_prc_str').textContent.trim().replace(/[^\d]/g, '');
         const productImage = document.querySelector('#mainImg').getAttribute('src').trim();
