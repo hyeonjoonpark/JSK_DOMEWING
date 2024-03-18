@@ -27,7 +27,7 @@
                                         <div class="custom-control custom-radio">
                                             <input type="radio" id="seller{{ $seller->vendor_id }}" name="sellers"
                                                 value="{{ $seller->vendor_id }}" class="custom-control-input"
-                                                @if ($seller->vendor_id === 23) checked @endif>
+                                                @if ($seller->vendor_id === 26) checked @endif>
                                             <label class="custom-control-label"
                                                 for="seller{{ $seller->vendor_id }}">{{ $seller->name }}</label>
                                         </div>
