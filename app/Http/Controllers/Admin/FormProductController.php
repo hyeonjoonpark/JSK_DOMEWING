@@ -12,6 +12,106 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class FormProductController extends Controller
 {
+    public function specialoffer($products, $margin_rate, $vendorEngName, $shippingCost, $index)
+    {
+        try {
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/specialoffer.xlsx'));
+            $sheet = $spreadsheet->getSheet(0);
+            // 데이터 추가
+            $rowIndex = 6;
+            foreach ($products as $product) {
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $data = [
+                    '',
+                    $categoryCode,
+                    $product->productName,
+                    $product->productKeywords,
+                    'JS협력사',
+                    '',
+                    '기타',
+                    'JS협력사',
+                    '13:00',
+                    1,
+                    1,
+                    '',
+                    '',
+                    0,
+                    $marginedPrice,
+                    '',
+                    '',
+                    0,
+                    0,
+                    '',
+                    '',
+                    3,
+                    0,
+                    $shippingCost,
+                    '',
+                    $product->productImage,
+                    $product->productImage,
+                    '',
+                    '',
+                    '',
+                    '',
+                    $product->productDetail,
+                    '',
+                    0,
+                    '',
+                    35,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    'N',
+                    'N',
+                    1,
+                    '',
+                    'N',
+                    $product->productCode,
+                    '',
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
+            }
+            // 엑셀 파일 저장
+            $fileName = 'specialoffer_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($formedExcelFile);
+            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            return ['status' => true, 'return' => $downloadURL];
+        } catch (\Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
     public function sellingkok($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {

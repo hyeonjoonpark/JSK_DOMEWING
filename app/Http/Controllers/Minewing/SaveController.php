@@ -79,7 +79,7 @@ class SaveController extends Controller
                 $productName = $nameController->index($productName, $productNameBytes);
                 foreach ($productOptions as $productOption) {
                     $newProductName = $productName . ' 옵션 ' . $type;
-                    $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:2rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1><br><br>' . $productDetail;
+                    $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:4rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1><br><br>' . $productDetail;
                     if ($optionPriceType == 'ADD') {
                         $productPrice = (int)$product['productPrice'] + (int)$productOption['optionPrice'];
                     } else {
