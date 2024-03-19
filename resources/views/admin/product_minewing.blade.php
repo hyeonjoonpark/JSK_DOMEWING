@@ -53,7 +53,9 @@
                             'searchKeyword' => $searchKeyword,
                         ])
                     </div>
-
+                    <div class="text-center mt-3 mb-3">
+                        <button class="btn btn-primary">상품셋 다운로드</button>
+                    </div>
                     <div class="table-responsive">
                         <table class="table text-nowrap align-middle">
                             <thead>
@@ -86,7 +88,6 @@
                                         </td>
                                         <td>{{ date('Y-m-d', strtotime($product->createdAt)) }}</td>
                                         <td>
-                                            <button class="btn btn-success mr-3">수정</button>
                                             <button class="btn btn-danger" onclick="getProductCodes();">품절</button>
                                         </td>
                                     </tr>

@@ -17,12 +17,15 @@ const fs = require('fs');
         await page.type('input[name="stx"]', searchStr);
         await page.click('input[value="검색"]');
         await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
-
+        const productElement = await page.$$('tr.list0');
+        if (productElement.length < 1) {
+            console.log(false);
+            return;
+        }
         await page.evaluate(() => {
             const inputElement = document.querySelector('input[name="checkall"]');
             inputElement?.click();
         });
-
         setupListeners(page);
         const [newPage] = await Promise.all([
             new Promise(resolve => browser.once('targetcreated', target => resolve(target.page()))),
