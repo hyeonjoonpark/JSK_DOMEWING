@@ -59,12 +59,25 @@ async function buildProduct(page, productHref) {
 }
 async function getProductDetail(page) {
     return await page.evaluate(() => {
+        const manualDivs = document.querySelectorAll('#detail > div.txt-manual');
+        let imagesToKeep = [];
+
+        manualDivs.forEach(div => {
+            // 첫 번째 이미지를 제외한 나머지 이미지들을 선택
+            const imgs = div.querySelectorAll('img:not(:nth-child(1))');
+            imgs.forEach(img => {
+                imagesToKeep.push(img.src);
+            });
+        });
+
+        // forbiddenSrcs를 포함하지 않는 src들만 필터링
         const forbiddenSrces = ['dc_2in1sunshade_01.jpg', '860_GTlivinglife_intro_200306'];
-        return Array.from(document.querySelectorAll('#detail > div.txt-manual img'))
-            .map(img => img.src)
-            .filter(src => !forbiddenSrces.some(forbiddenSrc => src.includes(forbiddenSrc)));
+        const filteredImages = imagesToKeep.filter(src => !forbiddenSrces.some(forbiddenSrc => src.includes(forbiddenSrc)));
+
+        return filteredImages;
     });
 }
+
 async function getProductImage(page) {
     const productImage = await page.evaluate(() => {
         return document.querySelector('#mainImage > img').src;
