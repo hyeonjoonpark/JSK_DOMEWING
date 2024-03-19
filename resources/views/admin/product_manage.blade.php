@@ -182,7 +182,7 @@
                 type: "POST",
                 dataType: "JSON",
                 data: {
-                    remember_token: '{{ Auth::user()->remember_token }}'
+                    rememberToken: '{{ Auth::user()->remember_token }}'
                 },
                 success: function(response) {
                     $('.btn').prop('disabled', false);

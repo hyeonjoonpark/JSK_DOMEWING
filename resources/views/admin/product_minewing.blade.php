@@ -53,7 +53,9 @@
                             'searchKeyword' => $searchKeyword,
                         ])
                     </div>
-
+                    <div class="text-center mt-3 mb-3">
+                        <button class="btn btn-primary" onclick="productsDownload();">상품셋 다운로드</button>
+                    </div>
                     <div class="table-responsive">
                         <table class="table text-nowrap align-middle">
                             <thead>
@@ -86,7 +88,6 @@
                                         </td>
                                         <td>{{ date('Y-m-d', strtotime($product->createdAt)) }}</td>
                                         <td>
-                                            <button class="btn btn-success mr-3">수정</button>
                                             <button class="btn btn-danger" onclick="getProductCodes();">품절</button>
                                         </td>
                                     </tr>
@@ -171,6 +172,42 @@
                 return $(this).val();
             }).get();
             initSoldOut(productCodes);
+        }
+
+        function productsDownload() {
+            popupLoader(1, '데이터베이스로부터 상품들을 추출 중입니다.');
+            const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            $.ajax({
+                url: "/api/product/download",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    rememberToken: '{{ Auth::user()->remember_token }}',
+                    productCodes: productCodes
+                },
+                success: function(response) {
+                    closePopup();
+                    const status = response.status;
+                    if (status === true) {
+                        const html = `
+                        <a href="${response.return}">상품셋 엑셀 파일 다운로드</a>
+                        `;
+                        Swal.fire({
+                            icon: 'success',
+                            title: '진행 성공',
+                            html: html
+                        });
+                    } else {
+                        closePopup();
+                        swalError(response.return);
+                    }
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
         }
     </script>
 @endsection
