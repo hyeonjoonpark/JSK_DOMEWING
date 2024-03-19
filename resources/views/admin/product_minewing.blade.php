@@ -54,7 +54,7 @@
                         ])
                     </div>
                     <div class="text-center mt-3 mb-3">
-                        <button class="btn btn-primary">상품셋 다운로드</button>
+                        <button class="btn btn-primary" onclick="productsDownload();">상품셋 다운로드</button>
                     </div>
                     <div class="table-responsive">
                         <table class="table text-nowrap align-middle">
@@ -172,6 +172,39 @@
                 return $(this).val();
             }).get();
             initSoldOut(productCodes);
+        }
+
+        function productsDownload() {
+            const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            $.ajax({
+                url: "/api/product/download",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    rememberToken: '{{ Auth::user()->remember_token }}',
+                    productCodes: productCodes
+                },
+                success: function(response) {
+                    const status = response.status;
+                    if (status === true) {
+                        const html = `
+                        <a href="${response.return}">상품셋 엑셀 파일 다운로드</a>
+                        `;
+                        Swal.fire({
+                            icon: 'success',
+                            title: '진행 성공',
+                            html: html
+                        });
+                    } else {
+                        swalError(response.return);
+                    }
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
         }
     </script>
 @endsection

@@ -46,6 +46,7 @@ use App\Http\Controllers\Productwing\RestockController;
 use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
+use App\Http\Controllers\Product\DownloadController;
 use App\Http\Controllers\SellwingApis\AuthController;
 use App\Http\Controllers\SellwingApis\CategoryListController;
 use App\Http\Controllers\SellwingApis\VendorListController;
@@ -88,6 +89,8 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('/product/restock', [RestockController::class, 'index']);
     Route::post('/product/new-minewing', [NewMinewingMiningController::class, 'index']);
     Route::post('/product/edit-name', [EditProductNameController::class, 'index']);
+    Route::post('/product/edit-name', [EditProductNameController::class, 'index']);
+    Route::post('/product/download', [DownloadController::class, 'main']);
     // account-setting
     Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
     Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);

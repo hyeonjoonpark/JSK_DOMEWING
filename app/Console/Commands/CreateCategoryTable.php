@@ -42,10 +42,10 @@ class CreateCategoryTable extends Command
                 $insertCategories = $this->splittedCategories($tableName, $row);
             }
             if ($insertCategories['status'] === false) {
-                $errorRows[] = $insertCategories['return'];
+                echo $insertCategories['return'];
             }
         }
-        print_r($errorRows);
+        return 'success';
     }
     private function extractExcel($excelFile)
     {
@@ -77,7 +77,7 @@ class CreateCategoryTable extends Command
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                'return' => $row
+                'return' => $e->getMessage()
             ];
         }
     }
@@ -94,7 +94,7 @@ class CreateCategoryTable extends Command
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                'return' => $row
+                'return' => $e->getMessage()
             ];
         }
     }
