@@ -51,6 +51,14 @@ async function signIn(page, username, password) {
 async function scrapeProduct(page, productHref) {
     await new Promise((page) => setTimeout(page, 1000));
     const product = await page.evaluate((productHref) => {
+        const checkSkipProduct = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > div.guideArea > p');
+        let checkSkip = true;
+        if (checkSkip) {
+            const textContent = checkSkipProduct.textContent.trim();
+            if (textContent.includes('최소주문수량 1개 이상')) checkSkip = false;
+
+            if (checkSkip) return false;
+        }
         const productName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img').getAttribute('alt').trim();
         const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
         const productImageElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img').getAttribute('src').trim();
