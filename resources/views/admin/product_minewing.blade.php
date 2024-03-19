@@ -175,6 +175,7 @@
         }
 
         function productsDownload() {
+            popupLoader(1, '데이터베이스로부터 상품들을 추출 중입니다.');
             const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
                 return $(this).val();
             }).get();
@@ -187,6 +188,7 @@
                     productCodes: productCodes
                 },
                 success: function(response) {
+                    closePopup();
                     const status = response.status;
                     if (status === true) {
                         const html = `
@@ -198,6 +200,7 @@
                             html: html
                         });
                     } else {
+                        closePopup();
                         swalError(response.return);
                     }
                 },
