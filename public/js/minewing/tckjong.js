@@ -43,11 +43,16 @@ async function getNumPage(page, listUrl) {
     return numPage;
 }
 
-
 async function moveToPage(page, listUrl, curPage) {
     curPage = parseInt(curPage);
     const listUrlSplit = listUrl.split('?');
-    const newUrl = listUrlSplit[0] + '?page=' + curPage + '&' + listUrlSplit[1];
+    let newUrl = listUrlSplit[0] + '?page=' + curPage + '&' + listUrlSplit[1];
+    let catoryNum = '';
+    if (listUrl.includes('&')) {
+        catoryNum = '&' + listUrl.split('&')[1];
+        newUrl = listUrlSplit[0] + '?page=' + curPage + catoryNum;
+    }
+
     await page.goto(newUrl, { waitUntil: 'domcontentloaded' });
 }
 
