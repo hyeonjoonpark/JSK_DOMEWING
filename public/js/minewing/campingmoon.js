@@ -50,7 +50,7 @@ async function moveToPage(page, listUrl, curPage) {
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         const products = [];
-        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div.xans-element-.xans-product.xans-product-listnormal > ul > li');
+        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div.xans-element-.xans-product.xans-product-listnormal > ul li');
 
         function checkSkipProduct(promotionElement) {
             const soldOut = "//img.echosting.cafe24.com/design/common/icon_sellout.gif";
