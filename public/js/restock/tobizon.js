@@ -1,26 +1,28 @@
 const puppeteer = require('puppeteer');
-const fs = require('fs');
+
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
-        const [username, password, tempFilePath] = process.argv.slice(2);
-        const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const args = process.argv.slice(2);
+        const [username, password, productCode] = args;
         page.on('dialog', async dialog => {
             await dialog.accept();
             return;
         });
-        const searchStr = productCodes.join(',');
-
         await login(page, username, password);
-
         await page.goto('http://www.tobizon.co.kr/scm/goods/goods_list.php', { waitUntil: 'networkidle0' });
         await page.select('select[name="search_key"]', 'vgoodscd');
         await delay(1000);
         await page.select('select[name="listsize"]', '500');
-        await page.type('#area_search_str', searchStr);
+        await page.type('#area_search_str', productCode);
+        await new Promise((page) => setTimeout(page, 1000));
+
+        await page.click('#btnDetailSearch');
+        await page.click('#searchFrm > tbody > tr:nth-child(3) > td:nth-child(2) > label:nth-child(6)');
         await new Promise((page) => setTimeout(page, 1000));
         await page.click('#searchFrm > tbody > tr:nth-child(1) > td:nth-child(2) > button');
+
         await new Promise((page) => setTimeout(page, 1000));
         const productElement = await page.$$('#loadWarpGoodslist > table > tbody > tr');
         if (productElement.length < 2) {
@@ -33,7 +35,8 @@ const fs = require('fs');
             inputElement?.click();
         });
         await new Promise((page) => setTimeout(page, 1000));
-        await page.click('#loadWarpGoodslist > div:nth-child(2) > div > div > button.button.warning.xs');
+        await page.click('#loadWarpGoodslist > div:nth-child(2) > div > div > button.button.success.xs');
+
         console.log(true);
     } catch (error) {
         console.error('Error:', error);
