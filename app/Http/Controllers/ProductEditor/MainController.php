@@ -4,7 +4,7 @@ namespace App\Http\Controllers\ProductEditor;
 
 use App\Http\Controllers\Admin\ProductDataValidityController;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Product\DownloadController;
+use App\Http\Controllers\Product\NameController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,9 +13,11 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class MainController extends Controller
 {
     private $productDataValidityController;
+    private $nameController;
     public function __construct()
     {
         $this->productDataValidityController = new ProductDataValidityController();
+        $this->nameController = new NameController();
     }
     public function main(Request $request)
     {
@@ -49,7 +51,7 @@ class MainController extends Controller
                 'G' => 'isActive'
             ];
             $errors = [];
-            $products=[];
+            $products = [];
             foreach ($sheet->getRowIterator() as $row) {
                 if ($isFirstRow) {
                     $isFirstRow = false;
@@ -72,8 +74,9 @@ class MainController extends Controller
                         'productCode' => $productCode,
                         'error' => $error
                     ];
+                } else {
+                    $products[] = $validateColumnsResult['return'];
                 }
-                $products[]=$rowData;
             }
             if (count($errors) > 0) {
                 return [
@@ -82,7 +85,9 @@ class MainController extends Controller
                     'errors' => $errors
                 ];
             }
-            foreach($)
+            foreach ($products as $product) {
+                $this->updateProduct($product);
+            }
             return [
                 'status' => true,
                 'return' => '상품셋 정보를 성공적으로 업데이트했습니다.',
@@ -96,18 +101,18 @@ class MainController extends Controller
             ];
         }
     }
-    private function updateProduct($rowData)
+    private function updateProduct($product)
     {
         try {
             DB::table('minewing_products')
-                ->where('productCode', $rowData['productCode'])
+                ->where('productCode', $product['productCode'])
                 ->update([
-                    'categoryID' => $rowData['categoryID'],
-                    'productName' => $rowData['productName'],
-                    'productKeywords' => $rowData['productKeywords'],
-                    'productPrice' => $rowData['productPrice'],
-                    'productDetail' => $rowData['productDetail'],
-                    'isActive' => $rowData['isActive']
+                    'categoryID' => $product['categoryID'],
+                    'productName' => $this->nameController->index($product['productName']),
+                    'productKeywords' => $product['productKeywords'],
+                    'productPrice' => $product['productPrice'],
+                    'productDetail' => $product['productDetail'],
+                    'isActive' => $product['isActive']
                 ]);
             return [
                 'status' => true
@@ -116,7 +121,7 @@ class MainController extends Controller
             return [
                 'status' => false,
                 'return' => [
-                    'productCode' => $rowData['productCode'],
+                    'productCode' => $product['productCode'],
                     'error' => $e->getMessage()
                 ]
             ];
