@@ -1,28 +1,18 @@
 const puppeteer = require('puppeteer');
 
-// 비동기 함수를 사용하여 스크립트의 주 실행 흐름을 정의합니다.
 (async () => {
-    // Puppeteer를 사용하여 브라우저 인스턴스를 생성합니다. headless 모드를 false로 설정하여 GUI를 사용합니다.
-    const browser = await puppeteer.launch({ headless: false });
-    // 새 탭 페이지를 엽니다.
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    // 커맨드 라인에서 입력된 인자들을 배열로 가져옵니다. 첫 두 인자는 무시합니다.
     const [listURL, username, password] = process.argv.slice(2);
 
     try {
-        // 로그인 함수를 호출하여 사용자 인증을 수행합니다.
         await login(page, username, password);
-        // 지정된 URL에서 상품 목록 페이지 처리를 수행합니다.
         await processPage(page, listURL);
-        // 상품 데이터를 스크래핑합니다.
         const products = await scrapeProducts(page);
-        // 스크래핑된 상품 데이터를 JSON 형식으로 콘솔에 출력합니다.
         console.log(JSON.stringify(products));
     } catch (error) {
-        // 오류가 발생한 경우, 오류 메시지를 콘솔에 출력합니다.
         console.error(error);
     } finally {
-        // 작업이 완료되면 브라우저를 닫습니다.
         await browser.close();
     }
 })();
