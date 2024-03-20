@@ -49,6 +49,7 @@ class MainController extends Controller
                 'G' => 'isActive'
             ];
             $errors = [];
+            $products=[];
             foreach ($sheet->getRowIterator() as $row) {
                 if ($isFirstRow) {
                     $isFirstRow = false;
@@ -63,20 +64,29 @@ class MainController extends Controller
                         $rowData[$columnMappings[$columnLetter]] = $value;
                     }
                 }
-                $rowData = $this->validateColumns($rowData);
-                if ($rowData['status'] === false) {
-                    $errors[] = $rowData;
-                    continue;
+                $validateColumnsResult = $this->validateColumns($rowData);
+                if ($validateColumnsResult['status'] === false) {
+                    $productCode = $validateColumnsResult['return']['productCode'];
+                    $error = $validateColumnsResult['return']['error'];
+                    $errors[] = [
+                        'productCode' => $productCode,
+                        'error' => $error
+                    ];
                 }
-                $updateProductResult = $this->updateProduct($rowData);
-                if ($updateProductResult['status'] === false) {
-                    $errors[] = $rowData;
-                    continue;
-                }
+                $products[]=$rowData;
             }
+            if (count($errors) > 0) {
+                return [
+                    'status' => false,
+                    'return' => '일부 상품에서 오류가 검출되었습니다.',
+                    'errors' => $errors
+                ];
+            }
+            foreach($)
             return [
                 'status' => true,
-                'return' => '상품셋 정보를 성공적으로 업데이트했습니다.'
+                'return' => '상품셋 정보를 성공적으로 업데이트했습니다.',
+                'errors' => $errors
             ];
         } catch (\Exception $e) {
             return [
@@ -135,7 +145,7 @@ class MainController extends Controller
             ];
         }
         $productKeywords = $this->productDataValidityController->validateKeywords($rowData['productKeywords']);
-        if ($productKeywords === false) {
+        if ($productKeywords !== true) {
             return [
                 'status' => false,
                 'return' => [
@@ -178,7 +188,11 @@ class MainController extends Controller
     }
     private function validateProductPrice($productPrice)
     {
-        $productPrice = intval($productPrice);
+        try {
+            $productPrice = intval($productPrice);
+        } catch (\Exception $e) {
+            return false;
+        }
         if ($productPrice > 0) {
             return true;
         }
