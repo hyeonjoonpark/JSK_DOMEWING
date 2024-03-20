@@ -26,11 +26,15 @@ class DownloadController extends Controller
                 'return' => $validator->errors()->first()
             ];
         }
+        $productCodes = $request->productCodes;
+        return $this->transformProducts($productCodes);
+    }
+    public function transformProducts($productCodes)
+    {
         $filePath = public_path('assets/excel/sellwing_products_editor.xlsx');
         $spreadsheet = IOFactory::load($filePath);
         $sheet = $spreadsheet->getSheet(0);
         $rowIndex = 2;
-        $productCodes = $request->productCodes;
         $products = DB::table('minewing_products')
             ->whereIn('productCode', $productCodes)
             ->get(['productCode', 'categoryID', 'productName', 'productKeywords', 'productPrice', 'productDetail', 'isActive']);
