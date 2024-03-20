@@ -23,8 +23,8 @@
                     <h6 class="title">상품 대량 관리 엑셀 업로드</h6>
                     <p>상품 기입이 완료된 셀윙 엑셀 양식을 업로드해주세요.</p>
                     <div class="d-flex text-nowrap">
-                        <input type="file" class="form-control">
-                        <button class="btn btn-primary">업로드</button>
+                        <input type="file" class="form-control" id="products">
+                        <button class="btn btn-primary" onclick="editProducts();">업로드</button>
                     </div>
                 </div>
             </div>
@@ -32,5 +32,30 @@
     </div>
 @endsection
 @section('scripts')
-    <script></script>
+    <script>
+        function editProducts() {
+            popupLoader(1, '수정된 상품들을 데이터베이스에 반영 중입니다.');
+            const formData = new FormData();
+            const products = $('#products')[0].files[0];
+            if (products) {
+                formData.append('products', products);
+            }
+            $.ajax({
+                url: 'your-upload-url',
+                type: 'POST',
+                dataType: 'JSON',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    closePopup();
+                    console.log('업로드 성공', data);
+                },
+                error: function(xhr, status, error) {
+                    closePopup();
+                    console.error('업로드 실패', error);
+                }
+            });
+        }
+    </script>
 @endsection
