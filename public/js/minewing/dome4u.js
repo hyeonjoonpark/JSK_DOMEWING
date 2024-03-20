@@ -36,13 +36,17 @@ async function login(page, username, password) {
 }
 
 async function processPage(page, listURL) {
-    await page.goto(listURL, { waitUntil: 'domcontentloaded' });
+    await page.goto(listURL);
+    await page.waitForSelector('#contents > div.conInfo.clearfix > em');
     const numProducts = await page.evaluate(() => {
         const numProductsText = document.querySelector('#contents > div.conInfo.clearfix > em').textContent;
         return parseInt(numProductsText.replace(/[^0-9]/g, '').trim());
     });
-    listURL += '&page=1&glimit=' + numProducts;
-    await page.goto(listURL, { waitUntil: 'domcontentloaded' });
+    const url = new URL(listURL);
+    const params = new URLSearchParams(url.search);
+    const cate = params.get('cate');
+    const newUrl = "https://dome4u.co.kr/home/product/?brand=&sortby=viewcount&ctl=m&seller_id=&prttp=&brandname=&brandsearchcate1=&brandsearchcate2=&glimit=&dp_view_type=&brandcategory=&cate=" + cate + "&search_f=&search_word=&cou=&pon=&delv1=&delv2=&delv3=&delv4=&stprice=&edprice=&rsearch_word=&view_type=0&page=1&sortby=viewcount&glimit=&view_type=1&glimit=" + numProducts;
+    await page.goto(newUrl, { waitUntil: 'domcontentloaded', timeout: 300000 });
 }
 
 async function scrapeProducts(page) {

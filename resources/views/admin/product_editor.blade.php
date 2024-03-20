@@ -39,21 +39,22 @@
             const products = $('#products')[0].files[0];
             if (products) {
                 formData.append('products', products);
+                formData.append('rememberToken', '{{ Auth::user()->remember_token }}');
             }
             $.ajax({
-                url: 'your-upload-url',
+                url: '/api/product/edit',
                 type: 'POST',
                 dataType: 'JSON',
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function(data) {
+                success: function(response) {
                     closePopup();
-                    console.log('업로드 성공', data);
+                    console.log(response);
                 },
-                error: function(xhr, status, error) {
+                error: function(response) {
                     closePopup();
-                    console.error('업로드 실패', error);
+                    console.error(response);
                 }
             });
         }
