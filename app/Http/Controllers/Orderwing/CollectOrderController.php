@@ -38,7 +38,7 @@ class CollectOrderController extends Controller
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where('v.is_active', 'ACTIVE')
             ->where('pr.is_active', 'Y')
-            ->whereNot('v.id', 6)
+            ->whereNotIn('v.id', [6, 11, 31, 33, 34, 35])
             ->get();
     }
     public function deleteLegacy($b2BEngName)

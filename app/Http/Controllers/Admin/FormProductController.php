@@ -12,6 +12,88 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class FormProductController extends Controller
 {
+    public function tobizon($products, $margin_rate, $vendorEngName, $shippingCost, $index)
+    {
+        try {
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/tobizon.xls'));
+            $sheet = $spreadsheet->getSheet(0);
+            // 데이터 추가
+            $rowIndex = 4;
+            foreach ($products as $product) {
+                $tobizonCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $data = [
+                    $categoryCode,
+                    $product->productName,
+                    $product->productName,
+                    $product->productCode,
+                    $product->productCode,
+                    'Y',
+                    'JS협력사',
+                    '기타',
+                    'JS협력사',
+                    'JS협력사',
+                    $product->productKeywords,
+                    $marginedPrice,
+                    '',
+                    'N',
+                    'N',
+                    'FE',
+                    0,
+                    'S',
+                    $shippingCost,
+                    $shippingCost,
+                    $shippingCost * 2,
+                    $shippingCost + 5000,
+                    $shippingCost + 5000,
+                    'Y',
+                    'N',
+                    'N',
+                    '',
+                    '',
+                    'N',
+                    '',
+                    $product->productImage,
+                    '',
+                    '',
+                    '',
+                    '',
+                    'S',
+                    'N',
+                    'B',
+                    'N',
+                    'N',
+                    'C',
+                    '',
+                    $product->productDetail,
+                    '',
+                    35
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
+            }
+            // 엑셀 파일 저장
+            $fileName = 'tobizon_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($formedExcelFile);
+            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            return ['status' => true, 'return' => $downloadURL];
+        } catch (\Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
     public function specialoffer($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {

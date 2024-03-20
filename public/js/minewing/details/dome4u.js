@@ -64,23 +64,29 @@ async function scrapeProduct(page, productHref) {
             return null;
         }
 
-        const { hasOption, productOptions } = await getHasOption(page, productPrice);
+        const { hasOption, productOptions } = await getHasOption(page);
 
         return await page.evaluate((productHref, hasOption, productOptions, productPrice) => {
             try {
+                const detailSelector = '#content .detailInfo.detailInner img';
+                const productDetailElements = document.querySelectorAll(detailSelector);
+                const productDetail = [];
+                for (const productDetailElement of productDetailElements) {
+                    productDetail.push(productDetailElement.src);
+                }
+                if (productDetail.length < 1) {
+                    return false;
+                }
                 const productNameSelector = '#buy_info > div > div.detailView.type2 > dl > dt > span';
                 const productNameElements = document.querySelectorAll(productNameSelector);
                 const productNameElement = Array.from(productNameElements).find(el => !el.classList.contains('ownershop'));
                 const productName = productNameElement ? productNameElement.textContent.trim() : '';
 
+                const baseUrl = window.location.origin;
                 const imageSelector = '#viewImage_m';
                 const imageElement = document.querySelector(imageSelector);
-                const productImage = imageElement ? imageElement.src : '';
-
-                const detailSelector = '#content .detailInfo.detailInner img';
-                const productDetailElement = document.querySelector(detailSelector);
-                const productDetail = productDetailElement ? productDetailElement.src : null;
-
+                const srcxx = imageElement.getAttribute('srcxx');
+                const productImage = new URL(srcxx, baseUrl).href;
                 return {
                     productName,
                     productPrice,
@@ -101,42 +107,37 @@ async function scrapeProduct(page, productHref) {
         return null;
     }
 }
-
-async function getHasOption(page, productPrice) {
-    productPrice = parseInt(productPrice, 10);
-    const optionSelector = '#buy_info > div > div.detailView.type2 > dl > dd.optionView > select';
-
-    const productOptions = [];
-
-    try {
-        const options = await page.$$(`${optionSelector} > option`);
-
-        // 첫 번째 옵션('선택하세요'와 같은 문구가 포함됨)을 제외하고 처리
-        for (let i = 1; i < options.length; i++) {
-            const option = options[i];
-            const optionText = await (await option.getProperty('textContent')).jsonValue();
-
-            if (optionText.includes('품절')) continue;
-
-            let optionName, optionPriceDiff;
-            const regex = /(.+)\s\(([\d,]+)원\)/;
-            const matches = optionText.match(regex);
-
-            if (matches) {
-                optionName = matches[1].trim();
-                let optionPrice = parseInt(matches[2].replace(/[^\d]/g, ''), 10);
-                optionPriceDiff = optionPrice - productPrice;
-            } else {
-                optionName = optionText.trim();
-                optionPriceDiff = 0; // 추가 비용 없음
-            }
-
-            productOptions.push({ optionName, optionPriceDiff });
-        }
-
-        return { hasOption: productOptions.length > 0, productOptions };
-    } catch (error) {
-        console.error('Error occurred while getting options:', error);
-        return { hasOption: false, productOptions: [] };
+async function getHasOption(page) {
+    const optionSelectElements = await page.$$('select.opt_ind_1');
+    const hasOption = optionSelectElements.length > 0;
+    let productOptions = [];
+    if (hasOption) {
+        productOptions = await generateOptions(optionSelectElements);
     }
+    return {
+        hasOption,
+        productOptions
+    };
+}
+async function generateOptions(selectElements) {
+    let options = [];
+    for (const select of selectElements) {
+        const values = await select.$$eval('option', opts => opts.map(opt => opt.textContent.trim()));
+        const validValues = values.slice(1);
+        if (options.length === 0) {
+            options = validValues.map(value => [value]);
+        } else {
+            let newOptions = [];
+            for (const option of options) {
+                for (const value of validValues) {
+                    newOptions.push([...option, value]);
+                }
+            }
+            options = newOptions;
+        }
+    }
+    return options.map(optionCombo => ({
+        optionName: optionCombo.join(", "),
+        optionPrice: 0
+    }));
 }
