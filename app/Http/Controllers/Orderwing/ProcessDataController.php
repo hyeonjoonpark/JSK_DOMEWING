@@ -478,4 +478,73 @@ class ProcessDataController extends Controller
 
         return $data;
     }
+    public function tobizon($excelPath)
+    {
+        $spreadsheet = IOFactory::load($excelPath);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $data = [];
+        $isFirstRow = true;
+
+        $columnMappings = [
+            'E' => 'receiverName', //수취인이름
+            'F' => 'receiverPhone', //수취인 연락처
+            'H' => 'postcode', //우편번호
+            'I' => 'address', //주소
+            'M' => 'productName', //상품이름
+            'T' => 'quantity', //상품개수
+            'U' => 'productPrice', //상품가격
+            'X' => 'shippingCost', //배송비
+            'A' => 'orderCode', //주문번호
+            'J' => 'shippingRemark', //배송요청사항
+            'L' => 'productCode', //우리꺼 상품코드
+            'AA' => 'orderedAt', //주문한시간
+            'Z' => 'amount', //총가격
+            'AB' => 'orderStatus'
+            // ... Add more mappings if needed
+        ];
+
+        foreach ($worksheet->getRowIterator() as $row) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+                continue;
+            }
+
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+
+            $rowData = [
+                'senderName' => '',
+                'senderPhone' => ''
+            ];
+
+
+            foreach ($cellIterator as $cell) {
+                $columnLetter = $cell->getColumn();
+                if (isset($columnMappings[$columnLetter])) {
+                    // Extract value and convert it to UTF-8
+                    $value = $cell->getValue();
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
+                    $rowData[$columnMappings[$columnLetter]] = $value;
+                }
+            }
+            $productCode = $rowData['productCode'];
+            $extractOrderController = new ExtractOrderController();
+            $response = $extractOrderController->getProductHref($productCode);
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
+            $rowData['b2BName'] = "투비즈온";
+            if (!empty($rowData)) {
+                $data[] = $rowData; // Push the row data to the main data array if not empty
+            }
+        }
+
+
+        return $data;
+    }
 }

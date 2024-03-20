@@ -27,14 +27,14 @@ class FormProductController extends Controller
                 $data = [
                     $categoryCode,
                     $product->productName,
-                    $product->productName,
+                    '',
                     $product->productCode,
-                    $product->productCode,
+                    '',
                     'Y',
                     'JS협력사',
                     '기타',
-                    'JS협력사',
-                    'JS협력사',
+                    '',
+                    '',
                     $product->productKeywords,
                     $marginedPrice,
                     '',
@@ -69,7 +69,15 @@ class FormProductController extends Controller
                     '',
                     $product->productDetail,
                     '',
-                    35
+                    35,
+                    '상세설명 참조',
+                    '상세설명 참조',
+                    '상세설명 참조',
+                    '상세설명 참조',
+                    '상세설명 참조',
+                    '상세설명 참조',
+                    '상세설명 참조',
+                    '상세설명 참조'
                 ];
                 // 엑셀에 데이터 추가
                 $colIndex = 1;
