@@ -28,9 +28,16 @@ use App\Http\Controllers\Domewing\Auth\ForgetPasswordController;
 use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
 use App\Http\Controllers\Domewing\FAQController;
 use App\Http\Controllers\Namewing\NamewingController;
+use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
+use App\Http\Controllers\Partners\LoginController as PartnersLoginController;
 use App\Http\Controllers\ProductEditor\ViewController;
 use App\Http\Controllers\Testmonial\TestmonialController;
 
+// Sellwing 파트너스 라우트 그룹
+Route::middleware(['auth'])->prefix('partner')->group(function () {
+    Route::get('/', [PartnersDashboardController::class, 'dashboard'])->name('partner.dashboard');
+});
+Route::get('partner/auth/login', [PartnersLoginController::class, 'index'])->name('partner.login');
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');

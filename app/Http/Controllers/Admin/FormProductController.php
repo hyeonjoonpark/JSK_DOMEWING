@@ -186,9 +186,9 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'tobizon_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
+            $fileName = 'tobizon_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
-            $writer = new Xlsx($spreadsheet);
+            $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
