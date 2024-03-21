@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\AuthenticatePartner;
 use App\Http\Middleware\CustomAuthMiddleware;
 use App\Http\Middleware\MembersAuth;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -60,6 +61,7 @@ class Kernel extends HttpKernel
         'auth.custom' => CustomAuthMiddleware::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
+        'auth.partner' => AuthenticatePartner::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,

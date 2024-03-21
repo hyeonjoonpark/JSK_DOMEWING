@@ -45,6 +45,11 @@ return [
             'driver' => 'session',
             'provider' => 'members',
         ],
+
+        'partner' => [
+            'driver' => 'sanctum',
+            'provider' => 'partners',
+        ],
     ],
 
     /*
@@ -75,10 +80,10 @@ return [
             'model' => App\Models\Member::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'partners' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Partner::class,
+        ],
     ],
 
     /*
