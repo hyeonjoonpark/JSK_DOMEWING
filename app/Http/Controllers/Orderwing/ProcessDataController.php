@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Orderwing;
 
 use App\Http\Controllers\Controller;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-
+use Illuminate\Support\Facades\DB;
 
 class ProcessDataController extends Controller
 {
@@ -605,9 +605,13 @@ class ProcessDataController extends Controller
             }
             $productPrice = (int)$rowData['productPrice'];
             $quantity = (int)$rowData['quantity'];
-            $shippingCost = (int)$rowData['shippingCost'];
-            $amount = $productPrice * $quantity + $shippingCost;
-
+            $productShippingFee = DB::table('minewing_products AS mp')
+                ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
+                ->where('mp.productCode', $productCode)
+                ->first(['ps.shipping_fee'])
+                ->shipping_fee;
+            $rowData['shippingCost'] = $productShippingFee;
+            $amount = $productPrice * $quantity;
             $rowData['amount'] = $amount;
             $rowData['b2BName'] = "K셀러";
             if (!empty($rowData)) {
