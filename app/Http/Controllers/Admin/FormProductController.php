@@ -19,6 +19,88 @@ class FormProductController extends Controller
             ->where('mp.id', $productId)
             ->first(['shipping_fee', 'additional_shipping_fee']);
     }
+    public function kseller($products, $margin_rate, $vendorEngName, $shippingCost, $index)
+    {
+        try {
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/kseller.xls'));
+            $sheet = $spreadsheet->getSheet(0);
+            // 데이터 추가
+            $rowIndex = 4;
+            foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
+                $tobizonCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $data = [
+                    $categoryCode,
+                    $product->productName,
+                    '',
+                    $product->productCode,
+                    '기타',
+                    'JS협력사',
+                    '',
+                    0,
+                    0,
+                    'N',
+                    $product->productKeywords,
+                    $marginedPrice,
+                    '',
+                    '',
+                    $product->productDetail,
+                    $product->productImage,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    0,
+                    '',
+                    '',
+                    0,
+                    '',
+                    0,
+                    1,
+                    '',
+                    '',
+                    35,
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시'
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
+            }
+            // 엑셀 파일 저장
+            $fileName = 'tobizon_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($formedExcelFile);
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
+            return ['status' => true, 'return' => $downloadURL];
+        } catch (\Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
     public function tobizon($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
