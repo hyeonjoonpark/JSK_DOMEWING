@@ -52,6 +52,7 @@ class RestockController extends Controller
         try {
             DB::table('minewing_products')
                 ->where('productCode', $productCode)
+                ->whereNotIn('v.id', [6, 33, 35])
                 ->update([
                     'isActive' => 'Y',
                     'updatedAt' => now()
