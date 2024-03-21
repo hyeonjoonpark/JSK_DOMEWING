@@ -85,13 +85,17 @@ class MainController extends Controller
                     'errors' => $errors
                 ];
             }
+            $productCodes = [];
             foreach ($products as $product) {
                 $this->updateProduct($product);
+                $productCodes[] = $product['productCode'];
             }
+            $productCodes = join(',', $productCodes);
             return [
                 'status' => true,
                 'return' => '상품셋 정보를 성공적으로 업데이트했습니다.',
-                'errors' => $errors
+                'errors' => $errors,
+                'productCodes' => $productCodes
             ];
         } catch (\Exception $e) {
             return [
