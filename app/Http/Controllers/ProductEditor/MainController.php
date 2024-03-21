@@ -21,6 +21,7 @@ class MainController extends Controller
     }
     public function main(Request $request)
     {
+        set_time_limit(0);
         $validator = Validator::make($request->all(), [
             'products' => 'required|file|mimes:xlsx'
         ], [
@@ -48,7 +49,6 @@ class MainController extends Controller
                 'D' => 'productKeywords',
                 'E' => 'productPrice',
                 'F' => 'productDetail',
-                'G' => 'isActive'
             ];
             $errors = [];
             $products = [];
@@ -57,7 +57,7 @@ class MainController extends Controller
                     $isFirstRow = false;
                     continue;
                 }
-                $cellIterator = $row->getCellIterator('A', 'G');
+                $cellIterator = $row->getCellIterator('A', 'F');
                 $cellIterator->setIterateOnlyExistingCells(false);
                 foreach ($cellIterator as $cell) {
                     $columnLetter = $cell->getColumn();
@@ -85,13 +85,17 @@ class MainController extends Controller
                     'errors' => $errors
                 ];
             }
+            $productCodes = [];
             foreach ($products as $product) {
                 $this->updateProduct($product);
+                $productCodes[] = $product['productCode'];
             }
+            $productCodes = join(',', $productCodes);
             return [
                 'status' => true,
                 'return' => '상품셋 정보를 성공적으로 업데이트했습니다.',
-                'errors' => $errors
+                'errors' => $errors,
+                'productCodes' => $productCodes,
             ];
         } catch (\Exception $e) {
             return [
@@ -104,18 +108,18 @@ class MainController extends Controller
     private function updateProduct($product)
     {
         try {
+            $productName = $this->nameController->index($product['productName']);
             DB::table('minewing_products')
                 ->where('productCode', $product['productCode'])
                 ->update([
                     'categoryID' => $product['categoryID'],
-                    'productName' => $this->nameController->index($product['productName']),
+                    'productName' => $productName,
                     'productKeywords' => $product['productKeywords'],
                     'productPrice' => $product['productPrice'],
-                    'productDetail' => $product['productDetail'],
-                    'isActive' => $product['isActive']
+                    'productDetail' => $product['productDetail']
                 ]);
             return [
-                'status' => true
+                'status' => true,
             ];
         } catch (\Exception $e) {
             return [
@@ -166,16 +170,6 @@ class MainController extends Controller
                 'return' => [
                     'productCode' => $rowData['productCode'],
                     'error' => '상품 가격은 0보다 큰 정수여야 합니다.'
-                ]
-            ];
-        }
-        $isActive = $this->validateIsActive($rowData['isActive']);
-        if ($isActive === false) {
-            return [
-                'status' => false,
-                'return' => [
-                    'productCode' => $rowData['productCode'],
-                    'error' => '상품 상태는 Y 혹은 N 으로 진열 여부를 기입해주세요.'
                 ]
             ];
         }

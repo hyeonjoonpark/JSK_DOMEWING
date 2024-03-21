@@ -12,6 +12,100 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 class FormProductController extends Controller
 {
+    private function getShippingFee($productId)
+    {
+        return DB::table('minewing_products AS mp')
+            ->join('product_search AS ps', 'mp.sellerID', '=', 'ps.vendor_id')
+            ->where('mp.id', $productId)
+            ->first(['shipping_fee', 'additional_shipping_fee']);
+    }
+    public function kseller($products, $margin_rate, $vendorEngName, $shippingCost, $index)
+    {
+        try {
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/kseller.xls'));
+            $sheet = $spreadsheet->getSheet(0);
+            // 데이터 추가
+            $rowIndex = 4;
+            foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
+                $tobizonCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
+                $basicShippingFee = 3000;
+                $gappedShippingFee = $shippingCost - $basicShippingFee;
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + $gappedShippingFee;
+
+
+                $data = [
+                    $categoryCode,
+                    $product->productName,
+                    '',
+                    $product->productCode,
+                    '기타',
+                    'JS협력사',
+                    '',
+                    0,
+                    0,
+                    '',
+                    'N',
+                    $product->productKeywords,
+                    $marginedPrice,
+                    '',
+                    '',
+                    $product->productDetail,
+                    $product->productImage,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    0,
+                    '',
+                    '',
+                    0,
+                    '',
+                    0,
+                    1,
+                    '',
+                    '',
+                    35,
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시',
+                    '상품 상세설명에 표시'
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
+            }
+            // 엑셀 파일 저장
+            $fileName = 'kseller_' . now()->format('YmdHis') . '_' . $index . '.xls';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xls($spreadsheet);
+            $writer->save($formedExcelFile);
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
+            return ['status' => true, 'return' => $downloadURL];
+        } catch (\Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
     public function tobizon($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
@@ -21,6 +115,9 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $tobizonCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -46,8 +143,8 @@ class FormProductController extends Controller
                     $shippingCost,
                     $shippingCost,
                     $shippingCost * 2,
-                    $shippingCost + 5000,
-                    $shippingCost + 5000,
+                    $shippingCost + $additionalShippingFee,
+                    $shippingCost + $additionalShippingFee,
                     'Y',
                     'N',
                     'N',
@@ -89,11 +186,11 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'tobizon_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
+            $fileName = 'tobizon_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
-            $writer = new Xlsx($spreadsheet);
+            $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
-            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -111,6 +208,9 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 6;
             foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -193,7 +293,7 @@ class FormProductController extends Controller
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
-            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -211,6 +311,9 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 3;
             foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -270,7 +373,7 @@ class FormProductController extends Controller
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
-            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -289,6 +392,9 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + (int)($shippingCost - $fixedShippingCost);
@@ -351,7 +457,7 @@ class FormProductController extends Controller
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
-            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -370,6 +476,9 @@ class FormProductController extends Controller
             $rowIndex = 2;
             $minAmount = 5000;
             foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -447,7 +556,7 @@ class FormProductController extends Controller
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
-            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -465,6 +574,9 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 3;
             foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -538,7 +650,7 @@ class FormProductController extends Controller
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
-            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -557,6 +669,9 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 5;
             foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + (int)($shippingCost - $fixedShippingCost);
@@ -636,7 +751,7 @@ class FormProductController extends Controller
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
-            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -655,6 +770,9 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = 4;
             foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -736,7 +854,7 @@ class FormProductController extends Controller
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
-            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -758,6 +876,9 @@ class FormProductController extends Controller
             // 데이터 추가
             $rowIndex = $startRowIndex;
             foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
@@ -783,7 +904,7 @@ class FormProductController extends Controller
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
-            $downloadURL = "https://www.sellwing.kr/assets/excel/formed/" . $fileName;
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return ['status' => false, 'return' => $e->getMessage()];

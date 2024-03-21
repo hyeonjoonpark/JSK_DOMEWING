@@ -61,7 +61,7 @@ class ExcelwingController extends Controller
             ->shipping_fee;
         return $shippingFee;
     }
-    protected function getProducts($sellerID)
+    public function getProducts($sellerID)
     {
         $products = DB::table("minewing_products")
             ->where("isActive", "Y")
@@ -72,7 +72,7 @@ class ExcelwingController extends Controller
             "return" => $products
         ];
     }
-    protected function getMarginRate($vendorID)
+    public function getMarginRate($vendorID)
     {
         $marginRate = DB::table("product_register AS pr")
             ->where("pr.vendor_id", $vendorID)
@@ -92,7 +92,7 @@ class ExcelwingController extends Controller
             ];
         }
     }
-    protected function getUser($remember_token)
+    public function getUser($remember_token)
     {
         $user = DB::table("users")
             ->where("remember_token", $remember_token)

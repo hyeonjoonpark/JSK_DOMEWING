@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Orderwing;
 
 use App\Http\Controllers\Controller;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-
+use Illuminate\Support\Facades\DB;
 
 class ProcessDataController extends Controller
 {
@@ -544,6 +544,80 @@ class ProcessDataController extends Controller
             }
         }
 
+
+        return $data;
+    }
+    public function kseller($excelPath)
+    {
+        $spreadsheet = IOFactory::load($excelPath);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $data = [];
+        $isFirstRow = true;
+
+        $columnMappings = [
+            'E' => 'receiverName',
+            'F' => 'receiverPhone',
+            'H' => 'postcode',
+            'I' => 'address',
+            'L' => 'productName',
+            'S' => 'quantity',
+            'R' => 'productPrice',
+            'U' => 'shippingCost',
+            'A' => 'orderCode',
+            'Y' => 'shippingRemark',
+            'K' => 'productCode',
+            'V' => 'orderedAt',
+            'W' => 'orderStatus'
+            // ... Add more mappings if needed
+        ];
+
+        foreach ($worksheet->getRowIterator() as $row) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+                continue;
+            }
+
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $rowData = [
+                'senderName' => '',
+                'senderPhone' => ''
+            ];
+            foreach ($cellIterator as $cell) {
+                $columnLetter = $cell->getColumn();
+                if (isset($columnMappings[$columnLetter])) {
+                    // Extract value and convert it to UTF-8
+                    $value = $cell->getValue();
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
+                    $rowData[$columnMappings[$columnLetter]] = $value;
+                }
+            }
+            $productCode = $rowData['productCode'];
+            $extractOrderController = new ExtractOrderController();
+            $response = $extractOrderController->getProductHref($productCode);
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
+            $productPrice = (int)$rowData['productPrice'];
+            $quantity = (int)$rowData['quantity'];
+            $productShippingFee = DB::table('minewing_products AS mp')
+                ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
+                ->where('mp.productCode', $productCode)
+                ->first(['ps.shipping_fee'])
+                ->shipping_fee;
+            $rowData['shippingCost'] = $productShippingFee;
+            $amount = $productPrice * $quantity;
+            $rowData['amount'] = $amount;
+            $rowData['b2BName'] = "K셀러";
+            if (!empty($rowData)) {
+                $data[] = $rowData; // Push the row data to the main data array if not empty
+            }
+        }
 
         return $data;
     }
