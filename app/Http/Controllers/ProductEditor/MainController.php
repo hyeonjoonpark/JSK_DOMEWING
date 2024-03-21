@@ -113,7 +113,7 @@ class MainController extends Controller
                 ->where('productCode', $product['productCode'])
                 ->update([
                     'categoryID' => $product['categoryID'],
-                    'productName' => "$productName",
+                    'productName' => $productName,
                     'productKeywords' => $product['productKeywords'],
                     'productPrice' => $product['productPrice'],
                     'productDetail' => $product['productDetail']
