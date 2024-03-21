@@ -21,6 +21,7 @@ class MainController extends Controller
     }
     public function main(Request $request)
     {
+        set_time_limit(0);
         $validator = Validator::make($request->all(), [
             'products' => 'required|file|mimes:xlsx'
         ], [
@@ -94,7 +95,7 @@ class MainController extends Controller
                 'status' => true,
                 'return' => '상품셋 정보를 성공적으로 업데이트했습니다.',
                 'errors' => $errors,
-                'productCodes' => $productCodes
+                'productCodes' => $productCodes,
             ];
         } catch (\Exception $e) {
             return [
@@ -112,14 +113,13 @@ class MainController extends Controller
                 ->where('productCode', $product['productCode'])
                 ->update([
                     'categoryID' => $product['categoryID'],
-                    'productName' => $productName,
+                    'productName' => "$productName",
                     'productKeywords' => $product['productKeywords'],
                     'productPrice' => $product['productPrice'],
-                    'productDetail' => $product['productDetail'],
-                    'isActive' => $product['isActive']
+                    'productDetail' => $product['productDetail']
                 ]);
             return [
-                'status' => true
+                'status' => true,
             ];
         } catch (\Exception $e) {
             return [
