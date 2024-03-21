@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const client = await page.target().createCDPSession();
 
@@ -25,14 +25,22 @@ const path = require('path');
         });
         await frame.waitForNavigation({ waitUntil: 'load' });
         await page.goto('https://ownerclan.com/vender/order_list.php', { waitUntil: 'domcontentloaded' });
-        await page.select('body > table:nth-child(1) > tbody > tr:nth-child(6) > td > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td > table:nth-child(2) > tbody > tr:nth-child(2) > td > select', '300');
+        await page.select('select[name="listnum"]', '300');
         await new Promise((page) => setTimeout(page, 3000));
-        await page.click('body > table:nth-child(1) > tbody > tr:nth-child(6) > td > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td > table:nth-child(3) > tbody > tr:nth-child(1) > td:nth-child(2) > input[type=checkbox]');
+        await page.evaluate(() => {
+            document.all.deliLate_check.style.visibility = 'hidden';
+            document.all.Notice10.style.visibility = 'hidden';
+            document.all.cancel_check.style.visibility = 'hidden';
+        });
+        await new Promise((page) => setTimeout(page, 1000));
         page.on('dialog', async dialog => {
-            await dialog.accept();
+            await dialog.dismiss();
             return;
         });
-        await page.click('body > table:nth-child(1) > tbody > tr:nth-child(6) > td > table > tbody > tr:nth-child(3) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td > table:nth-child(1) > tbody > tr > td > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td:nth-child(2) > a');
+        await page.evaluate(() => {
+            document.querySelector('input[name="allcheck"]').click();
+            OrderCheckExcel('1');
+        });
         await new Promise((page) => setTimeout(page, 3000));
         console.log(true);
     } catch (error) {
