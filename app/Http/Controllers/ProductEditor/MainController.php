@@ -107,11 +107,12 @@ class MainController extends Controller
     private function updateProduct($product)
     {
         try {
+            $productName = $this->nameController->index($product['productName']);
             DB::table('minewing_products')
                 ->where('productCode', $product['productCode'])
                 ->update([
                     'categoryID' => $product['categoryID'],
-                    'productName' => $this->nameController->index($product['productName']),
+                    'productName' => $productName,
                     'productKeywords' => $product['productKeywords'],
                     'productPrice' => $product['productPrice'],
                     'productDetail' => $product['productDetail'],
