@@ -33,7 +33,11 @@ class FormProductController extends Controller
                 $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $tobizonCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
-                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $basicShippingFee = 3000;
+                $gappedShippingFee = $shippingCost - $basicShippingFee;
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + $gappedShippingFee;
+
+
                 $data = [
                     $categoryCode,
                     $product->productName,
@@ -44,6 +48,7 @@ class FormProductController extends Controller
                     '',
                     0,
                     0,
+                    '',
                     'N',
                     $product->productKeywords,
                     $marginedPrice,
@@ -88,9 +93,9 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'tobizon_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
+            $fileName = 'kseller_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
-            $writer = new Xlsx($spreadsheet);
+            $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
