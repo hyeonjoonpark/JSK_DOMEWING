@@ -28,10 +28,10 @@
                     <div class="nk-block nk-block-middle nk-auth-body  wide-xs">
                         <div class="brand-logo pb-4 text-center">
                             <a href="{{ route('business_page') }}" class="logo-link">
-                                <h3 class="font-bold fw-bold m-0"
-                                    style="color: var(--dark-blue); line-height:44px; font-size:30px;">
-                                    SELLWING
-                                </h3>
+                                <img class="logo-light logo-img logo-img-lg" src="{{ asset('assets/images/logo.png') }}"
+                                    alt="셀윙 파트너 로고">
+                                <img class="logo-dark logo-img logo-img-lg" src="{{ asset('assets/images/logo.png') }}"
+                                    alt="셀윙 파트너 로고">
                             </a>
                         </div>
                         <div class="card card-bordered">
@@ -79,7 +79,8 @@
                                         <p class="text-danger" id="loginErrMsg"></p>
                                     </div>
                                 </form>
-                                <div class="form-note-s2 text-center pt-4"> 셀윙이 처음이신가요? <a href="auth/register">회원가입</a>
+                                <div class="form-note-s2 text-center pt-4"> 셀윙이 처음이신가요? <a
+                                        href="{{ route('partner.register') }}">회원가입</a>
                                 </div>
                             </div>
                         </div>

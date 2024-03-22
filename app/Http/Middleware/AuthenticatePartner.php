@@ -17,20 +17,9 @@ class AuthenticatePartner
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::guard('partner')->check()) {
-            return $this->redirectTo($request);
+        if (Auth::guard('partner')->check()) {
+            return $next($request);
         }
-
-        return $next($request);
-    }
-    /**
-     * Get the path the user should be redirected to when they are not authenticated.
-     *
-     * @param  Request  $request
-     * @return string|null
-     */
-    protected function redirectTo(Request $request): ?string
-    {
-        return $request->expectsJson() ? null : route('partner.login');
+        return redirect()->route('partner.login');
     }
 }

@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('partner.layouts.main')
 @section('title')
     대시보드
 @endsection
