@@ -9,9 +9,9 @@
     <meta name="description"
         content="A powerful and conceptual apps base dashboard template that especially build for developers and programmers.">
     <!-- Fav Icon  -->
-    <link rel="shortcut icon" href="{{asset('assets/images/favicon.png')}}">
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}">
     <!-- Page Title  -->
-    <title>도매윙 | 회원가입</title>
+    <title>셀윙 | 파트너 회원가입</title>
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="{{ asset('assets/css/dashlite.css') }}">
     <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/dashlite.css') }}">

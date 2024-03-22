@@ -19,6 +19,82 @@ class FormProductController extends Controller
             ->where('mp.id', $productId)
             ->first(['shipping_fee', 'additional_shipping_fee']);
     }
+    public function onch3($products, $margin_rate, $vendorEngName, $shippingCost, $index)
+    {
+        try {
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/onch3.xlsx'));
+            $sheet = $spreadsheet->getSheet(0);
+            // 데이터 추가
+            $rowIndex = 4;
+            foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
+                $tobizonCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
+                $marginedPrice = ceil(($product->productPrice * $margin_rate) / 10) * 10;
+
+                $data = [
+                $categoryCode,
+                $product->productName,
+                $product->productName,
+                0,
+                '',
+                $marginedPrice,
+                1,
+                'N',
+                3,
+                $shippingCost,
+                '오후 1시/본사/당일출고',
+                $additionalShippingFee,
+                $additionalShippingFee,
+                'N',
+                0,
+                '상세페이지 참조',
+                2,
+                1,
+                '',
+                $product->productKeywords,
+                $product->productDetail,
+                $product->productImage,
+                '',
+                '',
+                '',
+                $product->productCode,
+                26,
+                '해당사항없음',
+                '해당사항없음',
+                '해당사항없음',
+                0,
+                'JS협력사',
+                '기타',
+                'JS협력사/기타'
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
+            }
+            // 엑셀 파일 저장
+            $fileName = 'onch3_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xls($spreadsheet);
+            $writer->save($formedExcelFile);
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
+            return ['status' => true, 'return' => $downloadURL];
+        } catch (\Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
+
     public function kseller($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
