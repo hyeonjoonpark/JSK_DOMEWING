@@ -154,6 +154,7 @@ class ProductImageController extends Controller
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $img_link);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             $contents = curl_exec($ch);
             if ($contents === false) {
                 throw new Exception('cURL error: ' . curl_error($ch));
@@ -168,8 +169,7 @@ class ProductImageController extends Controller
             // 새 이미지 URL 반환
             return 'https://www.sellwing.kr/images/CDN/detail/' . $img;
         } catch (Exception $e) {
-            // 예외 처리: 로깅 또는 사용자 정의 오류 메시지 반환
-            return null;
+            return $e->getMessage();
         }
     }
     protected function encodeUrl($url)
