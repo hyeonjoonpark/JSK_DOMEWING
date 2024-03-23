@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Admin\FormController;
+use App\Http\Controllers\Admin\PartnersManagementController;
 use App\Http\Controllers\Admin\ProductCollectController;
 use App\Http\Controllers\Admin\ProductDataValidityController;
 use App\Http\Controllers\Admin\ProductDetailController;
@@ -146,6 +147,10 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('member/order-received', [ToReceiveController::class, 'confirmReceived']);
     Route::post('member/submit-review', [ToRateController::class, 'submitReview']);
     Route::post('member/edit-review', [ToRateController::class, 'editReview']);
+
+    Route::prefix('partner')->group(function () {
+        Route::post('update-is-active', [PartnersManagementController::class, 'updateIsActive']);
+    });
 
     Route::post('apiwing/get-unset-categories', [IndexController::class, 'getUnsetCategories']);
     Route::prefix('sellwing-api')->group(function () {

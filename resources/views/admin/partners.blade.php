@@ -2,6 +2,8 @@
 @section('style')
     <?php
     $profileColors = ['bg-dark', 'bg-warning', 'bg-success', 'bg-info', 'bg-danger', 'bg-purple', 'bg-dim-primary'];
+    $emailVerifiedIcons = ['text-warning ni ni-alert-circle', 'text-success ni ni-check-circle'];
+    $isActiveColors = ['ACTIVE' => 'success', 'PENDING' => 'warning', 'INACTIVE' => 'danger'];
     ?>
 @endsection
 @section('title')
@@ -26,10 +28,8 @@
                                 </th>
                                 <th class="nk-tb-col"><span class="sub-text">파트너스</span></th>
                                 <th class="nk-tb-col tb-col-mb"><span class="sub-text">사업자 정보</span></th>
-                                <th class="nk-tb-col tb-col-md"><span class="sub-text">연락처</span></th>
-                                <th class="nk-tb-col tb-col-lg"><span class="sub-text">Verified</span></th>
-                                <th class="nk-tb-col tb-col-lg"><span class="sub-text">Last Login</span></th>
-                                <th class="nk-tb-col tb-col-md"><span class="sub-text">Status</span></th>
+                                <th class="nk-tb-col tb-col-lg"><span class="sub-text">인증</span></th>
+                                <th class="nk-tb-col tb-col-md"><span class="sub-text">상태</span></th>
                                 <th class="nk-tb-col nk-tb-col-tools text-end">
                                 </th>
                             </tr>
@@ -51,7 +51,8 @@
                                             <div class="user-info">
                                                 <span class="tb-lead">{{ $partner->name }}<span
                                                         class="dot dot-success d-md-none ms-1"></span></span>
-                                                <span>{{ $partner->email }}</span>
+                                                <span>{{ $partner->email }}</span><br>
+                                                <span>{{ $partner->phone }}</span>
                                             </div>
                                         </div>
                                     </td>
@@ -62,69 +63,35 @@
                                         <a href="{{ asset('images/business-license/' . $partner->business_image) }}"
                                             target="_blank">사업자 등록증</a>
                                     </td>
-                                    <td class="nk-tb-col tb-col-md">
-                                        <span>{{ $partner->phone }}</span>
-                                    </td>
                                     <td class="nk-tb-col tb-col-lg" data-order="Email Verified - Kyc Unverified">
                                         <ul class="list-status">
-                                            <li><em class="icon text-success ni ni-check-circle"></em> <span>Email</span>
+                                            <li>
+                                                <em
+                                                    class="icon <?= is_null($partner->email_verified_at) ? $emailVerifiedIcons[0] : $emailVerifiedIcons[1] ?>"></em>
+                                                <span>Email</span>
                                             </li>
-                                            <li><em class="icon ni ni-alert-circle"></em> <span>KYC</span></li>
                                         </ul>
                                     </td>
-                                    <td class="nk-tb-col tb-col-lg">
-                                        <span>05 Oct 2019</span>
-                                    </td>
                                     <td class="nk-tb-col tb-col-md">
-                                        <span class="tb-status text-success">Active</span>
+                                        <span
+                                            class="tb-status text-{{ $isActiveColors[$partner->is_active] ?? 'secondary' }}">{{ $partner->is_active }}</span>
                                     </td>
                                     <td class="nk-tb-col nk-tb-col-tools">
                                         <ul class="nk-tb-actions gx-1">
-                                            <li class="nk-tb-action-hidden">
-                                                <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip"
-                                                    data-bs-placement="top" title="Wallet">
-                                                    <em class="icon ni ni-wallet-fill"></em>
-                                                </a>
-                                            </li>
-                                            <li class="nk-tb-action-hidden">
-                                                <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip"
-                                                    data-bs-placement="top" title="Send Email">
-                                                    <em class="icon ni ni-mail-fill"></em>
-                                                </a>
-                                            </li>
-                                            <li class="nk-tb-action-hidden">
-                                                <a href="#" class="btn btn-trigger btn-icon" data-bs-toggle="tooltip"
-                                                    data-bs-placement="top" title="Suspend">
-                                                    <em class="icon ni ni-user-cross-fill"></em>
-                                                </a>
-                                            </li>
                                             <li>
                                                 <div class="drodown">
                                                     <a href="#" class="dropdown-toggle btn btn-icon btn-trigger"
                                                         data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
                                                     <div class="dropdown-menu dropdown-menu-end">
                                                         <ul class="link-list-opt no-bdr">
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-focus"></em><span>Quick
-                                                                        View</span></a></li>
-                                                            <li><a href="#"><em class="icon ni ni-eye"></em><span>View
-                                                                        Details</span></a></li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-repeat"></em><span>Transaction</span></a>
+                                                            <li><a
+                                                                    href="javascript:updatePartnerActive('ACTIVE', '{{ $partner->token }}');"><em
+                                                                        class="icon fa-solid fa-check"></em><span>승인</span></a>
                                                             </li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-activity-round"></em><span>Activities</span></a>
+                                                            <li><a
+                                                                    href="javascript:updatePartnerActive('INACTIVE', '{{ $partner->token }}');"><em
+                                                                        class="icon fa-solid fa-ban"></em><span>정지</span></a>
                                                             </li>
-                                                            <li class="divider"></li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-shield-star"></em><span>Reset
-                                                                        Pass</span></a></li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-shield-off"></em><span>Reset
-                                                                        2FA</span></a></li>
-                                                            <li><a href="#"><em
-                                                                        class="icon ni ni-na"></em><span>Suspend
-                                                                        User</span></a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -141,5 +108,29 @@
     </div>
 @endsection
 @section('scripts')
-    <script></script>
+    <script>
+        function updatePartnerActive(isActive, token) {
+            $.ajax({
+                url: '/api/partner/update-is-active',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    isActive,
+                    token,
+                    rememberToken
+                },
+                success: function(response) {
+                    const status = response.status;
+                    let icon;
+                    if (status === true) {
+                        icon = 'success';
+                    } else {
+                        icon = 'error';
+                    }
+                    swalWithReload(response.return, icon);
+                },
+                error: AjaxErrorHandling
+            });
+        }
+    </script>
 @endsection

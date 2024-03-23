@@ -5,14 +5,32 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Partner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PartnersManagementController extends Controller
 {
     public function index()
     {
-        $partners = Partner::get();
+        $partners = Partner::orderBy('created_at', 'desc')->get();
         return view('admin/partners', [
             'partners' => $partners
         ]);
+    }
+    public function updateIsActive(Request $request)
+    {
+        $token = $request->token;
+        $isActive = $request->isActive;
+        try {
+            Partner::where('token', $token)->update(['is_active' => $isActive]);
+            return [
+                'status' => true,
+                'return' => '파트너스 회원의 상태를 성공적으로 변경했습니다.'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'return' => $e->getMessage()
+            ];
+        }
     }
 }
