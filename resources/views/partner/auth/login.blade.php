@@ -96,8 +96,12 @@
     <!-- JavaScript -->
     <script src="./assets/js/bundle.js?ver=3.1.1"></script>
     <script src="./assets/js/scripts.js?ver=3.1.1"></script>
+    <?php
+    if(isset($_GET['name'])){
+        $name=$_GET['name'];
+    ?>
     <script>
-        const name = @json($token);
+        const name = @json($name);
         if (name !== '') {
             Swal.fire({
                 icon: 'success',
@@ -106,5 +110,8 @@
             });
         }
     </script>
+    <?php
+}
+?>
 
 </html>
