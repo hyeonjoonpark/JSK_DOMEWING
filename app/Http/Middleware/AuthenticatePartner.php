@@ -9,17 +9,16 @@ use Illuminate\Support\Facades\Auth;
 class AuthenticatePartner
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  Request  $request
-     * @param  Closure  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::guard('partner')->check()) {
-            return $next($request);
+        if (!Auth::guard('partner')->check()) {
+            return redirect()->route('partner.login');
         }
-        return redirect()->route('partner.login');
+
+        return $next($request);
     }
 }

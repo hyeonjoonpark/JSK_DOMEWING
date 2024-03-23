@@ -168,7 +168,7 @@
 @endsection
 @section('scripts')
     <script>
-        var rememberToken = '{{ Auth::user()->remember_token }}';
+        var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
         var audioMining = new Audio('{{ asset('assets/audio/diring.mp3') }}');
         var audioCollect = new Audio('{{ asset('assets/audio/diring.mp3') }}');
         var audioSuccess = new Audio('{{ asset('assets/audio/diring.mp3') }}');

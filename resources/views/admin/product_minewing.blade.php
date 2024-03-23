@@ -184,7 +184,7 @@
                 type: "POST",
                 dataType: "JSON",
                 data: {
-                    rememberToken: '{{ Auth::user()->remember_token }}',
+                    rememberToken: '{{ Auth::guard('user')->user()->remember_token }}',
                     productCodes: productCodes
                 },
                 success: function(response) {

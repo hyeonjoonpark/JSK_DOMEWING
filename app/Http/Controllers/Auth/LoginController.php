@@ -33,7 +33,7 @@ class LoginController extends Controller
                 'is_active' => 'ACTIVE' // 'ACTIVE' 상태인 사용자만 로그인 허용
             ];
 
-            if (Auth::attempt($credentials)) {
+            if (Auth::guard('user')->attempt($credentials)) {
                 return redirect()->to('/admin/dashboard');
             }
 
@@ -48,7 +48,7 @@ class LoginController extends Controller
     // 로그아웃
     public function logout()
     {
-        Auth::logout(); // 현재 사용자 로그아웃
+        Auth::guard('user')->logout(); // 현재 사용자 로그아웃
         return redirect()->to('/auth/login'); // 로그아웃 후 리디렉션할 경로
     }
 }

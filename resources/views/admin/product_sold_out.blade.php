@@ -82,7 +82,7 @@
     <script src="{{ asset('assets/js/editors.js') }}"></script>
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
-        var rememberToken = '{{ Auth::user()->remember_token }}';
+        var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);

@@ -54,7 +54,7 @@ class AdminController extends Controller
     {
         $vendors = DB::table('product_register')->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')->where('product_register.is_active', 'Y')->get();
         $productInformation = DB::table('product_information')->get();
-        $remember_token = Auth::user()->remember_token;
+        $remember_token = Auth::guard('user')->user()->remember_token;
         return view('admin/product_register', [
             'vendors' => $vendors,
             'productInformation' => $productInformation,
@@ -65,7 +65,7 @@ class AdminController extends Controller
     {
         $vendors = DB::table('product_register')->join('vendors', 'vendors.id', '=', 'product_register.vendor_id')->where('product_register.is_active', 'Y')->get();
         $productInformation = DB::table('product_information')->get();
-        $remember_token = Auth::user()->remember_token;
+        $remember_token = Auth::guard('user')->user()->remember_token;
         return view('admin/product_register', [
             'vendors' => $vendors,
             'productInformation' => $productInformation,

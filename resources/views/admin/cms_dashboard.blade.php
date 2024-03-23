@@ -177,7 +177,7 @@
 
         function editDomain(domainId) {
             var domainName = $('#edit-domain-name').val();
-            var remember_token = "{{ Auth::user()->remember_token }}";
+            var remember_token = "{{ Auth::guard('user')->user()->remember_token }}";
 
             if (domainName != "") {
                 $.ajax({
@@ -228,7 +228,7 @@
         }
 
         function removeDomain(domainId) {
-            var remember_token = "{{ Auth::user()->remember_token }}";
+            var remember_token = "{{ Auth::guard('user')->user()->remember_token }}";
 
             $.ajax({
                 url: '/api/admin/remove-domain',

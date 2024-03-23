@@ -16,7 +16,7 @@ class UserInfoMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = Auth::user();
+        $user = Auth::guard('user')->user();
         view()->share('user', $user);
         return $next($request);
     }

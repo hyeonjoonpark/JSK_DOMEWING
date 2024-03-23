@@ -107,7 +107,7 @@
                 popupLoader(1, '수정된 상품들을 데이터베이스에 반영 중입니다.');
                 const formData = new FormData();
                 formData.append('products', products);
-                formData.append('rememberToken', '{{ Auth::user()->remember_token }}');
+                formData.append('rememberToken', '{{ Auth::guard('user')->user()->remember_token }}');
                 $.ajax({
                     url: '/api/product/edit',
                     type: 'POST',

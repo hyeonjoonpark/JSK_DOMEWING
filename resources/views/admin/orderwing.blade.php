@@ -69,7 +69,7 @@
 
 @section('scripts')
     <script>
-        var rememberToken = '{{ Auth::user()->remember_token }}';
+        var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
         var sellers = @json($vendors);
         var b2bs = @json($b2bs)
 

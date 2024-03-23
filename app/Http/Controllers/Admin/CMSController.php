@@ -13,21 +13,22 @@ class CMSController extends Controller
 {
     //This Controller will be used for Seller.
 
-    public function loadSellerCMS(Request $request , $id){
+    public function loadSellerCMS(Request $request, $id)
+    {
 
-        try{
+        try {
             $user = DB::table('users')->where('remember_token',  $id)->first();
 
-            if($user == NULL){
+            if ($user == NULL) {
                 Auth::logout();
                 return redirect()->route('auth.login');
-            }else if ( Auth::user()->id !== $user->id ){
+            } else if (Auth::guard('user')->user()->id !== $user->id) {
                 return redirect()->back();
             }
 
             $domain = DB::table('cms_domain')->where('user_id',  $user->id)->first();
 
-            if($domain == null){
+            if ($domain == null) {
                 $registerDomain = DB::table('cms_domain')->insert([
                     'domain_name' => $user->company,
                     'created_at' => now(),
@@ -47,25 +48,25 @@ class CMSController extends Controller
                 $image->formatted_created_at = Carbon::parse($image->created_at)->format('d M Y');
             }
 
-            return view('admin/cms_seller',[
+            return view('admin/cms_seller', [
                 'domain' => $domain,
                 'images' => $images,
                 'image_banners' => $image_banners,
                 'theme_color' => $theme_color,
             ]);
-
-        }catch (Exception $e){
+        } catch (Exception $e) {
             Auth::logout();
             return redirect()->route('auth.login');
         }
     }
 
-    public function editDomainName(Request $request){
-        $remember_token=$request->input('remember_token');
-        $domain_name=$request->input('domain_name');
-        $domain_id=$request->input('domain_id');
+    public function editDomainName(Request $request)
+    {
+        $remember_token = $request->input('remember_token');
+        $domain_name = $request->input('domain_name');
+        $domain_id = $request->input('domain_id');
 
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'domain_name' => 'required',
         ], [
             'required' => 'This field is required.',
@@ -73,9 +74,9 @@ class CMSController extends Controller
 
         if ($validator->fails()) {
 
-            $data=[
-                'status'=>-1,
-                'return'=>'Please Enter Domain Name'
+            $data = [
+                'status' => -1,
+                'return' => 'Please Enter Domain Name'
             ];
 
             return $data;
@@ -84,17 +85,17 @@ class CMSController extends Controller
         $user = DB::table('users')->where('remember_token',  $remember_token)->first();
 
         $domainUser = DB::table('cms_domain')
-                        ->join('users', 'users.id', '=', 'cms_domain.user_id')
-                        ->where('cms_domain.domain_id', $domain_id)
-                        ->value('users.remember_token');
+            ->join('users', 'users.id', '=', 'cms_domain.user_id')
+            ->where('cms_domain.domain_id', $domain_id)
+            ->value('users.remember_token');
 
-        if($user == NULL){
+        if ($user == NULL) {
             Auth::logout();
             return redirect()->route('auth.login');
-        }else if($domainUser != $remember_token){
-            $data=[
-                'status'=>-1,
-                'return'=>'No Permission to Change Domain Name'
+        } else if ($domainUser != $remember_token) {
+            $data = [
+                'status' => -1,
+                'return' => 'No Permission to Change Domain Name'
             ];
 
             return $data;
@@ -104,64 +105,63 @@ class CMSController extends Controller
 
         //Check if the domain already exists and is active
         $existingDomain = DB::table('cms_domain')
-                            ->where('domain_name', $domain_name)
-                            ->where('is_active', 'ACTIVE')
-                            ->where('domain_id', '!=', $domain->domain_id)
-                            ->first();
+            ->where('domain_name', $domain_name)
+            ->where('is_active', 'ACTIVE')
+            ->where('domain_id', '!=', $domain->domain_id)
+            ->first();
 
         if ($existingDomain) {
 
-            $data=[
-                'status'=>-1,
-                'return'=>'Domain Name Already Taken'
+            $data = [
+                'status' => -1,
+                'return' => 'Domain Name Already Taken'
             ];
 
             return $data;
         }
 
-        try{
-            DB::table('cms_domain')->where('domain_id',$domain->domain_id)->update([
-                'domain_name'=>$domain_name,
-                'updated_at'=>now(),
+        try {
+            DB::table('cms_domain')->where('domain_id', $domain->domain_id)->update([
+                'domain_name' => $domain_name,
+                'updated_at' => now(),
             ]);
-            $data=[
-                'status'=>1,
-                'return'=>'Information Updated'
+            $data = [
+                'status' => 1,
+                'return' => 'Information Updated'
             ];
-        }catch (Exception $e){
-            $data=[
-                'status'=>-1,
-                'return'=>$e->getMessage()
+        } catch (Exception $e) {
+            $data = [
+                'status' => -1,
+                'return' => $e->getMessage()
             ];
         }
 
         return $data;
-
     }
 
-    public function uploadImageBanner(Request $request){
+    public function uploadImageBanner(Request $request)
+    {
         $image = $request->file('file');
         $domainId = $request->input('domain_id');
         $remember_token = $request->input('remember_token');
 
         //assuming only seller can edit thier content only
         $domainUser = DB::table('cms_domain')
-                        ->join('users', 'users.id', '=', 'cms_domain.user_id')
-                        ->select('cms_domain.*', 'users.remember_token')
-                        ->where('cms_domain.domain_id', $domainId)
-                        ->first();
+            ->join('users', 'users.id', '=', 'cms_domain.user_id')
+            ->select('cms_domain.*', 'users.remember_token')
+            ->where('cms_domain.domain_id', $domainId)
+            ->first();
 
         $user = DB::table('users')->where('remember_token',  $remember_token)->first();
 
-        if($user == NULL){
+        if ($user == NULL) {
             Auth::logout();
             return redirect()->route('auth.login');
+        } else if ($domainUser->remember_token != $remember_token) {
 
-        }else if($domainUser->remember_token != $remember_token){
-
-            $data=[
-                'status'=>-1,
-                'message'=>'No Permission To Upload'
+            $data = [
+                'status' => -1,
+                'message' => 'No Permission To Upload'
             ];
 
             return $data;
@@ -176,88 +176,87 @@ class CMSController extends Controller
             // Move the uploaded file to the public library directory
             $image->move(public_path('library'), $imageName);
 
-            try{
+            try {
                 DB::table('image_banner')->insert([
                     'source' => $imageName,
                     'domain_id' => $domainId,
                     'created_at' => now(),
                 ]);
 
-                $data=[
-                    'status'=>1,
-                    'message'=>'Image Uploaded Successfully'
+                $data = [
+                    'status' => 1,
+                    'message' => 'Image Uploaded Successfully'
                 ];
-
-            }catch (Exception $e){
-                $data=[
-                    'status'=>-1,
-                    'message'=>'Failed to Upload Image'
+            } catch (Exception $e) {
+                $data = [
+                    'status' => -1,
+                    'message' => 'Failed to Upload Image'
                 ];
             }
         } else {
-            $data=[
-                'status'=>-1,
-                'message'=>'No File Uploaded'
+            $data = [
+                'status' => -1,
+                'message' => 'No File Uploaded'
             ];
         }
 
         return $data;
     }
 
-    public function changeImageStatus(Request $request){
-        $image_id=$request->input('image_id');
+    public function changeImageStatus(Request $request)
+    {
+        $image_id = $request->input('image_id');
         $remember_token = $request->input('remember_token');
 
         $user = DB::table('users')->where('remember_token',  $remember_token)->first();
 
         $imageUser = DB::table('image_banner')
-                        ->join('cms_domain', 'cms_domain.domain_id', '=', 'image_banner.domain_id')
-                        ->join('users', 'users.id', '=', 'cms_domain.user_id')
-                        ->where('image_banner.id', $image_id)
-                        ->value('users.remember_token');
+            ->join('cms_domain', 'cms_domain.domain_id', '=', 'image_banner.domain_id')
+            ->join('users', 'users.id', '=', 'cms_domain.user_id')
+            ->where('image_banner.id', $image_id)
+            ->value('users.remember_token');
 
-        if($user == NULL){
+        if ($user == NULL) {
 
             Auth::logout();
             return redirect()->route('auth.login');
+        } else if ($imageUser != $remember_token) {
 
-        } else if($imageUser != $remember_token){
-
-            $data=[
-                'status'=>-1,
-                'return'=>'No Permission on Current Action'
+            $data = [
+                'status' => -1,
+                'return' => 'No Permission on Current Action'
             ];
 
             return $data;
         }
 
-        try{
+        try {
             $newStatus = 'ACTIVE';
             $checkstatus = DB::table('image_banner')->where('id', $image_id)->value('status');
 
-            if($checkstatus== 'ACTIVE'){
+            if ($checkstatus == 'ACTIVE') {
                 $newStatus = 'HIDDEN';
-            }else if($checkstatus== 'INACTIVE'){
-                $data=[
-                    'status'=>-1,
-                    'return'=>'Image Not Found'
+            } else if ($checkstatus == 'INACTIVE') {
+                $data = [
+                    'status' => -1,
+                    'return' => 'Image Not Found'
                 ];
 
                 return $data;
             }
 
-            DB::table('image_banner')->where('id',$image_id)->update([
-                'status'=> $newStatus
+            DB::table('image_banner')->where('id', $image_id)->update([
+                'status' => $newStatus
             ]);
 
-            $data=[
-                'status'=>1,
-                'return'=>'Image Status Changed Successfully'
+            $data = [
+                'status' => 1,
+                'return' => 'Image Status Changed Successfully'
             ];
-        }catch(Exception $e){
-            $data=[
-                'status'=>-1,
-                'return'=>$e->getMessage()
+        } catch (Exception $e) {
+            $data = [
+                'status' => -1,
+                'return' => $e->getMessage()
             ];
         }
 
@@ -265,45 +264,45 @@ class CMSController extends Controller
         return $data;
     }
 
-    public function removeImage(Request $request){
-        $image_id=$request->input('image_id');
-        $remember_token=$request->input('remember_token');
+    public function removeImage(Request $request)
+    {
+        $image_id = $request->input('image_id');
+        $remember_token = $request->input('remember_token');
 
         $user = DB::table('users')->where('remember_token',  $remember_token)->first();
 
         $imageUser = DB::table('image_banner')
-                        ->join('cms_domain', 'cms_domain.domain_id', '=', 'image_banner.domain_id')
-                        ->join('users', 'users.id', '=', 'cms_domain.user_id')
-                        ->where('image_banner.id', $image_id)
-                        ->value('users.remember_token');
+            ->join('cms_domain', 'cms_domain.domain_id', '=', 'image_banner.domain_id')
+            ->join('users', 'users.id', '=', 'cms_domain.user_id')
+            ->where('image_banner.id', $image_id)
+            ->value('users.remember_token');
 
-        if($user == NULL){
+        if ($user == NULL) {
 
             Auth::logout();
             return redirect()->route('auth.login');
+        } else if ($imageUser != $remember_token) {
 
-        } else if($imageUser != $remember_token){
-
-            $data=[
-                'status'=>-1,
-                'return'=>'No Permission on Current Action'
+            $data = [
+                'status' => -1,
+                'return' => 'No Permission on Current Action'
             ];
 
             return $data;
         }
 
-        try{
-            DB::table('image_banner')->where('id',$image_id)->update([
-                'status'=>'INACTIVE'
+        try {
+            DB::table('image_banner')->where('id', $image_id)->update([
+                'status' => 'INACTIVE'
             ]);
-            $data=[
-                'status'=>1,
-                'return'=>'success'
+            $data = [
+                'status' => 1,
+                'return' => 'success'
             ];
-        }catch(Exception $e){
-            $data=[
-                'status'=>-1,
-                'return'=>$e->getMessage()
+        } catch (Exception $e) {
+            $data = [
+                'status' => -1,
+                'return' => $e->getMessage()
             ];
         }
 
@@ -311,38 +310,38 @@ class CMSController extends Controller
         return $data;
     }
 
-    public function changeThemeColor(Request $request){
-        $color=$request->input('color');
-        $domain_id=$request->input('domain_id');
+    public function changeThemeColor(Request $request)
+    {
+        $color = $request->input('color');
+        $domain_id = $request->input('domain_id');
         $remember_token = $request->input('remember_token');
 
         $domainUser = DB::table('cms_domain')
-                        ->join('users', 'users.id', '=', 'cms_domain.user_id')
-                        ->where('cms_domain.domain_id', $domain_id)
-                        ->value('users.remember_token');
+            ->join('users', 'users.id', '=', 'cms_domain.user_id')
+            ->where('cms_domain.domain_id', $domain_id)
+            ->value('users.remember_token');
 
         $user = DB::table('users')->where('remember_token',  $remember_token)->first();
 
-        if($user == NULL){
+        if ($user == NULL) {
 
             Auth::logout();
             return redirect()->route('auth.login');
+        } else if ($domainUser != $remember_token) {
 
-        }else if($domainUser != $remember_token){
-
-            $data=[
-                'status'=>-1,
-                'return'=>'No Permission To Change Theme Color'
+            $data = [
+                'status' => -1,
+                'return' => 'No Permission To Change Theme Color'
             ];
 
             return $data;
         }
 
-        $checkColor=DB::table('theme_color')->where('domain_id', $domain_id)->first();
+        $checkColor = DB::table('theme_color')->where('domain_id', $domain_id)->first();
 
-        if($checkColor == null){
+        if ($checkColor == null) {
             //insert color into table
-            try{
+            try {
                 DB::table('theme_color')->insert([
                     'color_code' => $color,
                     'domain_id' => $domain_id,
@@ -350,31 +349,31 @@ class CMSController extends Controller
                 ]);
 
                 $data = [
-                    'status'=>1,
-                    'return'=>'Theme Color Set Successfully'
+                    'status' => 1,
+                    'return' => 'Theme Color Set Successfully'
                 ];
-            }catch (Exception $e){
+            } catch (Exception $e) {
                 $data = [
-                    'status'=>-1,
-                    'return'=>$e->getMessage()
+                    'status' => -1,
+                    'return' => $e->getMessage()
                 ];
             }
-        }else{
+        } else {
             //update the color
-            try{
-                DB::table('theme_color')->where('id',$checkColor->id)->update([
+            try {
+                DB::table('theme_color')->where('id', $checkColor->id)->update([
                     'color_code' => $color,
                     'updated_at' => now()
                 ]);
 
                 $data = [
-                    'status'=>1,
-                    'return'=>'Theme Color Updated Successfully'
+                    'status' => 1,
+                    'return' => 'Theme Color Updated Successfully'
                 ];
-            }catch (Exception $e){
+            } catch (Exception $e) {
                 $data = [
-                    'status'=>-1,
-                    'return'=>$e->getMessage()
+                    'status' => -1,
+                    'return' => $e->getMessage()
                 ];
             }
         }

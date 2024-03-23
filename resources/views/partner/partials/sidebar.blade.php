@@ -122,7 +122,7 @@
                             </a>
                         </li>
                         <li class="nk-menu-item">
-                            <a href="/admin/cms/{{ Auth::user()->remember_token }}" class="nk-menu-link">
+                            <a href="/admin/cms/{{ Auth::guard('user')->user()->remember_token }}" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
                                 <span class="nk-menu-text">Seller CMS</span>
                             </a>

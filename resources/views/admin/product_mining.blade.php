@@ -168,7 +168,7 @@
 @endsection
 @section('scripts')
     <script>
-        var rememberToken = '{{ Auth::user()->remember_token }}';
+        var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
         var varIndex, varDupIndex, varProducts;
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');

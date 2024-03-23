@@ -12,7 +12,7 @@ class ImageUploadController extends Controller
     {
         $image = $request->file;
         // 사용자 정보 가져오기
-        $userId = Auth::user()->id;
+        $userId = Auth::guard('user')->user()->id;
 
         // 이미지 파일 이름 생성
         $path = public_path('assets/images/product/desc/');

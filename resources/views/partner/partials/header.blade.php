@@ -23,7 +23,7 @@
                                 </div>
                                 <div class="user-info d-none d-md-block">
                                     <div class="user-status">관리자</div>
-                                    <div class="user-name dropdown-indicator"><?php $user = Auth::user();
+                                    <div class="user-name dropdown-indicator"><?php $user = Auth::guard('user')->user();
                                     echo $user->name; ?></div>
                                 </div>
                             </div>

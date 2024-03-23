@@ -47,8 +47,13 @@ return [
         ],
 
         'partner' => [
-            'driver' => 'sanctum',
+            'driver' => 'session',
             'provider' => 'partners',
+        ],
+
+        'user' => [
+            'driver' => 'session',
+            'provider' => 'users',
         ],
     ],
 

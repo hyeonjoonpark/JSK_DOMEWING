@@ -204,7 +204,7 @@
 @section('scripts')
     <script>
         function updateDomainName() {
-            var remember_token = "{{ Auth::user()->remember_token }}";
+            var remember_token = "{{ Auth::guard('user')->user()->remember_token }}";
             var domain_id = "{{ $domain->domain_id }}";
             var domain_name = $('#domain-name').val();
 
@@ -286,7 +286,7 @@
         function prepareUpload(domain_id) {
             var formData = new FormData($('#uploadForm')[0]);
             formData.append('domain_id', domain_id);
-            formData.append('rememberToken', '{{ Auth::user()->remember_token }}');
+            formData.append('rememberToken', '{{ Auth::guard('user')->user()->remember_token }}');
 
             $.ajax({
                 url: '../../../api/admin/upload-image-banner',
@@ -325,7 +325,7 @@
         //change theme color
         function changeThemeColor(domain_id) {
             var color = $('#colorpicker').val();
-            var remember_token = "{{ Auth::user()->remember_token }}";
+            var remember_token = "{{ Auth::guard('user')->user()->remember_token }}";
 
             $.ajax({
                 url: '/api/admin/change-theme-color',
@@ -369,7 +369,7 @@
 
         function removeImage(image_id) {
 
-            var remember_token = "{{ Auth::user()->remember_token }}";
+            var remember_token = "{{ Auth::guard('user')->user()->remember_token }}";
 
             $.ajax({
                 url: '/api/admin/remove-image-banner',
@@ -409,7 +409,7 @@
 
         //show or hide image from banner
         function changeStatus(image_id) {
-            var remember_token = "{{ Auth::user()->remember_token }}";
+            var remember_token = "{{ Auth::guard('user')->user()->remember_token }}";
 
             $.ajax({
                 url: '/api/admin/change-image-status',

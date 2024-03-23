@@ -34,7 +34,7 @@
                 dataType: "JSON",
                 data: {
                     productName: productName,
-                    remember_token: '{{ Auth::user()->remember_token }}'
+                    remember_token: '{{ Auth::guard('user')->user()->remember_token }}'
                 },
                 success: function(response) {
                     console.log(response);

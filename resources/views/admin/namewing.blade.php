@@ -114,7 +114,7 @@
             });
         }
 
-        var rememberToken = '{{ Auth::user()->remember_token }}';
+        var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
 
         function initEditProductName(productCode) {
             popupLoader(1, '변경된 상품명을 DB에 적용 중입니다.');

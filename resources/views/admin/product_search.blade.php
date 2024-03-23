@@ -497,7 +497,7 @@
 
         function productCollect() {
             const formData = new FormData(); // FormData 객체 생성
-            formData.append('remember_token', '{{ Auth::user()->remember_token }}');
+            formData.append('remember_token', '{{ Auth::guard('user')->user()->remember_token }}');
             const productDetail = $('.summernote-basic').summernote('code');
             formData.append('productDetail', productDetail);
             formData.append('productName', $("#productName").val());
@@ -666,7 +666,7 @@
                 type: "POST",
                 dataType: "JSON",
                 data: {
-                    remember_token: '{{ Auth::user()->remember_token }}',
+                    remember_token: '{{ Auth::guard('user')->user()->remember_token }}',
                     products: products,
                     keywords: productKeywords,
                     categoryId: categoryId
