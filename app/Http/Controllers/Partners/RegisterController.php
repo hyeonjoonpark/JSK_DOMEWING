@@ -82,7 +82,7 @@ class RegisterController extends Controller
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                'return' => $e->getMessage()
+                'return' => '이미 등록된 회원 정보입니다.'
             ];
         }
     }
