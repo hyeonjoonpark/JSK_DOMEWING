@@ -13,6 +13,9 @@ class LoginController extends Controller
 {
     public function index()
     {
+        if (Auth::guard('partner')->check()) {
+            return redirect()->route('partner.dashboard');
+        }
         return view('partner/auth/login');
     }
     public function login(Request $request)
@@ -32,7 +35,17 @@ class LoginController extends Controller
                 $partner = Auth::guard('partner')->user();
                 $emailVerifiedAt = $partner->email_verified_at;
                 if ($emailVerifiedAt === null) {
+                    $this->logout();
                     return Redirect::back()->withErrors(['invalidLogin' => '이메일 인증을 완료해주세요.'])->withInput();
+                }
+                $isActive = $partner->is_active;
+                if ($isActive === 'PENDING') {
+                    $this->logout();
+                    return Redirect::back()->withErrors(['invalidLogin' => '관리자의 승인을 대기 중입니다.'])->withInput();
+                }
+                if ($isActive === 'INACTIVE') {
+                    $this->logout();
+                    return Redirect::back()->withErrors(['invalidLogin' => '승인이 거부된 회원입니다. 올바르지 못한 회원 정보 혹은 사업자 정보입니다.'])->withInput();
                 }
                 return redirect()->to('/partner');
             }

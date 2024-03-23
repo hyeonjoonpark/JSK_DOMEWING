@@ -36,16 +36,20 @@ use App\Http\Controllers\ProductEditor\ViewController;
 use App\Http\Controllers\Testmonial\TestmonialController;
 
 // Sellwing 파트너스 라우트 그룹
-Route::middleware(['auth.partner'])->prefix('partner')->group(function () {
-    Route::get('/', [PartnersDashboardController::class, 'index'])->name('partner.dashboard');
+Route::prefix('partner')->group(function () {
+    Route::prefix('auth')->group(function () {
+        Route::get('login', [PartnersLoginController::class, 'index'])->name('partner.login');
+        Route::post('login', [PartnersLoginController::class, 'login']);
+        Route::get('register', [PartnersRegisterController::class, 'index'])->name('partner.register');
+        Route::post('register', [PartnersRegisterController::class, 'main']);
+        Route::get('forgot-password', [ForgotPasswordController::class, 'index']);
+        Route::post('forgot-password', [ForgotPasswordController::class, 'main']);
+        Route::get('logout', [PartnersLoginController::class, 'logout']);
+    });
+    Route::middleware(['auth.partner'])->group(function () {
+        Route::get('/', [PartnersDashboardController::class, 'index'])->name('partner.dashboard');
+    });
 });
-Route::get('partner/auth/login', [PartnersLoginController::class, 'index'])->name('partner.login');
-Route::post('partner/auth/login', [PartnersLoginController::class, 'login']);
-Route::get('partner/auth/register', [PartnersRegisterController::class, 'index'])->name('partner.register');
-Route::post('partner/auth/register', [PartnersRegisterController::class, 'main']);
-Route::get('partner/auth/forgot-password', [ForgotPasswordController::class, 'index']);
-Route::post('partner/auth/forgot-password', [ForgotPasswordController::class, 'main']);
-Route::get('partner/auth/logout', [PartnersLoginController::class, 'logout']);
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');

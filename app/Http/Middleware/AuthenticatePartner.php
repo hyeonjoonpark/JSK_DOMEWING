@@ -18,7 +18,7 @@ class AuthenticatePartner
         if (!Auth::guard('partner')->check()) {
             return redirect()->route('partner.login');
         }
-
+        view()->share(['partner' => Auth::guard('partner')->user()]);
         return $next($request);
     }
 }

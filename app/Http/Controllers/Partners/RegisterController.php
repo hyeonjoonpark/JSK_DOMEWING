@@ -29,6 +29,7 @@ class RegisterController extends Controller
             'businessNumber' => 'required|digits:10',
             'businessName' => 'required|min:2|max:20',
             'businessImage' => 'required|file|mimes:jpg,jpeg,gif,png',
+            'businessAddress' => 'required|string|min:10|max:100',
             'ppt' => ['required', 'accepted']
         ], [
             'type' => '유효한 파트너 유형을 선택해주세요.',
@@ -40,6 +41,7 @@ class RegisterController extends Controller
             'businessNumber' => '사업자 번호는 10자리로 입력해주세요.',
             'businessName' => '사업자 명의는 최소 2글자, 최대 20글자로 입력해주세요.',
             'businessImage' => '사업자 등록증 사본은 jpg, jpeg, gif, png 확장자만 허용됩니다.',
+            'businessAddress' => '사업장 주소는 최소 10글자, 최대 100글자까지 가능합니다.',
             'ppt.required' => '이용약관을 읽은 후 동의하세요.',
             'ppt.accepted' => '이용약관을 읽은 후 동의하세요.'
         ]);
@@ -51,7 +53,7 @@ class RegisterController extends Controller
             return Redirect::back()->withErrors(['businessImage' => $businessImage['return']])->withInput();
         }
         $businessImage = $businessImage['return'];
-        $registerResult = $this->register($request->type, $request->name, $request->email, $request->password, $request->phone, $request->businessNumber, $request->businessName, $businessImage);
+        $registerResult = $this->register($request->type, $request->name, $request->email, $request->password, $request->phone, $request->businessNumber, $request->businessName, $businessImage, $request->businessAddress);
         if ($registerResult['status'] === false) {
             return Redirect::back()->withErrors(['error' => $registerResult['return']])->withInput();
         }
@@ -62,7 +64,7 @@ class RegisterController extends Controller
         ]));
         return redirect()->route('partner.login', ['name' => $partner->name]);
     }
-    private function register($type, $name, $email, $password, $phone, $businessNumber, $businessName, $businessImage)
+    private function register($type, $name, $email, $password, $phone, $businessNumber, $businessName, $businessImage, $businessAddress)
     {
         try {
             $partner = Partner::create([
@@ -73,7 +75,8 @@ class RegisterController extends Controller
                 'phone' => $phone,
                 'business_number' => $businessNumber,
                 'business_name' => $businessName,
-                'business_image' => $businessImage
+                'business_image' => $businessImage,
+                'business_address' => $businessAddress
             ]);
             return [
                 'status' => true,

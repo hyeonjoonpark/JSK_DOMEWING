@@ -60,8 +60,6 @@
                                     <div class="form-group">
                                         <div class="form-label-group">
                                             <label class="form-label" for="password">비밀번호</label>
-                                            <a class="link link-primary link-sm"
-                                                href="html/pages/auths/auth-reset-v2.html">비밀번호를 잊으셨나요?</a>
                                         </div>
                                         <div class="form-control-wrap">
                                             <a href="#" class="form-icon form-icon-right passcode-switch lg"
@@ -79,8 +77,6 @@
                                         <p class="text-danger" id="loginErrMsg"></p>
                                     </div>
                                 </form>
-                                <div class="form-note-s2 text-center pt-4"> 셀윙이 처음이신가요? <a href="auth/register">회원가입</a>
-                                </div>
                             </div>
                         </div>
                     </div>

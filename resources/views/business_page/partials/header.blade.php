@@ -37,7 +37,7 @@
 
                     <div class="vr my-n1" style="opacity: 1; color: var(--dark-blue); width:2px;"></div>
 
-                    <a href="{{ route('auth.login') }}">
+                    <a href="{{ route('partner.login') }}">
                         <h5 class="font-medium fw-normal" style="line-height:23px;">
                             로그인
                         </h5>

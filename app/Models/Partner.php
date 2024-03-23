@@ -10,7 +10,7 @@ class Partner extends Authenticatable
     protected $table = 'partners';
 
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'business_number', 'business_name', 'business_image', 'is_active',
+        'name', 'email', 'password', 'phone', 'business_number', 'business_name', 'business_image', 'business_address', 'is_active'
     ];
 
     protected $hidden = [

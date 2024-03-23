@@ -47,6 +47,7 @@
         <!-- main @e -->
     </div>
     <!-- app-root @e -->
+    @include('partner.partials.modals')
     <!-- JavaScript -->
     @include('partner.partials.scripts')
     @yield('scripts')

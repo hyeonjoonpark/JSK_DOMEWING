@@ -131,6 +131,16 @@
                             <p class="text-danger">{{ $errors->first('businessNumber') }}</p>
                         </div>
                         <div class="form-group">
+                            <label class="form-label" for="businessAddress">사업장 소재지</label>
+                            <div class="form-control-wrap">
+                                <input type="text"
+                                    class="form-control form-control-lg @error('businessAddress') is-invalid @enderror"
+                                    id="businessAddress" name="businessAddress" value="{{ old('businessAddress') }}"
+                                    placeholder="사업장 주소를 기입해주세요.">
+                            </div>
+                            <p class="text-danger">{{ $errors->first('businessNumber') }}</p>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label" for="businessImage">사업자 등록증</label>
                             <input type="file" class="form-control" id="businessImage" name="businessImage">
                             <p class="text-danger">{{ $errors->first('businessImage') }}</p>

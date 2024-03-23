@@ -1,0 +1,37 @@
+<div class="modal" tabindex="-1" role="dialog" id="viewProfileModal" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">내 프로필</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">성명</label>
+                    <input type="text" class="form-control" value="{{ $partner->name }}" disabled />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">연락처</label>
+                    <input type="text" class="form-control" value="{{ $partner->phone }}" disabled />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">이메일</label>
+                    <input type="text" class="form-control" value="{{ $partner->email }}" disabled />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">사업자 번호</label>
+                    <input type="text" class="form-control" value="{{ $partner->business_number }}" disabled />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">사업자명</label>
+                    <input type="text" class="form-control" value="{{ $partner->business_name }}" disabled />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>

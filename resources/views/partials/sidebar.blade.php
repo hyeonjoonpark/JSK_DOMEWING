@@ -2,10 +2,9 @@
     <div class="nk-sidebar-element nk-sidebar-head">
         <div class="nk-sidebar-brand">
             <a href="/" class="logo-link nk-sidebar-logo">
-                <img class="logo-light logo-img" src="{{ asset('assets/images/logo.png') }}"
-                    srcset="{{ asset('assets/images/logo.png') }} 2x" alt="logo">
-                <img class="logo-dark logo-img" src="{{ asset('assets/images/logo.png') }}"
-                    srcset="{{ asset('assets/images/logo.png') }} 2x" alt="logo-dark">
+                <h3 class="font-bold fw-bold m-0" style="color: var(--dark-blue); line-height:44px; font-size:30px;">
+                    SELLWING
+                </h3>
             </a>
         </div>
         <div class="nk-menu-trigger me-n2">

@@ -19,12 +19,11 @@
                         <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
                             <div class="user-toggle">
                                 <div class="user-avatar sm">
-                                    <em class="icon ni ni-user-alt"></em>
+                                    <img src="{{ asset('assets/images/favicon.png') }}" class="w-100" alt="">
                                 </div>
                                 <div class="user-info d-none d-md-block">
-                                    <div class="user-status">관리자</div>
-                                    <div class="user-name dropdown-indicator"><?php $partner = Auth::guard('partner')->user();
-                                    echo $partner->name; ?></div>
+                                    <div class="user-status">{{ $partner->business_name }}</div>
+                                    <div class="user-name dropdown-indicator">{{ $partner->name }}</div>
                                 </div>
                             </div>
                         </a>
@@ -42,24 +41,17 @@
                             </div>
                             <div class="dropdown-inner">
                                 <ul class="link-list">
-                                    <li><a href="html/user-profile-regular.html"><em
-                                                class="icon ni ni-user-alt"></em><span>View
-                                                Profile</span></a></li>
-                                    <li><a href="html/user-profile-setting.html"><em
-                                                class="icon ni ni-setting-alt"></em><span>Account
-                                                Setting</span></a></li>
-                                    <li><a href="html/user-profile-activity.html"><em
-                                                class="icon ni ni-activity-alt"></em><span>Login
-                                                Activity</span></a></li>
-                                    <li><a class="dark-switch" href="#"><em
-                                                class="icon ni ni-moon"></em><span>Dark Mode</span></a>
+                                    <li><a href="javascript:$('#viewProfileModal').modal('show');"><em
+                                                class="icon ni ni-user-alt"></em><span>프로필 보기</span></a></li>
+                                    <li><a class="dark-switch" href="#"><em class="icon ni ni-moon"></em><span>다크
+                                                모드</span></a>
                                     </li>
                                 </ul>
                             </div>
                             <div class="dropdown-inner">
                                 <ul class="link-list">
-                                    <li><a href="#"><em class="icon ni ni-signout"></em><span>Sign
-                                                out</span></a></li>
+                                    <li><a href="/partner/auth/logout"><em
+                                                class="icon ni ni-signout"></em><span>로그아웃</span></a></li>
                                 </ul>
                             </div>
                         </div>
