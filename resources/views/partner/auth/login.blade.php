@@ -44,7 +44,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <form action="auth/login" method="post">
+                                <form action="{{ route('partner.login') }}" method="post">
                                     @csrf
                                     <p class='text-danger'>{{ $errors->first('invalidLogin') }}</p>
                                     <div class="form-group">

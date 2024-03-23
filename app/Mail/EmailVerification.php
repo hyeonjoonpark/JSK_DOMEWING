@@ -11,17 +11,17 @@ class EmailVerification extends Mailable
     use Queueable, SerializesModels;
 
     public $name;
-    public $remember_token;
+    public $token;
 
-    public function __construct($user)
+    public function __construct($partner)
     {
-        $this->name = $user['name'];
-        $this->remember_token = $user['remember_token'];
+        $this->name = $partner['name'];
+        $this->token = $partner['token'];
     }
 
     public function build()
     {
         return $this->view('emails.email_verification')
-            ->subject('도매윙에 가입해주셔서 진심으로 감사드립니다');
+            ->subject('셀윙 파트너스에 가입해주셔서 진심으로 감사드립니다');
     }
 }

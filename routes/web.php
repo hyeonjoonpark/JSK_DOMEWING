@@ -40,6 +40,7 @@ Route::middleware(['auth.partner'])->prefix('partner')->group(function () {
 });
 Route::get('partner/auth/login', [PartnersLoginController::class, 'index'])->name('partner.login');
 Route::get('partner/auth/register', [PartnersRegisterController::class, 'index'])->name('partner.register');
+Route::post('partner/auth/register', [PartnersRegisterController::class, 'main']);
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');

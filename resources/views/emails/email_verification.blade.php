@@ -90,8 +90,8 @@
                         <tbody>
                             <tr>
                                 <td style="text-align: center; padding-bottom:25px">
-                                    <a href="#"><img style="height: 40px" src="images/logo-dark2x.png"
-                                            alt="이 자리에 로고가 들어갑니다"></a>
+                                    <a href="#"><img style="height: 40px"
+                                            src="{{ asset('assets/images/logo.png') }}" alt="이 자리에 로고가 들어갑니다"></a>
                                     <p style="font-size: 14px; color: #6576ff; padding-top: 12px;">당신의 도매에 날개를 달아줄</p>
                                 </td>
                             </tr>
@@ -108,9 +108,9 @@
                             <tr>
                                 <td style="padding: 0 30px 20px">
                                     <p style="margin-bottom: 10px;">안녕하십니까, {{ $name }} 님.</p>
-                                    <p style="margin-bottom: 10px;">환영합니다! <br> 저희 도매윙에 가입해주셔서 대단히 감사드립니다.</p>
+                                    <p style="margin-bottom: 10px;">환영합니다! <br> 저희 셀윙 파트너스에 가입해주셔서 대단히 감사드립니다.</p>
                                     <p style="margin-bottom: 10px;">아래 버튼을 눌러 이메일 인증을 진행해주세요.</p>
-                                    <a href="{{ url('/') }}/auth/verify-email?remember_token={{ $remember_token }}"
+                                    <a href="{{ url('/') }}/auth/verify-email?token={{ $token }}"
                                         style="background-color:#6576ff;border-radius:4px;color:#ffffff;display:inline-block;font-size:13px;font-weight:600;line-height:44px;text-align:center;text-decoration:none;text-transform: uppercase; padding: 0 30px">이메일
                                         인증하기</a>
                                 </td>
@@ -122,7 +122,7 @@
                                         혹은</h4>
                                     <p style="margin-bottom: 10px;">버튼 로딩에 문제가 발생했나요? 아래 링크를 통해 이메일 인증을 진행하실 수 있습니다.:
                                     </p>
-                                    <a href="{{ url('/') }}/auth/verify-email?remember_token={{ $remember_token }}"
+                                    <a href="{{ url('/') }}/auth/verify-email?token={{ $token }}"
                                         style="color: #6576ff; text-decoration:none;word-break: break-all;">{{ url('/') }}/auth/verify-email</a>
                                 </td>
                             </tr>
@@ -142,9 +142,9 @@
                                 <td style="text-align: center; padding:25px 20px 0;">
                                     <p style="font-size: 13px;">Copyright © 2020 JS Korea. All rights reserved. <br>
                                         Powered By <a style="color: #6576ff; text-decoration:none;"
-                                            href="https://themeforest.net/user/softnio/portfolio">DreamVizual</a>.</p>
+                                            href="https://sellwing.kr">(주) 제이에스코리아</a>.</p>
                                     <p style="padding-top: 15px; font-size: 12px;">
-                                        이 메일은 회원가입 인증을 위해 도매윙으로부터 작성되었습니다.
+                                        이 메일은 회원가입 인증을 위해 셀윙 파트너스로부터 작성되었습니다.
                                     </p>
                                 </td>
                             </tr>

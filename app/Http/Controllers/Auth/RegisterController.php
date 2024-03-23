@@ -72,18 +72,18 @@ class RegisterController extends Controller
     protected function verifyEmail(Request $request)
     {
         try {
-            $remember_token = $request->input('remember_token');
-            $user = DB::table('users')->where([
-                'remember_token' => $remember_token,
+            $token = $request->input('token');
+            $user = DB::table('partners')->where([
+                'token' => $token,
                 'email_verified_at' => null
-            ])->get();
-            if ($user->isEmpty()) {
+            ])->first();
+            if ($user === null) {
                 return view('auth/verify_email_result', [
                     'title' => "이메일 인증에 실패했습니다",
                     'content' => "유효한 링크가 아닙니다."
                 ]);
             }
-            DB::table('users')->where('remember_token', $remember_token)->update([
+            DB::table('partners')->where('token', $token)->update([
                 'email_verified_at' => now()
             ]);
             $title = "이메일을 성공적으로 인증했습니다";
