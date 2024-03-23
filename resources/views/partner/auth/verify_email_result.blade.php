@@ -41,7 +41,7 @@
                             <div class="nk-block-des text-success">
                                 <p>{{ $content }}</p>
                             </div>
-                            <a href="{{ route('auth.login') }}" class="btn btn-primary mt-5">로그인 페이지로 돌아가기</a>
+                            <a href="{{ route('partner.login') }}" class="btn btn-primary mt-5">로그인 페이지로 돌아가기</a>
                         </div>
                     </div>
                 </div><!-- .nk-block -->

@@ -96,5 +96,15 @@
     <!-- JavaScript -->
     <script src="./assets/js/bundle.js?ver=3.1.1"></script>
     <script src="./assets/js/scripts.js?ver=3.1.1"></script>
+    <script>
+        const name = @json($token);
+        if (name !== '') {
+            Swal.fire({
+                icon: 'success',
+                title: '가입 완료',
+                text: '회원가입을 진심으로 감사드립니다. 로그인 전, 반드시 가입하신 이메일 주소를 통해 이메일 인증을 완료해주셔야 합니다.'
+            });
+        }
+    </script>
 
 </html>

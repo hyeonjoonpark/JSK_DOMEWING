@@ -60,7 +60,7 @@ class RegisterController extends Controller
             'name' => $partner->name,
             'token' => $partner->token
         ]));
-        return redirect()->route('partner.login');
+        return redirect()->route('partner.login', ['name' => $partner->name]);
     }
     private function register($type, $name, $email, $password, $phone, $businessNumber, $businessName, $businessImage)
     {
