@@ -144,7 +144,7 @@
                             </ul><!-- .nk-menu-sub -->
                         </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item">
-                            <a href="/auth/logout" class="nk-menu-link">
+                            <a href="/partner/auth/logout" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em
                                         class="icon fa-solid fa-arrow-right-from-bracket"></em></span>
                                 <span class="nk-menu-text">로그아웃</span>

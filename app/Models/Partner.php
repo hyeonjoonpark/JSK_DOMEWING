@@ -2,18 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
 
-class Partner extends Model
+class Partner extends Authenticatable
 {
-    use HasFactory;
-
     protected $table = 'partners';
 
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'business_number', 'business_name', 'business_image', 'is_active', 'token', 'api_token'
+        'name', 'email', 'password', 'phone', 'business_number', 'business_name', 'business_image', 'is_active',
     ];
 
     protected $hidden = [
@@ -22,7 +19,6 @@ class Partner extends Model
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
     ];
 
     // 모델 이벤트를 사용하여 Partner 인스턴스가 생성될 때 token과 api_token을 자동으로 생성

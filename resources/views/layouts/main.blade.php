@@ -2,7 +2,7 @@
 <html lang="ko" class="js">
 
 <head>
-    @include('partner.partials.head')
+    @include('partials.head')
 </head>
 
 <body class="nk-body bg-white has-sidebar ">
@@ -10,12 +10,12 @@
         <!-- main @s -->
         <div class="nk-main ">
             <!-- sidebar @s -->
-            @include('partner.partials.sidebar')
+            @include('partials.sidebar')
             <!-- sidebar @e -->
             <!-- wrap @s -->
             <div class="nk-wrap ">
                 <!-- main header @s -->
-                @include('partner.partials.header')
+                @include('partials.header')
                 <!-- main header @e -->
                 <!-- content @s -->
                 <div class="nk-content nk-content-fluid">
@@ -39,7 +39,7 @@
                 </div>
                 <!-- content @e -->
                 <!-- footer @s -->
-                @include('partner.partials.footer')
+                @include('partials.footer')
                 <!-- footer @e -->
             </div>
             <!-- wrap @e -->
@@ -48,7 +48,7 @@
     </div>
     <!-- app-root @e -->
     <!-- JavaScript -->
-    @include('partner.partials.scripts')
+    @include('partials.scripts')
     @yield('scripts')
 </body>
 

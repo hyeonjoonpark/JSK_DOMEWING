@@ -148,11 +148,10 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('member/edit-review', [ToRateController::class, 'editReview']);
 
     Route::post('apiwing/get-unset-categories', [IndexController::class, 'getUnsetCategories']);
-
-    Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
     Route::prefix('sellwing-api')->group(function () {
         Route::post('vendor-list', [VendorListController::class, 'main']);
         Route::post('category-list', [CategoryListController::class, 'index']);
     });
 });
+Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
 Route::post('sellwing-api/auth', [AuthController::class, 'main']);

@@ -23,8 +23,8 @@
                                 </div>
                                 <div class="user-info d-none d-md-block">
                                     <div class="user-status">관리자</div>
-                                    <div class="user-name dropdown-indicator"><?php $user = Auth::guard('user')->user();
-                                    echo $user->name; ?></div>
+                                    <div class="user-name dropdown-indicator"><?php $partner = Auth::guard('partner')->user();
+                                    echo $partner->name; ?></div>
                                 </div>
                             </div>
                         </a>
@@ -32,11 +32,11 @@
                             <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
                                 <div class="user-card">
                                     <div class="user-avatar">
-                                        <span>{{ $substring = mb_substr($user->name, 1, 2, 'UTF-8') }}</span>
+                                        <span>{{ $substring = mb_substr($partner->name, 1, 2, 'UTF-8') }}</span>
                                     </div>
                                     <div class="user-info">
-                                        <span class="lead-text">{{ $user->name }}</span>
-                                        <span class="sub-text">{{ $user->email }}</span>
+                                        <span class="lead-text">{{ $partner->name }}</span>
+                                        <span class="sub-text">{{ $partner->email }}</span>
                                     </div>
                                 </div>
                             </div>

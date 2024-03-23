@@ -11,7 +11,7 @@
     <!-- Fav Icon  -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}">
     <!-- Page Title  -->
-    <title>셀윙 | 파트너 콘솔 로그인</title>
+    <title>셀윙 파트너스 | 로그인</title>
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="./assets/css/dashlite.css?ver=3.1.1">
     <link id="skin-default" rel="stylesheet" href="./assets/css/theme.css?ver=3.1.1">
@@ -40,7 +40,7 @@
                                     <div class="nk-block-head-content">
                                         <h4 class="nk-block-title">로그인</h4>
                                         <div class="nk-block-des">
-                                            <p>이메일과 비밀번호로 셀윙 파트너 콘솔에 접속합니다.</p>
+                                            <p>이메일과 비밀번호로 셀윙 파트너스에 접속합니다.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -61,7 +61,7 @@
                                         <div class="form-label-group">
                                             <label class="form-label" for="password">비밀번호</label>
                                             <a class="link link-primary link-sm"
-                                                href="html/pages/auths/auth-reset-v2.html">비밀번호를 잊으셨나요?</a>
+                                                href="/partner/auth/forgot-password">비밀번호를 잊으셨나요?</a>
                                         </div>
                                         <div class="form-control-wrap">
                                             <a href="#" class="form-icon form-icon-right passcode-switch lg"

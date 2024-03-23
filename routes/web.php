@@ -29,6 +29,7 @@ use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
 use App\Http\Controllers\Domewing\FAQController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
+use App\Http\Controllers\Partners\ForgotPasswordController;
 use App\Http\Controllers\Partners\LoginController as PartnersLoginController;
 use App\Http\Controllers\Partners\RegisterController as PartnersRegisterController;
 use App\Http\Controllers\ProductEditor\ViewController;
@@ -39,8 +40,12 @@ Route::middleware(['auth.partner'])->prefix('partner')->group(function () {
     Route::get('/', [PartnersDashboardController::class, 'index'])->name('partner.dashboard');
 });
 Route::get('partner/auth/login', [PartnersLoginController::class, 'index'])->name('partner.login');
+Route::post('partner/auth/login', [PartnersLoginController::class, 'login']);
 Route::get('partner/auth/register', [PartnersRegisterController::class, 'index'])->name('partner.register');
 Route::post('partner/auth/register', [PartnersRegisterController::class, 'main']);
+Route::get('partner/auth/forgot-password', [ForgotPasswordController::class, 'index']);
+Route::post('partner/auth/forgot-password', [ForgotPasswordController::class, 'main']);
+Route::get('partner/auth/logout', [PartnersLoginController::class, 'logout']);
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');

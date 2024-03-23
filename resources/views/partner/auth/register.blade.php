@@ -11,7 +11,7 @@
     <!-- Fav Icon  -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}">
     <!-- Page Title  -->
-    <title>셀윙 | 파트너 회원가입</title>
+    <title>셀윙 파트너스 | 회원가입</title>
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="{{ asset('assets/css/dashlite.css') }}">
     <link id="skin-default" rel="stylesheet" href="{{ asset('assets/css/dashlite.css') }}">
