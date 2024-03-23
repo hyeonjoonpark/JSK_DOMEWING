@@ -2,6 +2,41 @@
     set_time_limit(0);
 @endphp
 @extends('layouts.main')
+@section('style')
+    <style>
+        .product-list-image {
+            border: 1px solid black;
+            border-bottom: 2px solid black;
+            border-right: 2px solid black;
+            width: 100px;
+            height: 100px;
+        }
+
+        /* Active state for pagination */
+        .pagination.active {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+
+        /* Inactive state for pagination */
+        .pagination {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 4px;
+            font-size: 14px;
+            color: #007bff;
+            border: 1px solid #007bff;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+@endsection
 @section('title')
     상품윙
 @endsection

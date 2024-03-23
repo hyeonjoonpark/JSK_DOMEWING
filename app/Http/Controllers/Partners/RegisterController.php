@@ -7,10 +7,10 @@ use App\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailVerification;
+use Illuminate\Support\Facades\File;
 
 class RegisterController extends Controller
 {
@@ -91,15 +91,22 @@ class RegisterController extends Controller
     }
     private function businessImageHandle($businessImage)
     {
-        $destinationPath = 'public/images/business-license';
+        $destinationPath = public_path('images/business-license');
         $destinationPath = str_replace('/', DIRECTORY_SEPARATOR, $destinationPath);
+
         try {
-            if (!Storage::exists($destinationPath)) {
-                Storage::makeDirectory($destinationPath, 0775, true, true);
+            // 디렉토리가 없으면 생성
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory($destinationPath, 0775, true, true);
             }
+
+            // 파일 확장자 가져오기
             $extension = $businessImage->getClientOriginalExtension();
+            // 고유한 파일명 생성
             $fileName = Str::uuid() . '.' . $extension;
-            $businessImage->storeAs($destinationPath, $fileName);
+            // 파일 저장하기
+            $businessImage->move($destinationPath, $fileName);
+
             return [
                 'status' => true,
                 'return' => $fileName

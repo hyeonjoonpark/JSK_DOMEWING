@@ -27,6 +27,12 @@
                             </a>
                         </li>
                         <li class="nk-menu-item">
+                            <a href="/admin/partners" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-handshake"></em></span>
+                                <span class="nk-menu-text">파트너스 관리</span>
+                            </a>
+                        </li>
+                        <li class="nk-menu-item">
                             <a href="/admin/product/mining" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
                                 <span class="nk-menu-text">마인윙</span>

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\BusinessPageController;
 
 use App\Http\Controllers\Admin\DomainController;
+use App\Http\Controllers\Admin\PartnersManagementController;
 use App\Http\Controllers\Domewing\GeneralController;
 use App\Http\Controllers\Domewing\Auth\LoginMemberController;
 use App\Http\Controllers\Domewing\Auth\RegisterMemberController;
@@ -53,6 +54,7 @@ Route::prefix('partner')->group(function () {
 // 관리자 콘솔 라우트 그룹 설정
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/partners', [PartnersManagementController::class, 'index']);
     Route::get('/dashboard', [AdminController::class, 'dashboard']); // 대시보드 페이지는 뷰로 직접 로드
     Route::post('submit-post', [DashboardController::class, 'createPost']);
     Route::get('product/search', [AdminController::class, 'productSearch']);
