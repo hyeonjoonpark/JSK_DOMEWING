@@ -60,7 +60,7 @@
                                         <span class="tb-amount">{{ $partner->business_number }}</span>
                                         <span class="tb-amount">{{ $partner->business_address }}</span>
                                         <a href="{{ asset('images/business-license/' . $partner->business_image) }}"
-                                            target="_blank" download>사업자 등록증</a>
+                                            target="_blank">사업자 등록증</a>
                                     </td>
                                     <td class="nk-tb-col tb-col-md">
                                         <span>{{ $partner->phone }}</span>

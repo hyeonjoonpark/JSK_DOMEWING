@@ -48,6 +48,7 @@
         <!-- main @e -->
     </div>
     <!-- app-root @e -->
+    @include('partials.modals')
     <!-- JavaScript -->
     @include('partials.scripts')
     @yield('scripts')
