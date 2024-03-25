@@ -128,6 +128,7 @@ class FormProductController extends Controller
             // 엑셀 파일 저장
             $fileName = 'funn_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $spreadsheet->setActiveSheetIndex(0);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
@@ -151,8 +152,8 @@ class FormProductController extends Controller
                 $getShippingFeeResult = $this->getShippingFee($product->id);
                 $shippingCost = $getShippingFeeResult->shipping_fee;
                 $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
-                $tobizonCategoryID = $product->categoryID;
-                $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = ceil(($product->productPrice * $margin_rate) / 10) * 10;
 
                 $data = [
@@ -203,7 +204,7 @@ class FormProductController extends Controller
             // 엑셀 파일 저장
             $fileName = 'onch3_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
-            $writer = new Xls($spreadsheet);
+            $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
