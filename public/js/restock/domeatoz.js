@@ -13,7 +13,7 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
         const searchStr = productCodes.join(',');
         await login(page, username, password);
         await processPageList(page, searchStr);
-        await doSoldOut(page);
+        await doRestock(page);
         const response = await accessPopup(page);
 
         console.log(response);
@@ -43,7 +43,7 @@ async function processPageList(page, searchStr) {
     await new Promise((page) => setTimeout(page, 3000));
 }
 
-async function doSoldOut(page) {
+async function doRestock(page) {
     await page.select('#stateChange', '1');
     let status = await page.evaluate(() => {
         const checkbox = document.querySelector('#allChk');
