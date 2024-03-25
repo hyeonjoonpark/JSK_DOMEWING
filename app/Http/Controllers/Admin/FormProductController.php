@@ -61,7 +61,7 @@ class FormProductController extends Controller
                     '일반상품',
                     '',
                     99999,
-                    99999,
+                    1,
                     '과세',
                     '가격자율',
                     $marginedPrice,

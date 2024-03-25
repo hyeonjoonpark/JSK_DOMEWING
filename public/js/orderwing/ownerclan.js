@@ -40,6 +40,6 @@ const path = require('path');
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
