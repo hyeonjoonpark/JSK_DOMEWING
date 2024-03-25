@@ -19,6 +19,126 @@ class FormProductController extends Controller
             ->where('mp.id', $productId)
             ->first(['shipping_fee', 'additional_shipping_fee']);
     }
+    public function funn($products, $margin_rate, $vendorEngName, $shippingCost, $index)
+    {
+        try {
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/funn.xls'));
+            // 첫 번째 시트와 두 번째 시트를 선택
+            $firstSheet = $spreadsheet->getSheet(0);
+            $secondSheet = $spreadsheet->getSheet(1);
+            $fifthSheet = $spreadsheet->getSheet(4);
+
+            // 데이터 추가를 위한 행 인덱스 초기화
+            $rowIndexFirstSheet = 2;
+            $rowIndexSecondSheet = 2;
+            $rowIndexFifthSheet = 2;
+
+            // 데이터 추가
+            foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
+                $tobizonCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+
+                $serialNumber = $rowIndexFirstSheet - 1;
+
+                $dataForFirstSheet = [
+                    $serialNumber,
+                    $product->productCode,
+                    '국내',
+                    $product->productName,
+                    '',
+                    '',
+                    $product->productKeywords,
+                    '',
+                    '',
+                    '',
+                    $categoryCode,
+                    '제한없음',
+                    '일반상품',
+                    '',
+                    99999,
+                    99999,
+                    '과세',
+                    '가격자율',
+                    $marginedPrice,
+                    '',
+                    '',
+                    '',
+                    '선불',
+                    $shippingCost,
+                    '가능',
+                    $shippingCost,
+                    $shippingCost * 2,
+                    6624,
+                    'JS협력사',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '기타',
+                ];
+                $dataForSecondSheet = [
+                    $serialNumber,
+                    $product->productImage,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    $product->productDetail
+                ];
+                $dataForFifthSheet = [
+                    $serialNumber,
+                    35
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($dataForFirstSheet  as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndexFirstSheet;
+                    $firstSheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndexFirstSheet++;
+
+                $colIndex = 1;
+                foreach ($dataForSecondSheet as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndexSecondSheet;
+                    $secondSheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndexSecondSheet++;
+
+                $colIndex = 1;
+                foreach ($dataForFifthSheet as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndexFifthSheet;
+                    $fifthSheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndexFifthSheet++;
+            }
+            // 엑셀 파일 저장
+            $fileName = 'funn_' . now()->format('YmdHis') . '_' . $index . '.xls';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xls($spreadsheet);
+            $writer->save($formedExcelFile);
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
+            return ['status' => true, 'return' => $downloadURL];
+        } catch (\Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
     public function onch3($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
@@ -36,40 +156,40 @@ class FormProductController extends Controller
                 $marginedPrice = ceil(($product->productPrice * $margin_rate) / 10) * 10;
 
                 $data = [
-                $categoryCode,
-                $product->productName,
-                $product->productName,
-                0,
-                '',
-                $marginedPrice,
-                1,
-                'N',
-                3,
-                $shippingCost,
-                '오후 1시/본사/당일출고',
-                $additionalShippingFee,
-                $additionalShippingFee,
-                'N',
-                0,
-                '상세페이지 참조',
-                2,
-                1,
-                '',
-                $product->productKeywords,
-                $product->productDetail,
-                $product->productImage,
-                '',
-                '',
-                '',
-                $product->productCode,
-                26,
-                '해당사항없음',
-                '해당사항없음',
-                '해당사항없음',
-                0,
-                'JS협력사',
-                '기타',
-                'JS협력사/기타'
+                    $categoryCode,
+                    $product->productName,
+                    $product->productName,
+                    0,
+                    '',
+                    $marginedPrice,
+                    1,
+                    'N',
+                    3,
+                    $shippingCost,
+                    '오후 1시/본사/당일출고',
+                    $additionalShippingFee,
+                    $additionalShippingFee,
+                    'N',
+                    0,
+                    '상세페이지 참조',
+                    2,
+                    1,
+                    '',
+                    $product->productKeywords,
+                    $product->productDetail,
+                    $product->productImage,
+                    '',
+                    '',
+                    '',
+                    $product->productCode,
+                    26,
+                    '해당사항없음',
+                    '해당사항없음',
+                    '해당사항없음',
+                    0,
+                    'JS협력사',
+                    '기타',
+                    'JS협력사/기타'
                 ];
                 // 엑셀에 데이터 추가
                 $colIndex = 1;
