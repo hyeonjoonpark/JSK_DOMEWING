@@ -10,13 +10,17 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailVerification;
+use App\Models\PartnerClass;
 use Illuminate\Support\Facades\File;
 
 class RegisterController extends Controller
 {
     public function index()
     {
-        return view('partner.auth.register');
+        $partnerClass = PartnerClass::where('is_active', 'ACTIVE')->get();
+        return view('partner.auth.register', [
+            'partnerClass' => $partnerClass
+        ]);
     }
     public function main(Request $request)
     {

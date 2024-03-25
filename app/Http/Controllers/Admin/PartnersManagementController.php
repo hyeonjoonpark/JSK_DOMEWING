@@ -5,15 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Partner;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Models\PartnerClass;
 
 class PartnersManagementController extends Controller
 {
     public function index()
     {
-        $partners = Partner::orderBy('created_at', 'desc')->get();
+        Partner::where('expired_at', '<', now())->update([
+            'partner_class_id' => 1
+        ]);
+        $partners = Partner::with('partnerClass')->orderBy('created_at', 'desc')->get();
+        $partnerClasses = PartnerClass::where('is_active', 'ACTIVE')->get();
         return view('admin/partners', [
-            'partners' => $partners
+            'partners' => $partners,
+            'partnerClasses' => $partnerClasses
         ]);
     }
     public function updateIsActive(Request $request)
@@ -36,12 +41,12 @@ class PartnersManagementController extends Controller
     public function updateType(Request $request)
     {
         $token = $request->token;
-        $type = $request->type;
+        $partnerClassId = $request->partnerClassId;
         $expiredAt = $request->expiredAt;
         try {
             Partner::where("token", $token)->update([
-                'type' => $type,
-                'expired_at' => $expiredAt
+                'partner_class_id' => $partnerClassId,
+                'expired_at' => $expiredAt . ' 23:59:59'
             ]);
             return [
                 'status' => true,

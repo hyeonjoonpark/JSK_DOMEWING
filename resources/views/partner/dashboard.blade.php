@@ -8,6 +8,7 @@
 @section('content')
     <div class="row g-gs">
         <div class="col">
+            {{ print_r($partner) }}
         </div>
     </div>
 @endsection

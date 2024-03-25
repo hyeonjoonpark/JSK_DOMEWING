@@ -65,14 +65,14 @@
                                     <td class="nk-tb-col tb-col-lg" data-order="Email Verified - Kyc Unverified">
                                         <select class="form-control js-select2"
                                             onchange="setDuration('{{ $partner->token }}', this.value);">
-                                            <?php
-                                            $types = ['FREE' => 'FREE', 'PLUS' => 'PLUS', 'PREMIUM' => 'PREMIUM'];
-                                            foreach ($types as $value => $label) {
-                                                $selected = $partner->type === $value ? 'selected' : '';
-                                                echo "<option value='{$value}' {$selected}>{$label}</option>";
-                                            }
-                                            ?>
+                                            @foreach ($partnerClasses as $partnerClass)
+                                                <option value="{{ $partnerClass->id }}"
+                                                    {{ $partner->partner_class_id === $partnerClass->id ? 'selected' : '' }}>
+                                                    {{ $partnerClass->name }}
+                                                </option>
+                                            @endforeach
                                         </select>
+                                        <span>{{ $partner->expired_at }}</span>
                                     </td>
                                     <td class="nk-tb-col tb-col-md">
                                         <span
@@ -135,15 +135,15 @@
             });
         }
 
-        function setDuration(token, type) {
+        function setDuration(token, partnerClassId) {
             $('#expiredAtBtn').off('click').on('click', function() {
                 const expiredAt = $("#expiredAt").val();
-                updatePartnerType(token, type, expiredAt);
+                updatePartnerType(token, partnerClassId, expiredAt);
             });
             $("#expiredAtModal").modal("show");
         }
 
-        function updatePartnerType(token, type, expiredAt) {
+        function updatePartnerType(token, partnerClassId, expiredAt) {
             popupLoader(1, '파트너의 회원 등급을 업데이트 중입니다.');
             $.ajax({
                 url: "/api/partner/update-type",
@@ -151,7 +151,7 @@
                 dataType: "JSON",
                 data: {
                     token,
-                    type,
+                    partnerClassId,
                     expiredAt,
                     rememberToken
                 },

@@ -148,9 +148,12 @@
                         <div class="form-group">
                             <label for="type" class="form-label">파트너 유형</label>
                             <select name="type" id="type" class="form-control js-select2">
-                                <option value="FREE">무료</option>
-                                <option value="PLUS" disabled>플러스</option>
-                                <option value="PREMIUM" disabled>프리미엄</option>
+                                @foreach ($partnerClass as $pc)
+                                    <option value="{{ $pc->name }}" <?php if ($pc->name !== 'FREE') {
+                                        echo 'disabled';
+                                    } ?>>{{ $pc->name }}
+                                    </option>
+                                @endforeach
                             </select>
                             <p class="text-danger">{{ $errors->first('type') }}</p>
                         </div>
