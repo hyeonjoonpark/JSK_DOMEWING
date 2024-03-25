@@ -122,16 +122,16 @@
         swalError('"API 통신 요청 과정에서 에러가 발생했습니다."');
     }
 
-    function initSoldOut(productCodes) {
+    function initSoldOut(productCodes, type) {
         $('#runSoldOutBtn').off('click').on('click', function() {
-            runSoldOut(productCodes);
+            runSoldOut(productCodes, type);
         });
         $('#selectB2bModal').modal('show');
     }
 
-    function runSoldOut(productCodes) {
+    function runSoldOut(productCodes, type) {
         closePopup();
-        popupLoader(0, '"선택된 업체들에게 품절 소식을 알리고 올게요."');
+        popupLoader(0, '"선택된 업체들에게 업데이트 소식을 알리고 올게요."');
         const b2bs = $('input[name="b2bs"]:checked').map(function() {
             return $(this).val();
         }).get();
@@ -146,7 +146,8 @@
                 productCodes,
                 rememberToken: rememberToken,
                 b2bs,
-                isSellwingChecked
+                isSellwingChecked,
+                type
             },
             success: soldOutSuccess,
             error: AjaxErrorHandling

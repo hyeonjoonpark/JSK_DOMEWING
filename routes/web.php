@@ -70,7 +70,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('product/minewing', [AdminController::class, 'searchProductCodes']);
     Route::get('product/new-minewing', [AdminController::class, 'newMinewing']);
     Route::get('product/sold-out', [AdminController::class, 'soldOut']);
-    Route::post('product/sold-out', [AdminController::class, 'soldOut']);
+    Route::post('product/sold-out', [AdminController::class, 'searchSoldOutCodes']);
     Route::get('product/legacy', [AdminController::class, 'legacy']);
     Route::post('product/legacy', [AdminController::class, 'legacy']);
     Route::get('product/excelwing', [AdminController::class, 'excelwing']);

@@ -206,7 +206,7 @@
             const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
                 return $(this).val();
             }).get();
-            initSoldOut(productCodes);
+            initSoldOut(productCodes, 'sold-out');
         }
 
         function productsDownload() {

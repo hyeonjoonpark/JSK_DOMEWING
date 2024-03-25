@@ -1,10 +1,48 @@
+@php
+    set_time_limit(0);
+@endphp
 @extends('layouts.main')
+@section('style')
+    <style>
+        .product-list-image {
+            border: 1px solid black;
+            border-bottom: 2px solid black;
+            border-right: 2px solid black;
+            width: 100px;
+            height: 100px;
+        }
+
+        /* Active state for pagination */
+        .pagination.active {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+
+        /* Inactive state for pagination */
+        .pagination {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 4px;
+            font-size: 14px;
+            color: #007bff;
+            border: 1px solid #007bff;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+@endsection
 @section('title')
-    상품윙
+    품절 상품 관리
 @endsection
 @section('subtitle')
     <p>
-        마인윙으로부터 수집된 상품들을 관리합니다.
+        품절 처리된 상품들을 관리하는 페이지입니다.
     </p>
 @endsection
 @section('content')
@@ -16,10 +54,19 @@
                     <p>테이블의 모든 컬럼 중 원하는 키워드를 검색하세요.</p>
                     <div class="form-group">
                         <label for="" class="form-label">상품 검색</label>
-                        <form class="d-flex text-nowrap" method="POST">
+                        <form class="d-flex text-nowrap" method="GET" action="/admin/product/sold-out">
                             @csrf
                             <input type="text" class="form-control" placeholder="검색 키워드를 기입해주세요" name="searchKeyword"
                                 value="{{ $searchKeyword }}">
+                            <button type="submit" class="btn btn-primary">검색</button>
+                        </form>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">상품 코드 대량 검색</label>
+                        <form class="d-flex text-nowrap" method="POST" action="/admin/product/sold-out">
+                            @csrf
+                            <input type="text" class="form-control" placeholder="쉼표(,)로 구분해서 여러 상품 코드를 기입할 수 있습니다."
+                                name="productCodes" value="{{ $productCodesStr }}">
                             <button type="submit" class="btn btn-primary">검색</button>
                         </form>
                     </div>
@@ -27,12 +74,23 @@
             </div>
         </div>
     </div>
+
     <div class="row g-gs">
         <div class="col">
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">상품윙 테이블</h6>
-                    <p>검색된 상품이 총 {{ number_format(count($products), 0) }}건입니다. 상품 검색 결과는 최대 1,000건으로 제한됩니다.</p>
+                    <p>검색된 상품이 총 {{ number_format($products->total(), 0) }}건입니다. 페이지 당 500건의 상품이 출력됩니다.</p>
+                    <div class="form-group">
+                        @include('partials.pagination', [
+                            'page' => $products->currentPage(),
+                            'numPages' => $products->lastPage(),
+                            'searchKeyword' => $searchKeyword,
+                        ])
+                    </div>
+                    <div class="text-center mt-3 mb-3">
+                        <button class="btn btn-primary" onclick="productsDownload();">상품셋 다운로드</button>
+                    </div>
                     <div class="table-responsive">
                         <table class="table text-nowrap align-middle">
                             <thead>
@@ -60,18 +118,75 @@
                                         <td><a href="{{ $product->productHref }}"
                                                 target="_blank">{{ $product->productCode }}</a></td>
                                         <td><a href="{{ $product->productHref }}"
-                                                target="_blank">{{ number_format($product->productPrice, 0) }}원</a>
-                                        </td>
+                                                target="_blank">{{ number_format($product->productPrice, 0) }}원</a></td>
                                         <td><a href="{{ $product->productHref }}" target="_blank">{{ $product->name }}</a>
                                         </td>
                                         <td>{{ date('Y-m-d', strtotime($product->createdAt)) }}</td>
-                                        <td><button class="btn btn-success mr-3"
-                                                onclick="initRestock('{{ $product->productCode }}');">재입고</button></td>
+                                        <td>
+                                            <button class="btn btn-success" onclick="getProductCodes();">재입고</button>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
+                    <div class="form-group">
+                        @include('partials/pagination', [
+                            'page' => $products->currentPage(),
+                            'numPages' => $products->lastPage(),
+                            'searchKeyword' => $searchKeyword,
+                        ])
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" role="dialog" id="selectB2bModal" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">B2B 업체 선택</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="" class="form-label">B2B 업체 리스트</label>
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <div class="custom-control custom-checkbox">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="sellwing" name="sellwing" value="0"
+                                                    class="custom-control-input" checked>
+                                                <label class="custom-control-label" for="sellwing">셀윙</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @foreach ($b2bs as $b2b)
+                                        <div class="col-6 mb-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" id="b2b{{ $b2b->vendor_id }}" name="b2bs"
+                                                        value="{{ $b2b->vendor_id }}" class="custom-control-input"
+                                                        checked>
+                                                    <label class="custom-control-label"
+                                                        for="b2b{{ $b2b->vendor_id }}">{{ $b2b->name }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="runSoldOutBtn">선택완료</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">종료하기</button>
                 </div>
             </div>
         </div>
@@ -82,79 +197,52 @@
     <script src="{{ asset('assets/js/editors.js') }}"></script>
     <script src="{{ asset('assets/js/libs/editors/summernote.js') }}"></script>
     <script>
-        var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
 
-        function initRestock(productCode) {
-            Swal.fire({
-                icon: 'warning',
-                title: '상품 재입고',
-                text: '해당 상품을 재입고 처리하시겠습니까? 이 작업은 몇 분 정도 소요될 수 있습니다.',
-                showCancelButton: true,
-                confirmButtonText: '확인',
-                cancelButtonText: '취소'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    popupLoader(0, 'B2B 업체들에게 재입고 소식을 알리고 올게요.');
-                    runRestock(productCode);
-                }
-            });
+        function getProductCodes() {
+            const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            initSoldOut(productCodes, 'restock');
         }
 
-        function runRestock(productCode) {
+        function productsDownload() {
+            popupLoader(1, '데이터베이스로부터 상품들을 추출 중입니다.');
+            const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
+                return $(this).val();
+            }).get();
             $.ajax({
-                url: '/api/product/restock',
-                type: 'POST',
-                dataType: 'JSON',
+                url: "/api/product/download",
+                type: "POST",
+                dataType: "JSON",
                 data: {
-                    productCode,
-                    rememberToken
+                    rememberToken: '{{ Auth::guard('user')->user()->remember_token }}',
+                    productCodes: productCodes
                 },
-                success: restockSuccess,
-                error: restockError
+                success: function(response) {
+                    closePopup();
+                    const status = response.status;
+                    if (status === true) {
+                        const html = `
+                        <a href="${response.return}">상품셋 엑셀 파일 다운로드</a>
+                        `;
+                        Swal.fire({
+                            icon: 'success',
+                            title: '진행 성공',
+                            html: html
+                        });
+                    } else {
+                        closePopup();
+                        swalError(response.return);
+                    }
+                },
+                error: function(response) {
+                    console.log(response);
+                }
             });
-        }
-
-        function restockSuccess(response) {
-            console.log(response);
-            closePopup();
-            const success = response.success;
-            const error = response.error;
-            const html = restockSuccessHTML(success, error);
-            swalSuccess(html);
-        }
-
-        function restockSuccessHTML(success, error) {
-            let html = '';
-
-            if (Array.isArray(success) && success.length > 0) {
-                html += '성공한 업체:<br>';
-                for (success of success) {
-                    html += `${success}, `;
-                }
-            } else {
-                html += '성공한 업체가 없습니다.';
-            }
-            html += "<br><br>";
-            if (Array.isArray(error) && error.length > 0) {
-                html += '실패한 업체:<br>';
-                for (error of error) {
-                    html += `${error}, `;
-                }
-            } else {
-                html += '실패한 업체가 없습니다.';
-            }
-
-            return html;
-        }
-
-        function restockError(response) {
-            console.log(response);
-            closePopup();
-            swalError('예기치 못한 에러가 발생했습니다.');
         }
     </script>
 @endsection

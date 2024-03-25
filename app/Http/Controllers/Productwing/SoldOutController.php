@@ -39,6 +39,7 @@ class SoldOutController extends Controller
         $rememberToken = $request->rememberToken;
         $productCodes = $request->productCodes;
         $b2bIds = $request->b2bs;
+        $type = $request->type;
         if (!isset($b2bIds)) {
             $b2bIds = [];
         }
@@ -49,10 +50,10 @@ class SoldOutController extends Controller
                 'return' => '세션이 만료되었습니다. 안전한 서비스 이용을 위해 다시 로그인해주세요.'
             ]);
         }
-        $html = $this->runSoldOut($productCodes, $b2bIds, $rememberToken);
+        $html = $this->runSoldOut($productCodes, $b2bIds, $rememberToken, $type);
         $isSellwingChecked = $request->isSellwingChecked;
         if ($isSellwingChecked === 'true') {
-            $inactiveProducts = $this->indexController->inactiveProducts($productCodes);
+            $inactiveProducts = $this->indexController->inactiveProducts($productCodes, $type);
             $status = $inactiveProducts['status'];
             if ($status === false) {
                 return $inactiveProducts;
@@ -69,7 +70,7 @@ class SoldOutController extends Controller
      * @param string $rememberToken
      * @return string
      */
-    private function runSoldOut($productCodes, $b2bIds, $rememberToken)
+    private function runSoldOut($productCodes, $b2bIds, $rememberToken, $type)
     {
         $tempDirPath = storage_path('app/public/product-codes');
         $tempFilePath = $tempDirPath . '/' . uniqid() . '.json';
@@ -89,7 +90,7 @@ class SoldOutController extends Controller
             $password = $account->password;
             foreach ($productCodesChunks as $chunk) {
                 file_put_contents($tempFilePath, json_encode($chunk));
-                $soldOutResult = $this->sendSoldOutRequest($tempFilePath, $vendorEngName, $username, $password);
+                $soldOutResult = $this->sendSoldOutRequest($tempFilePath, $vendorEngName, $username, $password, $type);
                 if ($soldOutResult === false) {
                     foreach ($chunk as $productCode) {
                         $errorHtml .= $vendorName . ': ' . $productCode . ' / ';
@@ -101,39 +102,6 @@ class SoldOutController extends Controller
         return $errorHtml;
     }
     /**
-     * 선택된 업체들을 위한 반복문
-     * @param string $productCode
-     * @param array $b2bIds
-     * @param string $rememberToken
-     * @return string
-     */
-    private function loopB2bIds($productCode, $b2bIds, $rememberToken)
-    {
-        $errors = '';
-        foreach ($b2bIds as $b2bId) {
-            $getVendor = $this->controller->getVendor($b2bId);
-            $status = $getVendor['status'];
-            if ($status === false) {
-                return $getVendor;
-            }
-            $vendor = $getVendor['return'];
-            $vendorEngName = $vendor->name_eng;
-            $vendorName = $vendor->name;
-            $account = $this->controller->getVendorAccount($rememberToken, $b2bId);
-            $username = $account->username;
-            $password = $account->password;
-            $sendSoldOutRequest = $this->sendSoldOutRequest($productCode, $vendorEngName, $username, $password);
-            if ($sendSoldOutRequest === false) {
-                if ($errors === '') {
-                    $errors .= $vendorName;
-                } else {
-                    $errors .= ', ' . $vendorName;
-                }
-            }
-        }
-        return $errors;
-    }
-    /**
      * 스크래핑 봇을 보내는 메소드
      * @param string $productCode
      * @param string $vendorEngName
@@ -141,9 +109,9 @@ class SoldOutController extends Controller
      * @param string $password
      * @return boolean
      */
-    public function sendSoldOutRequest($tempJsonFilePath, $vendorEngName, $username, $password)
+    public function sendSoldOutRequest($tempJsonFilePath, $vendorEngName, $username, $password, $type)
     {
-        $scriptPath = public_path('js/sold-out/' . $vendorEngName . '.js');
+        $scriptPath = public_path('js/' . $type . '/' . $vendorEngName . '.js');
         $command = "node {$scriptPath} {$username} {$password} {$tempJsonFilePath}";
         exec($command, $output, $resultCode);
         if ($resultCode === 0 && $output[0] === 'true') {
@@ -157,7 +125,7 @@ class SoldOutController extends Controller
             'productCodes' => 'required|array',
             'rememberToken' => 'required|string'
         ], [
-            'productCodes' => '품절 처리할 상품을 하나 이상 선택해주세요.',
+            'productCodes' => '품절/재입고 처리할 상품을 하나 이상 선택해주세요.',
             'rememberToken' => '세션이 만료되었습니다. 안전한 서비스 이용을 위해 다시 로그인해주세요.',
         ]);
         return $validator;

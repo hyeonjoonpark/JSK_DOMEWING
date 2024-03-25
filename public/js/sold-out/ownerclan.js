@@ -3,43 +3,24 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         const searchStr = productCodes.join(',');
-        await page.goto('https://ownerclan.com/vender/', { waitUntil: 'networkidle0' });
-        const frame = page.frames().find(f => f.name() === 'vmainframe');
-        await frame.type('body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(1) > input', username);
-        await frame.type('body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(2) > input', password);
-        await frame.evaluate(() => {
-            document.querySelector("body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(3) > input[type=submit]").click();
-        });
-        await frame.waitForNavigation({ waitUntil: 'networkidle0' });
-        await page.goto('https://ownerclan.com/vender/product_myprd.php', { waitUntil: 'domcontentloaded' });
-        await page.select('select[name="s_check"]', 'vcode');
-        await page.evaluate(() => {
-            const closeBtn = document.querySelector('#Notice10 > table > tbody > tr:nth-child(2) > td > div');
-            if (closeBtn) {
-                closeBtn.click();
-            }
-        });
-        await page.type('input[name="search"]', searchStr);
-        await page.select('select[name="display_count"]', '500');
-        await new Promise((page) => setTimeout(page, 5000));
-        const products = await page.$$('tr[height="40"]');
-        for (const product of products) {
-            const productStatus = await product.evaluate(() => {
-                const productStatus = document.querySelector('td:nth-child(9) > span').textContent.trim();
-                if (productStatus.includes('정상')) {
-                    return true;
-                }
-                return false;
-            });
-            if (productStatus === true) {
-                const productCheckbox = await product.$('input[type=checkbox]');
-                await productCheckbox.click();
-            }
+        await login(page, username, password);
+        const products = await processPageList(page, searchStr);
+        if (products === false) {
+            console.log(false);
+            return;
         }
+        for (const product of products) {
+            await validateProducts(product);
+        }
+        // 마침내 품절/재입고 처리.
         await new Promise((page) => setTimeout(page, 1000));
         page.on('dialog', async dialog => {
             const message = dialog.message();
@@ -57,3 +38,44 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
         await browser.close();
     }
 })();
+async function validateProducts(product) {
+    const productStatus = await product.evaluate(() => {
+        const productStatus = document.querySelector('td:nth-child(9) > span').textContent.trim();
+        if (productStatus.includes('정상')) {
+            return true;
+        }
+        return false;
+    });
+    if (productStatus === true) {
+        const productCheckbox = await product.$('input[type=checkbox]');
+        await productCheckbox.click();
+    }
+}
+async function login(page, username, password) {
+    await page.goto('https://ownerclan.com/vender/', { waitUntil: 'networkidle0' });
+    const frame = page.frames().find(f => f.name() === 'vmainframe');
+    await frame.type('body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(1) > input', username);
+    await frame.type('body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(2) > input', password);
+    await frame.evaluate(() => {
+        document.querySelector("body > table:nth-child(1) > tbody > tr:nth-child(2) > td > div:nth-child(2) > div:nth-child(1) > p:nth-child(3) > input[type=submit]").click();
+    });
+    await frame.waitForNavigation({ waitUntil: 'networkidle0' });
+}
+async function processPageList(page, searchStr) {
+    await page.goto('https://ownerclan.com/vender/product_myprd.php', { waitUntil: 'domcontentloaded' });
+    await page.select('select[name="s_check"]', 'vcode');
+    await page.evaluate(() => {
+        const closeBtn = document.querySelector('#Notice10 > table > tbody > tr:nth-child(2) > td > div');
+        if (closeBtn) {
+            closeBtn.click();
+        }
+    });
+    await page.type('input[name="search"]', searchStr);
+    await page.select('select[name="display_count"]', '500');
+    await new Promise((page) => setTimeout(page, 5000));
+    const products = await page.$$('tr[height="40"]');
+    if (products.length < 1) {
+        return false;
+    }
+    return products;
+}
