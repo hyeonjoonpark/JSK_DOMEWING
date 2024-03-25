@@ -17,18 +17,13 @@
         <div class="col">
             <div class="card card-bordered">
                 <div class="card-inner">
-                    <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="false">
+                    <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="false" data-order="false">
                         <thead>
                             <tr class="nk-tb-item nk-tb-head">
-                                <th class="nk-tb-col nk-tb-col-check">
-                                    <div class="custom-control custom-control-sm custom-checkbox notext">
-                                        <input type="checkbox" class="custom-control-input" id="uid">
-                                        <label class="custom-control-label" for="uid"></label>
-                                    </div>
-                                </th>
                                 <th class="nk-tb-col"><span class="sub-text">파트너스</span></th>
                                 <th class="nk-tb-col tb-col-mb"><span class="sub-text">사업자 정보</span></th>
                                 <th class="nk-tb-col tb-col-lg"><span class="sub-text">인증</span></th>
+                                <th class="nk-tb-col tb-col-lg"><span class="sub-text">타입</span></th>
                                 <th class="nk-tb-col tb-col-md"><span class="sub-text">상태</span></th>
                                 <th class="nk-tb-col nk-tb-col-tools text-end">
                                 </th>
@@ -37,12 +32,6 @@
                         <tbody>
                             @foreach ($partners as $partner)
                                 <tr class="nk-tb-item">
-                                    <td class="nk-tb-col nk-tb-col-check">
-                                        <div class="custom-control custom-control-sm custom-checkbox notext">
-                                            <input type="checkbox" class="custom-control-input" id="uid1">
-                                            <label class="custom-control-label" for="uid1"></label>
-                                        </div>
-                                    </td>
                                     <td class="nk-tb-col">
                                         <div class="user-card">
                                             <div class="user-avatar <?php echo $profileColors[array_rand($profileColors)]; ?> d-none d-sm-flex">
@@ -52,11 +41,12 @@
                                                 <span class="tb-lead">{{ $partner->name }}<span
                                                         class="dot dot-success d-md-none ms-1"></span></span>
                                                 <span>{{ $partner->email }}</span><br>
-                                                <span>{{ $partner->phone }}</span>
+                                                <span>{{ $partner->phone }}</span><br>
+                                                <span>{{ $partner->created_at }}</span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="nk-tb-col tb-col-mb" data-order="35040.34">
+                                    <td class="nk-tb-col tb-col-mb">
                                         <span class="tb-amount">{{ $partner->business_name }}</span>
                                         <span class="tb-amount">{{ $partner->business_number }}</span>
                                         <span class="tb-amount">{{ $partner->business_address }}</span>
@@ -71,6 +61,18 @@
                                                 <span>Email</span>
                                             </li>
                                         </ul>
+                                    </td>
+                                    <td class="nk-tb-col tb-col-lg" data-order="Email Verified - Kyc Unverified">
+                                        <select class="form-control js-select2"
+                                            onchange="setDuration('{{ $partner->token }}', this.value);">
+                                            <?php
+                                            $types = ['FREE' => 'FREE', 'PLUS' => 'PLUS', 'PREMIUM' => 'PREMIUM'];
+                                            foreach ($types as $value => $label) {
+                                                $selected = $partner->type === $value ? 'selected' : '';
+                                                echo "<option value='{$value}' {$selected}>{$label}</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </td>
                                     <td class="nk-tb-col tb-col-md">
                                         <span
@@ -130,6 +132,52 @@
                     swalWithReload(response.return, icon);
                 },
                 error: AjaxErrorHandling
+            });
+        }
+
+        function setDuration(token, type) {
+            const html = `
+            <div class="form-group">
+                <label class="form-label">기간</label>
+                <select class="form-control js-select2">
+                    <option value="1">1개월</option>
+                    <option value="3">3개월</option>
+                    <option value="6">6개월</option>
+                    <option value="12">12개월</option>
+                </select>
+            </div>
+            `;
+            Swal.fire({
+                icon: "warning",
+                title: "타입 기간",
+                html: html,
+                showConfirmButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    updatePartnerType(token, type);
+                }
+            }):
+        }
+
+        function updatePartnerType(token, type) {
+            popupLoader(1, '파트너의 회원 등급을 업데이트 중입니다.');
+            $.ajax({
+                url: "/api/partner/update-type",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    token,
+                    type,
+                    rememberToken
+                },
+                success: function(response) {
+                    closePopup();
+                    console.log(response);
+                },
+                error: function(response) {
+                    closePopup();
+                    console.log(response);
+                }
             });
         }
     </script>
