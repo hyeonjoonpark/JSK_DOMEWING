@@ -208,28 +208,60 @@ class AdminController extends Controller
             'b2bs' => $b2bs
         ]);
     }
-    public function soldOut(Request $request)
+    public function searchSoldOutCodes(Request $request)
     {
-        $searchKeyword = '';
-        if (isset($request->searchKeyword)) {
-            $searchKeyword = $request->searchKeyword;
-        }
+        $productCodesStr = $request->productCodes;
+        $productCodesArr = explode(',', $productCodesStr);
+        $productCodesArr = array_map('trim', $productCodesArr);
         $products = DB::table('minewing_products AS mp')
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
+            ->whereIn('mp.productCode', $productCodesArr)
+            ->where('isActive', 'N')
+            ->orderBy('mp.createdAt', 'DESC')->paginate(500);;
+        $b2bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('pr.is_active', 'Y')
+            ->get();
+
+        return view('admin/product_sold_out', [
+            'products' => $products,
+            'productCodesStr' => $productCodesStr,
+            'searchKeyword' => '',
+            'b2bs' => $b2bs
+        ]);
+    }
+    public function soldOut(Request $request)
+    {
+        $searchKeyword = $request->input('searchKeyword', '');
+        $query = DB::table('minewing_products AS mp')
+            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->where('mp.isActive', 'N')
-            ->where(function ($query) use ($searchKeyword) {
+            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt');
+
+        if (!empty($searchKeyword)) {
+            $query->where(function ($query) use ($searchKeyword) {
                 $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('mp.productCode', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
                     ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
-            })
-            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt')
-            ->orderBy('createdAt', 'DESC')->limit(500)->get();
-        $searchKeyword = '';
+            });
+        }
+
+        $products = $query->orderBy('createdAt', 'DESC')->paginate(500);
+
+        $b2bs = DB::table('product_register AS pr')
+            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('pr.is_active', 'Y')
+            ->get();
+
         return view('admin/product_sold_out', [
             'products' => $products,
-            'searchKeyword' => $searchKeyword
+            'searchKeyword' => $searchKeyword,
+            'productCodesStr' => '',
+            'b2bs' => $b2bs
         ]);
     }
     public function legacy(Request $request)
