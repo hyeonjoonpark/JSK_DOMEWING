@@ -33,4 +33,25 @@ class PartnersManagementController extends Controller
             ];
         }
     }
+    public function updateType(Request $request)
+    {
+        $token = $request->token;
+        $type = $request->type;
+        $expiredAt = $request->expiredAt;
+        try {
+            Partner::where("token", $token)->update([
+                'type' => $type,
+                'expired_at' => $expiredAt
+            ]);
+            return [
+                'status' => true,
+                'return' => '해당 파트너의 타입을 성공적으로 업데이트했습니다.'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
 }

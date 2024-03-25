@@ -11,7 +11,7 @@
     <!-- Fav Icon  -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}">
     <!-- Page Title  -->
-    <title>도매윙 | 관리자 콘솔 로그인</title>
+    <title>셀윙 | 관리자 콘솔 로그인</title>
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="./assets/css/dashlite.css?ver=3.1.1">
     <link id="skin-default" rel="stylesheet" href="./assets/css/theme.css?ver=3.1.1">

@@ -1,5 +1,15 @@
 @extends('layouts.main')
-
+@section('style')
+    <style>
+        .product-list-image {
+            border: 1px solid black;
+            border-bottom: 2px solid black;
+            border-right: 2px solid black;
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+@endsection
 @section('title')
     오더윙
 @endsection
