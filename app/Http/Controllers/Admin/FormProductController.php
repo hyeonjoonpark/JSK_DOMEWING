@@ -155,7 +155,7 @@ class FormProductController extends Controller
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = ceil(($product->productPrice * $margin_rate) / 10) * 10;
-
+                $productKeywords = str_replace(',', '/', $product->productKeywords);
                 $data = [
                     $categoryCode,
                     $product->productName,
@@ -172,11 +172,11 @@ class FormProductController extends Controller
                     $additionalShippingFee,
                     'N',
                     0,
-                    '상세페이지 참조',
+                    '반품배송비: ' . $shippingCost,
                     2,
                     1,
                     '',
-                    $product->productKeywords,
+                    $productKeywords,
                     $product->productDetail,
                     $product->productImage,
                     '',
