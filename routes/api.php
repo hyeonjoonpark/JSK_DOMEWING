@@ -150,6 +150,7 @@ Route::middleware(['auth.custom'])->group(function () {
 
     Route::prefix('partner')->group(function () {
         Route::post('update-is-active', [PartnersManagementController::class, 'updateIsActive']);
+        Route::post('update-type', [PartnersManagementController::class, 'updateType']);
     });
 
     Route::post('apiwing/get-unset-categories', [IndexController::class, 'getUnsetCategories']);

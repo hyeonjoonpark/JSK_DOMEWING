@@ -136,30 +136,14 @@
         }
 
         function setDuration(token, type) {
-            const html = `
-            <div class="form-group">
-                <label class="form-label">기간</label>
-                <select class="form-control js-select2">
-                    <option value="1">1개월</option>
-                    <option value="3">3개월</option>
-                    <option value="6">6개월</option>
-                    <option value="12">12개월</option>
-                </select>
-            </div>
-            `;
-            Swal.fire({
-                icon: "warning",
-                title: "타입 기간",
-                html: html,
-                showConfirmButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    updatePartnerType(token, type);
-                }
-            }):
+            $('#expiredAtBtn').off('click').on('click', function() {
+                const expiredAt = $("#expiredAt").val();
+                updatePartnerType(token, type, expiredAt);
+            });
+            $("#expiredAtModal").modal("show");
         }
 
-        function updatePartnerType(token, type) {
+        function updatePartnerType(token, type, expiredAt) {
             popupLoader(1, '파트너의 회원 등급을 업데이트 중입니다.');
             $.ajax({
                 url: "/api/partner/update-type",
@@ -168,16 +152,20 @@
                 data: {
                     token,
                     type,
+                    expiredAt,
                     rememberToken
                 },
                 success: function(response) {
                     closePopup();
-                    console.log(response);
+                    const status = response.status;
+                    const data = response.return;
+                    if (status === true) {
+                        swalWithReload(data, 'success');
+                    } else {
+                        swalWithReload(data, 'error');
+                    }
                 },
-                error: function(response) {
-                    closePopup();
-                    console.log(response);
-                }
+                error: AjaxErrorHandling
             });
         }
     </script>
