@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const client = await page.target().createCDPSession();
 
@@ -27,12 +27,6 @@ const path = require('path');
         await page.goto('https://ownerclan.com/vender/order_list.php', { waitUntil: 'domcontentloaded' });
         await page.select('select[name="listnum"]', '300');
         await new Promise((page) => setTimeout(page, 3000));
-        await page.evaluate(() => {
-            document.all.deliLate_check.style.visibility = 'hidden';
-            document.all.Notice10.style.visibility = 'hidden';
-            document.all.cancel_check.style.visibility = 'hidden';
-        });
-        await new Promise((page) => setTimeout(page, 1000));
         page.on('dialog', async dialog => {
             await dialog.dismiss();
             return;
@@ -46,6 +40,6 @@ const path = require('path');
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        await browser.close();
+        // await browser.close();
     }
 })();
