@@ -61,7 +61,7 @@ async function doRestock(page, browser) {
         await delay(1000);
         await newPage.click('body > div.swal2-container.swal2-center.swal2-backdrop-show.swal2-noanimation > div > div.swal2-actions > button.swal2-confirm.swal2-styled');
     }
-    await delay(3000);
+    await delay(2000);
     console.log(true);
     return;
 
