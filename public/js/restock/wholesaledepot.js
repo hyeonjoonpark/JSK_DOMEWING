@@ -10,15 +10,12 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
     });
     clearPopup(page);
     try {
-
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         const searchStr = productCodes.join(',');
-
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doRestock(page);
-
     } catch (error) {
         console.error('Error:', error);
     } finally {

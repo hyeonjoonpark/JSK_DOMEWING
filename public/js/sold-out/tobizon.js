@@ -68,13 +68,13 @@ async function doSoldOut(page) {
 async function clearPopup(page) {
     page.on('dialog', async dialog => {
         const message = dialog.message();
-        if (message.includes('품절 처리')) {
-            await dialog.accept();
-            console.log(true);
-        }
-        else {
+        if (message.includes('선택')) {
             await dialog.dismiss();
             console.log(false);
+        }
+        else {
+            await dialog.accept();
+            console.log(true);
         }
         return;
     });

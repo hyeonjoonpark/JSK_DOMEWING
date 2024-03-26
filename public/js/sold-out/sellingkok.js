@@ -8,20 +8,11 @@ const fs = require('fs');
         width: 1920,
         height: 1080
     });
-    page.on('dialog', async dialog => {
-        const message = dialog.message();
-        await dialog.accept();
-        if (message.includes('수정')) {
-            console.log(true);
-        }
-        return;
-    });
-
+    clearPopup(page);
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         const searchStr = productCodes.join('\n');
-
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doSoldOut(page);
@@ -58,6 +49,20 @@ async function doSoldOut(page) {
     });
     await page.click('body > div:nth-child(2) > div.page-content > form > div:nth-child(11) > div.form-group.pull-left > button:nth-child(2)');
     await delay(3000);
+}
+
+async function clearPopup(page) {
+    page.on('dialog', async dialog => {
+        const message = dialog.message();
+        await dialog.accept();
+        if (message.includes('수정이 완료')) {
+            console.log(true);
+        }
+        else {
+            console.log(false);
+        }
+        return;
+    });
 }
 
 

@@ -8,6 +8,7 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
         width: 1920,
         height: 1080
     });
+    clearPopup(page);
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
@@ -15,9 +16,6 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doRestock(page);
-
-
-
     } catch (error) {
         console.error('Error:', error);
     } finally {
@@ -53,11 +51,18 @@ async function doRestock(page) {
     });
     await page.click('#btn_total_sale');
     await new Promise((page) => setTimeout(page, 3000));
+}
+
+async function clearPopup(page) {
     page.on('dialog', async dialog => {
         const message = dialog.message();
-        await dialog.accept();
-        if (message.includes('재판매')) {
+        if (message.includes('일괄 재판매')) {
+            await dialog.accept();
             console.log(true);
+        }
+        else {
+            await dialog.dismiss();
+            console.log(false);
         }
         return;
     });
