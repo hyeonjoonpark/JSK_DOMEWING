@@ -1,15 +1,22 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const pages = await browser.pages();
     const page = pages[0];
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
     try {
-        const args = process.argv.slice(2);
-        const [username, password, productCode] = args;
+        const [username, password, tempFilePath] = process.argv.slice(2);
+        const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const searchStr = productCodes.join(',');
+
         await login(page, username, password);
-        await searchProduct(page, productCode);
-        const processDelProductResult = await processDelProduct(page, productCode);
+        await searchProduct(page, searchStr);
+        const processDelProductResult = await processDelProduct(page, browser);
         console.log(processDelProductResult);
     } catch (error) {
         console.error('Error:', error);
@@ -28,15 +35,10 @@ async function searchProduct(page, productCode) {
     const searchProductCodeUrl = 'http://www.domesin.com/scm/M_item/item_list.html?cate1=&cate2=&cate3=&cate4=&cid=&date=w&start_date=&end_date=&status=&raid=&i_type=&adult=&delivery_type=&isreturn=&tax=&ls=&ok=&is_overseas=&item_sale_type=&q_type=vender_code&rows=20&isort=iid&q=&q2=' + productCode;
     await page.goto(searchProductCodeUrl, { waitUntil: 'networkidle0' });
 }
-async function processDelProduct(page) {
-    page.on('dialog', async dialog => {
-        await dialog.accept();
-        return;
-    });
+async function processDelProduct(page, browser) {
     const productExists = await page.evaluate(() => {
-        const productElement = document.querySelector('#main > table > tbody > tr:nth-child(2) > td:nth-child(1) > div:nth-child(2) > input');
-        if (productElement) {
-            productElement.checked = true;
+        const products = document.querySelectorAll('#main > table > tbody tr');
+        if (products.length > 1) {
             return true;
         }
         return false;
@@ -44,6 +46,12 @@ async function processDelProduct(page) {
     if (productExists === false) {
         return false;
     }
+    await page.click('input[name="ack"]');
+    await new Promise((page) => setTimeout(page, 1000));
+    page.on('dialog', async dialog => {
+        const message = dialog.message();
+        await dialog.accept();
+    });
     const [newPage] = await Promise.all([
         new Promise(resolve => browser.once('targetcreated', target => resolve(target.page()))),
         page.click('#btn_total_sale')
@@ -54,7 +62,7 @@ async function processDelProduct(page) {
         if (textContent.includes('판매')) {
             return true;
         }
-        return false;
+        return true;
     }
     return false;
 }
