@@ -47,6 +47,7 @@ use App\Http\Controllers\Productwing\RestockController;
 use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
+use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Product\DownloadController;
 use App\Http\Controllers\ProductEditor\ExcelwingController as ProductEditorExcelwingController;
 use App\Http\Controllers\ProductEditor\IndexController as ProductEditorIndexController;
@@ -157,6 +158,11 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::prefix('sellwing-api')->group(function () {
         Route::post('vendor-list', [VendorListController::class, 'main']);
         Route::post('category-list', [CategoryListController::class, 'index']);
+    });
+});
+Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
+    Route::prefix('account-setting')->group(function () {
+        Route::post('partner', [PartnerAccountSetting::class, 'validatePartner']);
     });
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);

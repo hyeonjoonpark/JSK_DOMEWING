@@ -6,6 +6,9 @@
     <p>
         아직 매핑되지 않은 카테고리들을 업데이트해주세요.
     </p>
+    <p>
+        총 <span class="text-weight-bold">{{ number_format(count($unmappedCategories), 0) }}</span>개의 카테고리가 남았습니다. 파이팅!
+    </p>
 @endsection
 @section('content')
     <div class="row g-gs">

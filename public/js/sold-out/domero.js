@@ -3,6 +3,11 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
+    clearPopup(page);
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
@@ -29,12 +34,12 @@ async function login(page, username, password) {
 async function processPageList(page, searchStr) {
     await page.goto('http://www.domero.net/vms/shop_item/item_list.php', { waitUntil: 'networkidle0', timeout: 0 });
     await page.select('#q_type', 'vender_code');
-    await new Promise((page) => setTimeout(page, 3000));
+    await delay(2000);
     await page.select('select[name="rows"]', '100');
-    await new Promise((page) => setTimeout(page, 1000));
+    await delay(1000);
     await page.type('#q2', searchStr);
     await page.click('#content > table.tb11 > tbody > tr:nth-child(8) > td.cttd > input.bt_blue');
-    await new Promise((page) => setTimeout(page, 3000));
+    await delay(3000);
 }
 
 async function doSoldOut(page) {
@@ -45,5 +50,24 @@ async function doSoldOut(page) {
         return;
     });
     await page.click('#btn_total_sold');
-    await new Promise((page) => setTimeout(page, 3000));
+    await delay(3000);
+
 }
+
+async function clearPopup(page) {
+    page.on('dialog', async dialog => {
+        const message = dialog.message();
+        if (message.includes('일괄 품절')) {
+            await dialog.accept();
+            console.log(true);
+        }
+        else {
+            await dialog.dismiss();
+            console.log(false);
+        }
+        return;
+    });
+}
+
+
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));

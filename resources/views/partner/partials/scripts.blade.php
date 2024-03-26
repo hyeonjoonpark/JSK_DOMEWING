@@ -3,6 +3,7 @@
 <script src="https://kit.fontawesome.com/0a14a1d42d.js" crossorigin="anonymous"></script>
 <script>
     var audioError = new Audio('{{ asset('assets/audio/diring.mp3') }}');
+    var apiToken = "{{ Auth::guard('partner')->user()->api_token }}";
 
     function popupLoader(index, text) {
         const loaders = ["{{ asset('assets/images/loading.gif') }}",
@@ -94,6 +95,6 @@
         console.log(error);
         closePopup();
         audioError.play();
-        swalError('"API 통신 요청 과정에서 에러가 발생했습니다."');
+        swalError('"로그인 세션이 만료되었습니다. 다시 로그인해주십시오."');
     }
 </script>
