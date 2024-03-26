@@ -37,10 +37,10 @@ async function processPageList(page, searchStr) {
     await page.select('#form > div > div:nth-child(6) > select', '8');
     await page.click('#forSaleType3');
     await page.select('#listBox > div > div:nth-child(1) > select:nth-child(3)', '500');
-    await new Promise((page) => setTimeout(page, 1000));
+    await delay(1000);
     await page.type('#search', searchStr);
     await page.click('#form > div > div:nth-child(6) > button.btn.btn-primary.px-5.ms-2');
-    await new Promise((page) => setTimeout(page, 3000));
+    await delay(3000);
 }
 
 async function doRestock(page) {
@@ -81,3 +81,5 @@ async function accessPopup(page) {
     });
     return response;
 }
+
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));

@@ -6,27 +6,25 @@ const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-
     await page.setViewport({
         width: 1920,
         height: 1080
     });
-
+    clearPopup(page);
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         const searchStr = productCodes.join(',');
-
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doRestock(page);
-
     } catch (error) {
         console.error('Error:', error);
     } finally {
         await browser.close();
     }
 })();
+
 async function login(page, username, password) {
     await page.goto('https://domeggook.com/sc/?login=pc', { waitUntil: 'networkidle0' });
     await page.type('#idInput', username);
@@ -49,14 +47,21 @@ async function doRestock(page) {
     const buttonSelector = await page.waitForSelector('#lList > div.pFunctions > a:nth-child(4)');
     await checkboxSelector.click();
     await selectSelector.select('Y');
-    page.on('dialog', async dialog => {
-        const message = dialog.message();
-        if (message.includes('상품수정이 모두 완료')) {
-            console.log(true);
-        }
-        await dialog.accept();
-        return;
-    });
     await buttonSelector.click();
     await new Promise((page) => setTimeout(page, 3000));
+}
+
+async function clearPopup(page) {
+    page.on('dialog', async dialog => {
+        const message = dialog.message();
+        if (message.includes('수정를 하시겠습니까')) {
+            await dialog.accept();
+            console.log(true);
+        }
+        else {
+            await dialog.dismiss();
+            console.log(false);
+        }
+        return;
+    });
 }

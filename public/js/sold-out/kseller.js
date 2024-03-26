@@ -7,16 +7,7 @@ const fs = require('fs');
         width: 1920,
         height: 1080
     });
-    page.on('dialog', async dialog => {
-        const message = dialog.message();
-        await dialog.accept();
-        if (message.includes('품절')) {
-            console.log(true);
-        }
-        return;
-    });
-
-
+    clearPopup(page);
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
@@ -49,9 +40,9 @@ async function processPageList(page, searchStr) {
     await delay(1000);
     await page.select('#content > table.tb11 > tbody > tr:nth-child(8) > td.cttd > select:nth-child(2)', '500');//한번에 보는 갯수
     await page.type('#q2', searchStr); //입력창에 입력
-    await new Promise((page) => setTimeout(page, 1000));
+    await delay(1000);
     await page.click('#content > table.tb11 > tbody > tr:nth-child(8) > td.cttd > input.bt_blue');//검색버튼 클릭
-    await new Promise((page) => setTimeout(page, 1000));
+    await delay(1000);
 }
 
 async function doSoldOut(page) {
@@ -60,12 +51,27 @@ async function doSoldOut(page) {
         console.log(false);
         return;
     }
-    await new Promise((page) => setTimeout(page, 1000));
+    await delay(1000);
     await page.evaluate(() => {
         const inputElement = document.querySelector('#content > table.tb12 > tbody > tr:nth-child(1) > td:nth-child(1) > input[type=checkbox]');
         inputElement?.click();
     });
     await page.click('#btn_total_sold');
-    await new Promise((page) => setTimeout(page, 2000));
+    await delay(2000);
+}
 
+
+async function clearPopup(page) {
+    page.on('dialog', async dialog => {
+        const message = dialog.message();
+        if (message.includes('일괄 품절')) {
+            await dialog.accept();
+            console.log(true);
+        }
+        else {
+            await dialog.dismiss();
+            console.log(false);
+        }
+        return;
+    });
 }

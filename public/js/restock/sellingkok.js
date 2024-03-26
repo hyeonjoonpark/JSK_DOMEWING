@@ -8,30 +8,21 @@ const fs = require('fs');
         width: 1920,
         height: 1080
     });
-    page.on('dialog', async dialog => {
-        const message = dialog.message();
-        await dialog.accept();
-        if (message.includes('수정')) {
-            console.log(true);
-        }
-        return;
-    });
-
+    clearPopup(page);
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         const searchStr = productCodes.join('\n');
-
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doRestock(page);
-
     } catch (error) {
         console.error('Error:', error);
     } finally {
         await browser.close();
     }
 })();
+
 const delay = (time) => new Promise(resolve => setTimeout(resolve, time));
 
 async function login(page, username, password) {
@@ -60,4 +51,16 @@ async function doRestock(page) {
     await delay(3000);
 }
 
-
+async function clearPopup(page) {
+    page.on('dialog', async dialog => {
+        const message = dialog.message();
+        await dialog.accept();
+        if (message.includes('수정이 완료')) {
+            console.log(true);
+        }
+        else {
+            console.log(false);
+        }
+        return;
+    });
+}
