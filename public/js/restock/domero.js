@@ -1,13 +1,19 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
     try {
-        const args = process.argv.slice(2);
-        const [username, password, productCode] = args;
+        const [username, password, tempFilePath] = process.argv.slice(2);
+        const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const searchStr = productCodes.join(',');
         await login(page, username, password);
-        await processPageList(page, productCode);
+        await processPageList(page, searchStr);
         await doRestock(page);
 
 
@@ -27,13 +33,13 @@ async function login(page, username, password) {
     await page.waitForNavigation();
 }
 
-async function processPageList(page, productCode) {
+async function processPageList(page, searchStr) {
     await page.goto('http://www.domero.net/vms/shop_item/item_list.php', { waitUntil: 'networkidle2', timeout: 0 });
     await page.select('#q_type', 'vender_code');
     await new Promise((page) => setTimeout(page, 3000));
     await page.select('select[name="rows"]', '100');
     await new Promise((page) => setTimeout(page, 1000));
-    await page.type('#q2', productCode);
+    await page.type('#q2', searchStr);
     await page.click('#content > table.tb11 > tbody > tr:nth-child(8) > td.cttd > input.bt_blue');
     await new Promise((page) => setTimeout(page, 3000));
 }

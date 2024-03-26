@@ -1,10 +1,7 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
-
-const navigateAndWait = async (page, url, waitUntil = 'networkidle0') => {
-    await page.goto(url, { waitUntil });
-};
 
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
@@ -16,10 +13,12 @@ const navigateAndWait = async (page, url, waitUntil = 'networkidle0') => {
     });
 
     try {
-        const args = process.argv.slice(2);
-        const [username, password, productCode] = args;
+        const [username, password, tempFilePath] = process.argv.slice(2);
+        const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const searchStr = productCodes.join(',');
+
         await login(page, username, password);
-        await processPageList(page, productCode);
+        await processPageList(page, searchStr);
         await doRestock(page);
 
     } catch (error) {
@@ -29,14 +28,14 @@ const navigateAndWait = async (page, url, waitUntil = 'networkidle0') => {
     }
 })();
 async function login(page, username, password) {
-    await navigateAndWait(page, 'https://domeggook.com/sc/?login=pc');
+    await page.goto('https://domeggook.com/sc/?login=pc', { waitUntil: 'networkidle0' });
     await page.type('#idInput', username);
     await page.type('#pwInput', password);
     await page.click('#formLogin > input.formSubmit');
     await page.waitForNavigation();
 }
 async function processPageList(page, searchStr) {
-    await navigateAndWait(page, 'https://domeggook.com/sc/item/lstAll');
+    await page.goto('https://domeggook.com/sc/item/lstAll', { waitUntil: 'networkidle0' });
     await page.click('input[value="code"]');
     await page.type('textarea[name="nos"]', searchStr);
     await page.select('select[name="sz"]', '500');
@@ -45,7 +44,7 @@ async function processPageList(page, searchStr) {
 }
 
 async function doRestock(page) {
-    const checkboxSelector = await page.waitForSelector('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody > tr:nth-child(1) > td.tui-grid-cell.tui-grid-cell-has-input.tui-grid-cell-row-header > div > input[type=checkbox]');
+    const checkboxSelector = await page.waitForSelector('input[name="_checked"]');
     const selectSelector = await page.waitForSelector('#lList > div.pFunctions > select');
     const buttonSelector = await page.waitForSelector('#lList > div.pFunctions > a:nth-child(4)');
     await checkboxSelector.click();
