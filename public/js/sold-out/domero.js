@@ -3,6 +3,10 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
@@ -46,4 +50,12 @@ async function doSoldOut(page) {
     });
     await page.click('#btn_total_sold');
     await new Promise((page) => setTimeout(page, 3000));
+    page.on('dialog', async dialog => {
+        const message = dialog.message();
+        await dialog.accept();
+        if (message.includes('품절')) {
+            console.log(true);
+        }
+        return;
+    });
 }
