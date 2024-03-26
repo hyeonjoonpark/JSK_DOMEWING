@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -42,9 +42,9 @@ async function processPageList(page, searchStr) {
     await delay(1000);
     await page.select('select[name="listsize"]', '500');
     await page.type('#area_search_str', searchStr);
-    await new Promise((page) => setTimeout(page, 1000));
+    await delay(1000);
     await page.click('#searchFrm > tbody > tr:nth-child(1) > td:nth-child(2) > button');
-    await new Promise((page) => setTimeout(page, 1000));
+    await delay(1000);
 }
 
 async function doSoldOut(page) {
@@ -53,12 +53,12 @@ async function doSoldOut(page) {
         console.log(false);
         return;
     }
-    await new Promise((page) => setTimeout(page, 1000));
+    await delay(1000);
     await page.evaluate(() => {
         const inputElement = document.querySelector('#chkAll');
         inputElement?.click();
     });
-    await new Promise((page) => setTimeout(page, 1000));
+    await delay(1000);
     await page.click('#loadWarpGoodslist > div:nth-child(2) > div > div > button.button.warning.xs');
     console.log(true);
     return;
