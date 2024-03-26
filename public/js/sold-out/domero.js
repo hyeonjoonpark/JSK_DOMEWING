@@ -50,4 +50,12 @@ async function doSoldOut(page) {
     });
     await page.click('#btn_total_sold');
     await new Promise((page) => setTimeout(page, 3000));
+    page.on('dialog', async dialog => {
+        const message = dialog.message();
+        await dialog.accept();
+        if (message.includes('품절')) {
+            console.log(true);
+        }
+        return;
+    });
 }

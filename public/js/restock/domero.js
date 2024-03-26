@@ -53,4 +53,12 @@ async function doRestock(page) {
     });
     await page.click('#btn_total_sale');
     await new Promise((page) => setTimeout(page, 3000));
+    page.on('dialog', async dialog => {
+        const message = dialog.message();
+        await dialog.accept();
+        if (message.includes('재판매')) {
+            console.log(true);
+        }
+        return;
+    });
 }
