@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Partner;
+use App\Models\PartnerClass;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,6 +40,7 @@ class AuthenticatePartner
             $guard->logout();
             return redirect()->route('partner.login')->withErrors(['invalidLogin' => '셀윙 파트너스 클래스가 만료되었습니다. 다시 로그인해주십시오.']);
         }
+        $partner = Partner::with('partnerClass')->find($partner->id);
         view()->share('partner', $partner);
         return $next($request);
     }

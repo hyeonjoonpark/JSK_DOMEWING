@@ -29,6 +29,9 @@ use App\Http\Controllers\Domewing\Auth\ForgetPasswordController;
 use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
 use App\Http\Controllers\Domewing\FAQController;
 use App\Http\Controllers\Namewing\NamewingController;
+use App\Http\Controllers\OpenMarketAccountsController;
+use App\Http\Controllers\OpenMarketController;
+use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
 use App\Http\Controllers\Partners\ForgotPasswordController;
 use App\Http\Controllers\Partners\LoginController as PartnersLoginController;
@@ -48,7 +51,13 @@ Route::prefix('partner')->group(function () {
         Route::get('logout', [PartnersLoginController::class, 'logout']);
     });
     Route::middleware(['auth.partner'])->group(function () {
-        Route::get('/', [PartnersDashboardController::class, 'index'])->name('partner.dashboard');
+        Route::get('/dashboard', [PartnersDashboardController::class, 'index'])->name('partner.dashboard');
+        Route::get('/', [PartnersDashboardController::class, 'index']);
+        Route::get('/index', [PartnersDashboardController::class, 'index']);
+        Route::prefix('account-setting')->group(function () {
+            Route::get('/partner', [PartnerAccountSetting::class, 'index']);
+            Route::get('/open-market', [OpenMarketController::class, 'index']);
+        });
     });
 });
 // 관리자 콘솔 라우트 그룹 설정

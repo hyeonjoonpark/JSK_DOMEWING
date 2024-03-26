@@ -25,7 +25,6 @@ class RegisterController extends Controller
     public function main(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|in:FREE,PLUS,PREMIUM',
             'name' => 'required|string|min:2|max:10',
             'email' => 'required|email',
             'password' => 'required|min:8|confirmed',
@@ -36,7 +35,6 @@ class RegisterController extends Controller
             'businessAddress' => 'required|string|min:10|max:100',
             'ppt' => ['required', 'accepted']
         ], [
-            'type' => '유효한 파트너 유형을 선택해주세요.',
             'name' => '성명은 최소 2글자, 최대 10글자 이내로 입력해주세요.',
             'email' => '유효한 이메일 주소를 입력해주세요.',
             'password' => '비밀번호는 8자 이상으로 설정해주세요.',
@@ -72,7 +70,6 @@ class RegisterController extends Controller
     {
         try {
             $partner = Partner::create([
-                'type' => $type,
                 'name' => $name,
                 'email' => $email,
                 'password' => $password,
