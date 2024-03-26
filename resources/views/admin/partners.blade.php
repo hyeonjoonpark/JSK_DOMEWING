@@ -17,12 +17,11 @@
         <div class="col">
             <div class="card card-bordered">
                 <div class="card-inner">
-                    <table class="datatable-init nk-tb-list nk-tb-ulist" data-order="false">
+                    <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="true" data-order="false">
                         <thead>
                             <tr class="nk-tb-item nk-tb-head">
                                 <th class="nk-tb-col"><span class="sub-text">파트너스</span></th>
-                                <th class="nk-tb-col tb-col-mb"><span class="sub-text">사업자 정보</span></th>
-                                <th class="nk-tb-col tb-col-lg"><span class="sub-text">인증</span></th>
+                                <th class="nk-tb-col"><span class="sub-text">사업자 정보</span></th>
                                 <th class="nk-tb-col"><span class="sub-text">클래스</span></th>
                             </tr>
                         </thead>
@@ -36,29 +35,28 @@
                                             </div>
                                             <div class="user-info">
                                                 <span class="tb-lead">{{ $partner->name }}</span>
-                                                <span>{{ $partner->email }}</span><br>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="me-1">{{ $partner->email }}</span>
+                                                    <ul class="list-status">
+                                                        <li>
+                                                            <em
+                                                                class="icon <?= is_null($partner->email_verified_at) ? $emailVerifiedIcons[0] : $emailVerifiedIcons[1] ?>"></em>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                                 <span>{{ $partner->phone }}</span><br>
                                                 <span>{{ $partner->created_at }}</span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="nk-tb-col tb-col-mb">
+                                    <td class="nk-tb-col">
                                         <span class="tb-amount">{{ $partner->business_name }}</span>
                                         <span class="tb-amount">{{ $partner->business_number }}</span>
                                         <span class="tb-amount">{{ $partner->business_address }}</span>
                                         <a href="{{ asset('images/business-license/' . $partner->business_image) }}"
                                             target="_blank">사업자 등록증</a>
                                     </td>
-                                    <td class="nk-tb-col tb-col-lg" data-order="Email Verified - Kyc Unverified">
-                                        <ul class="list-status">
-                                            <li>
-                                                <em
-                                                    class="icon <?= is_null($partner->email_verified_at) ? $emailVerifiedIcons[0] : $emailVerifiedIcons[1] ?>"></em>
-                                                <span>Email</span>
-                                            </li>
-                                        </ul>
-                                    </td>
-                                    <td class="nk-tb-col" data-order="Email Verified - Kyc Unverified">
+                                    <td class="nk-tb-col">
                                         <select class="form-control js-select2"
                                             onchange="updatePartnerActive(this.value, '{{ $partner->token }}');">
                                             <option value="ACTIVE"
