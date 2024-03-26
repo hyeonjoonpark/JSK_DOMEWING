@@ -13,6 +13,14 @@
                     <input type="text" class="form-control" value="{{ $partner->name }}" disabled />
                 </div>
                 <div class="form-group">
+                    <label class="form-label">클래스 / 만료일</label>
+                    <div class="d-flex">
+                        <input type="text" class="form-control" value="{{ $partner->partnerClass->name }}"
+                            disabled />
+                        <input type="text" class="form-control" value="{{ $partner->expired_at }} 까지" disabled />
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="form-label">연락처</label>
                     <input type="text" class="form-control" value="{{ $partner->phone }}" disabled />
                 </div>

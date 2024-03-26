@@ -22,111 +22,11 @@
                             <h6 class="overline-title text-primary-alt">메인 메뉴</h6>
                         </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item">
-                            <a href="/admin/dashboard" class="nk-menu-link">
+                            <a href="{{ route('partner.dashboard') }}" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-chart-line"></em></span>
                                 <span class="nk-menu-text">대시보드</span>
                             </a>
                         </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/product/mining" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
-                                <span class="nk-menu-text">마인윙</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/product/new-minewing" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
-                                <span class="nk-menu-text">뉴 마인윙</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/apiwing" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-code-pull-request"></em></span>
-                                <span class="nk-menu-text">API윙</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item has-sub">
-                            <a href="#" class="nk-menu-link nk-menu-toggle">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-cloud-arrow-up"></em></span>
-                                <span class="nk-menu-text">상품윙</span>
-                            </a>
-                            <ul class="nk-menu-sub">
-                                <li class="nk-menu-item">
-                                    <a href="/admin/product/minewing" class="nk-menu-link"><span class="nk-menu-text">상품
-                                            관리</span></a>
-                                </li>
-                                <li class="nk-menu-item">
-                                    <a href="/admin/product/sold-out" class="nk-menu-link"><span class="nk-menu-text">품절
-                                            상품</span></a>
-                                </li>
-                                <li class="nk-menu-item">
-                                    <a href="/admin/product/legacy" class="nk-menu-link"><span class="nk-menu-text">레거시
-                                            상품</span></a>
-                                </li>
-                                <li class="nk-menu-item">
-                                    <a href="/admin/product-editor" class="nk-menu-link"><span class="nk-menu-text">상품
-                                            대량 관리</span></a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nk-menu-item has-sub">
-                            <a href="#" class="nk-menu-link nk-menu-toggle">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-circle-nodes"></em></span>
-                                <span class="nk-menu-text">매핑윙</span>
-                            </a>
-                            <ul class="nk-menu-sub">
-                                <li class="nk-menu-item">
-                                    <a href="/admin/mappingwing/unmapped" class="nk-menu-link"><span
-                                            class="nk-menu-text">매핑윙 업데이트</span></a>
-                                </li>
-                                <li class="nk-menu-item">
-                                    <a href="/admin/mappingwing/mapped" class="nk-menu-link"><span
-                                            class="nk-menu-text">매핑윙 관리</span></a>
-                                </li>
-                            </ul><!-- .nk-menu-sub -->
-                        </li><!-- .nk-menu-item -->
-                        <li class="nk-menu-item">
-                            <a href="/admin/namewing" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-clone"></em></span>
-                                <span class="nk-menu-text">네임윙</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/product/excelwing" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-file-excel"></em></span>
-                                <span class="nk-menu-text">엑셀윙</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/orderwing" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-truck"></em></span>
-                                <span class="nk-menu-text">오더윙</span>
-                            </a>
-                        </li>
-                        {{-- <li class="nk-menu-item">
-                            <a href="/admin/product/register" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
-                                <span class="nk-menu-text">신규 상품 생성</span>
-                            </a>
-                        </li> --}}
-                        {{-- <li class="nk-menu-item">
-                            <a href="/admin/product/keywords" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
-                                <span class="nk-menu-text">상품 키워드 테스트</span>
-                            </a>
-                        </li> --}}
-                        {{-- <li class="nk-menu-item">
-                            <a href="/admin/cms_dashboard" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
-                                <span class="nk-menu-text">CMS 저작물 관리 시스템</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/cms/{{ Auth::guard('user')->user()->remember_token }}" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
-                                <span class="nk-menu-text">Seller CMS</span>
-                            </a>
-                        </li> --}}
                         <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-gear"></em></span>
@@ -134,15 +34,16 @@
                             </a>
                             <ul class="nk-menu-sub">
                                 <li class="nk-menu-item">
-                                    <a href="/admin/account-setting" class="nk-menu-link"><span
-                                            class="nk-menu-text">업체 별 환경설정</span></a>
+                                    <a href="/partner/account-setting/partner" class="nk-menu-link"><span
+                                            class="nk-menu-text">셀윙
+                                            파트너 계정 설정</span></a>
                                 </li>
                                 <li class="nk-menu-item">
-                                    <a href="/admin/edit-testmonials" class="nk-menu-link"><span
-                                            class="nk-menu-text">제품후기</span></a>
+                                    <a href="/partner/account-setting/open-market" class="nk-menu-link"><span
+                                            class="nk-menu-text">오픈마켓 계정 연동</span></a>
                                 </li>
-                            </ul><!-- .nk-menu-sub -->
-                        </li><!-- .nk-menu-item -->
+                            </ul>
+                        </li>
                         <li class="nk-menu-item">
                             <a href="/partner/auth/logout" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em

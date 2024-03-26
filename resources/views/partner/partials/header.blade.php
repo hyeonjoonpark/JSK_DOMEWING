@@ -22,7 +22,7 @@
                                     <img src="{{ asset('assets/images/favicon.png') }}" class="w-100" alt="">
                                 </div>
                                 <div class="user-info d-none d-md-block">
-                                    <div class="user-status">{{ $partner->business_name }}</div>
+                                    <div class="user-status">{{ $partner->partnerClass->name }}</div>
                                     <div class="user-name dropdown-indicator">{{ $partner->name }}</div>
                                 </div>
                             </div>
@@ -31,10 +31,14 @@
                             <div class="dropdown-inner user-card-wrap bg-lighter d-none d-md-block">
                                 <div class="user-card">
                                     <div class="user-avatar">
-                                        <span>{{ $substring = mb_substr($partner->name, 1, 2, 'UTF-8') }}</span>
+                                        <img src="{{ asset('assets/images/favicon.png') }}" class="w-100"
+                                            alt="">
                                     </div>
                                     <div class="user-info">
-                                        <span class="lead-text">{{ $partner->name }}</span>
+                                        <div class="d-flex align-items-center">
+                                            <span class="lead-text me-1">{{ $partner->name }}</span>
+                                            <div class="user-status">{{ $partner->partnerClass->name }}</div>
+                                        </div>
                                         <span class="sub-text">{{ $partner->email }}</span>
                                     </div>
                                 </div>
