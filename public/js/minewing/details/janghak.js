@@ -8,9 +8,6 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
         const args = process.argv.slice(2); // 커맨드 라인 인자를 가져옵니다.
         const [tempFilePath, username, password] = args; // 인자에서 파일 경로, 사용자 이름, 비밀번호를 추출합니다.
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8')); // URL 목록이 담긴 파일을 읽어서 파싱합니다.
-        // const urls = ['https://www.jhmungu.com/shop/goods_detail.php?ps_uid=157686'];
-        // const username = "jskorea2023";
-        // const password = "Tjddlf88!@#";
         await signIn(page, username, password); // 로그인 함수를 호출합니다.
 
         const products = []; // 스크래핑된 상품 정보를 저장할 배열을 초기화합니다.

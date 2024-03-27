@@ -16,8 +16,8 @@
     <div class="row g-gs">
         <div class="col">
             <div class="card card-bordered">
-                <div class="card-inner">
-                    <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="true" data-order="false">
+                <div class="card-inner table-responsive">
+                    <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="false" data-order="false">
                         <thead>
                             <tr class="nk-tb-item nk-tb-head">
                                 <th class="nk-tb-col"><span class="sub-text">파트너스</span></th>

@@ -42,7 +42,7 @@
                         <button class="btn btn-success"
                             onclick="initEditProductName('{{ $product->productCode }}');">수정완료</button>
                         <button class="btn btn-danger"
-                            onclick="initSoldOut(['{{ $product->productCode }}']);">품절처리</button>
+                            onclick="initSoldOut(['{{ $product->productCode }}'], 'sold-out');">품절처리</button>
                     </div>
                 </div>
             </div>
@@ -149,7 +149,7 @@
             const productCodes = $('input[name="productCodes"]:checked').map(function() {
                 return $(this).val();
             }).get();
-            initSoldOut(productCodes);
+            initSoldOut(productCodes, 'sold-out');
         }
     </script>
 @endsection
