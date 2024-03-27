@@ -80,7 +80,7 @@ async function scrapeProducts(page) {
                 const hrefElement = productElement.querySelector('div.col-lg-28w.col-10.py-lg-1 > div > div > div > div.col-lg-12.text-left > p:nth-child(1) > a')
                 const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
 
-                const platform = '하우스모어';
+                const platform = '장학문구사';
 
                 // 정의된 href 값을 반환 객체에 포함
                 return { name, price, image, href, platform };
