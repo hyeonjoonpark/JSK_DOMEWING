@@ -149,7 +149,7 @@
             const productCodes = $('input[name="productCodes"]:checked').map(function() {
                 return $(this).val();
             }).get();
-            initSoldOut(productCodes);
+            initSoldOut(productCodes, 'sold-out');
         }
     </script>
 @endsection
