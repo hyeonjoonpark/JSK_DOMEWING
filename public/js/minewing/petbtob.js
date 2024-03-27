@@ -36,14 +36,14 @@ async function getNumPage(page, listUrl) {
         const numProducts = parseInt(numProductsText.replace(/[^\d]/g, ''));
         return numProducts;
     });
-    const countProductInPage = 32; // 페이지당 상품 수
-    const numPage = Math.ceil(numProducts / countProductInPage); // 전체 페이지 수 계산
+    const countProductInPage = 32;
+    const numPage = Math.ceil(numProducts / countProductInPage);
     return numPage;
 }
 
 async function moveToPage(page, listUrl, curPage) {
     const url = new URL(listUrl);
-    url.searchParams.set('page', curPage); // 페이지 번호를 현재 페이지로 설정
+    url.searchParams.set('page', curPage);
 
     await page.goto(url.toString(), { waitUntil: 'domcontentloaded' });
 }
@@ -63,10 +63,8 @@ async function scrapeProducts(page) {
 
         for (const productElement of productElements) {
             const promotionElement = productElement.querySelector('div.description > div.status > div > img');
-            if (promotionElement) {
-                if (checkSkipProduct(promotionElement)) {
-                    continue;
-                }
+            if (promotionElement && checkSkipProduct(promotionElement)) {
+                continue; // Skip if sold out
             }
 
             const nameElement = productElement.querySelector('div.description > p.name > a');
@@ -74,8 +72,11 @@ async function scrapeProducts(page) {
             const priceElement = productElement.querySelector('div.description > ul > li:nth-child(2) > span:nth-child(2)');
             const hrefElement = productElement.querySelector('div.thumbnail.outline > a');
 
-            // removeSoldOutMessage 함수 호출을 제거함
-            const name = nameElement ? nameElement.textContent.trim() : 'Name not found';
+            if (!nameElement) continue; // Skip if no name element
+            const name = nameElement.textContent.trim();
+            // Skip if name contains "오프라인" or "판매금지"
+            if (name.includes("오프라인") || name.includes("판매금지")) continue;
+
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
             const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
