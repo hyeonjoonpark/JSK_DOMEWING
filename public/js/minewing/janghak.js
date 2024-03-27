@@ -56,12 +56,13 @@ async function scrapeProducts(page) {
             const tagList = productElement.querySelectorAll('div.col-lg-28w.col-10.py-lg-1 > div > div > div > div.col-lg-12.text-left > p:nth-child(2) span');
             for (const tag of tagList) {
                 const tagText = tag.textContent.trim();
-                if (tagText.includes('배송불가') || tagText.includes('안함') || tagText.includes('품절') || tagText.includes('미정') || tagText.includes('단종') || tagText.includes('반품불가')) {
+                if (tagText.includes('배송불가') || tagText.includes('안함') || tagText.includes('품절') || tagText.includes('미정') || tagText.includes('단종') || tagText.includes('반품불가') || tagText.includes('온라인')) {
                     return false;
                 }
             }
             return true;
         }
+
 
         // 상품 정보를 처리하여 추출하는 함수
         function processProduct(productElement) {
@@ -79,7 +80,7 @@ async function scrapeProducts(page) {
                 const hrefElement = productElement.querySelector('div.col-lg-28w.col-10.py-lg-1 > div > div > div > div.col-lg-12.text-left > p:nth-child(1) > a')
                 const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
 
-                const platform = '하우스모어';
+                const platform = '장학문구사';
 
                 // 정의된 href 값을 반환 객체에 포함
                 return { name, price, image, href, platform };

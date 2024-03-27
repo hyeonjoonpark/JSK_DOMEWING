@@ -22,16 +22,16 @@ const fs = require('fs');
     }
 })();
 async function signIn(page, username, password) {
-    await page.goto('http://bonniepet.co.kr/member/login.php', { waitUntil: 'networkidle0' });
-    await page.type('#loginId', username);
-    await page.type('#loginPwd', password);
-    await page.click('#formLogin > div.login > button');
+    await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle0' });
+    await page.type('#member_id', username);
+    await page.type('#member_passwd', password);
+    await page.click('div > div > fieldset > a');
     await page.waitForNavigation();
 }
 async function scrapeProduct(page, productHref) {
     try {
         const productImage = await getProductImage(page);
-        if (productImage.includes('img_detail_jpg.jpg')) {
+        if (productImage.includes('img_product_big.gif')) {
             return false;
         }
         const productDetail = await getProductDetail(page);
@@ -42,7 +42,7 @@ async function scrapeProduct(page, productHref) {
         const hasOption = await getHasOption(page);
         const productOptions = hasOption ? await getProductOptions(page) : [];
         const productPrice = await page.evaluate(() => {
-            const productPrice = document.querySelector('#frmView div.item > ul > li.price > div > strong').textContent.trim().replace(/[^\d]/g, '');
+            const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
             return productPrice;
         });
         const product = {
@@ -63,9 +63,8 @@ async function scrapeProduct(page, productHref) {
 }
 
 async function getProductDetail(page) {
-
     return await page.evaluate(() => {
-        const productDetailElements = document.querySelectorAll('#detail > div.txt-manual img');
+        const productDetailElements = document.querySelectorAll('#prdDetail > div.cont img');
         if (productDetailElements.length > 0) {
             return Array.from(productDetailElements, element => element.src);
         }
@@ -75,27 +74,17 @@ async function getProductDetail(page) {
 
 async function getProductImage(page) {
     const productImage = await page.evaluate(() => {
-        return document.querySelector('#mainImage > img').src;
+        return document.querySelector('div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg.item > div.thumbnail > a > img').src;
     });
     return productImage;
 }
 async function getProductOptions(page) {
     async function reloadSelects() {
-        const selectHandles = await page.$$('select.tune'); // 모든 select.ProductOption0 요소를 선택
-        const filteredHandles = [];
-
-        for (const handle of selectHandles) {
-            const name = await page.evaluate(el => el.name, handle); // 각 요소의 name 속성 가져오기
-            if (name !== 'deliveryCollectFl') { // 조건에 맞지 않는 이름 필터링
-                filteredHandles.push(handle);
-            }
-        }
-
-        return filteredHandles; // 필터링된 ElementHandle 배열 반환
+        return page.$$('select.ProductOption0');
     }
 
     async function resetSelects() {
-        const delBtn = await page.$('div[id^="option_display_item_"] > div > div.del > button');
+        const delBtn = await page.$('#option_box1_del');
         if (delBtn) {
             await delBtn.click();
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -111,7 +100,6 @@ async function getProductOptions(page) {
             }
         }
     }
-
 
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
@@ -130,18 +118,15 @@ async function getProductOptions(page) {
                     await processSelectOptions(newSelects, currentDepth + 1, newSelectedOptions, productOptions);
                 } else {
                     let optionName = newSelectedOptions.map(opt =>
-                        opt.text
-                            .replace(/\s*:.*/g, "")
-                            .trim()
+                        opt.text.replace(/\s*\([\+\-]?\d{1,3}(,\d{3})*원\)/g, "").trim()
                     ).join(", ");
-
                     const optionPrice = newSelectedOptions.reduce((total, opt) => {
-                        const matches = opt.text.match(/[\+\-]?\d{1,3}(,\d{3})*원/);
-                        return total + (matches ? parseInt(matches[0].replace(/,|원|\+/g, ''), 10) : 0);
+                        const matches = opt.text.match(/\(([\+\-]?\d{1,3}(,\d{3})*원)\)/);
+                        return total + (matches ? parseInt(matches[1].replace(/,|원|\+/g, ''), 10) : 0);
                     }, 0);
-
                     productOptions.push({ optionName, optionPrice });
                 }
+
                 await resetSelects();
                 selects = await reloadSelects();
                 if (currentDepth > 0) {
@@ -157,28 +142,30 @@ async function getProductOptions(page) {
     return processSelectOptions(selects);
 }
 
-
+// 페이지에서 제품의 이름을 가져오는 비동기 함수입니다.
 async function getProductName(page) {
     const productName = await page.evaluate(() => {
-        const productNameElement = document.querySelector('#frmView > div > div.goods-header > div.top > div > h2');
+        const productNameElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h2');
         let productNameText = productNameElement.textContent.trim();
+
+        // "해외배송"을 포함하는 괄호와 내용을 제거합니다.
         productNameText = productNameText.replace(/\(.*해외배송.*\)/g, '');
+        productNameText = productNameText.replace(/할인|최대|10%|20%|10~20%|이내|요망|대량구매|묶음|기준|온라인|판매가|준수/g, '');
+
+        // 최종적으로 정리된 상품명에서 앞뒤 공백을 제거합니다.
         return productNameText.trim();
     });
 
     return productName;
 }
 
+// 페이지에 제품 옵션이 있는지 확인하는 비동기 함수입니다.
 async function getHasOption(page) {
     return await page.evaluate(() => {
-        const selectElements = document.querySelectorAll('select.tune');
-        const filteredSelectElements = Array.from(selectElements).filter(select => select.name !== 'deliveryCollectFl');
-        if (filteredSelectElements.length > 0) {
+        const selectElements = document.querySelectorAll('select.ProductOption0');
+        if (selectElements.length > 0) {
             return true;
         }
         return false;
     });
 }
-
-
-

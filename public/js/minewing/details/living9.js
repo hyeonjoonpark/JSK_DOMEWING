@@ -10,9 +10,6 @@ const fs = require('fs');
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const urls = ['https://living9.com/product/%EC%9D%B8%EB%B8%94%EB%A3%B8-%EB%B6%80%EC%B0%A9%EC%8B%9D-304%EC%8A%A4%ED%85%90-%EB%8B%A4%EC%9A%A9%EB%8F%84-%EC%B2%AD%EC%86%8C%EB%8F%84%EA%B5%AC%ED%99%80%EB%8D%94/1781/category/59/display/1/'];
-        // const username = "jskorea2022";
-        // const password = "Tjddlf88!@#";
         await signIn(page, username, password);
         // 스크래핑된 제품 정보를 저장할 배열을 초기화합니다.
         const products = [];
