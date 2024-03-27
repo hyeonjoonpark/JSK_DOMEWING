@@ -7,7 +7,16 @@
 @endsection
 @section('content')
     <div class="row g-gs">
-        <div class="col"></div>
+        <div class="col-12 col-lg-6">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">쿠팡</h6>
+                    <div class="form-group">
+                        <label for="" class="form-label">쿠팡</label>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 @section('scripts')
