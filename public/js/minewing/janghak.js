@@ -56,12 +56,13 @@ async function scrapeProducts(page) {
             const tagList = productElement.querySelectorAll('div.col-lg-28w.col-10.py-lg-1 > div > div > div > div.col-lg-12.text-left > p:nth-child(2) span');
             for (const tag of tagList) {
                 const tagText = tag.textContent.trim();
-                if (tagText.includes('배송불가') || tagText.includes('안함') || tagText.includes('품절') || tagText.includes('미정') || tagText.includes('단종') || tagText.includes('반품불가')) {
+                if (tagText.includes('배송불가') || tagText.includes('안함') || tagText.includes('품절') || tagText.includes('미정') || tagText.includes('단종') || tagText.includes('반품불가') || tagText.includes('온라인')) {
                     return false;
                 }
             }
             return true;
         }
+
 
         // 상품 정보를 처리하여 추출하는 함수
         function processProduct(productElement) {
