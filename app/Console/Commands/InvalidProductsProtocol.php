@@ -43,6 +43,7 @@ class InvalidProductsProtocol extends Command
             $productsChunkFilePath = $this->createProductsChunkFile($productsChunk);
             $trackProductsResult = $this->trackProducts($productsChunkFilePath, $vendor->name_eng);
             if ($trackProductsResult === false) {
+                echo $productsChunkFilePath;
                 return $productsChunkFilePath;
             } else {
                 foreach ($trackProductsResult as $productCode) {
@@ -50,6 +51,7 @@ class InvalidProductsProtocol extends Command
                 }
             }
         }
+        echo "success";
         return $this->createResultFile($invalidProductCodes);
     }
     private function createResultFile($invalidProductCodes)
