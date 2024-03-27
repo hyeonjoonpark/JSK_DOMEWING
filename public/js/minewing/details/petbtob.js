@@ -3,16 +3,13 @@ const fs = require('fs');
 // 비동기 함수를 시작합니다. 이 함수는 전체 스크립트의 메인 로직을 담당합니다.
 (async () => {
     // Puppeteer로 브라우저 인스턴스를 시작합니다. headless 모드를 비활성화하여 브라우저 UI가 보이게 합니다.
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     // 새로운 페이지(탭)을 생성합니다.
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const urls = [''];
-        // const username = "jskorea2022";
-        // const password = "tjddlf88!@#";
         await signIn(page, username, password);
         // 스크래핑된 제품 정보를 저장할 배열을 초기화합니다.
         const products = [];

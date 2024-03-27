@@ -7,9 +7,6 @@ const fs = require('fs');
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const urls = ['http://bonniepet.co.kr/goods/goods_view.php?goodsNo=1000018446'];
-        // const username = "sungil2018";
-        // const password = "Tjddlf88!@";
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
