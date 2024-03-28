@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -55,6 +55,11 @@ async function scrapeProducts(page) {
         function hasSoldOutImage(productElement) {
             return productElement.querySelector('div.thumbnail > div.icon > div.promotion > img') !== null;
         }
+        function hasForbiddenWords(name) {
+            const forbiddenWords = ['판매금지', '준수'];
+            return forbiddenWords.some(word => name.includes(word));
+        }
+
 
         // 상품 정보를 처리하여 추출하는 함수
         function processProduct(productElement) {
@@ -65,6 +70,10 @@ async function scrapeProducts(page) {
                     return null;
                 }
 
+                // 상품명에 "판매금지"나 "준수"가 포함되어 있다면 해당 상품을 건너뜀
+                if (hasForbiddenWords(name)) {
+                    return null;
+                }
                 const productPriceText = productElement.querySelector('div.description > ul > li:nth-child(1) > span:nth-child(2)').textContent;
                 const price = productPriceText.replace(/[^0-9]/g, '').trim();
 

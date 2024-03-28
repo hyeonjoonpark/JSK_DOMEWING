@@ -115,17 +115,16 @@ async function getProductOptions(page) {
         }
     }
 
-
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
                 opts.map(opt => ({ value: opt.value, text: opt.text }))
-                    .filter(opt => opt.value !== '' && opt.value !== '*' && opt.value !== '**' && !opt.text.includes("품절"))
+                    .filter(opt => opt.value !== '' && opt.value !== '*' && opt.value !== '**' && !opt.text.toLowerCase().includes("품절")) // 품절 텍스트를 대소문자 구분 없이 필터링
             );
 
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1000)); // AJAX 로딩 등 페이지 업데이트 대기
                 const newSelectedOptions = [...selectedOptions, { text: option.text, value: option.value }];
 
                 if (currentDepth + 1 < selects.length) {
@@ -133,18 +132,16 @@ async function getProductOptions(page) {
                     await processSelectOptions(newSelects, currentDepth + 1, newSelectedOptions, productOptions);
                 } else {
                     let optionName = newSelectedOptions.map(opt =>
-                        opt.text
-                            .replace(/\s*:.*/g, "")
-                            .trim()
+                        opt.text.replace(/\s*\([\+\-]?\d{1,3}(,\d{3})*원\)/g, "").trim() // 가격 정보 제거
                     ).join(", ");
 
                     const optionPrice = newSelectedOptions.reduce((total, opt) => {
-                        const matches = opt.text.match(/[\+\-]?\d{1,3}(,\d{3})*원/);
-                        return total + (matches ? parseInt(matches[0].replace(/,|원|\+/g, ''), 10) : 0);
+                        const matches = opt.text.match(/\(([\+\-]?\d{1,3}(,\d{3})*원)\)/);
+                        return total + (matches ? parseInt(matches[1].replace(/,|원|\+/g, ''), 10) : 0); // 가격 정보 계산
                     }, 0);
-
                     productOptions.push({ optionName, optionPrice });
                 }
+
                 await resetSelects();
                 selects = await reloadSelects();
                 if (currentDepth > 0) {
@@ -159,8 +156,6 @@ async function getProductOptions(page) {
     const selects = await reloadSelects();
     return processSelectOptions(selects);
 }
-
-
 async function getProductName(page) {
     const productName = await page.evaluate(() => {
         const productNameElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > div.headingArea > h2');
