@@ -17,12 +17,6 @@ class SaveController extends Controller
         ini_set('memory_limit', '-1');
         $rememberToken = $request->rememberToken;
         $products = $request->products;
-        if (count($products) < 1) {
-            return [
-                'status' => false,
-                'return' => "상품 필터링 결과, 수집할 수 있는 상품이 없습니다."
-            ];
-        }
         $categoryID = $request->categoryID;
         $productKeywords = $request->productKeywords;
         $isValid = $this->validateElements($categoryID, $productKeywords);
