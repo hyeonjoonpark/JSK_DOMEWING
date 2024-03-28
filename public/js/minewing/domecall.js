@@ -2,6 +2,10 @@ const puppeteer = require('puppeteer');
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
     try {
         const args = process.argv.slice(2);
         const [listURL, username, password] = args;
@@ -92,7 +96,12 @@ async function scrapeProducts(page) {
             const expirationDateImage = "/data/icon/goods_icon/유통기한.jpg";
 
             const limitProductCount = productElement.querySelector('div > div.cart_area > div.arrow_area > input').value;
-            if (limitProductCount != 1) return true;
+            if (parseInt(limitProductCount) !== 1) {
+                return true;
+            }
+
+
+
             const soldOutImage = productElement.querySelector('div > div.thumbnail > a > span.soldout-img');
             const soldOut = soldOutImage ? soldOutImage.textContent.trim() : null;
             if (soldOut !== null) {
