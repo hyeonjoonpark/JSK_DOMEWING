@@ -20,7 +20,36 @@
                     </p>
                     <div class="form-group">
                         <label for="" class="form-label">업체코드</label>
-                        <input class="form-control" type="text">
+                        <input class="form-control" id="code" type="text" placeholder="업체코드를 입력해주세요.">
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">유효 기간</label>
+                        <div class="d-flex">
+                            <div class="form-control-wrap w-100">
+                                <div class="form-icon form-icon-left">
+                                    <em class="icon ni ni-calendar"></em>
+                                </div>
+                                <input type="text" class="form-control date-picker" id="expiredAt"
+                                    data-date-format="yyyy-mm-dd" placeholder="만료일 날짜를 지정해주세요.">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">Access Key</label>
+                        <input class="form-control" type="text" id="accessKey" placeholder="Access Key 를 입력해주세요.">
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">Secret Key</label>
+                        <input class="form-control" type="text" id="secretKey" placeholder="Secret Key 를 입력해주세요.">
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="handleCoupangAccount();">
+                            @if ($coupangAccount === null)
+                                추가하기
+                            @else
+                                수정하기
+                            @endif
+                        </button>
                     </div>
                 </div>
             </div>
@@ -28,5 +57,27 @@
     </div>
 @endsection
 @section('scripts')
-    <script></script>
+    <script>
+        function handleCoupangAccount() {
+            const code = $('#code').val();
+            const expiredAt = $('#expiredAt').val();
+            const accessKey = $('#accessKey').val();
+            const secretKey = $('#secretKey').val();
+            popupLoader(1, '입력하신 정보를 업데이트 중입니다.');
+            $.ajax({
+                url: "/api/partner/account-setting/coupang",
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    apiToken,
+                    code,
+                    expiredAt,
+                    accessKey,
+                    secretKey
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+    </script>
 @endsection

@@ -41,6 +41,12 @@ class ProcessController extends Controller
             return $scrapeProductDetails;
         }
         $products = $scrapeProductDetails['return'];
+        if (count($products) < 1) {
+            return [
+                'status' => false,
+                'return' => "상품 필터링 결과, 수집할 수 있는 상품이 없습니다."
+            ];
+        }
         return [
             'status' => true,
             'return' => $products

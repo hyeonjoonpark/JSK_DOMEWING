@@ -38,20 +38,21 @@ class InvalidProductsProtocol extends Command
             ];
         }, $products);
         $productsChunks = array_chunk($mappedProducts, 100);
+        $invalidProductCodes = [];
         foreach ($productsChunks as $index => $productsChunk) {
             $productsChunkFilePath = $this->createProductsChunkFile($productsChunk);
-            $trackProductsResult = $this->trackProducts($productsChunkFilePath, $vendor->name_eng);
+            $trackProductsResult = $this->trackProducts($productsChunkFilePath, $vendor->name_eng, $account);
             if ($trackProductsResult === false) {
                 echo $productsChunkFilePath . ' / ' . $index;
                 return $productsChunkFilePath;
             } else {
                 if (count($trackProductsResult) > 0) {
-                    $this->createResultFile($trackProductsResult);
+                    $invalidProductCodes = array_merge($invalidProductCodes, $trackProductsResult);
                 }
             }
         }
-        echo "success";
-        return;
+        $invalidProductCodesString = implode(',', $invalidProductCodes);
+        $this->createResultFile($invalidProductCodesString);
     }
     private function createResultFile($invalidProductCodes)
     {
@@ -62,11 +63,11 @@ class InvalidProductsProtocol extends Command
         $filePath = $directoryPath . Str::uuid() . '.json';
         file_put_contents($filePath, json_encode($invalidProductCodes));
     }
-    private function trackProducts($productsChunkFilePath, $vendorEngName)
+    private function trackProducts($productsChunkFilePath, $vendorEngName, $account)
     {
         $directoryPath = public_path('js/gdf/');
         $scriptPath = $directoryPath . $vendorEngName . '.js';
-        $command = "node {$scriptPath} {$productsChunkFilePath}";
+        $command = "node {$scriptPath} {$productsChunkFilePath} {$account->username} {$account->password}";
         exec($command, $output, $resultCode);
         if ($resultCode === 0 && isset($output[0])) {
             $productCodes = json_decode($output[0]);
@@ -94,9 +95,10 @@ class InvalidProductsProtocol extends Command
     private function getProducts($vendorId)
     {
         return DB::table('minewing_products')
-            ->where('isActive', 'Y')
-            ->where('sellerID', $vendorId)
-            ->where('createdAt', '<', '2024-03-27 14:00:00')
+            ->where([
+                'isActive' => 'Y',
+                'sellerID' => $vendorId
+            ])
             ->get(['productCode', 'productHref'])
             ->toArray();
     }

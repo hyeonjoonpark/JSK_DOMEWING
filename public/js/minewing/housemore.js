@@ -66,6 +66,9 @@ async function scrapeProducts(page) {
             try {
                 const productNameElement = productElement.querySelector('div.description > strong > a > span:nth-child(2)');
                 let name = productNameElement.textContent.trim();
+                if (name.includes('판매금지')) {
+                    return null;
+                }
 
                 // 상품명에 "판매금지"나 "준수"가 포함되어 있다면 해당 상품을 건너뜀
                 if (hasForbiddenWords(name)) {
