@@ -157,11 +157,13 @@ class FormProductController extends Controller
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = ceil(($product->productPrice * $margin_rate) / 10) * 10;
                 $productKeywords = str_replace(',', '/', $product->productKeywords);
+                $customerMarginRate = 1.45;
+                $customerPrice = ceil(($marginedPrice * $customerMarginRate) / 10) * 10;
                 $data = [
                     $categoryCode,
                     $product->productName,
-                    '단품',
-                    '',
+                    '본 상품 선택',
+                    $customerPrice,
                     '',
                     $marginedPrice,
                     1,
