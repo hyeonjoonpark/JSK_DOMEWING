@@ -95,6 +95,17 @@
         console.log(error);
         closePopup();
         audioError.play();
-        swalError('"로그인 세션이 만료되었습니다. 다시 로그인해주십시오."');
+        swalWithReload('"로그인 세션이 만료되었습니다. 다시 로그인해주십시오."', 'error');
+    }
+
+    function ajaxSuccessHandling(response) {
+        const status = response.status;
+        const message = response.message;
+        let icon = 'success';
+        if (status === false) {
+            icon = 'error';
+        }
+        closePopup();
+        swalWithReload(message, icon);
     }
 </script>
