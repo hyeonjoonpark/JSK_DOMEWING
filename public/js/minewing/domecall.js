@@ -91,6 +91,8 @@ async function scrapeProducts(page) {
             const deliverImage = "/data/icon/goods_icon/차량배송.jpg"
             const expirationDateImage = "/data/icon/goods_icon/유통기한.jpg";
 
+            const limitProductCount = productElement.querySelector('div > div.cart_area > div.arrow_area > input').value;
+            if (limitProductCount != 1) return true;
             const soldOutImage = productElement.querySelector('div > div.thumbnail > a > span.soldout-img');
             const soldOut = soldOutImage ? soldOutImage.textContent.trim() : null;
             if (soldOut !== null) {
