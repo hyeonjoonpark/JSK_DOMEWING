@@ -1,7 +1,11 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
     try {
         const args = process.argv.slice(2);
         const [listURL, username, password] = args;
@@ -56,9 +60,9 @@ async function scrapeProducts(page) {
         const productElements = document.querySelectorAll('#content > div.contents > div > div.cg-main > div.goods-list > div > div > ul li');
         for (const productElement of productElements) {
             const nameElement = productElement.querySelector('div > div.txt > a > strong').textContent.trim();
-            if (checkSkipProduct(productElement, nameElement)) {
-                continue;
-            }
+            // if (checkSkipProduct(productElement, nameElement)) {
+            //     continue;
+            // }
             const imageElement = productElement.querySelector('div > div.thumbnail > a > img');
             const priceElement = productElement.querySelector('div > div.price.gd-default > span > strong');
             const hrefElement = productElement.querySelector('div > div.txt > a').href.trim();
@@ -68,7 +72,8 @@ async function scrapeProducts(page) {
             const href = hrefElement ? makeSafetyUrl(hrefElement) : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
             const platform = "도매콜";
-            products.push({ name, price, image, href, platform });
+            const limitProductCount = parseInt(productElement.querySelector('input[name="goodsCnt[]"]').getAttribute('data-min'), 10);
+            products.push({ name, price, image, href, platform, limitProductCount });
         }
         return products;
 
@@ -92,7 +97,12 @@ async function scrapeProducts(page) {
             const expirationDateImage = "/data/icon/goods_icon/유통기한.jpg";
 
             const limitProductCount = productElement.querySelector('div > div.cart_area > div.arrow_area > input').value;
-            if (limitProductCount != 1) return true;
+            if (parseInt(limitProductCount) !== 1) {
+                return true;
+            }
+
+
+
             const soldOutImage = productElement.querySelector('div > div.thumbnail > a > span.soldout-img');
             const soldOut = soldOutImage ? soldOutImage.textContent.trim() : null;
             if (soldOut !== null) {
