@@ -61,6 +61,9 @@ async function scrapeProducts(page) {
             try {
                 const productNameElement = productElement.querySelector('div.description > strong > a > span:nth-child(2)');
                 let name = productNameElement.textContent.trim();
+                if (name.includes('판매금지')) {
+                    return null;
+                }
 
                 const productPriceText = productElement.querySelector('div.description > ul > li:nth-child(1) > span:nth-child(2)').textContent;
                 const price = productPriceText.replace(/[^0-9]/g, '').trim();
