@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CoupangAccount extends Model
 {
     use HasFactory;
-    protected $table = "coupang_account";
+    protected $table = "coupang_accounts";
     protected $fillable = [
         'code', 'access_key', 'secret_key', 'expired_at'
     ];

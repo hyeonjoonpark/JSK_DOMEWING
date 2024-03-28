@@ -24,8 +24,9 @@ class FormProductController extends Controller
         try {
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/funn.xls'));
-            // 첫 번째 시트와 두 번째 시트를 선택
+
             $firstSheet = $spreadsheet->getSheet(0);
+            $firstSheet->setTitle('기본정보');
             $secondSheet = $spreadsheet->getSheet(1);
             $fifthSheet = $spreadsheet->getSheet(4);
 
@@ -156,11 +157,13 @@ class FormProductController extends Controller
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = ceil(($product->productPrice * $margin_rate) / 10) * 10;
                 $productKeywords = str_replace(',', '/', $product->productKeywords);
+                $customerMarginRate = 1.45;
+                $customerPrice = ceil(($marginedPrice * $customerMarginRate) / 10) * 10;
                 $data = [
                     $categoryCode,
                     $product->productName,
-                    $product->productName,
-                    0,
+                    '본 상품 선택',
+                    $customerPrice,
                     '',
                     $marginedPrice,
                     1,

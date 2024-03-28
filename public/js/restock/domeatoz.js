@@ -73,7 +73,7 @@ async function accessPopup(page) {
     await page.waitForSelector('.swal2-popup.swal2-show', { visible: true });
     const response = await page.evaluate(() => {
         const resultMessage = document.querySelector('#swal2-content').textContent.trim();
-        if (resultMessage.includes('변경 되었습니다.')) {
+        if (resultMessage.includes('변경 되었습니다') || resultMessage.includes('재입고 처리할 상품이 없습니다')) {
             return true;
         } else {
             return false;

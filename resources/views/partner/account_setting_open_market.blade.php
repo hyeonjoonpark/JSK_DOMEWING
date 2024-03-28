@@ -11,8 +11,16 @@
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">쿠팡</h6>
+                    <p>
+                        @if ($coupangAccount === null)
+                            등록된 계정 정보가 없습니다. 새로운 계정 정보를 추가해주십시오.
+                        @else
+                            이미 등록된 계정이 있습니다. 만료일: {{ $coupangAccount->expired_at }}
+                        @endif
+                    </p>
                     <div class="form-group">
-                        <label for="" class="form-label">쿠팡</label>
+                        <label for="" class="form-label">업체코드</label>
+                        <input class="form-control" type="text">
                     </div>
                 </div>
             </div>
