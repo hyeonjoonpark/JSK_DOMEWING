@@ -46,19 +46,26 @@ async function scrapeProducts(page) {
             if (promotionElement && promotionElement.getAttribute('src') === soldOutImageSrc) {
                 return true;
             }
+            const nameElement = productElement.querySelector('div.txt > a > strong > font');
+            if (nameElement) {
+                const nameText = nameElement.textContent.trim();
+                if (nameText.includes("온라인") || nameText.includes("판매금지") || nameText.includes("오프라인")) {
+                    return true;
+                }
+            }
             return false;
         }
 
         for (const productElement of productElements) {
             if (checkSkipProduct(productElement)) {
-                continue; // 이 제품은 매진되어 건너뜁니다.
+                continue; // 이 제품은 조건에 맞지 않아 건너뜁니다.
             }
 
-            // 제품 정보를 추출하는 코드를 for 루프 내부로 옮겼습니다.
-            const nameElement = productElement.querySelector('#content > div.contents > div > div.cg-main > div > div > div > ul li div.txt > a > strong');
-            const imageElement = productElement.querySelector('#content > div.contents > div > div.cg-main > div > div > div > ul li div.thumbnail > a > img');
-            const priceElement = productElement.querySelector('#content > div.contents > div > div.cg-main > div > div > div > ul li div.price.gd-default > span > strong');
-            const hrefElement = productElement.querySelector('#content > div.contents > div > div.cg-main > div > div > div > ul li div.thumbnail > a');
+            // 제품 정보를 추출합니다.
+            const nameElement = productElement.querySelector('div.txt > a > strong');
+            const imageElement = productElement.querySelector('div.thumbnail > a > img');
+            const priceElement = productElement.querySelector('div.price.gd-default > span > strong');
+            const hrefElement = productElement.querySelector('div.thumbnail > a');
 
             const name = nameElement ? nameElement.textContent.trim() : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
@@ -71,4 +78,5 @@ async function scrapeProducts(page) {
     });
     return products;
 }
+
 
