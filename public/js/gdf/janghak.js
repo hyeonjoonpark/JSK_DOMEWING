@@ -23,16 +23,20 @@ const fs = require('fs');
     }
 })();
 async function validateProduct(page, url) {
-    await page.goto(url, { waitUntil: 'load' });
-    const isValid = await page.evaluate(() => {
-        const tagElement = document.querySelector('span.bg-noretn');
-        if (tagElement) {
-            const tagText = tagElement.textContent.trim();
-            if (tagText.includes('온라인 판매금지')) {
-                return false;
+    try {
+        await page.goto(url, { waitUntil: 'load' });
+        const isValid = await page.evaluate(() => {
+            const tagElement = document.querySelector('span.bg-noretn');
+            if (tagElement) {
+                const tagText = tagElement.textContent.trim();
+                if (tagText.includes('온라인 판매금지')) {
+                    return false;
+                }
             }
-        }
-        return true;
-    });
-    return isValid;
+            return true;
+        });
+        return isValid;
+    } catch (error) {
+        return false;
+    }
 }

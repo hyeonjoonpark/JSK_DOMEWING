@@ -38,21 +38,20 @@ class InvalidProductsProtocol extends Command
             ];
         }, $products);
         $productsChunks = array_chunk($mappedProducts, 100);
-        $invalidProductCodes = [];
-        foreach ($productsChunks as $productsChunk) {
+        foreach ($productsChunks as $index => $productsChunk) {
             $productsChunkFilePath = $this->createProductsChunkFile($productsChunk);
             $trackProductsResult = $this->trackProducts($productsChunkFilePath, $vendor->name_eng);
             if ($trackProductsResult === false) {
-                echo $productsChunkFilePath;
+                echo $productsChunkFilePath . ' / ' . $index;
                 return $productsChunkFilePath;
             } else {
-                foreach ($trackProductsResult as $productCode) {
-                    $invalidProductCodes[] = $productCode;
+                if (count($trackProductsResult) > 0) {
+                    $this->createResultFile($trackProductsResult);
                 }
             }
         }
         echo "success";
-        return $this->createResultFile($invalidProductCodes);
+        return;
     }
     private function createResultFile($invalidProductCodes)
     {
@@ -62,7 +61,6 @@ class InvalidProductsProtocol extends Command
         }
         $filePath = $directoryPath . Str::uuid() . '.json';
         file_put_contents($filePath, json_encode($invalidProductCodes));
-        return true;
     }
     private function trackProducts($productsChunkFilePath, $vendorEngName)
     {
@@ -98,6 +96,7 @@ class InvalidProductsProtocol extends Command
         return DB::table('minewing_products')
             ->where('isActive', 'Y')
             ->where('sellerID', $vendorId)
+            ->where('createdAt', '<', '2024-03-27 14:00:00')
             ->get(['productCode', 'productHref'])
             ->toArray();
     }

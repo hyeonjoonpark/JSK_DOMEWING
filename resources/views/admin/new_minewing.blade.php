@@ -235,8 +235,7 @@
                 // 이미지 로딩 완료 이벤트를 위한 이미지 태그에 onload 속성 추가
                 const imgTag =
                     "<img src='" + image + "' alt='상품 이미지' width='100' height='100' />";
-
-                html += "<tr>";
+                html += "<tr id='" + href + "'>";
                 html += "<td><input type='checkbox' name='selectedProducts' value='" + i + "'></td>";
                 html += "<td><a href='" + href + "' target='_blank' id='productHref" + i + "'>" + imgTag + "</a></td>";
                 html += "<td><a href='" + href + "' target='_blank' id='duplicatedProductNameOri" + i + "'>" + name +
@@ -376,8 +375,12 @@
             closePopup();
             popupLoader(1, '"데이터베이스에 상품 정보를 입력하고 있어요."');
         }
+        var successedHrefs = [];
 
         function runSave(categoryID, productKeywords, products, rememberToken) {
+            for (const product of products) {
+                successedHrefs.push(product.productHref);
+            }
             $.ajax({
                 url: '/api/minewing/save-products',
                 type: 'POST',
@@ -396,6 +399,9 @@
         function successHandle(response) {
             closePopup();
             if (response.status) {
+                for (const successHref of successedHrefs) {
+                    document.getElementById(successHref).style.display = 'none';
+                }
                 audioSuccess.play();
                 swalSuccess(response.return);
             } else {
