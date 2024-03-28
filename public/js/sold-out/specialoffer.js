@@ -55,8 +55,8 @@ async function doSoldOut(page, browser) {
         page.click('#fgoodslist > div.local_frm01 > button:nth-child(2)')
     ]);
     if (newPage) {
-        await newPage.waitForSelector('#form-memo > div:nth-child(5) > div > input');
-        await newPage.click('#form-memo > div:nth-child(5) > div > input');
+        await newPage.waitForSelector('input[value="등록"]');
+        await newPage.click('input[value="등록"]');
         await delay(1000);
         await newPage.click('body > div.swal2-container.swal2-center.swal2-backdrop-show.swal2-noanimation > div > div.swal2-actions > button.swal2-confirm.swal2-styled');
     }
