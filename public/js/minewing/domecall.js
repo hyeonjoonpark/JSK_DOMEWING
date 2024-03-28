@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -60,9 +60,9 @@ async function scrapeProducts(page) {
         const productElements = document.querySelectorAll('#content > div.contents > div > div.cg-main > div.goods-list > div > div > ul li');
         for (const productElement of productElements) {
             const nameElement = productElement.querySelector('div > div.txt > a > strong').textContent.trim();
-            // if (checkSkipProduct(productElement, nameElement)) {
-            //     continue;
-            // }
+            if (checkSkipProduct(productElement, nameElement)) {
+                continue;
+            }
             const imageElement = productElement.querySelector('div > div.thumbnail > a > img');
             const priceElement = productElement.querySelector('div > div.price.gd-default > span > strong');
             const hrefElement = productElement.querySelector('div > div.txt > a').href.trim();
@@ -72,8 +72,7 @@ async function scrapeProducts(page) {
             const href = hrefElement ? makeSafetyUrl(hrefElement) : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
             const platform = "도매콜";
-            const limitProductCount = parseInt(productElement.querySelector('input[name="goodsCnt[]"]').getAttribute('data-min'), 10);
-            products.push({ name, price, image, href, platform, limitProductCount });
+            products.push({ name, price, image, href, platform });
         }
         return products;
 
