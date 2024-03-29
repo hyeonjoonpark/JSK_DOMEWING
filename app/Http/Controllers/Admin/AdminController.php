@@ -24,7 +24,6 @@ class AdminController extends Controller
             ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
             ->where('v.is_active', 'ACTIVE')
             ->where('ps.is_active', 'Y')
-            ->whereNotIn('v.id', [33])
             ->get();
         $vendorHrefs = array_map(function ($vendor) {
             return $vendor->vendor_href;

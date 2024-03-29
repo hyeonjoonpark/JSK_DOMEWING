@@ -16,6 +16,8 @@ class ExtractOrderController extends Controller
 
             if ($b2BEngName == 'domesin') {
                 $data = array_merge($data, $this->processDomesin($b2BEngName));
+            } else if ($b2BEngName == 'funn') {
+                $data = array_merge($data, $this->processDomesin($b2BEngName));
             } else {
                 $excelPath = $this->getExcelPath($b2BEngName);
 
