@@ -57,6 +57,8 @@ Route::prefix('partner')->group(function () {
             Route::get('/partner', [PartnerAccountSetting::class, 'index']);
             Route::get('/open-market', [OpenMarketController::class, 'index']);
         });
+        Route::prefix('products')->group(function () {
+        });
     });
 });
 // 관리자 콘솔 라우트 그룹 설정

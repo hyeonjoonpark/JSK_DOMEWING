@@ -27,6 +27,12 @@
                                 <span class="nk-menu-text">대시보드</span>
                             </a>
                         </li>
+                        <li class="nk-menu-item">
+                            <a href="/partner/products/collect" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-chart-line"></em></span>
+                                <span class="nk-menu-text">상품 수집윙</span>
+                            </a>
+                        </li>
                         <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-gear"></em></span>

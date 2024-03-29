@@ -28,12 +28,32 @@ class CoupangController extends Controller
                 'message' => $validator->errors()->first()
             ];
         }
+        return $this->updateAccount($request->code, $request->expiredAt, $request->accessKey, $request->secretKey, $request->apiToken);
     }
     private function updateAccount($code, $expiredAt, $accessKey, $secretKey, $apiToken)
     {
         try {
-            DB::table('coupang_accounts AS ca')
-                ->join('');
+            $partnerId = DB::table('partners')
+                ->where('api_token', $apiToken)
+                ->first(['id'])
+                ->id;
+            DB::table('coupang_accounts')
+                ->where('partner_id', $partnerId)
+                ->update([
+                    'is_active' => 'INACTIVE'
+                ]);
+            DB::table('coupang_accounts')
+                ->insert([
+                    'partner_id' => $partnerId,
+                    'code' => trim($code),
+                    'expired_at' => $expiredAt . ' 23:59:59',
+                    'access_key' => trim($accessKey),
+                    'secret_key' => trim($secretKey)
+                ]);
+            return [
+                'status' => true,
+                'message' => '계정 정보를 성공적으로 추가했습니다.'
+            ];
         } catch (\Exception $e) {
             return [
                 'status' => false,
