@@ -50,6 +50,9 @@ async function doRestock(page) {
     for (const link of links) {
         await link.click();
         await page.waitForNavigation({ waitUntil: 'networkidle0' });
+        // await page.evaluate(() => {
+        //     document.querySelector('#Frm > table > tbody > tr:nth-child(12) > td:nth-child(4) > input[type=text]').value = 99999;
+        // });
         await page.type('#Frm > table > tbody > tr:nth-child(12) > td:nth-child(4) > input[type=text]', '999');
         await page.click('#complete_step');
         await page.waitForNavigation({ waitUntil: 'networkidle0' });
