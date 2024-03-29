@@ -1,28 +1,28 @@
-<!-- resources/views/admin/partials/pagination.blade.php -->
-
-<div class="d-flex justify-content-center align-items-center">
+<div class="d-flex justify-content-center align-items-center flex-wrap">
     @if ($page > 1)
-        <a class="pagination"
-            href="{{ route('admin.minewing', ['page' => $page - 1, 'searchKeyword' => $searchKeyword]) }}">
+        <a class="pagination mx-1 my-1"
+            href="{{ route('partner.products.collect', ['page' => $page - 1, 'searchKeyword' => $searchKeyword]) }}">
             &lt; 이전
         </a>
     @endif
 
     @php
-        $startPage = max(1, $page - 5);
-        $endPage = min($numPages, $startPage + 9);
+        $isMobile = true;
+        $range = $isMobile ? 3 : 5;
+        $startPage = max(1, $page - $range);
+        $endPage = min($numPages, $startPage + $range * 2);
     @endphp
 
     @for ($i = $startPage; $i <= $endPage; $i++)
-        <a class="pagination {{ $page == $i ? 'active' : '' }}"
-            href="{{ route('admin.minewing', ['page' => $i, 'searchKeyword' => $searchKeyword]) }}">
+        <a class="pagination mx-1 my-1 {{ $page == $i ? 'active' : '' }}"
+            href="{{ route('partner.products.collect', ['page' => $i, 'searchKeyword' => $searchKeyword]) }}">
             {{ $i }}
         </a>
     @endfor
 
     @if ($page < $numPages)
-        <a class="pagination"
-            href="{{ route('admin.minewing', ['page' => $page + 1, 'searchKeyword' => $searchKeyword]) }}">
+        <a class="pagination mx-1 my-1"
+            href="{{ route('partner.products.collect', ['page' => $page + 1, 'searchKeyword' => $searchKeyword]) }}">
             다음 &gt;
         </a>
     @endif

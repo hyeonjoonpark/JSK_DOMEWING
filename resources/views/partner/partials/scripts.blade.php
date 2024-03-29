@@ -103,6 +103,7 @@
         const message = response.message;
         let icon = 'success';
         if (status === false) {
+            console.log(response);
             icon = 'error';
         }
         closePopup();

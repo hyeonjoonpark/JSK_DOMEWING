@@ -3,6 +3,7 @@
 
 <head>
     @include('partner.partials.head')
+    @yield('style')
 </head>
 
 <body class="nk-body bg-white has-sidebar ">

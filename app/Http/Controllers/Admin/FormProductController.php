@@ -175,7 +175,7 @@ class FormProductController extends Controller
                     $additionalShippingFee,
                     'N',
                     0,
-                    '반품배송비: ' . $shippingCost,
+                    '왕복반품배송비: ' . $shippingCost * 2 . ', 공급사수거접수',
                     2,
                     1,
                     '',

@@ -643,7 +643,7 @@ class ProcessDataController extends Controller
             'A' => 'orderCode',
             'O' => 'shippingRemark',
             'E' => 'productCode',
-            
+
             // 'A' => 'orderedAt',
             // 'O' => 'amount'
             // ... Add more mappings if needed
@@ -682,6 +682,87 @@ class ProcessDataController extends Controller
             $rowData['b2BName'] = "오너클랜";
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty
+            }
+        }
+
+        return $data;
+    }
+    public function funn($excelPath)
+    {
+        $spreadsheet = IOFactory::load($excelPath);
+        $worksheet = $spreadsheet->getSheet(0);
+        $data = [];
+        $isFirstRow = true;
+
+        $columnMappings = [
+            'E' => 'senderName',
+            'F' => 'receiverName',
+            'H' => 'receiverPhone',
+            'R' => 'postcode',
+            'S' => 'address',
+            'J' => 'productName',
+            'L' => 'quantity',
+            'M' => 'productPrice',
+            'P' => 'shippingCost',
+            'A' => 'orderCode',
+            'V' => 'productCode',
+            'Q' => 'orderedAt',
+            'O' => 'amount',
+            'B' => 'orderStatus'
+        ];
+
+        foreach ($worksheet->getRowIterator() as $row) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+                continue;
+            }
+
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $rowData = [
+                'senderPhone' => '',
+                'shippingRemark' => ''
+            ];
+            foreach ($cellIterator as $cell) {
+                $columnLetter = $cell->getColumn();
+                if ($columnLetter == 'T') {
+                    $additionalTextForAddress = $cell->getValue();
+                    continue;
+                }
+                if (isset($columnMappings[$columnLetter])) {
+                    $value = $cell->getValue();
+
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
+
+                    if ($columnMappings[$columnLetter] == 'productCode') {
+                        $value = str_replace('JSKR', '', $value);
+                    }
+
+                    $rowData[$columnMappings[$columnLetter]] = $value;
+                }
+            }
+            if (isset($rowData['address']) && isset($additionalTextForAddress)) {
+                $rowData['address'] .= " " . $additionalTextForAddress;
+            }
+
+            if (isset($rowData['amount']) && isset($rowData['shippingCost'])) {
+                $rowData['amount'] = (int)$rowData['productPrice'] * (int)$rowData['quantity'] + (int)$rowData['shippingCost'];
+            }
+
+            $productCode = $rowData['productCode'];
+            $extractOrderController = new ExtractOrderController();
+            $response = $extractOrderController->getProductHref($productCode);
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
+            $rowData['b2BName'] = "펀앤";
+            if (!empty($rowData)) {
+                $data[] = $rowData;
             }
         }
 

@@ -12,6 +12,9 @@
                 <div class="card-inner">
                     <h6 class="title">쿠팡</h6>
                     <p>
+                        연동 정보에서 '연동업체 선택' 탭에서 업체명 셀윙을 선택해주세요.
+                    </p>
+                    <p>
                         @if ($coupangAccount === null)
                             등록된 계정 정보가 없습니다. 새로운 계정 정보를 추가해주십시오.
                         @else
