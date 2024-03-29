@@ -49,7 +49,7 @@ async function scrapeProducts(page) {
             const nameElement = productElement.querySelector('div.txt > a > strong > font');
             if (nameElement) {
                 const nameText = nameElement.textContent.trim();
-                if (nameText.includes("온라인") || nameText.includes("판매금지") || nameText.includes("오프라인")) {
+                if (nameText.includes("온라인") || nameText.includes("판매금지") || nameText.includes("오프라인") || nameText.includes("유통기한")) {
                     return true;
                 }
             }

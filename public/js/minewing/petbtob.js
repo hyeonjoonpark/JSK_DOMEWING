@@ -67,6 +67,14 @@ async function scrapeProducts(page) {
                 continue; // Skip if sold out
             }
 
+            const expiredDateElement = productElement.querySelector('div.description > ul > li:nth-child(3) > span');
+            if (expiredDateElement) {
+                const expiredDateText = expiredDateElement.textContent.trim();
+                if (expiredDateText.includes('유통기한')) {
+                    continue;
+                }
+            }
+
             const nameElement = productElement.querySelector('div.description > p.name > a');
             const imageElement = productElement.querySelector('div.thumbnail.outline > a > div.normal_thumb > img');
             const priceElement = productElement.querySelector('div.description > ul > li:nth-child(2) > span:nth-child(2)');

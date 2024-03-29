@@ -52,6 +52,15 @@ async function signIn(page, username, password) {
 
 async function scrapeProduct(page, productHref) {
     try {
+        const isSkipProduct = await page.evaluate(() => {
+            const skipSpan = document.querySelector('div.btnArea > span'); // 조건에 맞는 선택자 사용
+            return !!skipSpan; // 요소가 존재하면 true, 그렇지 않으면 false 반환
+        });
+
+        // 만약 특정 span 태그가 존재한다면, 상품 처리를 건너뜀
+        if (isSkipProduct) {
+            return false; // 여기서는 상품 처리를 건너뜁니다.
+        }
         const productPrice = await page.evaluate(() => {
             const priceSelector = '#buy_info > div > div.detailView.type2 > dl > dd.priceView > ul > li:nth-child(1) > strong';
             const productPriceText = document.querySelector(priceSelector)?.textContent.trim();
@@ -61,7 +70,7 @@ async function scrapeProduct(page, productHref) {
 
         if (!productPrice) {
             console.error('Product price could not be scraped.');
-            return null;
+            return false;
         }
 
         const { hasOption, productOptions } = await getHasOption(page);

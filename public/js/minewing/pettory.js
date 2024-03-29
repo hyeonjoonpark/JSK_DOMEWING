@@ -63,8 +63,14 @@ async function scrapeProducts(page) {
 
         function isWholesale(productElement) {
             const wholesaleText = productElement.querySelector('div.description > ul > li:nth-child(2) > span');
-            return wholesaleText && wholesaleText.textContent.includes("타도매");
+            return wholesaleText && (
+                wholesaleText.textContent.includes("타도매") ||
+                wholesaleText.textContent.includes("유통기한") ||
+                wholesaleText.textContent.includes("판매금지") ||
+                wholesaleText.textContent.includes("오프라인")
+            );
         }
+
 
         for (const productElement of productElements) {
             const promotionElement = productElement.querySelector('div.description > div.icon > div.promotion.cboth > img');
