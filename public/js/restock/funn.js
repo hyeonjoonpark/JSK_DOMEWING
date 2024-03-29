@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -14,6 +14,7 @@ const fs = require('fs');
         const productCodes = JSON.parse(productCodesRaw);
         const modifiedProductCodes = productCodes.map(code => "JSKR" + code);
         const searchStr = modifiedProductCodes.join(' ');
+
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doRestock(page);
@@ -28,7 +29,7 @@ async function login(page, username, password) {
     await page.goto('https://scm.funn.co.kr/login/login.asp', { waitUntil: 'networkidle0' });
     await page.type('body > form > div > div:nth-child(3) > div > div:nth-child(1) > input[type=text]', username);
     await page.type('body > form > div > div:nth-child(3) > div > div:nth-child(2) > input[type=password]', password);
-    await page.click('body > form > div > div:nth-child(3) > span > input[type=submit]');//로그인
+    await page.click('body > form > div > div:nth-child(3) > span > input[type=submit]');
     await page.waitForNavigation({ waitUntil: 'load' });
 }
 
