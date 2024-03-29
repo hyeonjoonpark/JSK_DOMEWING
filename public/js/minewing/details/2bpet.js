@@ -7,11 +7,17 @@ const fs = require('fs');
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // const urls = ['https://www.2bpet.co.kr/product/content.asp?guid=206305&cate=14512&params='];
+        // const username = "jskorea2024";
+        // const password = "tjddlf88!@";
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
             await page.goto(url, { waitUntil: 'domcontentloaded' });
             const product = await scrapeProduct(page, url);
+            if (product === false) {
+                continue;
+            }
             products.push(product);
         }
         console.log(JSON.stringify(products));
@@ -22,16 +28,16 @@ const fs = require('fs');
     }
 })();
 async function signIn(page, username, password) {
-    await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle0' });
-    await page.type('#member_id', username);
-    await page.type('#member_passwd', password);
-    await page.click('div > div > fieldset > a');
+    await page.goto('https://www.2bpet.co.kr/member/login.asp', { waitUntil: 'networkidle0' });
+    await page.type('#id', username);
+    await page.type('#pass', password);
+    await page.click('#Frm > div > a');
     await page.waitForNavigation();
 }
 async function scrapeProduct(page, productHref) {
     try {
         const productImage = await getProductImage(page);
-        if (productImage.includes('img_product_big.gif')) {
+        if (productImage.includes('img_petzone_big.jpg')) {
             return false;
         }
         const productDetail = await getProductDetail(page);
@@ -42,7 +48,15 @@ async function scrapeProduct(page, productHref) {
         const hasOption = await getHasOption(page);
         const productOptions = hasOption ? await getProductOptions(page) : [];
         const productPrice = await page.evaluate(() => {
-            const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
+            // priceElement의 복사본을 만듭니다.
+            const priceElement = document.querySelector('div:nth-child(7) > dl > dd').cloneNode(true);
+            // 복사본에서 span.discountVal 요소를 찾아 제거합니다.
+            const discountSpan = priceElement.querySelector('span.discountVal');
+            if (discountSpan) {
+                discountSpan.remove(); // span 요소를 제거합니다.
+            }
+            // 수정된 복사본의 텍스트에서 숫자만 추출합니다.
+            const productPrice = priceElement.textContent.trim().replace(/[^\d]/g, '');
             return productPrice;
         });
         const product = {
@@ -53,7 +67,7 @@ async function scrapeProduct(page, productHref) {
             hasOption: hasOption,
             productOptions: productOptions,
             productHref: productHref,
-            sellerID: 39
+            sellerID: 42
         };
         return product;
     } catch (error) {
@@ -64,27 +78,42 @@ async function scrapeProduct(page, productHref) {
 
 async function getProductDetail(page) {
     return await page.evaluate(() => {
-        const productDetailElements = document.querySelectorAll('#prdDetail > div.cont img');
-        if (productDetailElements.length > 0) {
-            return Array.from(productDetailElements, element => element.src);
-        }
-        return false;
+        const productDetailElements = document.querySelectorAll('#tbContent > tbody > tr > td > div.contentZoom.contentSize');
+        let imgSources = [];
+        productDetailElements.forEach(element => {
+            // 각 div.contentZoom.contentSize 요소 내의 모든 img 태그에 대해 순회
+            const images = element.querySelectorAll('img');
+            // 해당 img 태그들의 src 속성을 배열에 추가
+            Array.from(images).forEach(img => imgSources.push(img.src));
+        });
+        // imgSources에 img의 src들이 저장됩니다.
+        return imgSources.length > 0 ? imgSources : false;
     });
 }
 
 async function getProductImage(page) {
     const productImage = await page.evaluate(() => {
-        return document.querySelector('div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg.item > div.thumbnail > a > img').src;
+        return document.querySelector('#mainImg > li > span > img').src;
     });
     return productImage;
 }
 async function getProductOptions(page) {
     async function reloadSelects() {
-        return page.$$('select.ProductOption0');
+        const selectHandles = await page.$$('select.select_fild');
+        const filteredHandles = [];
+
+        for (const handle of selectHandles) {
+            const name = await page.evaluate(el => el.name, handle); // 각 요소의 name 속성 가져오기
+            if (name !== 'deliveryCollectFl') { // 조건에 맞지 않는 이름 필터링
+                filteredHandles.push(handle);
+            }
+        }
+
+        return filteredHandles; // 필터링된 ElementHandle 배열 반환
     }
 
     async function resetSelects() {
-        const delBtn = await page.$('#option_box1_del');
+        const delBtn = await page.$('#optList > div > span.btn_delete');
         if (delBtn) {
             await delBtn.click();
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -105,12 +134,12 @@ async function getProductOptions(page) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
                 opts.map(opt => ({ value: opt.value, text: opt.text }))
-                    .filter(opt => opt.value !== '' && opt.value !== '*' && opt.value !== '**' && !opt.text.includes("품절"))
+                    .filter(opt => opt.value !== '0' && opt.value !== '*' && opt.value !== '**' && !opt.text.toLowerCase().includes("품절")) // 품절 텍스트를 대소문자 구분 없이 필터링
             );
 
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1000)); // AJAX 로딩 등 페이지 업데이트 대기
                 const newSelectedOptions = [...selectedOptions, { text: option.text, value: option.value }];
 
                 if (currentDepth + 1 < selects.length) {
@@ -118,12 +147,16 @@ async function getProductOptions(page) {
                     await processSelectOptions(newSelects, currentDepth + 1, newSelectedOptions, productOptions);
                 } else {
                     let optionName = newSelectedOptions.map(opt =>
-                        opt.text.replace(/\s*\([\+\-]?\d{1,3}(,\d{3})*원\)/g, "").trim()
+                        opt.text.replace(/\s*\([^)]*\)/g, "").trim() // 괄호와 괄호 안의 모든 문자 제거
                     ).join(", ");
+
                     const optionPrice = newSelectedOptions.reduce((total, opt) => {
-                        const matches = opt.text.match(/\(([\+\-]?\d{1,3}(,\d{3})*원)\)/);
-                        return total + (matches ? parseInt(matches[1].replace(/,|원|\+/g, ''), 10) : 0);
+                        // "원" 바로 앞의 숫자를 포함한 문자열을 추출합니다.
+                        const matches = opt.text.match(/(\d[\d,\s]*)원/);
+                        // 추출된 문자열에서 콤마와 공백을 제거한 후 숫자로 변환합니다.
+                        return total + (matches ? parseInt(matches[1].replace(/[,\s]/g, ''), 10) : 0);
                     }, 0);
+
                     productOptions.push({ optionName, optionPrice });
                 }
 
@@ -141,31 +174,46 @@ async function getProductOptions(page) {
     const selects = await reloadSelects();
     return processSelectOptions(selects);
 }
-
-// 페이지에서 제품의 이름을 가져오는 비동기 함수입니다.
 async function getProductName(page) {
     const productName = await page.evaluate(() => {
-        const productNameElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h2');
-        let productNameText = productNameElement.textContent.trim();
+        const selector = '#Frm > div > div.infoWrap > div > h1';
+        const element = document.querySelector(selector);
 
-        // "해외배송"을 포함하는 괄호와 내용을 제거합니다.
-        productNameText = productNameText.replace(/\(.*해외배송.*\)/g, '');
-        productNameText = productNameText.replace(/할인|최대|10%|20%|10~20%|이내|요망|대량구매|묶음|기준|온라인|판매가|준수/g, '');
+        if (!element) return '';
 
-        // 최종적으로 정리된 상품명에서 앞뒤 공백을 제거합니다.
-        return productNameText.trim();
+        // HTML 태그와 "상품코드:", "class='subTit'"를 가진 span을 제거합니다.
+        let innerHTML = element.innerHTML
+            .replace(/상품코드:.*<\/font>/i, '')
+            .replace(/<span class="subTit">.*?<\/span>/gi, '')
+            .replace(/<[^>]*>/g, '');
+
+        // HTML 엔티티 &nbsp;를 빈 문자열로 대체합니다.
+        let productNameText = innerHTML.replace(/&nbsp;/gi, '');
+
+        // 개행 문자와 탭을 빈 문자열로 대체합니다.
+        productNameText = productNameText.replace(/[\n\t]/g, '');
+
+        // 여러 개의 공백을 하나의 공백으로 대체합니다.
+        productNameText = productNameText.replace(/\s+/g, ' ').trim();
+
+        return productNameText;
     });
 
     return productName;
 }
 
-// 페이지에 제품 옵션이 있는지 확인하는 비동기 함수입니다.
+
+
 async function getHasOption(page) {
     return await page.evaluate(() => {
-        const selectElements = document.querySelectorAll('select.ProductOption0');
-        if (selectElements.length > 0) {
+        const selectElements = document.querySelectorAll('select.select_fild');
+        const filteredSelectElements = Array.from(selectElements).filter(select => select.name !== 'deliveryCollectFl');
+        if (filteredSelectElements.length > 0) {
             return true;
         }
         return false;
     });
 }
+
+
+
