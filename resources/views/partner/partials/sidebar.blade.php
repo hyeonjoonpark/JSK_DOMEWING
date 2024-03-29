@@ -29,7 +29,7 @@
                         </li>
                         <li class="nk-menu-item">
                             <a href="/partner/products/collect" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-chart-line"></em></span>
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-shopping-cart"></em></span>
                                 <span class="nk-menu-text">상품 수집윙</span>
                             </a>
                         </li>

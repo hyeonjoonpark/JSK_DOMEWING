@@ -34,6 +34,7 @@ use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
 use App\Http\Controllers\Partners\ForgotPasswordController;
 use App\Http\Controllers\Partners\LoginController as PartnersLoginController;
+use App\Http\Controllers\Partners\Products\CollectController;
 use App\Http\Controllers\Partners\RegisterController as PartnersRegisterController;
 use App\Http\Controllers\ProductEditor\ViewController;
 use App\Http\Controllers\Testmonial\TestmonialController;
@@ -58,6 +59,7 @@ Route::prefix('partner')->group(function () {
             Route::get('/open-market', [OpenMarketController::class, 'index']);
         });
         Route::prefix('products')->group(function () {
+            Route::get('collect', [CollectController::class, 'index'])->name('partner.products.collect');
         });
     });
 });
