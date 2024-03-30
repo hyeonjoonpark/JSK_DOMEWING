@@ -70,7 +70,7 @@ class SoldOutController extends Controller
      * @param string $rememberToken
      * @return string
      */
-    private function runSoldOut($productCodes, $b2bIds, $rememberToken, $type)
+    public function runSoldOut($productCodes, $b2bIds, $rememberToken, $type)
     {
         $tempDirPath = storage_path('app/public/product-codes');
         $tempFilePath = $tempDirPath . '/' . uniqid() . '.json';
