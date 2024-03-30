@@ -86,6 +86,7 @@
                             'page' => $products->currentPage(),
                             'numPages' => $products->lastPage(),
                             'searchKeyword' => $searchKeyword,
+                            'productCodesStr' => $productCodesStr,
                         ])
                     </div>
                     <div class="text-center mt-3 mb-3">
@@ -115,8 +116,10 @@
                                                     height=100></a></td>
                                         <td><a href="{{ $product->productHref }}"
                                                 target="_blank">{{ $product->productName }}</a></td>
-                                        <td><a href="{{ $product->productHref }}"
-                                                target="_blank">{{ $product->productCode }}</a></td>
+                                        <td><a href="javascript:void(0);" id="copy{{ $product->productCode }}"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" title="클릭하여 복사"
+                                                onclick="copyCode('{{ $product->productCode }}');">{{ $product->productCode }}</a>
+                                        </td>
                                         <td><a href="{{ $product->productHref }}"
                                                 target="_blank">{{ number_format($product->productPrice, 0) }}원</a></td>
                                         <td><a href="{{ $product->productHref }}" target="_blank">{{ $product->name }}</a>
@@ -243,6 +246,31 @@
                     console.log(response);
                 }
             });
+        }
+
+        function copyCode(productCode) {
+            const button = $('#copy' + productCode); // jQuery를 사용하여 버튼 선택
+
+            // 클립보드에 텍스트 복사 시도
+            navigator.clipboard.writeText(productCode)
+                .then(() => {
+                    // 복사 성공 시, 툴팁 메시지 및 위치 변경
+                    button.attr('data-bs-original-title', '복사 완료!')
+                        .attr('data-bs-placement', 'bottom') // 툴팁 위치를 하단으로 변경
+                        .tooltip('dispose') // 기존 툴팁 인스턴스 제거
+                        .tooltip('show'); // 변경된 설정으로 툴팁 표시
+
+                    // 1초 후 원래의 툴팁 메시지 및 위치로 재설정
+                    setTimeout(() => {
+                        button.attr('data-bs-original-title', '클릭하여 복사')
+                            .attr('data-bs-placement', 'top') // 툴팁 위치를 상단으로 복귀
+                            .tooltip('dispose') // 변경된 툴팁 인스턴스 제거
+                            .tooltip(); // 원래 설정으로 툴팁 재생성
+                    }, 1000); // 1초 후 원래 상태로 복귀
+                })
+                .catch(err => {
+                    console.error('복사 실패: ', err);
+                });
         }
     </script>
 @endsection

@@ -154,36 +154,50 @@ class AdminController extends Controller
     }
     public function minewing(Request $request)
     {
+        // Initialize variables from the request with default values if not present
         $searchKeyword = $request->input('searchKeyword', '');
+        $productCodesStr = $request->input('productCodesStr', null);
+
+        // Base query for products
         $query = DB::table('minewing_products AS mp')
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->where('mp.isActive', 'Y')
-            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt');
+            ->select([
+                'mp.id AS productID', 'mp.productCode', 'mp.productImage',
+                'mp.productName', 'mp.productPrice', 'mp.productHref',
+                'v.name', 'mp.createdAt'
+            ]);
 
+        // Apply search keyword condition
         if (!empty($searchKeyword)) {
             $query->where(function ($query) use ($searchKeyword) {
-                $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('mp.productCode', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
+                $query->where('mp.productName', 'like', "%{$searchKeyword}%")
+                    ->orWhere('mp.productPrice', 'like', "%{$searchKeyword}%")
+                    ->orWhere('mp.productCode', 'like', "%{$searchKeyword}%")
+                    ->orWhere('v.name', 'like', "%{$searchKeyword}%")
+                    ->orWhere('mp.createdAt', 'like', "%{$searchKeyword}%");
             });
         }
 
-        $products = $query->orderBy('createdAt', 'DESC')->paginate(500);
+        // Apply product codes condition
+        if (!empty($productCodesStr)) {
+            $productCodesArr = explode(',', $productCodesStr);
+            $productCodesArr = array_map('trim', $productCodesArr);
+            $query->whereIn('mp.productCode', $productCodesArr);
+        }
 
+        // Execute the query with ordering and pagination
+        $products = $query->orderBy('mp.createdAt', 'DESC')->paginate(500);
+
+        // Query for B2Bs without changing, as it seems unrelated to the product's query
         $b2bs = DB::table('product_register AS pr')
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where('v.is_active', 'ACTIVE')
             ->where('pr.is_active', 'Y')
             ->get();
 
-        return view('admin/product_minewing', [
-            'products' => $products,
-            'searchKeyword' => $searchKeyword,
-            'productCodesStr' => '',
-            'b2bs' => $b2bs
-        ]);
+        // Return view with data
+        return view('admin/product_minewing', compact('products', 'searchKeyword', 'productCodesStr', 'b2bs'));
     }
     public function searchProductCodes(Request $request)
     {
@@ -194,7 +208,7 @@ class AdminController extends Controller
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->whereIn('mp.productCode', $productCodesArr)
             ->where('isActive', 'Y')
-            ->orderBy('mp.createdAt', 'DESC')->paginate(500);;
+            ->orderBy('mp.createdAt', 'DESC')->paginate(500);
         $b2bs = DB::table('product_register AS pr')
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where('v.is_active', 'ACTIVE')
@@ -233,36 +247,50 @@ class AdminController extends Controller
     }
     public function soldOut(Request $request)
     {
+        // Initialize variables from the request with default values if not present
         $searchKeyword = $request->input('searchKeyword', '');
+        $productCodesStr = $request->input('productCodesStr', null);
+
+        // Base query for products
         $query = DB::table('minewing_products AS mp')
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->where('mp.isActive', 'N')
-            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt');
+            ->select([
+                'mp.id AS productID', 'mp.productCode', 'mp.productImage',
+                'mp.productName', 'mp.productPrice', 'mp.productHref',
+                'v.name', 'mp.createdAt'
+            ]);
 
+        // Apply search keyword condition
         if (!empty($searchKeyword)) {
             $query->where(function ($query) use ($searchKeyword) {
-                $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('mp.productCode', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
+                $query->where('mp.productName', 'like', "%{$searchKeyword}%")
+                    ->orWhere('mp.productPrice', 'like', "%{$searchKeyword}%")
+                    ->orWhere('mp.productCode', 'like', "%{$searchKeyword}%")
+                    ->orWhere('v.name', 'like', "%{$searchKeyword}%")
+                    ->orWhere('mp.createdAt', 'like', "%{$searchKeyword}%");
             });
         }
 
-        $products = $query->orderBy('createdAt', 'DESC')->paginate(500);
+        // Apply product codes condition
+        if (!empty($productCodesStr)) {
+            $productCodesArr = explode(',', $productCodesStr);
+            $productCodesArr = array_map('trim', $productCodesArr);
+            $query->whereIn('mp.productCode', $productCodesArr);
+        }
 
+        // Execute the query with ordering and pagination
+        $products = $query->orderBy('mp.createdAt', 'DESC')->paginate(500);
+
+        // Query for B2Bs without changing, as it seems unrelated to the product's query
         $b2bs = DB::table('product_register AS pr')
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where('v.is_active', 'ACTIVE')
-            ->where('pr.is_active', 'Y')
+            ->where('pr.is_active', 'N')
             ->get();
 
-        return view('admin/product_sold_out', [
-            'products' => $products,
-            'searchKeyword' => $searchKeyword,
-            'productCodesStr' => '',
-            'b2bs' => $b2bs
-        ]);
+        // Return view with data
+        return view('admin.product_sold_out', compact('products', 'searchKeyword', 'productCodesStr', 'b2bs'));
     }
     public function legacy(Request $request)
     {

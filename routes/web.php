@@ -81,7 +81,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('product/minewing', [AdminController::class, 'minewing'])->name('admin.minewing');
     Route::post('product/minewing', [AdminController::class, 'searchProductCodes']);
     Route::get('product/new-minewing', [AdminController::class, 'newMinewing']);
-    Route::get('product/sold-out', [AdminController::class, 'soldOut']);
+    Route::get('product/sold-out', [AdminController::class, 'soldOut'])->name('admin.product.sold-out');
     Route::post('product/sold-out', [AdminController::class, 'searchSoldOutCodes']);
     Route::get('product/legacy', [AdminController::class, 'legacy']);
     Route::post('product/legacy', [AdminController::class, 'legacy']);
