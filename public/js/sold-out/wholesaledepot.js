@@ -79,6 +79,7 @@ async function clearPopup(page) {
         else {
             console.log(false);
         }
+        await dialog.accept();
         return;
     });
 }
