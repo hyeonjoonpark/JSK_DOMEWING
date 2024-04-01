@@ -121,7 +121,13 @@ async function getProductOptions(page) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
                 opts.map(opt => ({ value: opt.value, text: opt.text }))
-                    .filter(opt => opt.value !== '' && opt.value !== '*' && opt.value !== '**' && !opt.text.includes("품절"))
+                    .filter(opt =>
+                        opt.value !== '' &&
+                        opt.value !== '*' &&
+                        opt.value !== '**' &&
+                        !opt.text.includes("품절") &&
+                        !opt.text.includes("준수") // "준수" 포함 옵션 건너뛰기
+                    )
             );
 
             for (const option of options) {
