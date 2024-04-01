@@ -46,14 +46,14 @@ async function scrapeProducts(page) {
             if (promotionElement && promotionElement.getAttribute('src') === soldOutImageSrc) {
                 return true;
             }
-            const nameElement = productElement.querySelector('div.txt > a > strong > font');
+            const nameElement = productElement.querySelector('div.txt > a > strong');
             if (nameElement) {
-                const nameText = nameElement.textContent.trim();
+                const nameText = nameElement.textContent.trim().toLowerCase(); // 소문자로 변환
                 if (nameText.includes("온라인") || nameText.includes("판매금지") || nameText.includes("오프라인") || nameText.includes("유통기한")) {
-                    return true;
+                    return true; // 특정 문자열을 포함하면 true를 반환하여 건너뜁니다.
                 }
             }
-            return false;
+            return false; // 위 조건에 해당하지 않으면 false를 반환합니다.
         }
 
         for (const productElement of productElements) {

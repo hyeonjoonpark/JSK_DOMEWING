@@ -10,7 +10,11 @@ const fs = require('fs');
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
-            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            try {
+                await page.goto(url, { waitUntil: 'domcontentloaded' });
+            } catch (error) {
+                continue;
+            }
             const product = await scrapeProduct(page, url);
             products.push(product);
         }
