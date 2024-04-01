@@ -111,13 +111,17 @@ class SoldOutController extends Controller
      */
     public function sendSoldOutRequest($tempJsonFilePath, $vendorEngName, $username, $password, $type)
     {
-        $scriptPath = public_path('js/' . $type . '/' . $vendorEngName . '.js');
-        $command = "node {$scriptPath} {$username} {$password} {$tempJsonFilePath}";
-        exec($command, $output, $resultCode);
-        if ($resultCode === 0 && $output[0] === 'true') {
-            return true;
+        try {
+            $scriptPath = public_path('js/' . $type . '/' . $vendorEngName . '.js');
+            $command = "node {$scriptPath} {$username} {$password} {$tempJsonFilePath}";
+            exec($command, $output, $resultCode);
+            if ($resultCode === 0 && $output[0] === 'true') {
+                return true;
+            }
+            return false;
+        } catch (\Exception $e) {
+            return false;
         }
-        return false;
     }
     private function validator(Request $request)
     {

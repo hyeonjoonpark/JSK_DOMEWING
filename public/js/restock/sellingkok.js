@@ -35,12 +35,11 @@ async function login(page, username, password) {
 
 async function processPageList(page, searchStr) {
     await page.goto('https://www.sellingkok.com/shop/partner/?ap=list', { waitUntil: 'networkidle0' });
+    await page.click('input[name="it_soldout"][value="1"]');
     await page.select('#cd_search', 'pt_it_cd');
-    await page.select('#page_num', '100');
-    await delay(1000);
     await page.type('textarea[name="it_id"]', searchStr);
-    await page.click('body > div:nth-child(2) > div.page-content > div.well > form > div:nth-child(17) > div:nth-child(4) > div > button');
-    await delay(3000);
+    await page.select('#page_num', '500');
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
 }
 async function doRestock(page) {
     await page.evaluate(() => {
