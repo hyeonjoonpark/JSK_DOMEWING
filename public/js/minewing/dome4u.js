@@ -61,9 +61,13 @@ async function scrapeProducts(page) {
             const textContent = productElement.textContent || productElement.innerText;
             return !textContent.includes('품절');
         }
-
+        function isOwnProduct(productElement) {
+            // '자사상품'이 포함된 dt > span 태그를 찾습니다.
+            const ownProductElement = productElement.querySelector('dt > span');
+            return ownProductElement && ownProductElement.textContent.includes('자사상품');
+        }
         for (const productElement of productElements) {
-            if (hasStockByText(productElement)) {
+            if (hasStockByText(productElement) && isOwnProduct(productElement)) {
                 try {
                     const productInfo = processProduct(productElement);
                     products.push(productInfo);
