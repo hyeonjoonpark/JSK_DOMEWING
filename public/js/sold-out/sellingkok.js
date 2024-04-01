@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -19,7 +19,7 @@ const fs = require('fs');
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 
