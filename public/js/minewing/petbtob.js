@@ -20,8 +20,6 @@ const puppeteer = require('puppeteer');
         await browser.close();
     }
 })();
-
-
 async function signIn(page, username, password) {
     await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle0' });
     await page.type('#member_id', username);
@@ -40,18 +38,15 @@ async function getNumPage(page, listUrl) {
     const numPage = Math.ceil(numProducts / countProductInPage);
     return numPage;
 }
-
 async function moveToPage(page, listUrl, curPage) {
     const url = new URL(listUrl);
     url.searchParams.set('page', curPage);
-
     await page.goto(url.toString(), { waitUntil: 'domcontentloaded' });
 }
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         const products = [];
         const productElements = document.querySelectorAll('li.item,DB_rate xans-record-');
-
         function checkSkipProduct(promotionElement) {
             const soldOut = "//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif";
             const promotionSrc = promotionElement.getAttribute('src');
@@ -60,13 +55,11 @@ async function scrapeProducts(page) {
             }
             return false;
         }
-
         for (const productElement of productElements) {
             const promotionElement = productElement.querySelector('div.description > div.status > div > img');
             if (promotionElement && checkSkipProduct(promotionElement)) {
                 continue; // Skip if sold out
             }
-
             const expiredDateElement = productElement.querySelector('div.description > ul > li:nth-child(3) > span');
             if (expiredDateElement) {
                 const expiredDateText = expiredDateElement.textContent.trim();
@@ -74,17 +67,14 @@ async function scrapeProducts(page) {
                     continue;
                 }
             }
-
             const nameElement = productElement.querySelector('div.description > p.name > a');
             const imageElement = productElement.querySelector('div.thumbnail.outline > a > div.normal_thumb > img');
             const priceElement = productElement.querySelector('div.description > ul > li:nth-child(2) > span:nth-child(2)');
             const hrefElement = productElement.querySelector('div.thumbnail.outline > a');
-
             if (!nameElement) continue; // Skip if no name element
             const name = nameElement.textContent.trim();
             // Skip if name contains "오프라인" or "판매금지"
             if (name.includes("오프라인") || name.includes("판매금지")) continue;
-
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
             const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';

@@ -10,8 +10,15 @@ const fs = require('fs');
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
-            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            try {
+                await page.goto(url, { waitUntil: 'domcontentloaded' });
+            } catch (error) {
+                continue;
+            }
             const product = await scrapeProduct(page, url);
+            if (product === false) {
+                continue;
+            }
             products.push(product);
         }
         console.log(JSON.stringify(products));
@@ -57,7 +64,6 @@ async function scrapeProduct(page, productHref) {
         };
         return product;
     } catch (error) {
-        console.error('Error occurred:', error);
         return false;
     }
 }
