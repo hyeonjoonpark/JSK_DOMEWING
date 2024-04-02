@@ -43,15 +43,14 @@ class MiningController extends Controller
         exec($command, $output, $returnCode);
         if ($returnCode === 0 && isset($output[0])) {
             $products = json_decode($output[0], true);
-        } else {
             return [
-                'status' => false,
-                'return' => '상품 데이터 마이닝에 실패했습니다.'
+                'status' => true,
+                'return' => $products
             ];
         }
         return [
-            'status' => true,
-            'return' => $products
+            'status' => false,
+            'return' => '해당 카테고리에서 수집할 수 있는 상품이 없습니다.'
         ];
     }
     private function getAccount($rememberToken, $vendorId)
