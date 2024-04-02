@@ -123,51 +123,14 @@
             </div>
         </div>
     </div>
-    <div class="modal" tabindex="-1" role="dialog" id="handleDupNamesModal" data-bs-backdrop="static"
-        data-bs-keyboard="false">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">중복 상품명 검출</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="duplicatedType">
-                    <div class="row">
-                        <div class="col-12 col-md-6 mb-3">
-                            <h6 class="mb-3">수정할 상품</h6>
-                            <img id="editProductImage" class="w-100 mb-3" src="" alt="중복 상품명 이미지">
-                            <h6 class="mb-3">원상품명: <span id="editProductNameOri"></span></h6>
-                            <a href="" id="editProductHref" target="_blank">상품 상세보기</a>
-                        </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <h6 class="mb-3">중복된 상품</h6>
-                            <img id="duplicatedProductImage" class="w-100 mb-3" src="" alt="중복 상품명 이미지">
-                            <h6 class="mb-3">원상품명: <span id="duplicatedProductNameOri"></span></h6>
-                            <a href="" id="duplicatedProductHref" target="_blank">상품 상세보기</a>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="">수정할 상품명</label>
-                        <input type="text" class="form-control" id="editNewName">
-                    </div>
-                    <div class="form-group">
-                        <label for="">중복된 상품명</label>
-                        <input type="text" class="form-control" id="duplicatedNewName">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="initHandleDupName();">저장하기</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">종료하기</button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 @section('scripts')
     <script>
+        $(document).ready(function() {
+            $("#categoryId").select2({
+                dropdownParent: $("#productSaveForm")
+            });
+        });
         var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
         var audioMining = new Audio('{{ asset('assets/audio/diring.mp3') }}');
         var audioCollect = new Audio('{{ asset('assets/audio/diring.mp3') }}');
