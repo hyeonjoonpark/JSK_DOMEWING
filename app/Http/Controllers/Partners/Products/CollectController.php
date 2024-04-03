@@ -10,35 +10,48 @@ class CollectController extends Controller
 {
     public function index(Request $request)
     {
+        $productCodesStr = $request->input('productCodesStr', '');
         $searchKeyword = $request->input('searchKeyword', '');
-        $query = DB::table('minewing_products AS mp')
-            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
-            ->where('mp.isActive', 'Y')
-            ->select('mp.id AS productID', 'mp.productCode', 'mp.productImage', 'mp.productName', 'mp.productPrice', 'mp.productHref', 'v.name', 'mp.createdAt');
+        $categoryId = $request->input('categoryId', '');
+        $controller = new Controller();
+        $marginValue = $controller->getMarginValue();
 
-        if (!empty($searchKeyword)) {
+        $query = DB::table('minewing_products AS mp')
+            ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
+            ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
+            ->where('mp.isActive', 'Y')
+            ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name');
+
+        if ($searchKeyword) {
             $query->where(function ($query) use ($searchKeyword) {
-                $query->where('mp.productName', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('mp.productPrice', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('mp.productCode', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('v.name', 'like', '%' . $searchKeyword . '%')
-                    ->orWhere('mp.createdAt', 'like', '%' . $searchKeyword . '%');
+                $query->where('mp.productName', 'like', "%$searchKeyword%")
+                    ->orWhere('mp.productPrice', 'like', "%$searchKeyword%")
+                    ->orWhere('mp.productCode', 'like', "%$searchKeyword%");
             });
         }
 
+        if ($productCodesStr) {
+            $productCodesArr = explode(',', $productCodesStr);
+            $productCodesArr = array_map('trim', $productCodesArr);
+            $query->whereIn('mp.productCode', $productCodesArr);
+        }
+
+        if ($categoryId && $categoryId != '-1') {
+            $query->where('mp.categoryID', $categoryId);
+        }
+
         $products = $query->orderBy('createdAt', 'DESC')->paginate(500);
+        $categories = $this->getCategories();
 
-        $b2bs = DB::table('product_register AS pr')
-            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
-            ->where('v.is_active', 'ACTIVE')
-            ->where('pr.is_active', 'Y')
+        return view('partner/products_collect', compact('products', 'searchKeyword', 'productCodesStr', 'categories', 'categoryId'));
+    }
+    public function getCategories()
+    {
+        $categories = DB::table('minewing_products AS mp')
+            ->join('ownerclan_category AS oc', 'mp.categoryID', '=', 'oc.id')
+            ->select('oc.id', 'oc.name')
+            ->distinct()
             ->get();
-
-        return view('partner/products_collect', [
-            'products' => $products,
-            'searchKeyword' => $searchKeyword,
-            'productCodesStr' => '',
-            'b2bs' => $b2bs
-        ]);
+        return $categories;
     }
 }

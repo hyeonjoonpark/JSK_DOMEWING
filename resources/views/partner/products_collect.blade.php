@@ -42,7 +42,53 @@
 @endsection
 @section('content')
     <div class="row g-gs">
-        <div class="col">
+        <div class="col-12">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">통합 검색</h6>
+                    <p>테이블의 모든 컬럼 중 원하는 키워드를 검색하세요.</p>
+                    <form method="GET" action="{{ route('partner.products.collect') }}">
+                        @csrf
+                        <div class="row g-gs">
+                            <div class="col-12 col-lg-6">
+                                <div class="form-group">
+                                    <label for="categoryId" class="form-label">카테고리</label>
+                                    <select class="form-select js-select2" data-search="on" name="categoryId"
+                                        id="categoryId">
+                                        <option value="-1">카테고리 선택</option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}"
+                                                {{ $categoryId == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-6">
+                                <div class="form-group">
+                                    <label for="" class="form-label">상품 검색</label>
+                                    <input type="text" class="form-control" placeholder="검색 키워드를 기입해주세요"
+                                        name="searchKeyword" value="{{ $searchKeyword }}">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="" class="form-label">상품 코드 대량 검색</label>
+                                    <input type="text" class="form-control"
+                                        placeholder="쉼표(,)로 구분해서 여러 상품 코드를 기입할 수 있습니다." name="productCodesStr"
+                                        value="{{ $productCodesStr }}">
+                                </div>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-primary">검색</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">상품윙 테이블</h6>
@@ -58,35 +104,36 @@
                         <table class="table text-nowrap align-middle">
                             <thead>
                                 <tr>
-                                    <th scope="col"><input type="checkbox" onclick="selectAll(this);"></th>
+                                    <th scope="col"><input type="checkbox" id="selectAll"></th>
                                     <th scope="col">대표 이미지</th>
-                                    <th scope="col">상품명</th>
-                                    <th scope="col">코드</th>
-                                    <th scope="col">가격</th>
-                                    <th scope="col">원청사</th>
-                                    <th scope="col">수집일자</th>
-                                    <th scope="col">ACTION</th>
+                                    <th scope="col">상품</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($products as $product)
-                                    <tr>
+                                    <tr id="tr{{ $product->productCode }}">
                                         <td scope="row"><input type="checkbox" name="selectedProducts"
                                                 value="{{ $product->productCode }}"></td>
-                                        <td><a href="{{ $product->productHref }}" target="_blank"><img
-                                                    src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100
-                                                    height=100></a></td>
-                                        <td><a href="{{ $product->productHref }}"
-                                                target="_blank">{{ $product->productName }}</a></td>
-                                        <td><a href="{{ $product->productHref }}"
-                                                target="_blank">{{ $product->productCode }}</a></td>
-                                        <td><a href="{{ $product->productHref }}"
-                                                target="_blank">{{ number_format($product->productPrice, 0) }}원</a></td>
-                                        <td><a href="{{ $product->productHref }}" target="_blank">{{ $product->name }}</a>
-                                        </td>
-                                        <td>{{ date('Y-m-d', strtotime($product->createdAt)) }}</td>
                                         <td>
-                                            <button class="btn btn-danger" onclick="getProductCodes();">품절</button>
+                                            <img src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100 height=100>
+                                        </td>
+                                        <td>
+                                            <a class="product-contents"
+                                                href="javascript:view('{{ $product->productCode }}');">
+                                                <p>
+                                                    {{ $product->name }}<br>
+                                                    <span class="font-weight-bold">{{ $product->productName }}</span><br>
+                                                    {{ $product->productCode }}<br>
+                                                    <span
+                                                        class="wing-font">{{ number_format($product->productPrice, 0) }}</span>
+                                                    <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
+                                                        alt="윙"><br>
+                                                    배송비: <span
+                                                        class="wing-font">{{ number_format($product->shipping_fee, 0) }}</span>
+                                                    <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
+                                                        alt="윙">
+                                                </p>
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -94,7 +141,7 @@
                         </table>
                     </div>
                     <div class="form-group">
-                        @include('partials/pagination', [
+                        @include('partner.partials.pagination', [
                             'page' => $products->currentPage(),
                             'numPages' => $products->lastPage(),
                             'searchKeyword' => $searchKeyword,
@@ -104,7 +151,68 @@
             </div>
         </div>
     </div>
+    <button class="btn btn-success btn-collect" onclick="initCollect();">수집하기</button>
 @endsection
 @section('scripts')
-    <script></script>
+    <script>
+        $(document).on('click', '#selectAll', function() {
+            const isChecked = $(this).is(':checked');
+            $('input[name="selectedProducts"]').prop('checked', isChecked);
+        });
+
+        function view(productCode) {
+            popupLoader(1, "상품 정보를 불러오는 중입니다.");
+            $.ajax({
+                url: "/api/partner/product/view",
+                type: 'POST',
+                dataType: "JSON",
+                data: {
+                    productCode,
+                    apiToken
+                },
+                success: function(response) {
+                    closePopup();
+                    const {
+                        status,
+                        data,
+                        message
+                    } = response;
+                    if (status === true) {
+                        const {
+                            productName,
+                            productPrice,
+                            productImage,
+                            productDetail,
+                            shipping_fee,
+                            category
+                        } = data;
+                        $('#viewCategory').html(category);
+                        $('#viewProductName').html(productName);
+                        $("#viewProductCode").html(productCode);
+                        $('#viewProductPrice').html(
+                            `${numberFormat(productPrice)} <img class="wing" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />`
+                        );
+                        $('#viewProductImage').attr('src', productImage);
+                        $('#viewProductDetail').html(productDetail);
+                        $("#viewShippingFee").html(
+                            `${numberFormat(shipping_fee)} <img class="wing" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />`
+                        );
+                        $("#viewProduct").modal('show');
+                    } else {
+                        swalWithReload(message, 'error');
+                    }
+                },
+                error: function(error) {
+                    closePopup();
+                    swalWithReload('API 통신 중 에러가 발생했습니다.', 'error');
+                }
+            });
+        }
+
+        function initCollect() {
+            const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+        }
+    </script>
 @endsection

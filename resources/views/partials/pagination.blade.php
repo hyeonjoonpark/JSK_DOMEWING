@@ -1,5 +1,3 @@
-<!-- resources/views/admin/partials/pagination.blade.php -->
-
 <div class="d-flex justify-content-center align-items-center">
     @if ($page > 1)
         <a class="pagination"

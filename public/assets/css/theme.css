@@ -1,8 +1,18 @@
-/*!
- * Theme Name: Default
- * Package : DashLite
- * Author: Softnio
- * Author URI: http://themeforest.net/user/softnio
- * Version	 :	1.0.0
- * Updated	 :	07.23.2020
-**/
+.wing{
+    width: 1rem;
+}
+.product-contents{
+    color:#364a63;
+}
+.font-weight-bold{
+    font-weight: bold;
+}
+.wing-font{
+    font-weight:bold;
+    color:goldenrod;
+}
+.btn-collect{
+    position:fixed;
+    right:5%;
+    top:50%;
+}

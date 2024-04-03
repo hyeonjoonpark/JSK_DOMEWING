@@ -156,7 +156,7 @@
                 </td>
             </tr>
             `).join('');
-            const totalAmount = response.reduce((accumulator, order) => accumulator + parseInt(order.amount), 0);
+            const totalAmount = response.reduce((accumulator, order) => accumulator + parseInt(order.amount ?? 0), 0);
             $('#totalAmt').html(numberFormat(totalAmount) + '원');
             $('#orderwingResult').html(html);
             closePopup();

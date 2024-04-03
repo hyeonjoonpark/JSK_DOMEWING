@@ -27,11 +27,18 @@
                                 <span class="nk-menu-text">대시보드</span>
                             </a>
                         </li>
-                        <li class="nk-menu-item">
-                            <a href="/partner/products/collect" class="nk-menu-link">
+                        <li class="nk-menu-item has-sub">
+                            <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-shopping-cart"></em></span>
-                                <span class="nk-menu-text">상품 수집윙</span>
+                                <span class="nk-menu-text">상품윙</span>
                             </a>
+                            <ul class="nk-menu-sub">
+                                <li class="nk-menu-item">
+                                    <a href="/partner/products/collect" class="nk-menu-link"><span
+                                            class="nk-menu-text">상품 수집관</span></a>
+                                </li>
+
+                            </ul>
                         </li>
                         <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
@@ -47,6 +54,10 @@
                                 <li class="nk-menu-item">
                                     <a href="/partner/account-setting/open-market" class="nk-menu-link"><span
                                             class="nk-menu-text">오픈마켓 계정 연동</span></a>
+                                </li>
+                                <li class="nk-menu-item">
+                                    <a href="/partner/account-setting/accounts-management" class="nk-menu-link"><span
+                                            class="nk-menu-text">오픈마켓 계정 관리</span></a>
                                 </li>
                             </ul>
                         </li>
