@@ -231,7 +231,7 @@ class AdminController extends Controller
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->whereIn('mp.productCode', $productCodesArr)
             ->where('isActive', 'N')
-            ->orderBy('mp.createdAt', 'DESC')->paginate(500);;
+            ->orderBy('mp.createdAt', 'DESC')->paginate(500);
         $b2bs = DB::table('product_register AS pr')
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where('v.is_active', 'ACTIVE')

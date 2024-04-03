@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const pages = await browser.pages();
     const page = pages[0];
     await page.setViewport({
@@ -44,6 +44,7 @@ async function processDelProduct(page, browser) {
     if (productExists === false) {
         return false;
     }
+    await page.waitForSelector('input[name="ack"]');
     await page.click('input[name="ack"]');
     await new Promise((page) => setTimeout(page, 1000));
     page.on('dialog', async dialog => {

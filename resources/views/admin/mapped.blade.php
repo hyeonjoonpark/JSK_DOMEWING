@@ -95,6 +95,7 @@
                 </div>
             `;
             $('#selectCategoryResult').html(html);
+            $('.js-select2').select2();
         }
 
         function handleEnter(event, btnID) {

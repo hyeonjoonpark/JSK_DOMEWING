@@ -123,51 +123,14 @@
             </div>
         </div>
     </div>
-    <div class="modal" tabindex="-1" role="dialog" id="handleDupNamesModal" data-bs-backdrop="static"
-        data-bs-keyboard="false">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">중복 상품명 검출</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="duplicatedType">
-                    <div class="row">
-                        <div class="col-12 col-md-6 mb-3">
-                            <h6 class="mb-3">수정할 상품</h6>
-                            <img id="editProductImage" class="w-100 mb-3" src="" alt="중복 상품명 이미지">
-                            <h6 class="mb-3">원상품명: <span id="editProductNameOri"></span></h6>
-                            <a href="" id="editProductHref" target="_blank">상품 상세보기</a>
-                        </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <h6 class="mb-3">중복된 상품</h6>
-                            <img id="duplicatedProductImage" class="w-100 mb-3" src="" alt="중복 상품명 이미지">
-                            <h6 class="mb-3">원상품명: <span id="duplicatedProductNameOri"></span></h6>
-                            <a href="" id="duplicatedProductHref" target="_blank">상품 상세보기</a>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="">수정할 상품명</label>
-                        <input type="text" class="form-control" id="editNewName">
-                    </div>
-                    <div class="form-group">
-                        <label for="">중복된 상품명</label>
-                        <input type="text" class="form-control" id="duplicatedNewName">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="initHandleDupName();">저장하기</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">종료하기</button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 @section('scripts')
     <script>
+        $(document).ready(function() {
+            $("#categoryId").select2({
+                dropdownParent: $("#productSaveForm")
+            });
+        });
         var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
         var audioMining = new Audio('{{ asset('assets/audio/diring.mp3') }}');
         var audioCollect = new Audio('{{ asset('assets/audio/diring.mp3') }}');
@@ -235,7 +198,7 @@
                 // 이미지 로딩 완료 이벤트를 위한 이미지 태그에 onload 속성 추가
                 const imgTag =
                     "<img src='" + image + "' alt='상품 이미지' width='100' height='100' />";
-                html += "<tr id='" + href + "'>";
+                html += "<tr id='tr" + i + "'>";
                 html += "<td><input type='checkbox' name='selectedProducts' value='" + i + "'></td>";
                 html += "<td><a href='" + href + "' target='_blank' id='productHref" + i + "'>" + imgTag + "</a></td>";
                 html += "<td><a href='" + href + "' target='_blank' id='duplicatedProductNameOri" + i + "'>" + name +
@@ -255,6 +218,7 @@
                 const index = this.value;
                 const productHref = $('#productHref' + index).attr('href');
                 productHrefs.push(productHref);
+                $('#tr' + index).hide();
             });
             popupLoader(1, '"각 상품의 고유 URL을 사용하여 중복 상품을 검사하고 있어요."');
             runUniqueProductHrefs(productHrefs);
@@ -375,12 +339,8 @@
             closePopup();
             popupLoader(1, '"데이터베이스에 상품 정보를 입력하고 있어요."');
         }
-        var successedHrefs = [];
 
         function runSave(categoryID, productKeywords, products, rememberToken) {
-            for (const product of products) {
-                successedHrefs.push(product.productHref);
-            }
             $.ajax({
                 url: '/api/minewing/save-products',
                 type: 'POST',
@@ -399,9 +359,6 @@
         function successHandle(response) {
             closePopup();
             if (response.status) {
-                for (const successHref of successedHrefs) {
-                    document.getElementById(successHref).style.display = 'none';
-                }
                 audioSuccess.play();
                 swalSuccess(response.return);
             } else {

@@ -29,6 +29,7 @@ use App\Http\Controllers\Domewing\Auth\ForgetPasswordController;
 use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
 use App\Http\Controllers\Domewing\FAQController;
 use App\Http\Controllers\Namewing\NamewingController;
+use App\Http\Controllers\OpenMarkets\AccountManagementController;
 use App\Http\Controllers\Partners\OpenMarketController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
@@ -56,7 +57,10 @@ Route::prefix('partner')->group(function () {
         Route::get('/index', [PartnersDashboardController::class, 'index']);
         Route::prefix('account-setting')->group(function () {
             Route::get('/partner', [PartnerAccountSetting::class, 'index']);
-            Route::get('/open-market', [OpenMarketController::class, 'index']);
+            Route::get('/open-market', function () {
+                return view('partner/account_setting_open_market');
+            });
+            Route::get('/accounts-management', [AccountManagementController::class, 'index']);
         });
         Route::prefix('products')->group(function () {
             Route::get('collect', [CollectController::class, 'index'])->name('partner.products.collect');

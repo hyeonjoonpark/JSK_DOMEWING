@@ -108,4 +108,31 @@ class Controller extends BaseController
             ->where('pr.is_active', 'Y')
             ->get();
     }
+    public function getProductWithCode($productCode)
+    {
+        $marginValue = $this->getMarginValue();
+        $product = DB::table('minewing_products AS mp')
+            ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
+            ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
+            ->where('mp.productCode', $productCode)
+            ->select([
+                'mp.productName',
+                'mp.productImage',
+                DB::raw("mp.productPrice * {$marginValue} AS productPrice"),
+                'mp.productDetail',
+                'ps.shipping_fee',
+                'oc.name AS category'
+            ])
+            ->first();
+        return $product;
+    }
+    public function getMarginValue()
+    {
+        $marginValue = DB::table('sellwing_config')
+            ->where('title', 'margin')
+            ->select(DB::raw('value/100+1 AS margin_value'))
+            ->first()
+            ->margin_value;
+        return $marginValue;
+    }
 }

@@ -90,23 +90,26 @@
                 const b2BName = b2B.name;
                 const b2BVendorId = b2B.vendorID;
                 html += `
-                    <div class="form-group">
-                        <label for="" class="form-label">${b2BName}</label>
-                        <div class="d-flex text-nowrap">
-                            <input type="text" class="form-control" id="searchKeyword${b2BVendorId}" placeholder="검색 키워드를 기입해주세요." onkeydown="handleEnter(event, 'searchBtn${b2BVendorId}')">
-                            <button class="btn btn-primary" id="searchBtn${b2BVendorId}" onclick="categorySearch(${b2BVendorId});">검색</button>
-                        </div>
-                        <select name="categoryID${b2BVendorId}" id="categoryID${b2BVendorId}" class="form-select js-select2"></select>
-                    </div>
-                `;
+            <div class="form-group">
+                <label for="" class="form-label">${b2BName}</label>
+                <div class="d-flex text-nowrap">
+                    <input type="text" class="form-control" id="searchKeyword${b2BVendorId}" placeholder="검색 키워드를 기입해주세요." onkeydown="handleEnter(event, 'searchBtn${b2BVendorId}')">
+                    <button class="btn btn-primary" id="searchBtn${b2BVendorId}" onclick="categorySearch(${b2BVendorId});">검색</button>
+                </div>
+                <select name="categoryID${b2BVendorId}" id="categoryID${b2BVendorId}" class="form-select js-select2" data-search="on"></select>
+            </div>
+        `;
                 vendorIDs.push(b2BVendorId);
             }
             html += `
-                <div class="d-flex justify-content-center">
-                    <button class="btn btn-primary" onclick="initMapping(${JSON.stringify(vendorIDs)}, ${ownerclanCategoryID});">저장하기</button>
-                </div>
-            `;
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-primary" onclick="initMapping(${JSON.stringify(vendorIDs)}, ${ownerclanCategoryID});">저장하기</button>
+        </div>
+    `;
             $('#selectCategoryResult').html(html);
+
+            // select2 초기화하기
+            $('.js-select2').select2();
         }
 
         function handleEnter(event, btnID) {
