@@ -46,8 +46,11 @@ async function processDelProduct(page, browser) {
     if (productExists === false) {
         return false;
     }
+    await page.waitForSelector('input[name="ack"]');
     await page.click('input[name="ack"]');
     await new Promise((page) => setTimeout(page, 1000));
+
+
     page.on('dialog', async dialog => {
         const message = dialog.message();
         await dialog.accept();
