@@ -75,4 +75,44 @@ class CoupangController extends Controller
             ];
         }
     }
+    public function edit(Request $request)
+    {
+        $coupangAccount = $request->coupangAccount;
+        $validator = Validator::make($coupangAccount, [
+            'code' => 'required',
+            'expiredAt' => 'required|date',
+            'accessKey' => 'required',
+            'secretKey' => 'required',
+            'name' => 'required|max:16'
+        ], [
+            'code' => '업체코드를 입력해주세요.',
+            'expiredAt' => 'API 키 만료일을 기입해주세요.',
+            'accessKey' => '엑세스 키를 기입해주세요.',
+            'secretKey' => '시크릿 키를 기입해주세요.',
+            'name.required' => '본 계정 별칭을 입력해주세요.',
+            'name.max' => '별칭은 16글자 이하여야 합니다.'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ];
+        }
+        $apiToken = $request->apiToken;
+        $partnerId = DB::table('partners')
+            ->where('api_token', $apiToken)
+            ->first(['id'])
+            ->id;
+        return $this->update($coupangAccount, $partnerId);
+    }
+    private function update($coupangAccount, $partnerId)
+    {
+        DB::table('coupang_accounts')
+            ->where('partner_id', $partnerId)
+            ->update($coupangAccount);
+        return [
+            'status' => true,
+            'message' => '쿠팡 계정 정보를 성공적으로 업데이트했습니다.'
+        ];
+    }
 }
