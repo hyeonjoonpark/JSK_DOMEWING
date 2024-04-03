@@ -61,24 +61,48 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button class="btn btn-success">수정하기</button>
+                    <button class="btn btn-success" onclick="editCoupangAccount();">수정하기</button>
                     <button class="btn btn-danger">삭제하기</button>
                 </div>
             </div>
         </div>
     </div>
-    <input type="hidden" id="hash">
 @endsection
 @section('scripts')
     <script>
+        var hashVar;
+
         function viewCoupangAccount(name, code, accessKey, secretKey, hash, expiredAt) {
             $('#name').val(name);
             $('#code').val(code);
             $('#accessKey').val(accessKey);
             $('#secretKey').val(secretKey);
             $('#expiredAt').val(expiredAt);
-            $('#hash').val(hash);
+            hashVar = hash;
             $('#viewCoupangAccountModal').modal('show');
+        }
+
+        function editCoupangAccount() {
+            const coupangAccount = {
+                name: $('#name').val(),
+                code: $('#code').val(),
+                access_key: $('#accessKey').val(),
+                secret_key: $('#secretKey').val(),
+                expired_at: $('#expiredAt').val(),
+                hash: hashVar
+            };
+            console.log(coupangAccount);
+            $.ajax({
+                url: "/api/partner/account-setting/coupang/edit",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    coupangAccount,
+                    apiToken
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
         }
     </script>
 @endsection

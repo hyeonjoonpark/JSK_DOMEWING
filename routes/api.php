@@ -165,7 +165,10 @@ Route::middleware(['auth.custom'])->group(function () {
 Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     Route::prefix('account-setting')->group(function () {
         Route::post('partner', [PartnerAccountSetting::class, 'validatePartner']);
-        Route::post('coupang', [CoupangController::class, 'accountSetting']);
+        Route::prefix('coupang')->group(function () {
+            Route::post('/', [CoupangController::class, 'accountSetting']);
+            Route::post('edit', [CoupangController::class, 'edit']);
+        });
     });
     Route::prefix('product')->group(function () {
         Route::post('view', [ViewController::class, 'main']);
