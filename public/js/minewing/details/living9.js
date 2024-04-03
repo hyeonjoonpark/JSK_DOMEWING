@@ -2,30 +2,23 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 // 비동기 함수를 시작합니다. 이 함수는 전체 스크립트의 메인 로직을 담당합니다.
 (async () => {
-    // Puppeteer로 브라우저 인스턴스를 시작합니다. headless 모드를 비활성화하여 브라우저 UI가 보이게 합니다.
     const browser = await puppeteer.launch({ headless: true });
-    // 새로운 페이지(탭)을 생성합니다.
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         await signIn(page, username, password);
-        // 스크래핑된 제품 정보를 저장할 배열을 초기화합니다.
         const products = [];
-        // 읽어들인 URL들을 순회하면서 각 제품 페이지에 접근합니다.
         for (const url of urls) {
             await page.goto(url, { waitUntil: 'domcontentloaded' });
             const product = await scrapeProduct(page, url);
             products.push(product);
         }
-        // 최종적으로 스크래핑된 모든 제품 정보를 콘솔에 출력합니다.
         console.log(JSON.stringify(products));
     } catch (error) {
-        // 에러가 발생했을 경우 에러 메시지를 콘솔에 출력합니다.
         console.error('Error occurred:', error);
     } finally {
-        // 모든 작업이 완료되면, 브라우저 인스턴스를 닫습니다.
         await browser.close();
     }
 })();
@@ -59,17 +52,14 @@ async function scrapeProduct(page, productHref) {
         const productPrice = await page.evaluate(() => {
             const priceElement = document.querySelector('#span_product_price_text');
             let textContent = '';
-            // childNodes를 순회하며 노드 타입이 TEXT_NODE인 경우만 텍스트를 추출합니다.
             priceElement.childNodes.forEach(node => {
                 if (node.nodeType === Node.TEXT_NODE) {
                     textContent += node.textContent;
                 }
             });
-            // 추출한 텍스트에서 숫자가 아닌 문자를 제거합니다.
             const productPrice = textContent.trim().replace(/[^\d]/g, '');
             return productPrice;
         });
-        // 위에서 추출한 정보들로 제품 객체를 구성합니다.
         const product = {
             productName: productName,
             productPrice: productPrice,
