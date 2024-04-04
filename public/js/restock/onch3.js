@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -19,7 +19,7 @@ const fs = require('fs');
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 
@@ -58,13 +58,11 @@ async function doSoldOut(page) {
 
     await page.click('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > span');
     await delay(2000);
-    await page.select('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_type > select', 1);
+    await page.select('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_type > select', "1");
     await delay(2000);
     await page.type('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_content > textarea', restockMsg);
     await delay(2000);
     await page.click('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_btn_group > a:nth-child(1)');
-
-
     await delay(2000);
 }
 
@@ -72,6 +70,6 @@ async function doSoldOut(page) {
 async function clearPopup(page) {
     page.on('dialog', async dialog => {
         await dialog.accept();
-        return;
+        return console.log(true);
     });
 }
