@@ -30,7 +30,7 @@ use App\Http\Controllers\Domewing\Auth\ResetPasswordController;
 use App\Http\Controllers\Domewing\FAQController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\AccountManagementController;
-use App\Http\Controllers\Partners\OpenMarketController;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
 use App\Http\Controllers\Partners\ForgotPasswordController;

@@ -35,5 +35,7 @@ return [
         'api_key' => env('NAVER_SHOP_API_KEY'),
         'secret_key' => env('NAVER_SHOP_SECRET_KEY'),
     ],
-
+    'coupang' => [
+        'base_url' => env('COUPANG_BASE_URL'),
+    ],
 ];
