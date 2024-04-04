@@ -54,12 +54,15 @@ async function doSoldOut(page) {
         const inputElement = document.querySelector('body > center > table > tbody > tr:nth-child(3) > td:nth-child(3) > div.my_pg_con_box > div.my_pg_con > div > div.made_list_title > div.made_select > input');
         inputElement?.click();
     });
-    const soldOutMsg = "안녕하세요 대표님\n해당상품 재고소진으로 품절처리 드립니다.\n재입고 일정이 현재 따로 잡혀있지 않습니다.\n감사합니다.";
+    const restockMsg = "안녕하세요 대표님\n해당상품 재입고 되어 알려드립니다.\n감사합니다.";
 
     await page.click('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > span');
-    await delay(2000); await page.select('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_type > select', 5);
-    await delay(2000); await page.type('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_content > textarea', soldOutMsg)
-    await delay(2000); await page.click('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_btn_group > a:nth-child(1)');
+    await delay(2000);
+    await page.select('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_type > select', 1);
+    await delay(2000);
+    await page.type('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_content > textarea', restockMsg);
+    await delay(2000);
+    await page.click('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_btn_group > a:nth-child(1)');
 
 
     await delay(2000);
