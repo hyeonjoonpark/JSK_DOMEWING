@@ -95,18 +95,18 @@
         console.log(error);
         closePopup();
         audioError.play();
-        swalWithReload('"로그인 세션이 만료되었습니다. 다시 로그인해주십시오."', 'error');
+        swalError('"API 요청 과정에서 에러가 발생했습니다."');
     }
 
     function ajaxSuccessHandling(response) {
         const status = response.status;
         const message = response.message;
-        let icon = 'success';
+        closePopup();
         if (status === false) {
             console.log(response);
-            icon = 'error';
+            swalError(message);
+        } else {
+            swalSuccess(message);
         }
-        closePopup();
-        swalWithReload(message, icon);
     }
 </script>

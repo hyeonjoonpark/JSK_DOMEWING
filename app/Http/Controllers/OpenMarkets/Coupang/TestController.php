@@ -32,7 +32,7 @@ class TestController extends Controller
         $url = 'https://api-gateway.coupang.com' . $path;
         $strjson = '
         {
-            "productName": "패션의류 남성언더웨어 잠옷 시즌성내의 모시메리",
+            "productName": "가구/인테리어>침구단품>기타침구단품",
             "vendorId": "A00921418"
         }
         ';

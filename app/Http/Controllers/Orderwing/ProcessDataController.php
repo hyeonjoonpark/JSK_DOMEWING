@@ -629,23 +629,18 @@ class ProcessDataController extends Controller
         $isFirstRow = true;
 
         $columnMappings = [
-            // 'B' => 'senderName',
-            // 'D' => 'senderPhone',
-            'J' => 'receiverName',
-            'K' => 'receiverPhone',
-            'M' => 'postcode',
-            'N' => 'address',
-
-            'D' => 'productName',
-            'G' => 'quantity',
-            'H' => 'productPrice',
+            'I' => 'receiverName',
+            'J' => 'receiverPhone',
+            'L' => 'postcode',
+            'M' => 'address',
+            'C' => 'productName',
+            'F' => 'quantity',
+            'G' => 'productPrice',
             // 'N' => 'shippingCost',
             'A' => 'orderCode',
-            'O' => 'shippingRemark',
-            'E' => 'productCode',
-
-            // 'A' => 'orderedAt',
-            // 'O' => 'amount'
+            'N' => 'shippingRemark',
+            'O' => 'productCode',
+            'B' => 'orderedAt',
             // ... Add more mappings if needed
         ];
 
@@ -658,7 +653,10 @@ class ProcessDataController extends Controller
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
 
-            $rowData = [];
+            $rowData = [
+                'senderName' => '',
+                'senderPhone' => ''
+            ];
             foreach ($cellIterator as $cell) {
                 $columnLetter = $cell->getColumn();
                 if (isset($columnMappings[$columnLetter])) {
@@ -673,13 +671,20 @@ class ProcessDataController extends Controller
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
+            $productShippingFee = DB::table('minewing_products AS mp')
+                ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
+                ->where('mp.productCode', $productCode)
+                ->first(['ps.shipping_fee'])
+                ->shipping_fee;
+            $rowData['shippingCost'] = $productShippingFee;
             if ($response['status'] === true) {
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
             }
+            $rowData['amount'] = (int)$rowData['productPrice'] * (int)$rowData['quantity'] + (int)$rowData['shippingCost'];
             $rowData['orderStatus'] = '배송준비';
-            $rowData['b2BName'] = "오너클랜";
+            $rowData['b2BName'] = "온채널";
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }

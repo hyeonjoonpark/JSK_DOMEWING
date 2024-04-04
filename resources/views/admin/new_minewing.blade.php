@@ -28,8 +28,9 @@
                                             <input type="radio" id="seller{{ $seller->vendor_id }}" name="sellers"
                                                 value="{{ $seller->vendor_id }}" class="custom-control-input"
                                                 @if ($seller->vendor_id === 26) checked @endif>
-                                            <label class="custom-control-label"
-                                                for="seller{{ $seller->vendor_id }}">{{ $seller->name }}</label>
+                                            <label class="custom-control-label" for="seller{{ $seller->vendor_id }}"><a
+                                                    href="{{ $seller->vendor_href }}"
+                                                    target="_blank">{{ $seller->name }}</a></label>
                                         </div>
                                     </div>
                                 </div>
@@ -67,7 +68,15 @@
                         <table class="table table-striped text-nowrap align-middle">
                             <thead>
                                 <tr>
-                                    <th scope="col"><input type="checkbox" onclick="selectAll(this);"></th>
+                                    <th scope="col">
+                                        <div class="preview-block">
+                                            <div class="custom-control custom-control-lg custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input"
+                                                    onclick="selectAll(this);" id="allCheck">
+                                                <label class="custom-control-label" for="allCheck"></label>
+                                            </div>
+                                        </div>
+                                    </th>
                                     <th scope="col">상품 대표 이미지</th>
                                     <th scope="col">상품명</th>
                                     <th scope="col">가격</th>
@@ -199,7 +208,14 @@
                 const imgTag =
                     "<img src='" + image + "' alt='상품 이미지' width='100' height='100' />";
                 html += "<tr id='tr" + i + "'>";
-                html += "<td><input type='checkbox' name='selectedProducts' value='" + i + "'></td>";
+                html += `
+                    <td>
+                        <div class="custom-control custom-control-lg custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" name="selectedProducts" value="${i}" id="customCheck${i}">
+                            <label class="custom-control-label" for="customCheck${i}"></label>
+                        </div>
+                    </td>
+                    `;
                 html += "<td><a href='" + href + "' target='_blank' id='productHref" + i + "'>" + imgTag + "</a></td>";
                 html += "<td><a href='" + href + "' target='_blank' id='duplicatedProductNameOri" + i + "'>" + name +
                     "</a></td>";

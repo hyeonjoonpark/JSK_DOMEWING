@@ -1,12 +1,19 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
-        const args = process.argv.slice(2);
-        const [tempFilePath, username, password] = args;
-        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        await page.setViewport({
+            width: 1920,
+            height: 1080
+        });
+        // const args = process.argv.slice(2);
+        // const [tempFilePath, username, password] = args;
+        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const urls = ['https://www.vipb2b.co.kr/goods/goods_view.php?goodsNo=2661'];
+        const username = 'sungil2018';
+        const password = 'Tjddlf88!@';
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -16,6 +23,9 @@ const fs = require('fs');
                 continue;
             }
             const product = await scrapeProduct(page, url);
+            if (product === false) {
+                continue;
+            }
             products.push(product);
         }
         console.log(JSON.stringify(products));
@@ -29,35 +39,37 @@ async function signIn(page, username, password) {
     await page.goto('https://www.vipb2b.co.kr/member/login.php', { waitUntil: 'networkidle0' });
     await page.type('#loginId', username);
     await page.type('#loginPwd', password);
-    const loginButton = await page.$('#formLogin > div.member_login_box > div.login_input_sec > button');
-    await loginButton.evaluate(b => b.click());
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+        document.querySelector('#formLogin').submit();
+    });
+    await page.waitForNavigation({ waitUntil: 'load' });
 }
 async function scrapeProduct(page, productHref) {
     try {
-        const productImage = await getProductImage(page);
-        if (productImage.includes('#mainImage > img')) {
+        if (await page.$('input[name="optionTextInput_0"]')) {
             return false;
         }
+        const productOptionData = await getProductOptions(page);
+        const hasOption = productOptionData.hasOption;
+        const productOptions = productOptionData.productOptions;
+        if (!await page.$('#mainImage > img')) {
+            return false;
+        }
+        const productImage = await getProductImage(page);
         const productDetail = await getProductDetail(page);
         if (productDetail === false) {
             return false;
         }
         const productName = await getProductName(page);
-        const hasOption = await getHasOption(page);
-        const productOptions = hasOption ? await getProductOptions(page) : [];
-        const productPrice = await page.evaluate(() => {
-            const productPrice = document.querySelector('#frmView > div > div > div.item_detail_list > dl.item_price > dd > strong > b').textContent.trim().replace(/[^\d]/g, '');
-            return productPrice;
-        });
+        const productPrice = 0;
         const product = {
-            productName: productName,
-            productPrice: productPrice,
-            productImage: productImage,
-            productDetail: productDetail,
-            hasOption: hasOption,
-            productOptions: productOptions,
-            productHref: productHref,
+            productName,
+            productPrice,
+            productImage,
+            productDetail,
+            hasOption,
+            productOptions,
+            productHref,
             sellerID: 45
         };
         return product;
@@ -65,9 +77,7 @@ async function scrapeProduct(page, productHref) {
         return false;
     }
 }
-
 async function getProductDetail(page) {
-
     return await page.evaluate(() => {
         const productDetailElements = document.querySelectorAll('#detail > div.detail_cont > div > div.txt-manual > center > img');
         if (productDetailElements.length > 0) {
@@ -76,7 +86,6 @@ async function getProductDetail(page) {
         return false;
     });
 }
-
 async function getProductImage(page) {
     const productImage = await page.evaluate(() => {
         return document.querySelector('#mainImage > img').src;
@@ -97,15 +106,13 @@ async function getProductOptions(page) {
 
         return filteredHandles; // 필터링된 ElementHandle 배열 반환
     }
-
     async function resetSelects() {
-        const delBtn = await page.$('tr > td > button');
+        const delBtn = await page.$('button.delete_goods');
         if (delBtn) {
             await delBtn.click();
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
-
     async function reselectOptions(selects, selectedOptions) {
         for (let i = 0; i < selectedOptions.length; i++) {
             await selects[i].select(selectedOptions[i].value);
@@ -115,41 +122,30 @@ async function getProductOptions(page) {
             }
         }
     }
-
-
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
-                opts.map(opt => ({ value: opt.value, text: opt.text }))
-                    .filter(opt =>
-                        opt.value !== 'value' &&
-                        opt.value !== '*' &&
-                        opt.value !== '**' &&
-                        !opt.text.includes("품절") &&
-                        !opt.text.includes("준수") // "준수" 포함 옵션 건너뛰기
-                    )
+                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt =>
+                    opt.value !== '' &&
+                    opt.value !== '*' &&
+                    opt.value !== '**' &&
+                    !opt.text.includes("품절") &&
+                    !opt.text.includes("준수"))
             );
-
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 const newSelectedOptions = [...selectedOptions, { text: option.text, value: option.value }];
-
                 if (currentDepth + 1 < selects.length) {
                     const newSelects = await reloadSelects();
                     await processSelectOptions(newSelects, currentDepth + 1, newSelectedOptions, productOptions);
                 } else {
                     let optionName = newSelectedOptions.map(opt =>
                         opt.text
-                            .replace(/\s*:.*/g, "")
+                            .replace(/\s\+\d+,\d+원/g, "")
                             .trim()
-                    ).join(", ");
-
-                    const optionPrice = newSelectedOptions.reduce((total, opt) => {
-                        const matches = opt.text.match(/[\+\-]?\d{1,3}(,\d{3})*원/);
-                        return total + (matches ? parseInt(matches[0].replace(/,|원|\+/g, ''), 10) : 0);
-                    }, 0);
-
+                    ).join(" / ");
+                    const optionPrice = parseInt(await page.$eval('dl.total_amount > dd > strong', el => el.textContent.trim().replace(/[^\d]/g, '')));
                     productOptions.push({ optionName, optionPrice });
                 }
                 await resetSelects();
@@ -162,12 +158,19 @@ async function getProductOptions(page) {
         }
         return productOptions;
     }
-
-    const selects = await reloadSelects();
-    return processSelectOptions(selects);
+    let selects = await reloadSelects();
+    if (selects.length < 1) {
+        return {
+            hasOption: false,
+            productOptions: []
+        };
+    }
+    const productOptions = await processSelectOptions(selects);
+    return {
+        hasOption: true,
+        productOptions: productOptions
+    };
 }
-
-
 async function getProductName(page) {
     const productName = await page.evaluate(() => {
         const productNameElement = document.querySelector('#frmView > div > div > div.item_detail_tit > h3');

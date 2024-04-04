@@ -32,6 +32,23 @@ class CoupangController extends Controller
                 'message' => $validator->errors()->first()
             ];
         }
+        $apiController = new ApiController();
+        $method = "GET";
+        $path = "/v2/providers/seller_api/apis/api/v1/marketplace/seller-products?vendorId={$request->code}";
+        $accessKey = $request->accessKey;
+        $secretKey = $request->secretKey;
+        $apiResult = $apiController->build($method, $path, $accessKey, $secretKey);
+        $data = $apiResult['data'];
+        $httpcode = $data['httpcode'];
+        $result = json_decode($data['result']);
+        echo $httpcode;
+        if ((int)$httpcode !== 200) {
+            return [
+                'status' => false,
+                'message' => $result->message
+            ];
+        }
+        print_r($result);
         return $this->updateAccount($request->code, $request->expiredAt, $request->accessKey, $request->secretKey, $request->apiToken, $request->name);
     }
     private function updateAccount($code, $expiredAt, $accessKey, $secretKey, $apiToken, $name)
@@ -39,6 +56,7 @@ class CoupangController extends Controller
         try {
             $exists = DB::table('coupang_accounts')
                 ->where('secret_key', trim($secretKey))
+                ->where('is_active', 'ACTIVE')
                 ->exists();
             if ($exists === true) {
                 return [
