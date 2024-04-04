@@ -22,48 +22,123 @@ class FormProductController extends Controller
     public function funn($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
-            $startRowIndex = 2;
-            $detailedDescription = str_repeat("상품 상세설명 참조\n", 6) . str_repeat("상품 상세정보에 별도 표기\n", 4);
-
             // 엑셀 파일 로드
             $spreadsheet = IOFactory::load(public_path('assets/excel/funn.xls'));
-            $sheet = $spreadsheet->getSheet(0);
+
+            $firstSheet = $spreadsheet->getSheet(0);
+            $firstSheet->setTitle('기본정보');
+            $secondSheet = $spreadsheet->getSheet(1);
+            $fifthSheet = $spreadsheet->getSheet(4);
+
+            // 데이터 추가를 위한 행 인덱스 초기화
+            $rowIndexFirstSheet = 2;
+            $rowIndexSecondSheet = 2;
+            $rowIndexFifthSheet = 2;
 
             // 데이터 추가
-            $rowIndex = $startRowIndex;
             foreach ($products as $product) {
                 $getShippingFeeResult = $this->getShippingFee($product->id);
                 $shippingCost = $getShippingFeeResult->shipping_fee;
                 $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
-                $ownerclanCategoryID = $product->categoryID;
-                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
+                $tobizonCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
-                $data = [
-                    '', $categoryCode, '', '', '', $product->productName, $product->productName,
-                    $product->productKeywords, '기타', "JS협력사", '', $marginedPrice, '자율', '',
-                    '과세', '', '', '', "N," . $product->productCode, $product->productImage, '',
-                    $product->productDetail, '가능', '선불', $shippingCost, $shippingCost, '', '', '', 1, 0, '',
-                    35, $detailedDescription, 0, '', '', '', '', ''
-                ];
 
+                $serialNumber = $rowIndexFirstSheet - 1;
+
+                $dataForFirstSheet = [
+                    $serialNumber,
+                    $product->productCode,
+                    '국내',
+                    $product->productName,
+                    '',
+                    '',
+                    $product->productKeywords,
+                    '',
+                    '',
+                    '',
+                    $categoryCode,
+                    '제한없음',
+                    '일반상품',
+                    '',
+                    99999,
+                    1,
+                    '과세',
+                    '가격자율',
+                    $marginedPrice,
+                    '',
+                    '',
+                    '',
+                    '선불',
+                    $shippingCost,
+                    '가능',
+                    $shippingCost,
+                    $shippingCost * 2,
+                    6624,
+                    'JS협력사',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '기타',
+                ];
+                $dataForSecondSheet = [
+                    $serialNumber,
+                    $product->productImage,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    $product->productDetail
+                ];
+                $dataForFifthSheet = [
+                    $serialNumber,
+                    35
+                ];
+                // 엑셀에 데이터 추가
                 $colIndex = 1;
-                foreach ($data as $value) {
-                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
-                    $sheet->setCellValue($cellCoordinate, $value);
+                foreach ($dataForFirstSheet  as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndexFirstSheet;
+                    $firstSheet->setCellValue($cellCoordinate, $value);
                     $colIndex++;
                 }
-                $rowIndex++;
-            }
+                $rowIndexFirstSheet++;
 
+                $colIndex = 1;
+                foreach ($dataForSecondSheet as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndexSecondSheet;
+                    $secondSheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndexSecondSheet++;
+
+                $colIndex = 1;
+                foreach ($dataForFifthSheet as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndexFifthSheet;
+                    $fifthSheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndexFifthSheet++;
+            }
             // 엑셀 파일 저장
             $fileName = 'funn_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
-            $writer = new Xlsx($spreadsheet);
+            $spreadsheet->setActiveSheetIndex(0);
+            $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
             return ['status' => true, 'return' => $downloadURL];
-        } catch (Exception $e) {
-            return ['status' => false, 'return' => $e->getMessage()];
+        } catch (\Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
         }
     }
     public function onch3($products, $margin_rate, $vendorEngName, $shippingCost, $index)
