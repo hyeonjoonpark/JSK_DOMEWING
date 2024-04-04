@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -19,7 +19,7 @@ const fs = require('fs');
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 
@@ -57,7 +57,7 @@ async function doSoldOut(page) {
     const soldOutMsg = "안녕하세요 대표님\n해당상품 재고소진으로 품절처리 드립니다.\n재입고 일정이 현재 따로 잡혀있지 않습니다.\n감사합니다.";
 
     await page.click('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > span');
-    await delay(2000); await page.select('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_type > select', 5);
+    await delay(2000); await page.select('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_type > select', "5");
     await delay(2000); await page.type('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_content > textarea', soldOutMsg)
     await delay(2000); await page.click('#searchForm > div > div.filter_btn_wrap > div.fbw_bot > div > div.ss_btn_group > a:nth-child(1)');
 
@@ -69,6 +69,6 @@ async function doSoldOut(page) {
 async function clearPopup(page) {
     page.on('dialog', async dialog => {
         await dialog.accept();
-        return;
+        return console.log(true);
     });
 }
