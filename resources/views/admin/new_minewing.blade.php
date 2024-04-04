@@ -72,8 +72,8 @@
                                         <div class="preview-block">
                                             <div class="custom-control custom-control-lg custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input"
-                                                    onclick="selectAll(this);" id="customCheck1">
-                                                <label class="custom-control-label" for="customCheck1"></label>
+                                                    onclick="selectAll(this);" id="allCheck">
+                                                <label class="custom-control-label" for="allCheck"></label>
                                             </div>
                                         </div>
                                     </th>
