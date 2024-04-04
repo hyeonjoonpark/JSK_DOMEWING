@@ -17,14 +17,14 @@ class CoupangController extends Controller
             'expiredAt' => 'required|date',
             'accessKey' => 'required',
             'secretKey' => 'required',
-            'name' => 'required|max:16'
+            'username' => 'required|max:16'
         ], [
             'code' => '업체코드를 입력해주세요.',
             'expiredAt' => 'API 키 만료일을 기입해주세요.',
             'accessKey' => '엑세스 키를 기입해주세요.',
             'secretKey' => '시크릿 키를 기입해주세요.',
-            'name.required' => '본 계정 별칭을 입력해주세요.',
-            'name.max' => '별칭은 16글자 이하여야 합니다.'
+            'username.required' => '본 계정 별칭을 입력해주세요.',
+            'username.max' => '별칭은 16글자 이하여야 합니다.'
         ]);
         if ($validator->fails()) {
             return [
@@ -32,26 +32,34 @@ class CoupangController extends Controller
                 'message' => $validator->errors()->first()
             ];
         }
-        $apiController = new ApiController();
-        $method = "GET";
-        $path = "/v2/providers/seller_api/apis/api/v1/marketplace/seller-products?vendorId={$request->code}";
         $accessKey = $request->accessKey;
         $secretKey = $request->secretKey;
+        $vendorId = $request->code;
+        $validateAccountResult = $this->validateAccount($accessKey, $secretKey, $vendorId);
+        if ($validateAccountResult['status'] === false) {
+            return $validateAccountResult;
+        }
+        return $this->updateAccount($request->code, $request->expiredAt, $request->accessKey, $request->secretKey, $request->apiToken, $request->username);
+    }
+    private function validateAccount($accessKey, $secretKey, $vendorId)
+    {
+        $apiController = new ApiController();
+        $method = "GET";
+        $path = "/v2/providers/seller_api/apis/api/v1/marketplace/meta/category-related-metas/display-category-codes/77723";
         $apiResult = $apiController->build($method, $path, $accessKey, $secretKey);
         $data = $apiResult['data'];
         $httpcode = $data['httpcode'];
-        $result = json_decode($data['result']);
-        echo $httpcode;
         if ((int)$httpcode !== 200) {
             return [
                 'status' => false,
-                'message' => $result->message
+                'message' => '유효한 계정 정보가 아닙니다.'
             ];
         }
-        print_r($result);
-        return $this->updateAccount($request->code, $request->expiredAt, $request->accessKey, $request->secretKey, $request->apiToken, $request->name);
+        return [
+            'status' => true
+        ];
     }
-    private function updateAccount($code, $expiredAt, $accessKey, $secretKey, $apiToken, $name)
+    private function updateAccount($code, $expiredAt, $accessKey, $secretKey, $apiToken, $username)
     {
         try {
             $exists = DB::table('coupang_accounts')
@@ -78,7 +86,7 @@ class CoupangController extends Controller
                     'expired_at' => $expiredAt . ' 23:59:59',
                     'access_key' => trim($accessKey),
                     'secret_key' => trim($secretKey),
-                    'name' => trim($name),
+                    'username' => trim($username),
                     'hash' => Str::uuid()
                 ]);
             return [
@@ -101,14 +109,14 @@ class CoupangController extends Controller
             'expiredAt' => 'required|date',
             'accessKey' => 'required',
             'secretKey' => 'required',
-            'name' => 'required|max:16'
+            'username' => 'required|max:16'
         ], [
             'code' => '업체코드를 입력해주세요.',
             'expiredAt' => 'API 키 만료일을 기입해주세요.',
             'accessKey' => '엑세스 키를 기입해주세요.',
             'secretKey' => '시크릿 키를 기입해주세요.',
-            'name.required' => '본 계정 별칭을 입력해주세요.',
-            'name.max' => '별칭은 16글자 이하여야 합니다.'
+            'username.required' => '본 계정 별칭을 입력해주세요.',
+            'username.max' => '별칭은 16글자 이하여야 합니다.'
         ]);
         if ($validator->fails()) {
             return [

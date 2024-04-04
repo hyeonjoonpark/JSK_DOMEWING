@@ -14,7 +14,7 @@
                     <p>각 계정을 클릭하여 관리합니다.</p>
                     @foreach ($coupangAccounts as $item)
                         <button class="btn btn-primary"
-                            onclick="viewCoupangAccount('{{ $item->name }}','{{ $item->code }}','{{ $item->access_key }}','{{ $item->secret_key }}','{{ $item->hash }}','{{ date('Y-m-d', strtotime($item->expired_at)) }}');">{{ $item->name }}</button>
+                            onclick="viewCoupangAccount('{{ $item->username }}','{{ $item->code }}','{{ $item->access_key }}','{{ $item->secret_key }}','{{ $item->hash }}','{{ date('Y-m-d', strtotime($item->expired_at)) }}');">{{ $item->username }}</button>
                     @endforeach
                 </div>
             </div>
@@ -32,8 +32,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">별칭</label>
-                        <input type="text" class="form-control" id="name">
+                        <label class="form-label">쿠팡 로그인 아이디</label>
+                        <input type="text" class="form-control" id="username">
                     </div>
                     <div class="form-group">
                         <label class="form-label">업체코드</label>
@@ -72,8 +72,8 @@
     <script>
         var hashVar;
 
-        function viewCoupangAccount(name, code, accessKey, secretKey, hash, expiredAt) {
-            $('#name').val(name);
+        function viewCoupangAccount(username, code, accessKey, secretKey, hash, expiredAt) {
+            $('#username').val(username);
             $('#code').val(code);
             $('#accessKey').val(accessKey);
             $('#secretKey').val(secretKey);
@@ -84,7 +84,7 @@
 
         function editCoupangAccount() {
             const coupangAccount = {
-                name: $('#name').val(),
+                username: $('#username').val(),
                 code: $('#code').val(),
                 access_key: $('#accessKey').val(),
                 secret_key: $('#secretKey').val(),

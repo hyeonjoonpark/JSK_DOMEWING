@@ -39,8 +39,8 @@
                         <input class="form-control" type="text" id="secretKey" placeholder="Secret Key 를 입력해주세요.">
                     </div>
                     <div class="form-group">
-                        <label for="" class="form-label">별칭(아이디)</label>
-                        <input class="form-control" type="text" id="name" placeholder="본 쿠팡 계정 별칭을 입력해주세요.">
+                        <label for="" class="form-label">쿠팡 로그인 아이디</label>
+                        <input class="form-control" type="text" id="username" placeholder="쿠팡 판매자 로그인 아이디를 입력해주세요.">
                     </div>
                     <div class="text-center">
                         <button class="btn btn-primary" onclick="handleCoupangAccount();">추가하기</button>
@@ -57,7 +57,7 @@
             const expiredAt = $('#expiredAt').val();
             const accessKey = $('#accessKey').val();
             const secretKey = $('#secretKey').val();
-            const name = $('#name').val();
+            const username = $('#username').val();
             popupLoader(1, '입력하신 정보를 업데이트 중입니다.');
             $.ajax({
                 url: "/api/partner/account-setting/coupang",
@@ -69,7 +69,7 @@
                     expiredAt,
                     accessKey,
                     secretKey,
-                    name
+                    username
                 },
                 success: ajaxSuccessHandling,
                 error: AjaxErrorHandling
