@@ -37,10 +37,17 @@ async function signIn(page, username, password) {
 }
 async function buildProduct(page, productHref) {
     try {
+        const isValid = await validateProduct(page);
+        if (isValid === false) {
+            return false;
+        }
         const productName = await getProductName(page);
         const hasOption = await getHasOption(page);
         const productOptions = hasOption === true ? await getProductOptions(page) : [];
         const productPrice = await getProductPrice(page);
+        if (productPrice < 1) {
+            return false;
+        }
         const productImage = await getProductImage(page);
         const productDetail = await getProductDetail(page);
         const product = {
@@ -59,9 +66,19 @@ async function buildProduct(page, productHref) {
         return false;
     }
 }
+async function validateProduct(page) {
+    return await page.evaluate(() => {
+        if (document.querySelector('#frmView > div > div.btn > a > em')) {
+            const isValidText = document.querySelector('#frmView > div > div.btn > a > em').textContent.trim();
+            if (isValidText.includes('불가')) {
+                return false;
+            }
+        }
+    });
+}
 async function getProductPrice(page) {
     return await page.evaluate(() => {
-        return document.querySelector('li.price > div > strong').textContent.trim().replace(/[^\d]/g, '');
+        return parseInt(document.querySelector('li.price > div > strong').textContent.trim().replace(/[^\d]/g, ''), 10);
     });
 }
 async function getProductDetail(page) {
