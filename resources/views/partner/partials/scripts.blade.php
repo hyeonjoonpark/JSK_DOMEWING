@@ -106,7 +106,7 @@
             console.log(response);
             swalError(message);
         } else {
-            swalSuccess(message);
+            swalWithReload(message, 'success');
         }
     }
 </script>

@@ -168,6 +168,7 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
         Route::prefix('coupang')->group(function () {
             Route::post('/', [CoupangController::class, 'accountSetting']);
             Route::post('edit', [CoupangController::class, 'edit']);
+            Route::post('delete', [CoupangController::class, 'delete']);
         });
     });
     Route::prefix('product')->group(function () {

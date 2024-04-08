@@ -62,7 +62,7 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button class="btn btn-success" onclick="editCoupangAccount();">수정하기</button>
-                    <button class="btn btn-danger">삭제하기</button>
+                    <button class="btn btn-danger" onclick="deleteCoupangAccount();">삭제하기</button>
                 </div>
             </div>
         </div>
@@ -83,22 +83,34 @@
         }
 
         function editCoupangAccount() {
-            const coupangAccount = {
-                username: $('#username').val(),
-                code: $('#code').val(),
-                access_key: $('#accessKey').val(),
-                secret_key: $('#secretKey').val(),
-                expired_at: $('#expiredAt').val(),
-                hash: hashVar
-            };
-            console.log(coupangAccount);
+            popupLoader(1, "계정 정보를 수정 중입니다.");
             $.ajax({
                 url: "/api/partner/account-setting/coupang/edit",
                 type: "POST",
                 dataType: "JSON",
                 data: {
-                    coupangAccount,
-                    apiToken
+                    apiToken,
+                    username: $('#username').val(),
+                    code: $('#code').val(),
+                    accessKey: $('#accessKey').val(),
+                    secretKey: $('#secretKey').val(),
+                    expiredAt: $('#expiredAt').val(),
+                    hash: hashVar
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
+        function deleteCoupangAccount() {
+            popupLoader(1, "해당 계정을 삭제 중입니다.");
+            $.ajax({
+                url: "/api/partner/account-setting/coupang/delete",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    hash: hashVar
                 },
                 success: ajaxSuccessHandling,
                 error: AjaxErrorHandling
