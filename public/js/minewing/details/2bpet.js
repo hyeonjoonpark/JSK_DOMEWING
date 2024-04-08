@@ -7,9 +7,6 @@ const fs = require('fs');
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const urls = ['https://www.2bpet.co.kr/product/content.asp?guid=206305&cate=14512&params='];
-        // const username = "jskorea2024";
-        // const password = "tjddlf88!@";
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -57,8 +54,11 @@ async function scrapeProduct(page, productHref) {
             }
             // 수정된 복사본의 텍스트에서 숫자만 추출합니다.
             const productPrice = priceElement.textContent.trim().replace(/[^\d]/g, '');
-            return productPrice;
+            return parseInt(productPrice, 10);
         });
+        if (productPrice < 1) {
+            return false;
+        }
         const product = {
             productName: productName,
             productPrice: productPrice,
