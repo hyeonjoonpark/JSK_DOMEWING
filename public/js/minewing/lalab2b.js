@@ -1,7 +1,7 @@
 const getForbiddenWords = require('../forbidden_words');
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     const [listURL, username, password] = process.argv.slice(2);
     try {
@@ -47,7 +47,7 @@ async function scrapeProducts(page, forbiddenWords) {
         function scrapeProduct(productElement, forbiddenWords) {
             try {
                 const soldOutImageElement = productElement.querySelector('div.txt > div > img');
-                if (soldOutImageElement) {
+                if (soldOutImageElement && soldOutImageElement.src === 'https://cdn-pro-web-213-28.cdn-nhncommerce.com/lalab2tr0217_godomall_com/data/icon/goods_icon/icon_soldout.gif') {
                     return false;
                 }
                 const name = productElement.querySelector('strong.prdName').textContent.trim();
