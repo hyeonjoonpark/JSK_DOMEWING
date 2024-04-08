@@ -46,7 +46,7 @@ async function scrapeProducts(page, forbiddenWords) {
         return products;
         function scrapeProduct(productElement, forbiddenWords) {
             try {
-                const soldOutImageElement = productElement.querySelector('iv > div.txt > div > img');
+                const soldOutImageElement = productElement.querySelector('div.txt > div > img');
                 if (soldOutImageElement) {
                     return false;
                 }
