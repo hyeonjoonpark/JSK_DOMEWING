@@ -70,11 +70,17 @@ async function scrapeProducts(page) {
                 "https://www.2bpet.co.kr/data/petzone/icon/04.jpg",
                 "https://www.2bpet.co.kr/data/petzone/icon/01.jpg"
             ];
+            const tagImageElement = productElement.querySelector('div.point_wrap > div.isiconBoxTop > div > span > img');
+            if (tagImageElement) {
+                if (tagImageElement.src.includes(skipImageSrc)) {
+                    return false;
+                }
+            }
             const skipKeywords = ["온라인", "유통기한", "판매금지"];
             const skipPriceText = "품절";
 
-            const imageElementSrc = querySelectorSrc(productElement, 'div.isiconBoxTop > div > span > img');
-            if (skipImageSrc.includes(imageElementSrc)) {
+            const imageElementSrc = querySelectorSrc(productElement, 'div.list_top > a > img');
+            if (!imageElementSrc) {
                 return false;
             }
 
