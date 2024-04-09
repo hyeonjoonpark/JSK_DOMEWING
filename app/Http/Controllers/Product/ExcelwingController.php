@@ -22,7 +22,7 @@ class ExcelwingController extends Controller
         }
         $products = $response['return'];
         $products = $products->toArray();
-        $productsChunks = array_chunk($products, 500);
+        $productsChunks = array_chunk($products, 300);
         $response = $this->getMarginRate($b2BID);
         if (!$response['status']) {
             return $response;
