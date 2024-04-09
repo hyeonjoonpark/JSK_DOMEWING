@@ -58,6 +58,7 @@ use App\Http\Controllers\ProductEditor\MainController;
 use App\Http\Controllers\SellwingApis\AuthController;
 use App\Http\Controllers\SellwingApis\CategoryListController;
 use App\Http\Controllers\SellwingApis\VendorListController;
+use App\Http\Controllers\SmartStore\SmartStoreAccountController;
 use App\Http\Controllers\Testmonial\TestmonialController;
 
 /*
@@ -171,6 +172,10 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
             Route::post('/', [CoupangController::class, 'accountSetting']);
             Route::post('edit', [CoupangController::class, 'edit']);
             Route::post('delete', [CoupangController::class, 'delete']);
+        });
+        Route::prefix('smart-store')->group(function () {
+            Route::post('/', [SmartStoreAccountController::class, 'add']);
+            Route::post('edit', [SmartStoreAccountController::class, 'edit']);
         });
     });
     Route::prefix('product')->group(function () {
