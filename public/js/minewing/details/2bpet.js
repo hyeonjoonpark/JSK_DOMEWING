@@ -1,12 +1,16 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const { timeout } = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // const urls = ['https://2bpet.co.kr/product/content.asp?guid=155196&cate=14501&params='];
+        // const username = "jskorea2024";
+        // const password = "tjddlf88!@";
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -29,7 +33,7 @@ async function signIn(page, username, password) {
     await page.type('#id', username);
     await page.type('#pass', password);
     await page.click('#Frm > div > a');
-    await page.waitForNavigation();
+    await page.waitForNavigation({ waitUntil: 'load', timeout: 600000 });
 }
 async function scrapeProduct(page, productHref) {
     try {
@@ -45,17 +49,16 @@ async function scrapeProduct(page, productHref) {
         const hasOption = await getHasOption(page);
         const productOptions = hasOption ? await getProductOptions(page) : [];
         const productPrice = await page.evaluate(() => {
-            // priceElement의 복사본을 만듭니다.
-            const priceElement = document.querySelector('div:nth-child(7) > dl > dd').cloneNode(true);
-            // 복사본에서 span.discountVal 요소를 찾아 제거합니다.
-            const discountSpan = priceElement.querySelector('span.discountVal');
-            if (discountSpan) {
-                discountSpan.remove(); // span 요소를 제거합니다.
+            const productPriceInput = document.querySelector('#packprice');
+            if (productPriceInput) {
+                const productPrice = productPriceInput.value;
+                return parseInt(productPrice, 10);
             }
-            // 수정된 복사본의 텍스트에서 숫자만 추출합니다.
-            const productPrice = priceElement.textContent.trim().replace(/[^\d]/g, '');
-            return parseInt(productPrice, 10);
+            return false;
         });
+        if (productPrice === false) {
+            return false;
+        }
         if (productPrice < 1) {
             return false;
         }

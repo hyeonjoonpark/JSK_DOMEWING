@@ -62,7 +62,7 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button class="btn btn-success" onclick="editCoupangAccount();">수정하기</button>
-                    <button class="btn btn-danger" onclick="deleteCoupangAccount();">삭제하기</button>
+                    <button class="btn btn-danger" onclick="initDel();">삭제하기</button>
                 </div>
             </div>
         </div>
@@ -99,6 +99,22 @@
                 },
                 success: ajaxSuccessHandling,
                 error: AjaxErrorHandling
+            });
+        }
+
+        function initDel() {
+            Swal.fire({
+                icon: "warning",
+                title: "계정 삭제",
+                text: "해당 계정에 속한 모든 상품 정보 또한 삭제됩니다. 그래도 진행하시겠습니까?",
+                showConfirmButton: true,
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteCoupangAccount();
+                }
             });
         }
 

@@ -10,6 +10,9 @@
 {{-- 메인 콘텐츠 섹션 --}}
 @section('content')
     <div class="row g-gs mb-3">
+        <div class="col-12 text-center">
+            <button class="btn btn-outline-danger" onclick="powerNamewing();">진짜 굉장히 위험한 버튼</button>
+        </div>
         <div class="col text-center">
             <button class="btn btn-success" onclick="selectAllExceptFirst();">첫 번째 상품 제외 전체선택</button>
             <button class="btn btn-danger" onclick="multiSoldOut();">일괄품절</button>
@@ -150,6 +153,39 @@
                 return $(this).val();
             }).get();
             initSoldOut(productCodes, 'sold-out');
+        }
+
+        function powerNamewing() {
+            Swal.fire({
+                icon: "warning",
+                title: "매우 위험",
+                text: "상품명이 같은 상품들 중, 첫 상품을 제외한 모든 상품들을 품절 처리합니다. 되돌릴 수 없는 액션입니다.",
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: "확인",
+                cancelButtonText: "취소"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/api/namewing/power-namewing",
+                        type: "POST",
+                        dataType: "JSON",
+                        data: {
+                            rememberToken
+                        },
+                        success: function(response) {
+                            console.log(response);
+                            const status = response.status;
+                            let statusStr = "error";
+                            if (status === true) {
+                                statusStr = "success";
+                            }
+                            swalWithReload(response.message, statusStr);
+                        },
+                        error: AjaxErrorHandling
+                    });
+                }
+            });
         }
     </script>
 @endsection

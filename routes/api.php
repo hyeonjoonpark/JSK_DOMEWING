@@ -47,6 +47,7 @@ use App\Http\Controllers\Productwing\RestockController;
 use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
+use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\Products\ViewController;
@@ -100,6 +101,7 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('/product/download', [DownloadController::class, 'main']);
     Route::post('/product/edit', [MainController::class, 'main']);
     Route::post('/product/edit/excelwing', [ProductEditorExcelwingController::class, 'index']);
+    Route::post('/namewing/power-namewing', [NamewingController::class, 'power']);
     // account-setting
     Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
     Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);
