@@ -99,6 +99,7 @@
     }
 
     function ajaxSuccessHandling(response) {
+        console.log(response);
         const status = response.status;
         const message = response.message;
         closePopup();

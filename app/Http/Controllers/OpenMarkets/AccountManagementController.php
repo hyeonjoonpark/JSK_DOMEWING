@@ -18,8 +18,14 @@ class AccountManagementController extends Controller
                 'is_active' => 'ACTIVE',
                 'partner_id' => $partnerId
             ])->get();
+        $smartStoreAccounts = DB::table('smart_store_accounts')
+            ->where([
+                'is_active' => 'ACTIVE',
+                'partner_id' => $partnerId
+            ])->get();
         return view('partner.accounts_management', [
-            'coupangAccounts' => $coupangAccounts
+            'coupangAccounts' => $coupangAccounts,
+            'smartStoreAccounts' => $smartStoreAccounts
         ]);
     }
 }
