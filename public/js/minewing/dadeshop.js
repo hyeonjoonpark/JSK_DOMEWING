@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -50,7 +50,7 @@ async function moveToPage(page, listUrl, curPage) {
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         const products = [];
-        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div.xans-element-.xans-product.xans-product-listnormal.ec-base-product > ul li.xans-record-');
+        const productElements = document.querySelectorAll('div.xans-element-.xans-product.xans-product-listnormal.ec-base-product > ul.prdList.grid4 > li.xans-record-');
 
         function checkSkipProduct(promotionElement) {
             const skipImages = ["/web/upload/icon_201909061817097000.png"];
@@ -59,7 +59,7 @@ async function scrapeProducts(page) {
         }
 
         for (const productElement of productElements) {
-            const promotionElement = productElement.querySelector('div.description > div.icon > div.promotion.cboth > img');
+            const promotionElement = productElement.querySelector('div.icon > img');
             if (promotionElement && checkSkipProduct(promotionElement)) {
                 continue; // Skip if sold out, matches the custom promotion image, or is marked as wholesale
             }
@@ -69,10 +69,13 @@ async function scrapeProducts(page) {
             const priceElement = productElement.querySelector('div.description > ul > li:nth-child(1) > span:nth-child(2)');
             const hrefElement = productElement.querySelector('div.thumbnail > div > a');
 
-            const name = nameElement ? nameElement.textContent.trim().replace(/[A-Za-z]{2}-\d+/g, '').trim() : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
             const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
             const price = priceElement ? priceElement.textContent.trim().replace(/[^\d]/g, '') : 'Price not found';
+            const name = nameElement ? nameElement.textContent.trim()
+                .replace(/[A-Za-z]{2}-[A-Za-z0-9]+/g, '')
+                .replace('상품명 :', '')
+                .trim() : 'Name not found';
             const platform = "다데샵";
             products.push({ name, price, image, href, platform });
         }
