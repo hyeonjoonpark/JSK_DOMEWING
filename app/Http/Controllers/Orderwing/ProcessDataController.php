@@ -282,6 +282,79 @@ class ProcessDataController extends Controller
 
         return $data;
     }
+    public function domeggook2($excelPath)
+    {
+        $reader = IOFactory::createReader('Csv');
+        $reader->setInputEncoding('EUC-KR'); // EUC-KR 인코딩 설정
+        $spreadsheet = $reader->load($excelPath);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $data = [];
+        $isFirstRow = true; // 첫 행은 헤더로 간주, 건너뛰기 위한 플래그
+
+        // 열 매핑
+        $columnMappings = [
+            'L' => 'senderName',
+            'M' => 'senderPhone',
+            'N' => 'receiverName',
+            'R' => 'receiverPhone',
+            'P' => 'postcode',
+            'O' => 'address',
+            'G' => 'productName',
+            'J' => 'quantity',
+            'AM' => 'productPrice',
+            'AA' => 'shippingCost',
+            'A' => 'orderCode',
+            'U' => 'shippingRemark',
+            'I' => 'productCode',
+            'AH' => 'orderedAt',
+            'AN' => 'amount',
+            'B' => 'orderStatus'
+        ];
+
+        foreach ($worksheet->getRowIterator() as $row) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+                continue;
+            }
+
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false); // 모든 셀 순회
+
+            $rowData = [];
+            foreach ($cellIterator as $cell) {
+                $columnLetter = $cell->getColumn();
+                if (isset($columnMappings[$columnLetter])) {
+                    $value = $cell->getValue();
+                    if ($columnLetter == 'P') {
+                        $value = str_replace("'", "", $value);
+                    }
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
+                    if ($columnMappings[$columnLetter] == 'amount') {
+                        (int)$value = (int)$value + (int)$rowData['shippingCost'];
+                    }
+                    $rowData[$columnMappings[$columnLetter]] = $value;
+                }
+            }
+
+            $productCode = $rowData['productCode'] ?? '';
+            $extractOrderController = new ExtractOrderController();
+            $response = $extractOrderController->getProductHref($productCode);
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
+            $rowData['b2BName'] = "도매꾹";
+
+            if (!empty($rowData)) {
+                $data[] = $rowData;
+            }
+        }
+
+        return $data;
+    }
     public function domesin($excelPath)
     {
         $spreadsheet = IOFactory::load($excelPath);

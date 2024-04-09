@@ -53,4 +53,35 @@ class NamewingController extends Controller
             'totalDuplicateGroups' => $totalDuplicateGroups // 중복 그룹의 총 개수 전달
         ]);
     }
+    public function power()
+    {
+        try {
+            DB::statement("
+                UPDATE minewing_products
+                SET isActive = 'N'
+                WHERE id IN (
+                    SELECT id
+                    FROM (
+                        SELECT
+                            id,
+                            productName,
+                            ROW_NUMBER() OVER(PARTITION BY productName ORDER BY id) AS rn
+                        FROM minewing_products
+                        WHERE isActive = 'Y'
+                    ) AS ranked_products
+                    WHERE rn > 1
+                );
+            ");
+            return [
+                'status' => true,
+                'message' => "파워 네임윙을 성공적으로 처리했습니다. 반드시 상품군들을 확인해주세요."
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => "파워 네임윙 가동 중 에러가 발생했습니다. 다음에 다시 시도해주십시오.",
+                'error' => $e->getMessage()
+            ];
+        }
+    }
 }
