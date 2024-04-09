@@ -22,14 +22,23 @@ class ExcelwingController extends Controller
         }
         $products = $response['return'];
         $products = $products->toArray();
+        // $b2BID에 따른 $numChunks 값 매핑
+        $numChunksMapping = [
+            35 => 300,
+            33 => 100,
+        ];
+
+        // 기본값 설정
         $numChunks = 500;
-        if ((int)$b2BID === 35) {
-            $numChunks = 300;
+
+        // $b2BID 값에 해당하는 매핑이 있는 경우, 그 값을 사용
+        if (array_key_exists((int)$b2BID, $numChunksMapping)) {
+            $numChunks = $numChunksMapping[(int)$b2BID];
         }
-        if ((int)$b2BID === 33) {
-            $numChunks = 100;
-        }
+
+        // $products 배열을 $numChunks 크기의 청크로 나눔
         $productsChunks = array_chunk($products, $numChunks);
+
         $response = $this->getMarginRate($b2BID);
         if (!$response['status']) {
             return $response;
