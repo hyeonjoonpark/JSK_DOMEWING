@@ -70,7 +70,10 @@ class PullSmartStoreCategories extends Command
         $result = $ssac->build("GET", "/v1/categories", ['last' => true], $accessToken);
         if ($result['status'] === true) {
             $categories = json_decode($result['data']);
-            foreach ($categories as $item) {
+            foreach ($categories as $index => $item) {
+                if ($index < 2177) {
+                    continue;
+                }
                 DB::table('smart_store_category')->updateOrInsert(
                     ['code' => $item->id],
                     ['name' => $item->wholeCategoryName]
