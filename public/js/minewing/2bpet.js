@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
@@ -27,12 +27,12 @@ async function signIn(page, username, password) {
     await page.type('#id', username);
     await page.type('#pass', password);
     await page.click('#Frm > div > a');
-    await page.waitForNavigation({ waitUntil: 'load' });
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
 }
 async function getNumPage(page, listUrl) {
     await page.goto(listUrl, { waitUntil: 'networkidle0' });
     await page.select('#viewCount', '20');
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    await new Promise(resolve => setTimeout(resolve, 30000));
     const numProducts = await page.evaluate(() => {
         const numProductsText = document.querySelector('#container > div > div > div.view_type_box > p > em').innerHTML.trim();
         const matches = numProductsText.match(/\d+/g);
@@ -48,7 +48,7 @@ async function moveToPage(page, curPage) {
     await page.evaluate((sibalPage) => {
         paging('pStart', '' + sibalPage);
     }, sibalPage);
-    await new Promise(resolve => setTimeout(resolve, 20000));
+    await new Promise(resolve => setTimeout(resolve, 10000));
 }
 async function scrapeProducts(page) {
     return await page.evaluate(() => {
