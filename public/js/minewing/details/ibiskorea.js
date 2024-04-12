@@ -29,16 +29,40 @@ async function signIn(page, username, password) {
     await page.click('#loginWrap > div > div > div.mlog > form > fieldset > a > img');
     await page.waitForNavigation({ waitUntil: 'load' });
 }
+async function checkImageUrl(page, url) {
+    try {
+        // 이미지 URL에 대해 HEAD 요청을 수행
+        const response = await page.goto(url, { method: 'HEAD' });
+        // 200~299 상태 코드는 성공을 의미
+        return response.status() >= 200 && response.status() < 300;
+    } catch (error) {
+        console.error(`Error checking image URL: ${url}`, error);
+        return false;
+    }
+}
+function normalizeUrl(url) {
+    return url.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
+}
+
+const skipUrls = [
+    "gi.esmplus.com/ibis001/info/TOP/t002.jpg",
+    "gi.esmplus.com/ibis001/info/TOP/t001.jpg",
+    "gi.esmplus.com/ibis001/info/TOP/t003.jpg",
+    "gi.esmplus.com/ibis001/ibis_detail/story.jpg",
+    "gi.esmplus.com/ibis001/info/END/b001.jpg",
+    "gi.esmplus.com/ibis001/info/END/b002.jpg",
+    "gi.esmplus.com/ibis001/info/END/b003.jpg"
+].map(normalizeUrl);
+
+
 async function scrapeProduct(page, url) {
     try {
         await page.goto(url, { waitUntil: 'networkidle0' });
 
-        // 먼저 해당 셀렉터가 존재하는지 확인합니다.
         const isSelectorPresent = await page.evaluate(() => {
             return !!document.querySelector('#form1 > div > div.prd-btns > div:nth-child(1)');
         });
 
-        // 셀렉터가 존재하면 건너뜁니다.
         if (isSelectorPresent) {
             return false;
         }
@@ -49,56 +73,40 @@ async function scrapeProduct(page, url) {
 
         const productData = await page.evaluate(() => {
             const productName = document.querySelector('#form1 > div > h3').textContent.trim();
-            // 두 번째 셀렉터 요소를 선택하기 위해 querySelectorAll을 사용하고 인덱스 1을 사용합니다.
             const priceElements = document.querySelectorAll('table > tbody > tr > td.price > div.tb-left');
             const productPrice = priceElements.length > 1 ? priceElements[1].textContent.trim().replace(/[^\d]/g, '') : 'Price not available';
             const productImage = document.querySelector('#lens_img').src;
             const productDetailElements = document.querySelectorAll('#productDetail > div > div.prd-detail > p > img');
 
-            if (productDetailElements.length < 1) {
-                return false;
-            }
-
-
-            const productDetail = [];
-            for (const productDetailElement of productDetailElements) {
-                const tempProductDetailSrc = productDetailElement.src;
-                const skipUrls = [
-                    "http://gi.esmplus.com/ibis001/info/TOP/t002.jpg",
-                    "http://gi.esmplus.com/ibis001/info/TOP/t001.jpg",
-                    "http://gi.esmplus.com/ibis001/info/TOP/t003.jpg",
-                    "https://gi.esmplus.com/ibis001/ibis_detail/story.jpg",
-                    "http://gi.esmplus.com/ibis001/info/END/b001.jpg",
-                    "http://gi.esmplus.com/ibis001/info/END/b002.jpg",
-                    "http://gi.esmplus.com/ibis001/info/END/b003.jpg"
-                ];
-
-                if (!tempProductDetailSrc || skipUrls.includes(tempProductDetailSrc)) {
-                    continue; // 이미지 URL이 건너뛰기 목록에 있으면 건너뛴다
-                }
-                productDetail.push(productDetailElement.src);
-            }
-
-            const productData = {
+            return {
                 productName,
                 productPrice,
                 productImage,
-                productDetail
+                productDetailElements: Array.from(productDetailElements).map(elem => elem.src)
             };
-            return productData;
         });
 
-        const { productName, productPrice, productImage, productDetail } = productData;
+        // 이미지 URL 검증
+        const validProductDetails = [];
+        for (const src of productData.productDetailElements) {
+            const normalizedSrc = normalizeUrl(src);
+            if (skipUrls.includes(normalizedSrc)) {
+                continue; // URL이 건너뛰기 목록에 있으면 건너뜁니다.
+            }
+            if (await checkImageUrl(page, src)) {
+                validProductDetails.push(src);
+            }
+        }
+
         const product = {
-            productName,
-            productPrice,
-            productImage,
-            productDetail,
+            ...productData,
+            productDetail: validProductDetails,
             hasOption,
             productOptions,
             productHref: url,
             sellerID: 53
         };
+
         return product;
     } catch (error) {
         console.error(error);
