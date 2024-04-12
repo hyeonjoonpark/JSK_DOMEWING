@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\FormProductController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use ZipArchive;
 
 class ExcelwingController extends Controller
 {
@@ -63,10 +64,34 @@ class ExcelwingController extends Controller
                 ];
             }
         }
-        return [
-            'status' => true,
-            'return' => $downloadURLs
-        ];
+        $zip = new ZipArchive();
+        $zipFileName = public_path('assets/excel/formed/' . $vendorEngName . '_' . date('YmdHis') . '.zip');
+        if ($zip->open($zipFileName, ZipArchive::CREATE) === TRUE) {
+            foreach ($downloadURLs as $file) {
+                $localPath = public_path(parse_url($file, PHP_URL_PATH));
+                if (file_exists($localPath)) {
+                    $zip->addFile($localPath, basename($localPath));
+                } else {
+                    $zip->close();  // 열린 압축 파일을 닫고
+                    return [
+                        'status' => false,
+                        'return' => '파일을 찾을 수 없습니다: ' . $localPath
+                    ];
+                }
+            }
+            $zip->close();
+            $urlZip = asset('assets/excel/formed/' . basename($zipFileName));
+            return [
+                'status' => true,
+                'return' => $downloadURLs,
+                'urlZip' => $urlZip
+            ];
+        } else {
+            return [
+                'status' => false,
+                'return' => '압축 파일 생성에 실패했습니다.'
+            ];
+        }
     }
     public function getShippingFee($vendorID)
     {

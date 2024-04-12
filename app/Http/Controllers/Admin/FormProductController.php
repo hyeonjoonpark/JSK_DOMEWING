@@ -835,7 +835,7 @@ class FormProductController extends Controller
                     '선결제:고정배송비',
                     $shippingCost,
                     '',
-                    'SA0058243',
+                    'SA0062116',
                     $shippingCost,
                     'N',
                     365,
