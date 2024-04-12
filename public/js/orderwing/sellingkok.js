@@ -20,7 +20,8 @@ const path = require('path');
         await page.type('#login_id', username);
         await page.type('#login_pw', password);
         await page.click('#sub-wrapper > div > div.box-block > form > div.foot > button');
-        await page.waitForNavigation({ waitUntil: 'load' });
+        await new Promise((page) => setTimeout(page, 3000));
+
         await page.goto('https://www.sellingkok.com/shop/partner/?ap=saleitem&status=1', { waitUntil: 'domcontentloaded' });
         await page.click('#list_chk_all');
         page.on('dialog', async dialog => {
