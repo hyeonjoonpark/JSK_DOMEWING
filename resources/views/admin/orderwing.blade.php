@@ -112,35 +112,34 @@
 
         function updateOrderTable(response) {
             console.log(response);
+
+            // Update the number of orders displayed
             $('#numOrders').html(response.length);
-            let html = response.map(order => `
+
+            // Generate HTML for each order and the total amount
+            $('#orderwingResult').html(generateOrdersHtml(response));
+            $('#totalAmt').html(`${numberFormat(calculateTotalAmount(response))}원`);
+
+            // Close any open popup
+            closePopup();
+        }
+
+        function generateOrdersHtml(orders) {
+            return orders.map(order => generateOrderRowHtml(order)).join('');
+        }
+
+        function generateOrderRowHtml(order) {
+            return `
             <tr>
                 <td>
                     <div class="row">
                         <div class="col">
-                            <p><b>이름:</b><br>${order.receiverName}<br><b>연락처</b>:<br>${order.receiverPhone}<br><b>우편번호 | 주소:</b><br>${order.postcode} | ${order.address}<br><b>배송메시지</b>:<br>${order.shippingRemark}</p>
+                            <p><b>이름:</b><br>${order.receiverName}<br><b>연락처:</b><br>${order.receiverPhone}<br><b>우편번호 | 주소:</b><br>${order.postcode} | ${order.address}<br><b>배송메시지:</b><br>${order.shippingRemark}</p>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <a href="${order.productHref}" target="_blank"><img src="${order.productImage}" class="product-list-image" /></a>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col">
-                            <h6 class='title'><a href="${order.productHref}" target="_blank">${order.productName}</a></h6>
-                            <p><a href="${order.productHref}" target="_blank">${numberFormat(order.productPrice)}원</a></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <p><b>수량:</b> ${numberFormat(order.quantity)}개<br>
-                                <b>배송비:</b> ${numberFormat(order.shippingCost)}원<br>
-                            <b>총액:</b> ${numberFormat(order.amount)}원</p>
-                        </div>
-                    </div>
+                    ${generateProductDetailsHtml(order)}
                 </td>
                 <td class="text-nowrap">
                     <h6 class="title">${order.orderStatus}</h6>
@@ -154,12 +153,33 @@
                         </div>
                     </div>
                 </td>
-            </tr>
-            `).join('');
-            const totalAmount = response.reduce((accumulator, order) => accumulator + parseInt(order.amount ?? 0), 0);
-            $('#totalAmt').html(numberFormat(totalAmount) + '원');
-            $('#orderwingResult').html(html);
-            closePopup();
+            </tr>`;
+        }
+
+        function generateProductDetailsHtml(order) {
+            return `
+            <div class="row mb-3">
+                <div class="col">
+                    <a href="${order.productHref}" target="_blank"><img src="${order.productImage}" class="product-list-image" /></a>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <h6 class='title'><a href="${order.productHref}" target="_blank">${order.productName}</a></h6>
+                    <p><a href="${order.productHref}" target="_blank">${numberFormat(order.productPrice)}원</a></p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p><b>수량:</b> ${numberFormat(order.quantity)}개<br>
+                        <b>배송비:</b> ${numberFormat(order.shippingCost)}원<br>
+                    <b>총액:</b> ${numberFormat(order.amount)}원</p>
+                </div>
+            </div>`;
+        }
+
+        function calculateTotalAmount(orders) {
+            return orders.reduce((accumulator, order) => accumulator + parseInt(order.amount || 0, 10), 0);
         }
     </script>
 @endsection
