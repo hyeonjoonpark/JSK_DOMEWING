@@ -8,6 +8,69 @@ use Illuminate\Support\Facades\DB;
 
 class ProcessDataController extends Controller
 {
+    public function sellingkok($excelPath)
+    {
+        $spreadsheet = IOFactory::load($excelPath);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $data = [];
+        $isFirstRow = true;
+
+        $columnMappings = [
+            'Q' => 'receiverName',
+            'T' => 'receiverPhone',
+            'R' => 'postcode',
+            'S' => 'address',
+            'H' => 'productName',
+            'M' => 'quantity',
+            'L' => 'productPrice',
+            'N' => 'shippingCost',
+            'A' => 'orderCode',
+            'V' => 'shippingRemark',
+            'G' => 'productCode',
+            'E' => 'orderedAt',
+            'P' => 'amount'
+        ];
+
+        foreach ($worksheet->getRowIterator() as $row) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+                continue;
+            }
+
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $rowData = [
+                'senderName' => '',
+                'senderPhone' => ''
+            ];
+            foreach ($cellIterator as $cell) {
+                $columnLetter = $cell->getColumn();
+                if (isset($columnMappings[$columnLetter])) {
+                    $value = $cell->getValue();
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
+                    $rowData[$columnMappings[$columnLetter]] = $value;
+                }
+            }
+            $productCode = $rowData['productCode'];
+            $extractOrderController = new ExtractOrderController();
+            $response = $extractOrderController->getProductHref($productCode);
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
+            $rowData['orderStatus'] = '신규주문';
+            $rowData['b2BName'] = "셀링콕";
+            if (!empty($rowData)) {
+                $data[] = $rowData; // Push the row data to the main data array if not empty
+            }
+        }
+
+        return $data;
+    }
     public function ownerclan($excelPath)
     {
         $spreadsheet = IOFactory::load($excelPath);
