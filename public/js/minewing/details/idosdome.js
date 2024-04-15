@@ -53,7 +53,7 @@ async function signIn(page, username, password) {
 async function scrapeProduct(page, productHref) {
     await new Promise((page) => setTimeout(page, 1000));
     const product = await page.evaluate((productHref) => {
-        const productName = document.querySelector('#goods_spec > form > div:nth-child(4) > b').textContent;
+        const productName = document.querySelector('#goods_spec > form > div:nth-child(4) > b').textContent.trim();
         const productPrice = document.querySelector('#price').textContent.trim().replace(/[^\d]/g, '');
 
         const productImage = document.querySelector('#objImg').getAttribute('src').trim();
@@ -66,7 +66,9 @@ async function scrapeProduct(page, productHref) {
         const productDetailImageElement = [];
         images.forEach((image) => {
             const imageUrl = image.getAttribute('src').trim();
-            productDetailImageElement.push(imageUrl);
+            if (imageUrl !== 'http://ai.esmplus.com/idoscomp/idos/msg.jpg' && imageUrl !== 'http://ai.esmplus.com/idoscomp/idos/good_deliveryInfo.jpg') {
+                productDetailImageElement.push(imageUrl);
+            }
         });
         const productDetail = productDetailImageElement;
         const optionElement = document.querySelector('#goods_spec > form > div:nth-child(5) > table:nth-child(3) > tbody > tr:nth-child(2) > td > div > select');
