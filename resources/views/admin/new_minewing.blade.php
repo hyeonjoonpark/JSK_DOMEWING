@@ -234,7 +234,7 @@
                 const index = this.value;
                 const productHref = $('#productHref' + index).attr('href');
                 productHrefs.push(productHref);
-                $('#tr' + index).hide();
+                $('#tr' + index).html('');
             });
             popupLoader(1, '"각 상품의 고유 URL을 사용하여 중복 상품을 검사하고 있어요."');
             runUniqueProductHrefs(productHrefs);
