@@ -44,9 +44,17 @@ async function processDelProduct(page, browser) {
     if (productExists === false) {
         return false;
     }
-    await page.waitForSelector('input[name="ack"]');
-    await page.click('input[name="ack"]');
-    await new Promise((page) => setTimeout(page, 1000));
+    await page.evaluate(() => {
+        document.querySelector('#q_type').value = 'vender_code';
+        document.querySelector('#q2').innerHTML = 'CNIMK';
+        document.querySelector('#main > form > table > tbody > tr: nth - child(9) > td.cttd > select: nth - child(2)').value = '1000';
+        document.querySelector('#main > form > table > tbody > tr:nth-child(9) > td.cttd > input.mybt01-orange').click();
+    });
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await page.evaluate(() => {
+        document.querySelector('input[name="ack"]').click();
+        document.querySelector('#btn_total_sold').click();
+    });
     page.on('dialog', async dialog => {
         const message = dialog.message();
         await dialog.accept();
