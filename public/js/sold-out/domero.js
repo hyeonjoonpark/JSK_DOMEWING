@@ -44,14 +44,13 @@ async function processPageList(page, searchStr) {
 
 async function doSoldOut(page) {
     await page.click('input[name="ack"]');
-    page.on('dialog', async dialog => {
-        await dialog.accept();
-        console.log(true);
-        return;
-    });
+    await delay(1000);
     await page.click('#btn_total_sold');
-    await delay(3000);
-
+    const [newPage] = await Promise.all([
+        new Promise(resolve => browser.once('targetcreated', target => resolve(target.page()))),
+        page.click('#btn_total_sold')
+    ]);
+    await newPage.waitForNavigation({ waitUntil: 'load' });
 }
 
 async function clearPopup(page) {
