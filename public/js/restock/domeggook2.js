@@ -36,7 +36,6 @@ async function processPageList(page, searchStr) {
     await page.goto('https://domeggook.com/sc/item/lstAll', { waitUntil: 'networkidle0' });
     await page.click('input[value="code"]');
     await page.type('textarea[name="nos"]', searchStr);
-    await page.select('select[name="sz"]', '500');
     await page.click('input[value="검색"]');
     await delay(5000);
 }

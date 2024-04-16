@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });
     try {
@@ -101,7 +101,7 @@ async function scrapeProduct(page, productHref) {
             hasOption: hasOption,
             productOptions: productOptions,
             productHref: productHref,
-            sellerID: 48
+            sellerID: 52
         };
     }, productHref);
     return product;
