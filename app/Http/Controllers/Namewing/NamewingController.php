@@ -65,7 +65,7 @@ class NamewingController extends Controller
                         SELECT
                             id,
                             productName,
-                            ROW_NUMBER() OVER(PARTITION BY productName ORDER BY id) AS rn
+                            ROW_NUMBER() OVER(PARTITION BY productName ORDER BY productPrice ASC) AS rn
                         FROM minewing_products
                         WHERE isActive = 'Y'
                     ) AS ranked_products
