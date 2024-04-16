@@ -42,12 +42,13 @@ async function processPageList(page, searchStr) {
 
 async function doRestock(page) {
     const checkboxSelector = await page.waitForSelector('input[name="_checked"]');
+    await delay(1000);
     const selectSelector = await page.waitForSelector('#lList > div.pFunctions > select');
     const buttonSelector = await page.waitForSelector('#lList > div.pFunctions > a:nth-child(4)');
     await checkboxSelector.click();
     await selectSelector.select('Y');
     await buttonSelector.click();
-    await new Promise((page) => setTimeout(page, 3000));
+    await delay(3000);
 }
 
 async function clearPopup(page) {
