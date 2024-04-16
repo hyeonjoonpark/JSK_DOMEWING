@@ -19,6 +19,84 @@ class FormProductController extends Controller
             ->where('mp.id', $productId)
             ->first(['shipping_fee', 'additional_shipping_fee']);
     }
+    public function trendhunterb2b($products, $margin_rate, $vendorEngName, $shippingCost, $index)
+    {
+        try {
+            // 엑셀 파일 로드
+            $spreadsheet = IOFactory::load(public_path('assets/excel/trendhunterb2b.xlsx'));
+            $sheet = $spreadsheet->getSheet(0);
+            // 데이터 추가
+            $rowIndex = 6;
+            foreach ($products as $product) {
+                $getShippingFeeResult = $this->getShippingFee($product->id);
+                $shippingCost = $getShippingFeeResult->shipping_fee;
+                $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
+                $ownerclanCategoryID = $product->categoryID;
+                $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
+                $margin_rate_per = $margin_rate + 0.10;
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate_per);
+                $least_marginedPrice = $marginedPrice + 1;
+                $data = [
+                    '',
+                    '',
+                    '오픈마켓',
+                    $categoryCode,
+                    $product->productName,
+                    $product->productCode,
+                    '과세',
+                    $marginedPrice,
+                    $least_marginedPrice,
+                    $product->productImage,
+                    '',
+                    '',
+                    '',
+                    $product->productDetail,
+                    'N',
+                    99999,
+                    '',
+                    '',
+                    '',
+                    '',
+                    7616,
+                    '해외',
+                    '기타',
+                    '2024-01-01',
+                    '',
+                    '해당없음',
+                    '해당없음',
+                    35,
+                    '상세설명참고',
+                    '상세설명참고',
+                    '상세설명참고',
+                    '상세설명참고',
+                    '상세설명참고',
+                    '상세설명참고',
+                    '상세설명참고',
+                    '상세설명참고'
+                ];
+                // 엑셀에 데이터 추가
+                $colIndex = 1;
+                foreach ($data as $value) {
+                    $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex) . $rowIndex;
+                    $sheet->setCellValue($cellCoordinate, $value);
+                    $colIndex++;
+                }
+                $rowIndex++;
+            }
+            // 엑셀 파일 저장
+            $fileName = 'trendhunterb2b_' . now()->format('YmdHis') . '_' . $index . '.xlsx';
+            $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($formedExcelFile);
+            $downloadURL = asset('assets/excel/formed/' . $fileName);
+            return ['status' => true, 'return' => $downloadURL];
+        } catch (\Exception $e) {
+            return [
+                'status' => -1,
+                'return' => $e->getMessage()
+            ];
+        }
+    }
     public function funn($products, $margin_rate, $vendorEngName, $shippingCost, $index)
     {
         try {
@@ -81,7 +159,7 @@ class FormProductController extends Controller
                     '',
                     '',
                     '',
-                    '기타',
+                    '해외|기타|원산지가여러곳일경우',
                 ];
                 $dataForSecondSheet = [
                     $serialNumber,
@@ -99,7 +177,15 @@ class FormProductController extends Controller
                 ];
                 $dataForFifthSheet = [
                     $serialNumber,
-                    35
+                    35,
+                    '상세정보 참조',
+                    '상세정보 참조',
+                    '상세정보 참조',
+                    '상세정보 참조',
+                    '상세정보 참조',
+                    '',
+                    '상세정보 참조',
+                    '상세정보 참조'
                 ];
                 // 엑셀에 데이터 추가
                 $colIndex = 1;

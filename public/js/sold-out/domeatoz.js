@@ -33,17 +33,26 @@ async function login(page, username, password) {
 
 async function processPageList(page, searchStr) {
     await page.goto('https://www.domeatoz.com/vendor-myGoods', { waitUntil: 'networkidle0' });
-    await page.select('#form > div > div:nth-child(6) > select', '8');
 
-    await page.select('#listBox > div > div:nth-child(1) > select:nth-child(3)', '500');
-    await delay(1000);
-    await page.type('#search', searchStr);
-    await page.click('#form > div > div:nth-child(6) > button.btn.btn-primary.px-5.ms-2');
+    await page.evaluate((searchStr) => {
+        document.querySelector('#form > div > div:nth-child(6) > select').value = '8';
+        document.querySelector('#listBox > div > div:nth-child(1) > select:nth-child(3)').value = '500';
+        document.querySelector('#search').value = searchStr;
+        document.querySelector('#form > div > div:nth-child(6) > button.btn.btn-primary.px-5.ms-2').click();
+    }, searchStr);
     await delay(3000);
 }
 
 async function doSoldOut(page) {
-    await page.select('#stateChange', '2');
+    const productElement = await page.$$('#list tr');
+    if (productElement.length < 1) {
+        console.log(false);
+        return;
+    }
+    await page.evaluate(() => {
+        const selectElement = document.querySelector('#stateChange');
+        selectElement.value = '2';
+    });
     let status = await page.evaluate(() => {
         const checkbox = document.querySelector('#allChk');
         if (checkbox) {
@@ -57,13 +66,19 @@ async function doSoldOut(page) {
         console.log(status);
         return;
     }
-    await page.click('#listBox > div > div:nth-child(1) > button.btn.btn-primary.px-3.btn-sm.ms-1');
+    await page.evaluate(() => {
+        const buttonElement = document.querySelector('#listBox > div > div:nth-child(1) > button.btn.btn-primary.px-3.btn-sm.ms-1');
+        buttonElement.click();
+    });
     await page.waitForSelector('.swal2-popup.swal2-show', { visible: true });
 }
 async function accessPopup(page) {
     const confirmBtn = await page.$('body > div.swal2-container.swal2-center.swal2-backdrop-show > div > div.swal2-actions > button.swal2-confirm.btn-danger.swal2-styled');
     if (confirmBtn) {
-        await page.click('body > div.swal2-container.swal2-center.swal2-backdrop-show > div > div.swal2-actions > button.swal2-confirm.btn-danger.swal2-styled', { waitUntil: 'networkidle2' });
+        await page.evaluate(() => {
+            const buttonElement = document.querySelector('body > div.swal2-container.swal2-center.swal2-backdrop-show > div > div.swal2-actions > button.swal2-confirm.btn-danger.swal2-styled');
+            buttonElement.click();
+        });
     } else {
         console.log(false);
         return false;

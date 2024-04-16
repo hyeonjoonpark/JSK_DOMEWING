@@ -47,6 +47,11 @@ async function processDelProduct(page, browser, productCode) {
     page.on('dialog', async dialog => {
         await dialog.accept();
     });
+    const productElement = await page.$$('#main > table > tbody > tr');
+    if (productElement.length < 2) {
+        console.log(false);
+        return;
+    }
 
     const newPagePromise = new Promise(resolve => browser.once('targetcreated', target => resolve(target.page())));
 

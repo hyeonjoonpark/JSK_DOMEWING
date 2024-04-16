@@ -409,7 +409,7 @@ class ProcessDataController extends Controller
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
             }
-            $rowData['b2BName'] = "도매꾹";
+            $rowData['b2BName'] = "도매꾹2";
 
             if (!empty($rowData)) {
                 $data[] = $rowData;
@@ -541,7 +541,7 @@ class ProcessDataController extends Controller
                 $rowData['productImage'] = $product->productImage;
             }
             $rowData['orderStatus'] = '배송준비';
-            $rowData['b2BName'] = "오너클랜";
+            $rowData['b2BName'] = "도매로";
             if (!empty($rowData)) {
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
@@ -904,6 +904,72 @@ class ProcessDataController extends Controller
             $rowData['b2BName'] = "펀앤";
             if (!empty($rowData)) {
                 $data[] = $rowData;
+            }
+        }
+
+        return $data;
+    }
+    public function trendhunterb2b($excelPath)
+    {
+        $spreadsheet = IOFactory::load($excelPath);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $data = [];
+        $isFirstRow = true;
+
+        $columnMappings = [
+            // 'B' => 'senderName',
+            // 'D' => 'senderPhone',
+            'C' => 'receiverName',
+            'D' => 'receiverPhone',
+            'E' => 'postcode',
+            'F' => 'address',
+            'I' => 'productName',
+            'K' => 'quantity',
+            'L' => 'productPrice',
+            'N' => 'shippingCost',
+            'H' => 'orderCode',
+            'Q' => 'shippingRemark',
+
+
+
+            'V' => 'productCode',
+            'A' => 'orderedAt',
+            'O' => 'amount'
+        ];
+
+        foreach ($worksheet->getRowIterator() as $row) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+                continue;
+            }
+
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false);
+
+            $rowData = [];
+            foreach ($cellIterator as $cell) {
+                $columnLetter = $cell->getColumn();
+                if (isset($columnMappings[$columnLetter])) {
+                    // Extract value and convert it to UTF-8
+                    $value = $cell->getValue();
+                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                        $value = preg_replace('/[^0-9]/', '', $value);
+                    }
+                    $rowData[$columnMappings[$columnLetter]] = $value;
+                }
+            }
+            $productCode = $rowData['productCode'];
+            $extractOrderController = new ExtractOrderController();
+            $response = $extractOrderController->getProductHref($productCode);
+            if ($response['status'] === true) {
+                $product = $response['return'];
+                $rowData['productHref'] = $product->productHref;
+                $rowData['productImage'] = $product->productImage;
+            }
+            $rowData['orderStatus'] = '배송준비';
+            $rowData['b2BName'] = "트렌드헌터";
+            if (!empty($rowData)) {
+                $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
 

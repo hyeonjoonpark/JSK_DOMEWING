@@ -50,6 +50,12 @@ async function processDelProduct(page, browser, productCode) {
         document.querySelector('input[name="ack"]').click();
         document.querySelector('#btn_total_sold').click();
     });
+    const productElement = await page.$$('#main > table > tbody > tr');
+    if (productElement.length < 2) {
+        console.log(false);
+        return;
+    }
+
 
     const newPage = await newPagePromise;
 
