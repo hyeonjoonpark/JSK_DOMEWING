@@ -409,7 +409,7 @@ class ProcessDataController extends Controller
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
             }
-            $rowData['b2BName'] = "도매꾹";
+            $rowData['b2BName'] = "도매꾹2";
 
             if (!empty($rowData)) {
                 $data[] = $rowData;
