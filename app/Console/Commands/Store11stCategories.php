@@ -34,13 +34,15 @@ class Store11stCategories extends Command
     {
         $categories = [];
         $xml = new SimpleXMLElement($xml);
-        $this->buildCategoryPath($xml, $categories);
+        $xml->registerXPathNamespace('ns2', 'http://api.11st.co.kr/rest/cateservice');  // 네임스페이스 등록
+
+        $this->buildCategoryPath($xml->xpath('//ns2:category'), $categories);  // XPath를 사용하여 ns2:category 요소 선택
         return $categories;
     }
 
-    private function buildCategoryPath($xmlElement, &$categories, $path = '')
+    private function buildCategoryPath($xmlElements, &$categories, $path = '')
     {
-        foreach ($xmlElement->category as $category) {
+        foreach ($xmlElements as $category) {
             $newPath = $path . ($path ? ' > ' : '') . $category->dispNm;
             if ($category->leafYn == 'Y') { // 최하위 노드만 추가
                 $categories[] = [
@@ -48,7 +50,8 @@ class Store11stCategories extends Command
                     'code' => (string)$category->dispNo
                 ];
             } else {
-                $this->buildCategoryPath($category, $categories, $newPath); // 최하위가 아니면 계속 순회
+                // 재귀적으로 하위 카테고리 탐색
+                $this->buildCategoryPath($category->xpath('.//ns2:category'), $categories, $newPath);
             }
         }
     }
