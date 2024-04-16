@@ -53,7 +53,7 @@ async function scrapeProduct(page, url) {
             const productImageElement = document.querySelector('div.prdImg > div > a > img');
             const productImage = productImageElement ? productImageElement.src : 'No image available';
 
-            const productDetailElements = document.querySelectorAll('#Table_01 img');
+            const productDetailElements = document.querySelectorAll('#prdDetail img');
             const productDetail = [];
             if (productDetailElements.length > 0) {
                 for (const productDetailElement of productDetailElements) {
