@@ -16,6 +16,8 @@ class ExtractOrderController extends Controller
 
             if ($b2BEngName == 'domesin') {
                 $data = array_merge($data, $this->processDomesin($b2BEngName));
+            } else if ($b2BEngName == 'funn') { // 오더윙 제외 필터링. 엑셀파일 깨져서옴
+                $data = array_merge($data, $this->processDomesin($b2BEngName));
             } else {
                 $excelPath = $this->getExcelPath($b2BEngName);
 
