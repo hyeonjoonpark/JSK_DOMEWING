@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -43,14 +43,14 @@ async function processPageList(page, searchStr) {
 }
 
 async function doRestock(page) {
-    await page.click('#content > table.tb12 > tbody > tr > td:nth-child(1) > input[type=checkbox]');
-    page.on('dialog', async dialog => {
-        await dialog.accept();
-        console.log(true);
-        return;
-    });
+    await page.click('input[name="ack"]');
+    await delay(1000);
     await page.click('#btn_total_sale');
-    await new Promise((page) => setTimeout(page, 3000));
+    const [newPage] = await Promise.all([
+        new Promise(resolve => browser.once('targetcreated', target => resolve(target.page()))),
+        page.click('#btn_total_sale')
+    ]);
+    await newPage.waitForNavigation({ waitUntil: 'load' });
 }
 
 async function clearPopup(page) {
@@ -67,3 +67,4 @@ async function clearPopup(page) {
         return;
     });
 }
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
