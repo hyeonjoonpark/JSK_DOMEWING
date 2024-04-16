@@ -1,15 +1,12 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const urls = ['https://mroutlet.cafe24.com/product/detail.html?product_no=52&cate_no=24&display_group=1#none'];
-        // const username = "sungiltradekorea";
-        // const password = "tjddlf88!@";
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -34,40 +31,6 @@ async function signIn(page, username, password) {
     await page.click('div > div > fieldset > a');
     await page.waitForNavigation();
 }
-async function scrapeProduct(page, productHref) {
-    try {
-        const productImage = await getProductImage(page);
-        if (productImage.includes('div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > img')) {
-            return false;
-        }
-        const productName = await getProductName(page);
-        const hasOption = await getHasOption(page);
-        const productOptions = hasOption ? await getProductOptions(page) : [];
-        const productPrice = await page.evaluate(() => {
-            const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
-            return productPrice;
-        });
-        const productDetail = await getProductDetail(page);
-        if (productDetail === false) {
-            return false;
-        }
-        const product = {
-            productName: productName,
-            productPrice: productPrice,
-            productImage: productImage,
-            productDetail: productDetail,
-            hasOption: hasOption,
-            productOptions: productOptions,
-            productHref: productHref,
-            sellerID: 58
-        };
-        return product;
-    } catch (error) {
-        console.error('Error occurred:', error);
-        return false;
-    }
-}
-
 async function getProductDetail(page) {
     return await page.evaluate(async () => {
         const distance = 200;
@@ -101,6 +64,39 @@ async function getProductDetail(page) {
 
         return productImages;
     });
+}
+async function scrapeProduct(page, productHref) {
+    try {
+        const productImage = await getProductImage(page);
+        if (productImage.includes('div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > img')) {
+            return false;
+        }
+        const productName = await getProductName(page);
+        const hasOption = await getHasOption(page);
+        const productOptions = hasOption ? await getProductOptions(page) : [];
+        const productPrice = await page.evaluate(() => {
+            const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
+            return productPrice;
+        });
+        const productDetail = await getProductDetail(page);
+        if (productDetail === false) {
+            return false;
+        }
+        const product = {
+            productName: productName,
+            productPrice: productPrice,
+            productImage: productImage,
+            productDetail: productDetail,
+            hasOption: hasOption,
+            productOptions: productOptions,
+            productHref: productHref,
+            sellerID: 58
+        };
+        return product;
+    } catch (error) {
+        console.error('Error occurred:', error);
+        return false;
+    }
 }
 
 
