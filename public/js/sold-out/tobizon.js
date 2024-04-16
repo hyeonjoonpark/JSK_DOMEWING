@@ -49,7 +49,7 @@ async function processPageList(page, searchStr) {
 
 async function doSoldOut(page) {
     const productElement = await page.$$('#loadWarpGoodslist > table > tbody > tr');
-    if (productElement.length < 2) {
+    if (productElement.length < 1) {
         console.log(false);
         return;
     }
@@ -58,8 +58,17 @@ async function doSoldOut(page) {
         const inputElement = document.querySelector('#chkAll');
         inputElement?.click();
     });
-    await delay(1000);
-    await page.click('#loadWarpGoodslist > div:nth-child(2) > div > div > button.button.warning.xs');
+
+    await delay(2000);
+    await page.evaluate(() => {
+        const buttons = document.querySelectorAll('button.button.warning.xs');
+        buttons.forEach(button => {
+            if (button.innerText === '품절') {
+                button.click();
+            }
+        });
+    });
+    await delay(2000);
     console.log(true);
     return;
 }
@@ -68,7 +77,7 @@ async function doSoldOut(page) {
 async function clearPopup(page) {
     page.on('dialog', async dialog => {
         const message = dialog.message();
-        if (message.includes('선택')) {
+        if (message.includes('상품을 선택')) {
             await dialog.dismiss();
             console.log(false);
         }

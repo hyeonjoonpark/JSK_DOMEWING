@@ -54,6 +54,7 @@ async function doRestock(page) {
             return false;
         }
     });
+    await delay(1000);
     if (status === false) {
         console.log(status);
         return;
@@ -70,6 +71,7 @@ async function accessPopup(page) {
         console.log(false);
         return;
     }
+    await delay(1000);
     await page.waitForSelector('.swal2-popup.swal2-show', { visible: true });
     const response = await page.evaluate(() => {
         const resultMessage = document.querySelector('#swal2-content').textContent.trim();

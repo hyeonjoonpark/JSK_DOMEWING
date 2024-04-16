@@ -33,6 +33,8 @@ async function login(page, username, password) {
 
 async function processPageList(page, searchStr) {
     await page.goto('https://specialoffer.kr/mypage/page.php?code=seller_goods_change', { waitUntil: 'networkidle0' });
+    await page.click('#fsearch > div.tbl_frm01 > table > tbody > tr:nth-child(1) > td > span > input:nth-child(7)');
+    await delay(2000);
     await page.select('select[name="sfl"]', 'seller_gcode');
     await delay(1000);
     await page.type('input[name="stx"]', searchStr);

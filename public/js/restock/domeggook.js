@@ -36,19 +36,19 @@ async function processPageList(page, searchStr) {
     await page.goto('https://domeggook.com/sc/item/lstAll', { waitUntil: 'networkidle0' });
     await page.click('input[value="code"]');
     await page.type('textarea[name="nos"]', searchStr);
-    await page.select('select[name="sz"]', '500');
     await page.click('input[value="검색"]');
     await delay(5000);
 }
 
 async function doRestock(page) {
     const checkboxSelector = await page.waitForSelector('input[name="_checked"]');
+    await delay(1000);
     const selectSelector = await page.waitForSelector('#lList > div.pFunctions > select');
     const buttonSelector = await page.waitForSelector('#lList > div.pFunctions > a:nth-child(4)');
     await checkboxSelector.click();
     await selectSelector.select('Y');
     await buttonSelector.click();
-    await new Promise((page) => setTimeout(page, 3000));
+    await delay(3000);
 }
 
 async function clearPopup(page) {

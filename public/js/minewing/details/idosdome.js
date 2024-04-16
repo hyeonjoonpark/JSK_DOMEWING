@@ -101,7 +101,7 @@ async function scrapeProduct(page, productHref) {
             hasOption: hasOption,
             productOptions: productOptions,
             productHref: productHref,
-            sellerID: 48
+            sellerID: 52
         };
     }, productHref);
     return product;

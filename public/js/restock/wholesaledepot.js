@@ -45,6 +45,11 @@ async function processPageList(page, searchStr) {
 }
 
 async function doRestock(page) {
+    const productElement = await page.$$('body > div.scm_contents_warp > div.container-fluid > div.oh-tbwarp > table > tbody tr');
+    if (productElement.length < 3) {
+        console.log(false);
+        return;
+    }
     let status = await page.evaluate(() => {
         const checkbox = document.querySelector('#chkIdxAll');
         if (checkbox) {

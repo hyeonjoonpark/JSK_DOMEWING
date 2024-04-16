@@ -46,10 +46,11 @@ async function processPageList(page, searchStr) {
     await delay(1000);
     await page.click('#searchFrm > tbody > tr:nth-child(1) > td:nth-child(2) > button');
     await delay(1000);
+    await page.click('#btnDetailSearch');
 }
 async function doRestock(page) {
     const productElement = await page.$$('#loadWarpGoodslist > table > tbody > tr');
-    if (productElement.length < 2) {
+    if (productElement.length < 1) {
         console.log(false);
         return;
     }
@@ -58,24 +59,31 @@ async function doRestock(page) {
         const inputElement = document.querySelector('#chkAll');
         inputElement?.click();
     });
-    await delay(1000);
-    await page.click('#loadWarpGoodslist > div:nth-child(2) > div > div > button.button.success.xs');
+    await delay(2000);
+    await page.evaluate(() => {
+        const buttons = document.querySelectorAll('button.button.success.xs');
+        buttons.forEach(button => {
+            if (button.innerText === '재입고') {
+                button.click();
+            }
+        });
+    });
+    await delay(2000);
     console.log(true);
     return;
 }
+
 async function clearPopup(page) {
     page.on('dialog', async dialog => {
         const message = dialog.message();
-        if (message.includes('선택')) {
+        if (message.includes('상품을 선택')) {
             await dialog.dismiss();
             console.log(false);
         }
         else {
             await dialog.accept();
             console.log(true);
-
         }
         return;
     });
 }
-
