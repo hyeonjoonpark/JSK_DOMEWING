@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const delay = (time) => new Promise(resolve => setTimeout(resolve, time));
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
@@ -20,6 +21,8 @@ const fs = require('fs');
                 continue;
             }
             products.push(product);
+            await delay(3000);
+
         }
         console.log(JSON.stringify(products));
     } catch (error) {
