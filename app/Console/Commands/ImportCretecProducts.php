@@ -41,23 +41,30 @@ class ImportCretecProducts extends Command
     }
     private function extractSheetData($sheet)
     {
+        $isFirstRow = true;
         foreach ($sheet->getRowIterator() as $index => $row) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+                continue;
+            }
             if ($index > 10) {
                 break;
             }
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(true);
-            print_r($cellIterator);
-            // foreach ($cellIterator as $cell) {
-
-            //     $product = [
-            //         'sellerID' => 61,
-            //         'userID' => 15,
-            //         'productCode' => $this->createProductCode(),
-            //         'productName'=>
-            //     ];
-            // }
+            $productName = $this->createProductName($sheet, $index + 1);
+            $product = [
+                'sellerID' => 61,
+                'userID' => 15,
+                'productCode' => $this->createProductCode(),
+                'productName' => $productName
+            ];
         }
+    }
+    private function createProductName($sheet, $excelIndex)
+    {
+        $brandName = $sheet->getCell('F' . $excelIndex)->getValue();
+        $basicName = $sheet->getCell('G' . $excelIndex)->getValue();
     }
     private function createProductCode()
     {
