@@ -908,7 +908,6 @@ class ProcessDataController extends Controller
 
         return $data;
     }
-    //대기 -----------------------------------------------------------------------------------------------------------------------------
     public function trendhunterb2b()
     {
         $excelPath = public_path("assets/excel/orderwing/trendhunterb2b/");
