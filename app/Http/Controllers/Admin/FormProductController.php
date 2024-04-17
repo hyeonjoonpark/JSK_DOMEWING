@@ -33,8 +33,7 @@ class FormProductController extends Controller
                 $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
-                $margin_rate_per = $margin_rate + 0.10;
-                $marginedPrice = (int)ceil($product->productPrice * $margin_rate_per);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate * 1.10);
                 $least_marginedPrice = $marginedPrice + 1;
                 $data = [
                     '',
@@ -153,7 +152,7 @@ class FormProductController extends Controller
                     $shippingCost,
                     $shippingCost * 2,
                     6624,
-                    'JS협력사',
+                    'ISMRO',
                     '',
                     '',
                     '',
@@ -277,9 +276,9 @@ class FormProductController extends Controller
                     '해당사항없음',
                     '해당사항없음',
                     0,
-                    'JS협력사',
+                    'ISMRO',
                     '기타',
-                    'JS협력사/기타'
+                    'ISMRO/기타'
                 ];
                 // 엑셀에 데이터 추가
                 $colIndex = 1;
@@ -330,7 +329,7 @@ class FormProductController extends Controller
                     '',
                     $product->productCode,
                     '기타',
-                    'JS협력사',
+                    'ISMRO',
                     '',
                     0,
                     0,
@@ -414,7 +413,7 @@ class FormProductController extends Controller
                     $product->productCode,
                     '',
                     'Y',
-                    'JS협력사',
+                    'ISMRO',
                     '기타',
                     '',
                     '',
@@ -505,10 +504,10 @@ class FormProductController extends Controller
                     $categoryCode,
                     $product->productName,
                     $product->productKeywords,
-                    'JS협력사',
+                    'ISMRO',
                     '',
                     '기타',
-                    'JS협력사',
+                    'ISMRO',
                     '13:00',
                     1,
                     1,
@@ -611,8 +610,8 @@ class FormProductController extends Controller
                     $product->productKeywords,
                     $categoryCode,
                     '상세설명표시',
-                    'JS협력사',
-                    'JS협력사',
+                    'ISMRO',
+                    'ISMRO',
                     '',
                     'N',
                     'N',
@@ -690,8 +689,8 @@ class FormProductController extends Controller
                     $product->productName,
                     $product->productCode,
                     '기타',
-                    'JS협력사',
-                    'JS협력사',
+                    'ISMRO',
+                    'ISMRO',
                     0,
                     0,
                     '',
@@ -779,7 +778,7 @@ class FormProductController extends Controller
                     $categoryCode,
                     '상세정보별도표기',
                     '',
-                    'JS협력사',
+                    'ISMRO',
                     'N',
                     'N',
                     '1X1X1',
@@ -878,7 +877,7 @@ class FormProductController extends Controller
                     $categoryCode,
                     '상세정보별도표기',
                     '',
-                    'JS협력사',
+                    'ISMRO',
                     'N',
                     'N',
                     '1X1X1',
@@ -983,7 +982,7 @@ class FormProductController extends Controller
                     $shippingCost,
                     5000,
                     5000,
-                    'JS협력사',
+                    'ISMRO',
                     '기타',
                     '',
                     $product->productImage,
@@ -1067,8 +1066,8 @@ class FormProductController extends Controller
                     '',
                     $product->productCode,
                     '기타',
-                    'JS협력사',
-                    'JS협력사',
+                    'ISMRO',
+                    'ISMRO',
                     1,
                     0,
                     '',
@@ -1168,7 +1167,7 @@ class FormProductController extends Controller
                     $product->productName,
                     $product->productCode,
                     '기타',
-                    'JS협력사',
+                    'ISMRO',
                     '',
                     '',
                     0,
@@ -1269,7 +1268,7 @@ class FormProductController extends Controller
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
                 $data = [
                     '', $categoryCode, '', '', '', $product->productName, $product->productName,
-                    $product->productKeywords, '기타', "JS협력사", '', $marginedPrice, '자율', '',
+                    $product->productKeywords, '기타', "ISMRO", '', $marginedPrice, '자율', '',
                     '과세', '', '', '', "N," . $product->productCode, $product->productImage, '',
                     $product->productDetail, '가능', '선불', $shippingCost, $shippingCost, '', '', '', 1, 0, '',
                     35, $detailedDescription, 0, '', '', '', '', ''

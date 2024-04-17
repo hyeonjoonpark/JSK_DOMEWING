@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Namewing;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Product\NameController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class NamewingController extends Controller
 {
@@ -80,6 +82,40 @@ class NamewingController extends Controller
             return [
                 'status' => false,
                 'message' => "파워 네임윙 가동 중 에러가 발생했습니다. 다음에 다시 시도해주십시오.",
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    public function multiEdit(Request $request)
+    {
+        $namewings = $request->namewings;
+        $nameController = new NameController();
+        foreach ($namewings as $namewing) {
+            $productCode = $namewing['productCode'];
+            $productName = $nameController->index($namewing['productName']);
+            $result = $this->update($productCode, $productName);
+            if ($result['status'] === false) {
+                return $result;
+            }
+        }
+        return $result;
+    }
+    private function update($productCode, $productName)
+    {
+        try {
+            DB::table('minewing_products')
+                ->where('productCode', $productCode)
+                ->update([
+                    'productName' => $productName
+                ]);
+            return [
+                'status' => true,
+                'message' => '네임윙을 성공적으로 진행했습니다.'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '네임윙 진행 중 에러가 발생했습니다.',
                 'error' => $e->getMessage()
             ];
         }

@@ -15,6 +15,7 @@
         </div>
         <div class="col text-center">
             <button class="btn btn-success" onclick="selectAllExceptFirst();">첫 번째 상품 제외 전체선택</button>
+            <button class="btn btn-primary" onclick="multiEdit();">일괄수정</button>
             <button class="btn btn-danger" onclick="multiSoldOut();">일괄품절</button>
         </div>
     </div>
@@ -147,6 +148,48 @@
                 }
             });
         }
+        @if (isset($duplicatedProducts))
+            function multiEdit() {
+                popupLoader(1, '수정하신 상품명들을 일괄 반영 중입니다.');
+                const products = @json($duplicatedProducts);
+                const namewings = [];
+                for (const product of products) {
+                    const productCode = product.productCode;
+                    const productName = $('#' + productCode).val();
+                    const namewing = {
+                        productCode,
+                        productName
+                    };
+                    namewings.push(namewing);
+                }
+                $.ajax({
+                    url: "/api/namewing/multi-edit",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        namewings,
+                        rememberToken
+                    },
+                    success: function(response) {
+                        closePopup();
+                        const status = response.status;
+                        if (status === true) {
+                            swalWithReload(response.message, 'success');
+                        } else {
+                            swalError(response.message);
+                        }
+                    },
+                    error: AjaxErrorHandling
+                });
+            }
+        @else
+            function multiEdit() {
+                Swal.fire({
+                    icon: "error",
+                    text: "네임윙을 진행할 상품이 없습니다."
+                });
+            }
+        @endif
 
         function multiSoldOut() {
             const productCodes = $('input[name="productCodes"]:checked').map(function() {

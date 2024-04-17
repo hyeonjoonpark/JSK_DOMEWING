@@ -772,7 +772,6 @@ class ProcessDataController extends Controller
             'C' => 'productName',
             'F' => 'quantity',
             'G' => 'productPrice',
-            // 'N' => 'shippingCost',
             'A' => 'orderCode',
             'N' => 'shippingRemark',
             'O' => 'productCode',
@@ -909,33 +908,64 @@ class ProcessDataController extends Controller
 
         return $data;
     }
-    public function trendhunterb2b($excelPath)
+    public function trendhunterb2b()
+    {
+        $excelPath = public_path("assets/excel/orderwing/trendhunterb2b/");
+        if (!is_dir($excelPath)) {
+            mkdir($excelPath, 0755, true);
+        }
+        $allFiles = scandir($excelPath, SCANDIR_SORT_DESCENDING);
+
+        $files = array_filter($allFiles, function ($file) use ($excelPath) {
+            return is_file($excelPath . $file);
+        });
+        if (empty($files)) {
+            echo "No Excel files found in the directory.";
+            return;
+        }
+        $invoicesFiles = $excelPath . $files[0];
+        $ordersFiles = $excelPath . $files[1];
+        $ordersData = [];
+        $invoicesData = [];
+
+
+        // 두 번째 파일 (주문서)
+        if (!empty($invoicesFiles)) {
+            $ordersData = $this->processExcelFile($invoicesFiles, [
+                'J' => 'quantity',
+                'K' => 'productPrice',
+                'M' => 'shippingCost',
+                'N' => 'amount',
+                'S' => 'productCode'
+            ]);
+        }
+
+        // 첫 번째 파일 (발주서)
+        if (!empty($ordersFiles)) {
+            $invoicesData = $this->processExcelFile($ordersFiles, [
+                'C' => 'receiverName',
+                'D' => 'receiverPhone',
+                'E' => 'postcode',
+                'F' => 'address',
+                'I' => 'productName',
+                'H' => 'orderCode',
+                'Q' => 'shippingRemark',
+                'G' => 'orderedAt'
+            ]);
+        }
+
+        $finalData = array_merge($ordersData[0], $invoicesData[0]);
+
+
+        return $finalData;
+    }
+
+    private function processExcelFile($excelPath, $columnMappings)
     {
         $spreadsheet = IOFactory::load($excelPath);
         $worksheet = $spreadsheet->getActiveSheet();
         $data = [];
         $isFirstRow = true;
-
-        $columnMappings = [
-            // 'B' => 'senderName',
-            // 'D' => 'senderPhone',
-            'C' => 'receiverName',
-            'D' => 'receiverPhone',
-            'E' => 'postcode',
-            'F' => 'address',
-            'I' => 'productName',
-            'K' => 'quantity',
-            'L' => 'productPrice',
-            'N' => 'shippingCost',
-            'H' => 'orderCode',
-            'Q' => 'shippingRemark',
-
-
-
-            'V' => 'productCode',
-            'A' => 'orderedAt',
-            'O' => 'amount'
-        ];
 
         foreach ($worksheet->getRowIterator() as $row) {
             if ($isFirstRow) {
@@ -947,10 +977,10 @@ class ProcessDataController extends Controller
             $cellIterator->setIterateOnlyExistingCells(false);
 
             $rowData = [];
+
             foreach ($cellIterator as $cell) {
                 $columnLetter = $cell->getColumn();
                 if (isset($columnMappings[$columnLetter])) {
-                    // Extract value and convert it to UTF-8
                     $value = $cell->getValue();
                     if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
                         $value = preg_replace('/[^0-9]/', '', $value);
@@ -958,18 +988,20 @@ class ProcessDataController extends Controller
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
-            $productCode = $rowData['productCode'];
-            $extractOrderController = new ExtractOrderController();
-            $response = $extractOrderController->getProductHref($productCode);
-            if ($response['status'] === true) {
-                $product = $response['return'];
-                $rowData['productHref'] = $product->productHref;
-                $rowData['productImage'] = $product->productImage;
+            if (isset($rowData['productCode'])) {
+                $extractOrderController = new ExtractOrderController();
+                $response = $extractOrderController->getProductHref($rowData['productCode']);
+                if ($response['status'] === true) {
+                    $product = $response['return'];
+                    $rowData['productHref'] = $product->productHref;
+                    $rowData['productImage'] = $product->productImage;
+                }
+                $rowData['orderStatus'] = '배송준비';
+                $rowData['b2BName'] = "트렌드헌터";
             }
-            $rowData['orderStatus'] = '배송준비';
-            $rowData['b2BName'] = "트렌드헌터";
+
             if (!empty($rowData)) {
-                $data[] = $rowData; // Push the row data to the main data array if not empty
+                $data[] = $rowData;
             }
         }
 
