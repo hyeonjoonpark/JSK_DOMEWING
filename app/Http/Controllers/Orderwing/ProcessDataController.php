@@ -962,16 +962,38 @@ class ProcessDataController extends Controller
     // }
 
     //대기 -----------------------------------------------------------------------------------------------------------------------------
-    public function trendhunterb2b($excelPath)
+    public function trendhunterb2b()
     {
-        // 파일 경로 직접 지정
-        $ordersFiles = 'public/assets/excel/orderwing/trendhunterb2b/*발주서*.xlsx';
-        $invoicesFiles = 'public/assets/excel/orderwing/trendhunterb2b/*주문서*.xlsx';
+        $excelPath = public_path("assets/excel/orderwing/trendhunterb2b/");
+
+        // Check if the directory exists, if not create it
+        if (!is_dir($excelPath)) {
+            mkdir($excelPath, 0755, true);
+        }
+
+        // Scan the directory for files
+        $allFiles = scandir($excelPath, SCANDIR_SORT_DESCENDING);
+
+        // Filter out the directory entries '.' and '..'
+        $files = array_filter($allFiles, function ($file) use ($excelPath) {
+            return is_file($excelPath . $file);
+        });
+
+        // Check if there are any actual Excel files
+        if (empty($files)) {
+            echo "No Excel files found in the directory.";
+            return;
+        }
+
+        // Attempt to load the first actual file (assuming files are correctly sorted if needed)
+        $invoicesFiles = $excelPath . $files[0];
+        $ordersFiles = $excelPath . $files[1];
+        $ordersData = [];
+        $invoicesData = [];
 
         // 첫 번째 파일 (발주서)
-        if (!empty($ordersFiles)) {
-            $ordersData = $this->processExcelFile($ordersFiles[0], [
-                // 여기에 첫 번째 파일의 매핑 정보를 입력하세요.
+        if (!empty($invoicesFiles)) {
+            $ordersData = $this->processExcelFile($invoicesFiles, [
                 'C' => 'receiverName',
                 'D' => 'receiverPhone',
                 'E' => 'postcode',
@@ -984,8 +1006,8 @@ class ProcessDataController extends Controller
         }
 
         // 두 번째 파일 (주문서)
-        if (!empty($invoicesFiles)) {
-            $invoicesData = $this->processExcelFile($invoicesFiles[0], [
+        if (!empty($ordersFiles)) {
+            $invoicesData = $this->processExcelFile($ordersFiles, [
                 'J' => 'quantity',
                 'K' => 'productPrice',
                 'M' => 'shippingCost',
@@ -993,7 +1015,8 @@ class ProcessDataController extends Controller
                 'S' => 'productCode'
             ]);
         }
-        $finalData = array_merge($ordersData ?? [], $invoicesData ?? []);
+
+        $finalData = array_merge($ordersData, $invoicesData);
         return $finalData;
     }
 
