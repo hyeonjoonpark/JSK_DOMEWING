@@ -942,7 +942,7 @@ class ProcessDataController extends Controller
                 'G' => 'orderedAt'
             ]);
         }
-
+        print_r($ordersData);
         // 두 번째 파일 (주문서)
         if (!empty($ordersFiles)) {
             $invoicesData = $this->processExcelFile($ordersFiles, [
