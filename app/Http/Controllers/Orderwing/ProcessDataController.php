@@ -929,9 +929,21 @@ class ProcessDataController extends Controller
         $ordersData = [];
         $invoicesData = [];
 
-        // 첫 번째 파일 (발주서)
+
+        // 두 번째 파일 (주문서)
         if (!empty($invoicesFiles)) {
             $ordersData = $this->processExcelFile($invoicesFiles, [
+                'J' => 'quantity',
+                'K' => 'productPrice',
+                'M' => 'shippingCost',
+                'N' => 'amount',
+                'S' => 'productCode'
+            ]);
+        }
+
+        // 첫 번째 파일 (발주서)
+        if (!empty($ordersFiles)) {
+            $invoicesData = $this->processExcelFile($ordersFiles, [
                 'C' => 'receiverName',
                 'D' => 'receiverPhone',
                 'E' => 'postcode',
@@ -940,17 +952,6 @@ class ProcessDataController extends Controller
                 'H' => 'orderCode',
                 'Q' => 'shippingRemark',
                 'G' => 'orderedAt'
-            ]);
-        }
-
-        // 두 번째 파일 (주문서)
-        if (!empty($ordersFiles)) {
-            $invoicesData = $this->processExcelFile($ordersFiles, [
-                'J' => 'quantity',
-                'K' => 'productPrice',
-                'M' => 'shippingCost',
-                'N' => 'amount',
-                'S' => 'productCode'
             ]);
         }
 
