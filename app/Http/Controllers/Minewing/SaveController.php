@@ -197,7 +197,7 @@ class SaveController extends Controller
                 $productPrice = ceil((int)$productPrice * 1.1);
             }
             do {
-                $productCode = $this->generateRandomProductCode(5);
+                $productCode = $this->generateRandomProductCode(8);
                 $isExist = DB::table('minewing_products')
                     ->where('productCode', $productCode)
                     ->where('isActive', 'Y')
