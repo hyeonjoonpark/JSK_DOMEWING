@@ -37,16 +37,11 @@ const path = require('path');
             document.querySelector('body > div.page-content > div.content-wrapper > div.content > div:nth-child(8) > div.table-responsive > table > thead > tr:nth-child(1) > th:nth-child(1) > label > input').click();
             document.querySelector('body > div.page-content > div.content-wrapper > div.content > div:nth-child(8) > div:nth-child(1) > div > div > div > button:nth-child(1)').click();
             document.querySelector('#modalConfirmExcel > div > div > div.modal-footer.mt-3 > input').click();
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            // document.querySelector('#excel_type').value = "order";
-            const element = document.querySelector('#excel_type');
-            element.value = 'order';
-            element.dispatchEvent(new Event('change'));
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            document.querySelector('#modalConfirmExcel > div > div > div.modal-footer.mt-3 > input').click();
-            await new Promise(resolve => setTimeout(resolve, 3000));
         });
-
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        await page.select('#modalConfirmExcel > div > div > div.modal-body.border-bottom > div:nth-child(1) > div.col > select', 'order');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await page.click('#modalConfirmExcel > div > div > div.modal-footer.mt-3 > input');
 
         console.log(true);
     } catch (error) {
