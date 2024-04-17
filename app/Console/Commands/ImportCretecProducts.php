@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\Minewing\SaveController;
+use App\Http\Controllers\Product\NameController;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
@@ -54,7 +55,6 @@ class ImportCretecProducts extends Command
                 continue;
             }
             $product = $this->createProduct($sheet, $index);
-            print_r($product);
             $this->insert($product);
         }
         echo "success";
@@ -83,9 +83,10 @@ class ImportCretecProducts extends Command
     {
         $brandName = $sheet->getCell('F' . $index)->getValue();
         $basicName = $sheet->getCell('G' . $index)->getValue();
-        $modelName = $sheet->getCell('H' . $index)->getValue();
-        $productName = $brandName . ' ' . $basicName . ' ' . $modelName;
-        return $productName;
+        $productDetail = $sheet->getCell('V' . $index)->getValue();
+        $productName = $brandName . ' ' . $basicName . ' ' . $productDetail;
+        $nameController = new NameController();
+        return $nameController->index($productName);
     }
     private function createProductDetail($sheet, $index)
     {

@@ -103,6 +103,7 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('/product/edit', [MainController::class, 'main']);
     Route::post('/product/edit/excelwing', [ProductEditorExcelwingController::class, 'index']);
     Route::post('/namewing/power-namewing', [NamewingController::class, 'power']);
+    Route::post('/namewing/multi-edit', [NamewingController::class, 'multiEdit']);
     // account-setting
     Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
     Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);
