@@ -908,84 +908,22 @@ class ProcessDataController extends Controller
 
         return $data;
     }
-
-
-
-    // public function trendhunterb2b($excelPath)
-    // {
-
-    //     $spreadsheet = IOFactory::load($excelPath);
-    //     $worksheet = $spreadsheet->getActiveSheet();
-    //     $data = [];
-    //     $isFirstRow = true;
-
-    //     $columnMappings = [
-    //     ];
-
-    //     foreach ($worksheet->getRowIterator() as $row) {
-    //         if ($isFirstRow) {
-    //             $isFirstRow = false;
-    //             continue;
-    //         }
-
-    //         $cellIterator = $row->getCellIterator();
-    //         $cellIterator->setIterateOnlyExistingCells(false);
-
-    //         $rowData = [];
-    //         foreach ($cellIterator as $cell) {
-    //             $columnLetter = $cell->getColumn();
-    //             if (isset($columnMappings[$columnLetter])) {
-    //                 // Extract value and convert it to UTF-8
-    //                 $value = $cell->getValue();
-    //                 if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
-    //                     $value = preg_replace('/[^0-9]/', '', $value);
-    //                 }
-    //                 $rowData[$columnMappings[$columnLetter]] = $value;
-    //             }
-    //         }
-    //         $productCode = $rowData['productCode'];
-    //         $extractOrderController = new ExtractOrderController();
-    //         $response = $extractOrderController->getProductHref($productCode);
-    //         if ($response['status'] === true) {
-    //             $product = $response['return'];
-    //             $rowData['productHref'] = $product->productHref;
-    //             $rowData['productImage'] = $product->productImage;
-    //         }
-    //         $rowData['orderStatus'] = '배송준비';
-    //         $rowData['b2BName'] = "트렌드헌터";
-    //         if (!empty($rowData)) {
-    //             $data[] = $rowData; // Push the row data to the main data array if not empty
-    //         }
-    //     }
-
-    //     return $data;
-    // }
-
     //대기 -----------------------------------------------------------------------------------------------------------------------------
     public function trendhunterb2b()
     {
         $excelPath = public_path("assets/excel/orderwing/trendhunterb2b/");
-
-        // Check if the directory exists, if not create it
         if (!is_dir($excelPath)) {
             mkdir($excelPath, 0755, true);
         }
-
-        // Scan the directory for files
         $allFiles = scandir($excelPath, SCANDIR_SORT_DESCENDING);
 
-        // Filter out the directory entries '.' and '..'
         $files = array_filter($allFiles, function ($file) use ($excelPath) {
             return is_file($excelPath . $file);
         });
-
-        // Check if there are any actual Excel files
         if (empty($files)) {
             echo "No Excel files found in the directory.";
             return;
         }
-
-        // Attempt to load the first actual file (assuming files are correctly sorted if needed)
         $invoicesFiles = $excelPath . $files[0];
         $ordersFiles = $excelPath . $files[1];
         $ordersData = [];
@@ -1016,7 +954,9 @@ class ProcessDataController extends Controller
             ]);
         }
 
-        $finalData = array_merge($ordersData, $invoicesData);
+        $finalData = array_merge($ordersData[0], $invoicesData[0]);
+
+
         return $finalData;
     }
 
@@ -1036,10 +976,7 @@ class ProcessDataController extends Controller
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
 
-            $rowData = [
-                'senderName' => '',
-                'senderPhone' => ''
-            ];
+            $rowData = [];
 
             foreach ($cellIterator as $cell) {
                 $columnLetter = $cell->getColumn();
@@ -1070,5 +1007,4 @@ class ProcessDataController extends Controller
 
         return $data;
     }
-    //대기 -----------------------------------------------------------------------------------------------------------------------------
 }
