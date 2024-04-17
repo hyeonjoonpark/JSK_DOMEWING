@@ -33,8 +33,7 @@ class FormProductController extends Controller
                 $additionalShippingFee = $getShippingFeeResult->additional_shipping_fee;
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
-                $margin_rate_per = $margin_rate + 0.10;
-                $marginedPrice = (int)ceil($product->productPrice * $margin_rate_per);
+                $marginedPrice = (int)ceil($product->productPrice * $margin_rate * 1.10);
                 $least_marginedPrice = $marginedPrice + 1;
                 $data = [
                     '',

@@ -908,7 +908,6 @@ class ProcessDataController extends Controller
 
         return $data;
     }
-    //대기 -----------------------------------------------------------------------------------------------------------------------------
     public function trendhunterb2b()
     {
         $excelPath = public_path("assets/excel/orderwing/trendhunterb2b/");
@@ -929,9 +928,21 @@ class ProcessDataController extends Controller
         $ordersData = [];
         $invoicesData = [];
 
-        // 첫 번째 파일 (발주서)
+
+        // 두 번째 파일 (주문서)
         if (!empty($invoicesFiles)) {
             $ordersData = $this->processExcelFile($invoicesFiles, [
+                'J' => 'quantity',
+                'K' => 'productPrice',
+                'M' => 'shippingCost',
+                'N' => 'amount',
+                'S' => 'productCode'
+            ]);
+        }
+
+        // 첫 번째 파일 (발주서)
+        if (!empty($ordersFiles)) {
+            $invoicesData = $this->processExcelFile($ordersFiles, [
                 'C' => 'receiverName',
                 'D' => 'receiverPhone',
                 'E' => 'postcode',
@@ -940,17 +951,6 @@ class ProcessDataController extends Controller
                 'H' => 'orderCode',
                 'Q' => 'shippingRemark',
                 'G' => 'orderedAt'
-            ]);
-        }
-        print_r($ordersData);
-        // 두 번째 파일 (주문서)
-        if (!empty($ordersFiles)) {
-            $invoicesData = $this->processExcelFile($ordersFiles, [
-                'J' => 'quantity',
-                'K' => 'productPrice',
-                'M' => 'shippingCost',
-                'N' => 'amount',
-                'S' => 'productCode'
             ]);
         }
 
