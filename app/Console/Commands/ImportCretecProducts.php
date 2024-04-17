@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\Minewing\SaveController;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
 class ImportCretecProducts extends Command
@@ -41,39 +41,36 @@ class ImportCretecProducts extends Command
     }
     private function extractSheetData($sheet)
     {
-        $isFirstRow = true;
         foreach ($sheet->getRowIterator() as $index => $row) {
-            if ($isFirstRow) {
-                $isFirstRow = false;
+            if ($index === 0) {
                 continue;
             }
             if ($index > 10) {
                 break;
             }
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(true);
-            $productName = $this->createProductName($sheet, $index + 1);
-            $product = [
-                'sellerID' => 61,
-                'userID' => 15,
-                'productCode' => $this->createProductCode(),
-                'productName' => $productName
-            ];
+            $product = $this->createProduct($sheet, $index + 1);
         }
+    }
+    private function createProduct($sheet, $excelIndex)
+    {
+        $productName = $this->createProductName($sheet, $excelIndex);
+        echo $productName;
+        $saveController = new SaveController();
+        $productCode = $saveController->generateRandomProductCode(8);
+        $product = [
+            'sellerID' => 61,
+            'userID' => 15,
+            'productCode' => $productCode,
+            'productName' => $productName
+        ];
     }
     private function createProductName($sheet, $excelIndex)
     {
         $brandName = $sheet->getCell('F' . $excelIndex)->getValue();
         $basicName = $sheet->getCell('G' . $excelIndex)->getValue();
-    }
-    private function createProductCode()
-    {
-        do {
-            $productCode = Str::random(8);
-            $exists = DB::table('minewing_products')
-                ->where('productCode', $productCode)
-                ->exists();
-        } while ($exists === true);
-        return $productCode;
+        $modelName = $sheet->getCell('H' . $excelIndex)->getValue();
+        $productName = $brandName . ' ' . $basicName . ' ' . $modelName;
+        echo $productName;
+        return $productName;
     }
 }

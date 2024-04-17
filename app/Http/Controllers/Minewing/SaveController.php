@@ -240,7 +240,7 @@ class SaveController extends Controller
             ];
         }
     }
-    protected function generateRandomProductCode($length)
+    public function generateRandomProductCode($length)
     {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         $charactersLength = strlen($characters);
