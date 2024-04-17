@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     const client = await page.target().createCDPSession();
     await page.setViewport({
@@ -40,14 +40,15 @@ const path = require('path');
         });
         await new Promise(resolve => setTimeout(resolve, 3000));
         await page.select('#modalConfirmExcel > div > div > div.modal-body.border-bottom > div:nth-child(1) > div.col > select', 'order');
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await page.click('#modalConfirmExcel > div > div > div.modal-footer.mt-3 > input');
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         console.log(true);
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        // await browser.close();
+        await browser.close();
     }
 })();
 
