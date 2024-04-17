@@ -3,9 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\Minewing\SaveController;
-use App\Http\Controllers\Orderwing\ProcessDataController;
 use Illuminate\Console\Command;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 
@@ -32,11 +30,7 @@ class ImportCretecProducts extends Command
     {
         ini_set('memory_limit', '-1');
         $filePath = storage_path('app/public/excel/cretec_products.csv');
-
-        // Load the CSV file
         $spreadsheet = $this->loadCsv($filePath);
-
-        // Extract data from the spreadsheet
         $sheet = $spreadsheet->getActiveSheet();
         $this->extractDataFromSheet($sheet);
     }
@@ -44,10 +38,10 @@ class ImportCretecProducts extends Command
     private function loadCsv($filePath)
     {
         $reader = new Csv();
-        $reader->setDelimiter(',');  // Set delimiter based on your CSV
-        $reader->setEnclosure('"');  // Set enclosure
+        $reader->setDelimiter(',');
+        $reader->setEnclosure('"');
         $reader->setInputEncoding('CP949');
-        $reader->setSheetIndex(0);  // Assuming we need the first sheet
+        $reader->setSheetIndex(0);
         return $reader->load($filePath);
     }
 
@@ -61,7 +55,7 @@ class ImportCretecProducts extends Command
             }
             $product = $this->createProduct($sheet, $index);
             print_r($product);
-            // $this->insert($product);
+            $this->insert($product);
         }
         echo "success";
     }
