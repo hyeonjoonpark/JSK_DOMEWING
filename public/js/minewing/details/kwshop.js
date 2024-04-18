@@ -1,14 +1,11 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
-        // const [tempFilePath, username, password] = process.argv.slice(2);
-        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const urls = ['https://kwshop.co.kr/goods/view?no=39110', 'https://kwshop.co.kr/goods/view?no=38198'];
-        const username = "jskorea2024";
-        const password = "tjddlf88!@";
+        const [tempFilePath, username, password] = process.argv.slice(2);
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -116,7 +113,7 @@ async function scrapeProduct(page, url) {
 }
 async function scrollToDetail(page) {
     await page.evaluate(async () => {
-        const distance = 100;
+        const distance = 50;
         const scrollInterval = 5;
         while (true) {
             const scrollTop = window.scrollY;
