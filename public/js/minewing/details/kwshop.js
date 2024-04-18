@@ -78,7 +78,8 @@ async function scrapeProduct(page, url) {
                 if (!productNameElement) {
                     continue;
                 }
-                const productName = productNameElement.textContent.trim();
+                const productName = productNameElement.textContent.trim().replace(/강원전자/g, '').trim();
+
                 // 상품 가격
                 const productPriceElement = productElement.querySelector('div.gd_opt_c.gd_opt_name > div > div > span');
                 if (!productPriceElement) continue;  // 가격 정보가 없는 경우 건너뜁니다
