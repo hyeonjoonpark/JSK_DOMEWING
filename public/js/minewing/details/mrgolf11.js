@@ -37,34 +37,34 @@ async function scrapeProduct(page, url) {
 
         const productData = await page.evaluate(() => {
             const productNameElement = document.querySelector('div.infoArea > div.headingArea.sale_on > h1');
-            const productName = productNameElement ? productNameElement.textContent.trim() : 'No product name';
+            if (!productNameElement) {
+                return false; // 상품 이름 요소가 없으면 함수를 즉시 종료하고 false 반환
+            }
+            const productName = productNameElement.textContent.trim();
 
             let productPrice = '';
             const priceElement = document.querySelector('#span_product_price_text');
             if (priceElement) {
                 const childDiv = priceElement.querySelector('div');
-                if (childDiv) {
-                    productPrice = priceElement.childNodes[0].textContent.trim().replace(/[^\d]/g, '');
-                } else {
-                    productPrice = priceElement.textContent.trim().replace(/[^\d]/g, '');
-                }
+                productPrice = childDiv ? priceElement.childNodes[0].textContent.trim().replace(/[^\d]/g, '') : priceElement.textContent.trim().replace(/[^\d]/g, '');
             }
 
             const productImageElement = document.querySelector('div.prdImg > div > a > img');
-            const productImage = productImageElement ? productImageElement.src : 'No image available';
+            if (!productImage) {
+                return false;  // 상품 이미지가 없으면 반환 중단
+            }
+            const productImage = productImageElement.src();
 
             const productDetailElements = document.querySelectorAll('#prdDetail img');
             const productDetail = [];
-            if (productDetailElements.length > 0) {
-                for (const productDetailElement of productDetailElements) {
-                    const tempProductDetailSrc = productDetailElement.src;
-                    if (tempProductDetailSrc.includes('open_end.jpg') || tempProductDetailSrc.includes('open_notice.jpg')) {
-                        continue;
-                    }
+            if (productDetailElements.length === 0) {
+                return false;  // 상세 이미지가 없으면 반환 중단
+            }
+            for (const productDetailElement of productDetailElements) {
+                const tempProductDetailSrc = productDetailElement.src;
+                if (!tempProductDetailSrc.includes('open_end.jpg') && !tempProductDetailSrc.includes('open_notice.jpg')) {
                     productDetail.push(tempProductDetailSrc);
                 }
-            } else {
-                productDetail.push('No detail images available');
             }
 
             return {
@@ -75,6 +75,10 @@ async function scrapeProduct(page, url) {
             };
         });
 
+        if (!productData) {
+            return false;  // productData가 false이면 함수에서 더 이상 처리하지 않고 중단
+        }
+
         return {
             ...productData,
             hasOption: productOptionData.hasOption,
@@ -82,12 +86,12 @@ async function scrapeProduct(page, url) {
             productHref: url,
             sellerID: 59
         };
-        return product;
     } catch (error) {
         console.error(error);
         return false;
     }
 }
+
 async function getProductOptions(page) {
     async function reloadSelects() {
         return await page.$$('table select');
