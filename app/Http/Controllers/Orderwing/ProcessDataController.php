@@ -953,8 +953,14 @@ class ProcessDataController extends Controller
                 'G' => 'orderedAt'
             ]);
         }
-
-        $finalData = array_merge($ordersData[0], $invoicesData[0]);
+        $finalData = [];
+        if (!empty($ordersData) && !empty($invoicesData)) {
+            for ($i = 0; $i < count($ordersData); $i++) {
+                if (isset($invoicesData[$i])) {
+                    $finalData[] = array_merge($ordersData[$i], $invoicesData[$i]);
+                }
+            }
+        }
 
 
         return $finalData;
