@@ -1,7 +1,8 @@
+const { downloadBrowser } = require('puppeteer/internal/node/install.js');
 const getForbiddenWords = require('../forbidden_words');
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     const [listURL, username, password] = process.argv.slice(2);
     try {
@@ -46,7 +47,7 @@ async function scrapeProducts(page, forbiddenWords) {
         return products;
         function scrapeProduct(productElement, forbiddenWords) {
             try {
-                const soldOutImageElement = productElement.querySelector('el-goods-soldout-image-mask');
+                const soldOutImageElement = productElement.querySelector('div img.el-goods-soldout-image');
                 if (soldOutImageElement) {
                     return false;
                 }
@@ -61,6 +62,13 @@ async function scrapeProducts(page, forbiddenWords) {
                     return false;
                 }
                 const image = productElement.querySelector('li > div > a > img').src;
+
+                // 주석 처리된 변경 사항: 특정 이미지 경로를 확인하고 그 이미지가 있을 경우 제품을 건너뜁니다.
+                const forbiddenImage = '../data/my_icon/my_icon_14906635858.png';
+                if (image === forbiddenImage) {
+                    return false; // 특정 이미지가 있는 경우 false를 반환하여 제품을 건너뜁니다.
+                }
+
                 const href = productElement.querySelector(' li > div > a.goodsDisplay_a').href;
                 const platform = "랜마트";
                 const product = { name, price, image, href, platform };

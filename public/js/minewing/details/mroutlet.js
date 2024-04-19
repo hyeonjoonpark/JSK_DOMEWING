@@ -31,64 +31,35 @@ async function signIn(page, username, password) {
     await page.click('div > div > fieldset > a');
     await page.waitForNavigation();
 }
-async function getProductDetail(page) {
-    return await page.evaluate(async () => {
-        const distance = 200;
-        const scrollInterval = 155;
-        while (true) {
-            const scrollTop = window.scrollY;
-            const prdDetailElement = document.getElementById('prdDetail');
-            const prdInfoElement = document.getElementById('prdInfo');
-            if (prdDetailElement) {
-                const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
-                if (scrollTop < targetScrollBottom) {
-                    window.scrollBy(0, distance);
-                } else {
-                    break;
-                }
-            } else if (prdInfoElement) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                break;
-            } else {
-                window.scrollBy(0, distance);
-            }
-            await new Promise(resolve => setTimeout(resolve, scrollInterval));
-        }
 
-        // 이미지 URL 추출 로직
-        const productDetailImageElements = document.querySelectorAll('#prdDetail > div > p img');
-        const excludedPaths = ['/web/img/start', '/web/img/event'];
-        const productImages = [...productDetailImageElements]
-            .filter(img => img.src && !excludedPaths.some(path => img.src.includes(path)))
-            .map(img => img.src); // 이미 절대 경로이므로 바로 src를 사용
-
-        return productImages;
-    });
-}
 async function scrapeProduct(page, productHref) {
+    await scrollToDetail(page);
     try {
-        const productImage = await getProductImage(page);
-        if (productImage.includes('div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > img')) {
-            return false;
+        const optionCount = await getOptionCount(page);
+        if (optionCount > 1) {  // 옵션이 두 개 이상인 경우
+            return false;  // 해당 제품은 스크레이핑하지 않음
         }
+
+        const productDetailImages = await getProductDetail(page);
+        if (productDetailImages.length === 0) {  // 상세 이미지가 하나도 없는 경우
+            return false;  // 해당 제품은 스크레이핑하지 않음
+        }
+
+        const productImage = await getProductImage(page);
         const productName = await getProductName(page);
-        const hasOption = await getHasOption(page);
-        const productOptions = hasOption ? await getProductOptions(page) : [];
+        const productOptions = optionCount === 1 ? await getProductOptions(page) : [];
         const productPrice = await page.evaluate(() => {
             const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
             return productPrice;
         });
-        const productDetail = await getProductDetail(page);
-        if (productDetail === false) {
-            return false;
-        }
+
         const product = {
             productName: productName,
             productPrice: productPrice,
             productImage: productImage,
-            productDetail: productDetail,
-            hasOption: hasOption,
-            productOptions: productOptions,
+            productDetail: productDetailImages,
+            hasOption: optionCount === 1,  // 옵션이 하나 있는지 여부
+            productOptions: productOptions,  // 옵션이 있다면 옵션 목록, 없다면 빈 배열
             productHref: productHref,
             sellerID: 58
         };
@@ -98,7 +69,6 @@ async function scrapeProduct(page, productHref) {
         return false;
     }
 }
-
 
 async function getProductImage(page) {
     const productImage = await page.evaluate(() => {
@@ -121,23 +91,23 @@ async function getProductOptions(page) {
         return filteredHandles; // 필터링된 ElementHandle 배열 반환
     }
 
-    async function resetSelects() {
-        const delBtn = await page.$('#option_box1_del');
-        if (delBtn) {
-            await delBtn.click();
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-    }
+    // async function resetSelects() {
+    //     const delBtn = await page.$('#totalProducts > table > tbody.option_products > tr > td:nth-child(2) > a');
+    //     if (delBtn) {
+    //         await delBtn.click();
+    //         await new Promise(resolve => setTimeout(resolve, 1000));
+    //     }
+    // }
 
-    async function reselectOptions(selects, selectedOptions) {
-        for (let i = 0; i < selectedOptions.length; i++) {
-            await selects[i].select(selectedOptions[i].value);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            if (i < selectedOptions.length - 1) {
-                selects = await reloadSelects();
-            }
-        }
-    }
+    // async function reselectOptions(selects, selectedOptions) {
+    //     for (let i = 0; i < selectedOptions.length; i++) {
+    //         await selects[i].select(selectedOptions[i].value);
+    //         await new Promise(resolve => setTimeout(resolve, 1000));
+    //         if (i < selectedOptions.length - 1) {
+    //             selects = await reloadSelects();
+    //         }
+    //     }
+    // }
 
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
@@ -166,12 +136,12 @@ async function getProductOptions(page) {
                     productOptions.push({ optionName, optionPrice });
                 }
 
-                await resetSelects();
-                selects = await reloadSelects();
-                if (currentDepth > 0) {
-                    await reselectOptions(selects, selectedOptions);
-                    selects = await reloadSelects();
-                }
+                // await resetSelects();
+                // selects = await reloadSelects();
+                // if (currentDepth > 0) {
+                //     await reselectOptions(selects, selectedOptions);
+                //     selects = await reloadSelects();
+                // }
             }
         }
         return productOptions;
@@ -191,6 +161,19 @@ async function getProductName(page) {
     return productName;
 }
 
+async function getProductDetail(page) {
+    // 페이지 컨텍스트 내에서 이미지 URL 추출 로직 실행
+    return page.evaluate(() => {
+        const productDetailImageElements = document.querySelectorAll('#prdDetail > div > p img');
+        const excludedPaths = ['/web/img/start', '/web/img/event'];
+        const productImages = [...productDetailImageElements]
+            .filter(img => img.src && !excludedPaths.some(path => img.src.includes(path)))
+            .map(img => img.src); // 이미 절대 경로이므로 바로 src를 사용
+
+        return productImages;
+    });
+};
+
 async function getHasOption(page) {
     return await page.evaluate(() => {
         const selectElements = document.querySelectorAll('select.ProductOption0');
@@ -201,6 +184,35 @@ async function getHasOption(page) {
         return false;
     });
 }
-
-
+async function getOptionCount(page) {
+    return await page.evaluate(() => {
+        const selectElements = document.querySelectorAll('select.ProductOption0');
+        return selectElements.length;  // 옵션의 개수를 반환
+    });
+}
+async function scrollToDetail(page) {
+    await page.evaluate(async () => {
+        const distance = 50;
+        const scrollInterval = 5;
+        while (true) {
+            const scrollTop = window.scrollY;
+            const prdDetailElement = document.getElementById('prdDetail');
+            const prdInfoElement = document.getElementById('prdInfo');
+            if (prdDetailElement) {
+                const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
+                if (scrollTop < targetScrollBottom) {
+                    window.scrollBy(0, distance);
+                } else {
+                    break;
+                }
+            } else if (prdInfoElement) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                break;
+            } else {
+                window.scrollBy(0, distance);
+            }
+            await new Promise(resolve => setTimeout(resolve, scrollInterval));
+        }
+    });
+}
 

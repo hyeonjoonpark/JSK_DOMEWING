@@ -73,18 +73,33 @@ async function scrapeProduct(page, url) {
 
         const productData = await page.evaluate(() => {
             const productName = document.querySelector('#form1 > div > h3').textContent.trim();
-            const priceElements = document.querySelectorAll('table > tbody > tr > td.price > div.tb-left');
-            const productPrice = priceElements.length > 1 ? priceElements[1].textContent.trim().replace(/[^\d]/g, '') : 'Price not available';
+            const priceElements = document.querySelectorAll('table > tbody > tr > td.price > div.tb-left');//
+
+            if (priceElements.length < 2) { // 2번째 요소가 없으면 버린다는거임
+                return false;
+            }
+
+            // 가격 정보를 숫자로 변환
+            const rawPrice = priceElements[1].textContent.trim().replace(/[^\d]/g, '');
+            const productPrice = parseInt(rawPrice, 10);
+
+            // 가격 정보가 0이거나 숫자 변환이 실패한 경우 (NaN)
+            if (!productPrice) {
+                return false; // false 반환하고 처리 중단
+            }
+
             const productImage = document.querySelector('#lens_img').src;
             const productDetailElements = document.querySelectorAll('#productDetail > div > div.prd-detail > p > img');
 
+            // 필요한 데이터 반환
             return {
                 productName,
-                productPrice,
+                productPrice: rawPrice, // 문자열 가격을 반환
                 productImage,
-                productDetailElements: Array.from(productDetailElements).map(elem => elem.src)
+                productDetailElements: Array.from(productDetailElements).map(el => el.src)
             };
         });
+
 
         // 이미지 URL 검증
         const validProductDetails = [];
