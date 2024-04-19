@@ -177,6 +177,7 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
         Route::prefix('smart-store')->group(function () {
             Route::post('/', [SmartStoreAccountController::class, 'add']);
             Route::post('edit', [SmartStoreAccountController::class, 'edit']);
+            Route::post('delete', [SmartStoreAccountController::class, 'delete']);
         });
     });
     Route::prefix('product')->group(function () {

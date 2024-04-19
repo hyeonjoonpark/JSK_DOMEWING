@@ -208,7 +208,34 @@
         }
 
         function initSmartStoreDel() {
+            Swal.fire({
+                icon: "warning",
+                title: "계정 삭제",
+                text: "해당 계정에 속한 모든 상품 정보 또한 삭제됩니다. 그래도 진행하시겠습니까?",
+                showConfirmButton: true,
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteSsAccount();
+                }
+            });
+        }
 
+        function deleteSsAccount() {
+            popupLoader(1, "해당 계정을 삭제 중입니다.");
+            $.ajax({
+                url: "/api/partner/account-setting/smart-store/delete",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    hash: hashVar
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
         }
     </script>
 @endsection

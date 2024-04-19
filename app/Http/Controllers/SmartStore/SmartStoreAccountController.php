@@ -62,9 +62,7 @@ class SmartStoreAccountController extends Controller
                 ->where('is_active', 'ACTIVE')
                 ->Where('application_id', $applicationId)
                 ->Where('secret', $secret)
-                ->Where('username', $username)
                 ->Where('access_token', $accessToken)
-                ->Where('store_name', $storeName)
                 ->exists();
             if ($exists === true) {
                 return [
@@ -194,6 +192,27 @@ class SmartStoreAccountController extends Controller
             return [
                 'status' => false,
                 'message' => '데이터베이스에 추가하는 작업 중 에러가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    public function delete(Request $request)
+    {
+        $hash = $request->hash;
+        try {
+            DB::table('smart_store_accounts')
+                ->where('hash', $hash)
+                ->update([
+                    'is_active' => 'INACTIVE'
+                ]);
+            return [
+                'status' => true,
+                'message' => '해당 계정을 성공적으로 삭제했습니다.'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '유효한 접근이 아닙니다.',
                 'error' => $e->getMessage()
             ];
         }
