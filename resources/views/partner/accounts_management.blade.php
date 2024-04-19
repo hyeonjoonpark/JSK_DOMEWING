@@ -206,5 +206,9 @@
                 error: AjaxErrorHandling
             });
         }
+
+        function initSmartStoreDel() {
+
+        }
     </script>
 @endsection

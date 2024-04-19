@@ -60,11 +60,11 @@ class SmartStoreAccountController extends Controller
         try {
             $exists = DB::table('smart_store_accounts')
                 ->where('is_active', 'ACTIVE')
-                ->orWhere('application_id', $applicationId)
-                ->orWhere('secret', $secret)
-                ->orWhere('username', $username)
-                ->orWhere('access_token', $accessToken)
-                ->orWhere('store_name', $storeName)
+                ->Where('application_id', $applicationId)
+                ->Where('secret', $secret)
+                ->Where('username', $username)
+                ->Where('access_token', $accessToken)
+                ->Where('store_name', $storeName)
                 ->exists();
             if ($exists === true) {
                 return [

@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\DB;
 use SimpleXMLElement;
 
 class ImportSt11Categories extends Command
@@ -15,36 +14,36 @@ class ImportSt11Categories extends Command
     public function handle()
     {
         $response = Http::get('http://api.11st.co.kr/rest/cateservice/category');
-        $xmlBody = iconv("EUC-KR", "UTF-8", $response->body()); // 인코딩 변환
-        $xml = new SimpleXMLElement($xmlBody);
+        $xmlBody = $response->body();
 
-        $categories = $xml->children('ns2', true)->category;
-        $this->processCategories($categories);
-    }
+        // 인코딩 확인 및 변환 (EUC-KR -> UTF-8)
+        if (!mb_check_encoding($xmlBody, 'UTF-8')) {
+            $xmlBody = iconv("EUC-KR", "UTF-8", $xmlBody);
+        }
 
-    private function processCategories($categories, $path = '')
-    {
-        foreach ($categories as $category) {
-            $currentPath = empty($path) ? (string) $category->dispNm : $path . '>' . (string) $category->dispNm;
-
-            if ((string) $category->leafYn === 'Y') {
-                // 최하위 카테고리인 경우 데이터베이스에 저장
-                $this->insertCategory($currentPath, (string) $category->dispNo);
-            } else {
-                // 하위 카테고리가 존재하는 경우 재귀적으로 처리
-                if (isset($category->subCategory)) {
-                    $subCategories = $category->subCategory->children('ns2', true)->category;
-                    $this->processCategories($subCategories, $currentPath);
-                }
-            }
+        try {
+            $xml = new SimpleXMLElement($xmlBody);
+            $categories = $xml->children('ns2', true)->category;
+            $arrayData = $this->xmlToArray($categories);
+            $jsonData = json_encode($arrayData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            echo $jsonData;
+        } catch (\Exception $e) {
+            echo 'Error: ' . $e->getMessage();
         }
     }
 
-    private function insertCategory($name, $code)
+    private function xmlToArray($xml)
     {
-        DB::table('st11_category')->insert([
-            'name' => $name,
-            'code' => $code
-        ]);
+        $result = [];
+
+        foreach ($xml as $element => $node) {
+            if ($node->children('ns2', true)->count() > 0) {
+                $result[$element] = $this->xmlToArray($node->children('ns2', true));
+            } else {
+                $result[$element] = (string) $node;
+            }
+        }
+
+        return $result;
     }
 }
