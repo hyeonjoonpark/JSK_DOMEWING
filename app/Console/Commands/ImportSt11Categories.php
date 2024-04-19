@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
-use GuzzleHttp\Client;
 use SimpleXMLElement;
 
 class ImportSt11Categories extends Command
@@ -16,34 +15,36 @@ class ImportSt11Categories extends Command
     public function handle()
     {
         $response = Http::get('http://api.11st.co.kr/rest/cateservice/category');
-        $xml = new SimpleXMLElement($response->body());
-        $categories = $xml->categorys->category;
+        $xmlBody = iconv("EUC-KR", "UTF-8", $response->body()); // 인코딩 변환
+        $xml = new SimpleXMLElement($xmlBody);
 
-        $this->storeCategories($categories);
+        $categories = $xml->children('ns2', true)->category;
+        $this->processCategories($categories);
     }
 
-    private function storeCategories($categories, $path = '')
+    private function processCategories($categories, $path = '')
     {
         foreach ($categories as $category) {
-            $currentPath = $path === '' ? $category->dispNm : $path . '>' . $category->dispNm;
-            if ($category->leafYn == 'Y') {
-                // It's a leaf node, store in the database
-                DB::table('st11_category')->insert([
-                    'name' => $currentPath,
-                    'code' => (string) $category->dispNo
-                ]);
+            $currentPath = empty($path) ? (string) $category->dispNm : $path . '>' . (string) $category->dispNm;
+
+            if ((string) $category->leafYn === 'Y') {
+                // 최하위 카테고리인 경우 데이터베이스에 저장
+                $this->insertCategory($currentPath, (string) $category->dispNo);
             } else {
-                // Not a leaf node, recurse
-                $subcategories = $this->fetchSubCategories($category->dispNo);
-                $this->storeCategories($subcategories, $currentPath);
+                // 하위 카테고리가 존재하는 경우 재귀적으로 처리
+                if (isset($category->subCategory)) {
+                    $subCategories = $category->subCategory->children('ns2', true)->category;
+                    $this->processCategories($subCategories, $currentPath);
+                }
             }
         }
     }
 
-    private function fetchSubCategories($dispNo)
+    private function insertCategory($name, $code)
     {
-        $response = Http::get("http://api.11st.co.kr/rest/cateservice/category?parentDispNo={$dispNo}");
-        $xml = new SimpleXMLElement($response->body());
-        return $xml->categorys->category;
+        DB::table('st11_category')->insert([
+            'name' => $name,
+            'code' => $code
+        ]);
     }
 }
