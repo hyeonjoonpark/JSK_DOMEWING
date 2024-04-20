@@ -111,78 +111,84 @@
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">상품윙 테이블</h6>
-                    <p>검색된 상품이 총 {{ number_format($products->total(), 0) }}건입니다. 페이지 당 500건의 상품이 출력됩니다.</p>
-                    <div class="form-group">
-                        @include('partner.partials.manage_pagination', [
-                            'page' => $products->currentPage(),
-                            'numPages' => $products->lastPage(),
-                            'searchKeyword' => $searchKeyword,
-                        ])
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table text-nowrap align-middle">
-                            <thead>
-                                <tr>
-                                    <th scope="col">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="custom-control-input" id="selectAll">
-                                            <label class="custom-control-label" for="selectAll"></label>
-                                        </div>
-                                    </th>
-                                    <th scope="col">대표 이미지</th>
-                                    <th scope="col">상품</th>
-                                    <th scope="col">ACTION</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($products as $product)
-                                    <tr id="tr{{ $product->productCode }}">
-                                        <td scope="row">
+                    @if ($products === null)
+                        <p>아직 생성된 상품윙 테이블이 없습니다. 먼저 테이블을 생성하신 후, 상품 수집관에서 상품들을 수집해주세요.</p>
+                    @else
+                        <p>검색된 상품이 총 {{ number_format($products->total(), 0) }}건입니다. 페이지 당 500건의 상품이 출력됩니다.</p>
+                        <div class="form-group">
+                            @include('partner.partials.manage_pagination', [
+                                'page' => $products->currentPage(),
+                                'numPages' => $products->lastPage(),
+                                'searchKeyword' => $searchKeyword,
+                            ])
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table text-nowrap align-middle">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
                                             <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input"
-                                                    id="check{{ $product->productCode }}" name="selectedProducts"
-                                                    value="{{ $product->productCode }}">
-                                                <label class="custom-control-label"
-                                                    for="check{{ $product->productCode }}"></label>
+                                                <input type="checkbox" class="custom-control-input" id="selectAll">
+                                                <label class="custom-control-label" for="selectAll"></label>
                                             </div>
-                                        </td>
-                                        <td>
-                                            <img src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100 height=100>
-                                        </td>
-                                        <td>
-                                            <a class="product-contents"
-                                                href="javascript:view('{{ $product->productCode }}');">
-                                                <p>
-                                                    {{ $product->name }}<br>
-                                                    <span class="font-weight-bold">{{ $product->productName }}</span><br>
-                                                    {{ $product->productCode }}<br>
-                                                    <span
-                                                        class="wing-font">{{ number_format($product->productPrice, 0) }}</span>
-                                                    <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
-                                                        alt="윙"><br>
-                                                    배송비: <span
-                                                        class="wing-font">{{ number_format($product->shipping_fee, 0) }}</span>
-                                                    <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
-                                                        alt="윙">
-                                                </p>
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-success" onclick="edit();">수정</button>
-                                            <button class="btn btn-danger" onclick="del();">삭제</button>
-                                        </td>
+                                        </th>
+                                        <th scope="col">대표 이미지</th>
+                                        <th scope="col">상품</th>
+                                        <th scope="col">ACTION</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="form-group">
-                        @include('partner.partials.manage_pagination', [
-                            'page' => $products->currentPage(),
-                            'numPages' => $products->lastPage(),
-                            'searchKeyword' => $searchKeyword,
-                        ])
-                    </div>
+                                </thead>
+                                <tbody>
+                                    @foreach ($products as $product)
+                                        <tr id="tr{{ $product->productCode }}">
+                                            <td scope="row">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                        id="check{{ $product->productCode }}" name="selectedProducts"
+                                                        value="{{ $product->productCode }}">
+                                                    <label class="custom-control-label"
+                                                        for="check{{ $product->productCode }}"></label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <img src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100
+                                                    height=100>
+                                            </td>
+                                            <td>
+                                                <a class="product-contents"
+                                                    href="javascript:view('{{ $product->productCode }}');">
+                                                    <p>
+                                                        {{ $product->name }}<br>
+                                                        <span
+                                                            class="font-weight-bold">{{ $product->productName }}</span><br>
+                                                        {{ $product->productCode }}<br>
+                                                        <span
+                                                            class="wing-font">{{ number_format($product->productPrice, 0) }}</span>
+                                                        <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
+                                                            alt="윙"><br>
+                                                        배송비: <span
+                                                            class="wing-font">{{ number_format($product->shipping_fee, 0) }}</span>
+                                                        <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
+                                                            alt="윙">
+                                                    </p>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-success" onclick="edit();">수정</button>
+                                                <button class="btn btn-danger" onclick="del();">삭제</button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group">
+                            @include('partner.partials.manage_pagination', [
+                                'page' => $products->currentPage(),
+                                'numPages' => $products->lastPage(),
+                                'searchKeyword' => $searchKeyword,
+                            ])
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

@@ -12,14 +12,18 @@ class ManageController extends Controller
 {
     public function index(Request $request)
     {
+        $partnerId = Auth::guard('partner')->id();
         $partnerTables = DB::table('partner_tables')
             ->where('is_active', 'Y')
-            ->where('partner_id', Auth::guard('partner')->id())
+            ->where('partner_id', $partnerId)
             ->get();
+
         $searchKeyword = $request->input('searchKeyword', '');
-        $partnerTableToken = $request->input('partnerTableToken', false);
+        $partnerTableToken = $request->input('partnerTableToken', '');
         $productCodesStr = $request->input('productCodeStr', '');
-        $products = $this->getProductList($searchKeyword, $partnerTableToken);
+
+        $products = $this->getProductList($searchKeyword, $partnerTableToken, $partnerId);
+
         return view('partner.products_manage', [
             'partnerTables' => $partnerTables,
             'products' => $products,
@@ -28,26 +32,29 @@ class ManageController extends Controller
             'productCodesStr' => $productCodesStr
         ]);
     }
-    private function getProductList($searchKeyword, $partnerTableToken)
+    private function getProductList($searchKeyword, $partnerTableToken, $partnerId)
     {
-        $partnerId = Auth::guard('partner')->id();
-        if ($partnerTableToken === false) {
-            $partnerTableIdQuery = DB::table('partner_tables')
-                ->where('partner_id', $partnerId);
-        } else {
-            $partnerTableIdQuery = DB::table('partner_tables')
-                ->where('token', $partnerTableToken);
+        $query = DB::table('partner_tables')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'Y');
+
+        if ($partnerTableToken) {
+            $query->where('token', $partnerTableToken);
         }
-        $partnerTableId = $partnerTableIdQuery->first('id')->id;
-        $products = DB::table('partner_products AS pp')
+
+        $partnerTableId = $query->first('id');
+        if ($partnerTableId === null) {
+            return null;
+        }
+        $partnerTableId = $partnerTableId->id;
+        return DB::table('partner_products AS pp')
             ->join('minewing_products AS mp', 'pp.product_id', '=', 'mp.id')
             ->join('ownerclan_category AS oc', 'mp.categoryID', '=', 'oc.id')
             ->join('product_search AS ps', 'mp.sellerID', '=', 'ps.vendor_id')
             ->where('pp.partner_table_id', $partnerTableId)
             ->where('pp.is_active', 'Y')
-            ->where('mp.productName', 'like', "%$searchKeyword%")
+            ->where('mp.productName', 'like', "%{$searchKeyword}%")
             ->paginate(500);
-        return $products;
     }
     public function add(Request $request)
     {
