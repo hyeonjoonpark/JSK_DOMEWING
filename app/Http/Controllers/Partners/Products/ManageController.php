@@ -34,9 +34,10 @@ class ManageController extends Controller
         if ($partnerTableToken === false) {
             $partnerTableIdQuery = DB::table('partner_tables')
                 ->where('partner_id', $partnerId);
+        } else {
+            $partnerTableIdQuery = DB::table('partner_tables')
+                ->where('token', $partnerTableToken);
         }
-        $partnerTableIdQuery = DB::table('partner_tables')
-            ->where('token', $partnerTableToken);
         $partnerTableId = $partnerTableIdQuery->first('id')->id;
         $products = DB::table('partner_products AS pp')
             ->join('minewing_products AS mp', 'pp.product_id', '=', 'mp.id')
