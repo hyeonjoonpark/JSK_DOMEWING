@@ -67,54 +67,41 @@
     </style>
 @endsection
 @section('title')
-    상품 수집윙
+    상품 관리관
 @endsection
 @section('subtitle')
-    <p>내 상품 DB에 수집하기 위한 상품 수집관입니다.</p>
+    <p>수집한 상품들을 관리하는 페이지입니다.</p>
 @endsection
 @section('content')
     <div class="row g-gs">
+        <div class="col-12 text-center">
+            <button class="btn btn-primary" onclick="$('#createProductTableModal').modal('show')">상품 테이블 생성</button>
+        </div>
         <div class="col-12">
             <div class="card card-bordered">
                 <div class="card-inner">
-                    <h6 class="title">통합 검색</h6>
-                    <p>테이블의 모든 컬럼 중 원하는 키워드를 검색하세요.</p>
-                    <form method="GET" action="{{ route('partner.products.collect') }}">
-                        @csrf
-                        <div class="row g-gs">
-                            <div class="col-12 col-lg-6">
-                                <div class="form-group">
-                                    <label for="categoryId" class="form-label">카테고리</label>
-                                    <select class="form-select js-select2" data-search="on" name="categoryId"
-                                        id="categoryId">
-                                        <option value="-1">카테고리 선택</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}"
-                                                {{ $categoryId == $category->id ? 'selected' : '' }}>
-                                                {{ $category->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                    <form class="row g-gs" method="GET">
+                        <div class="col-12 col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label">상품 테이블</label>
+                                <select class="form-select js-select2" data-search="on" name="partnerTableToken"
+                                    id="partnerTableToken">
+                                    @foreach ($partnerTables as $table)
+                                        <option value="{{ $table->token }}"
+                                            @if ($partnerTableToken === $table->token) selected @endif>{{ $table->title }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <div class="col-12 col-lg-6">
-                                <div class="form-group">
-                                    <label for="" class="form-label">상품 검색</label>
-                                    <input type="text" class="form-control" placeholder="검색 키워드를 기입해주세요"
-                                        name="searchKeyword" value="{{ $searchKeyword }}">
-                                </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">상품 키워드 검색</label>
+                                <input type="text" class="form-control" name="searchKeyword"
+                                    placeholder="검색 키워드를 기입해주세요." value="{{ $searchKeyword }}">
                             </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="" class="form-label">상품 코드 대량 검색</label>
-                                    <input type="text" class="form-control"
-                                        placeholder="쉼표(,)로 구분해서 여러 상품 코드를 기입할 수 있습니다." name="productCodesStr"
-                                        value="{{ $productCodesStr }}">
-                                </div>
-                            </div>
-                            <div class="col-12 text-center">
-                                <button type="submit" class="btn btn-primary">검색</button>
-                            </div>
+                        </div>
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-primary">조회하기</button>
                         </div>
                     </form>
                 </div>
@@ -126,7 +113,7 @@
                     <h6 class="title">상품윙 테이블</h6>
                     <p>검색된 상품이 총 {{ number_format($products->total(), 0) }}건입니다. 페이지 당 500건의 상품이 출력됩니다.</p>
                     <div class="form-group">
-                        @include('partner.partials.pagination', [
+                        @include('partner.partials.manage_pagination', [
                             'page' => $products->currentPage(),
                             'numPages' => $products->lastPage(),
                             'searchKeyword' => $searchKeyword,
@@ -144,6 +131,7 @@
                                     </th>
                                     <th scope="col">대표 이미지</th>
                                     <th scope="col">상품</th>
+                                    <th scope="col">ACTION</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -179,13 +167,17 @@
                                                 </p>
                                             </a>
                                         </td>
+                                        <td>
+                                            <button class="btn btn-success" onclick="edit();">수정</button>
+                                            <button class="btn btn-danger" onclick="del();">삭제</button>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                     <div class="form-group">
-                        @include('partner.partials.pagination', [
+                        @include('partner.partials.manage_pagination', [
                             'page' => $products->currentPage(),
                             'numPages' => $products->lastPage(),
                             'searchKeyword' => $searchKeyword,
@@ -195,34 +187,7 @@
             </div>
         </div>
     </div>
-    <button class="btn btn-success btn-collect" onclick="initCollect();">수집하기</button>
     <button id="topBtn" onclick="topFunction()">Top</button>
-    <div class="modal" role="dialog" id="collectProductsModal">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">저장할 상품 테이블 선택</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="" class="form-label">상품 테이블</label>
-                        <select name="partnerTable" id="partnerTableToken" class="form-select">
-                            @foreach ($partnerTables as $partnerTable)
-                                <option value="{{ $partnerTable->token }}">{{ $partnerTable->title }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" onclick="collectProducts();">수집하기</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소하기</button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 @section('scripts')
     <script>
@@ -235,6 +200,11 @@
                 dropdownParent: $("#collectProductsModal")
             });
         });
+
+        function topFunction() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }
 
         function view(productCode) {
             popupLoader(1, "상품 정보를 불러오는 중입니다.");
@@ -285,47 +255,18 @@
             });
         }
 
-        function initCollect() {
-            const partnerTables = @json($partnerTables);
-            if (partnerTables.length > 0) {
-                $('#collectProductsModal').modal('show')
-            } else {
-                $('#createProductTableModal').modal('show');
-            }
-        }
-
-        function collectProducts() {
-            popupLoader(1, '수집한 상품들을 내 테이블에 기록 중입니다.');
-            const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
-                return $(this).val();
-            }).get();
-            const partnerTableToken = $('#partnerTableToken').val();
-            $.ajax({
-                url: "/api/partner/product/collect",
-                type: "POST",
-                dataType: "JSON",
-                data: {
-                    productCodes,
-                    partnerTableToken,
-                    apiToken
-                },
-                success: function(response) {
-                    closePopup();
-                    console.log(response);
-                    const status = response.status;
-                    if (status === true) {
-                        swalSuccess(response.message);
-                    } else {
-                        swalError(response.message);
-                    }
-                },
-                error: AjaxErrorHandling
+        function edit() {
+            Swal.fire({
+                icon: "warning",
+                text: "해당 기능은 업데이트 중입니다."
             });
         }
 
-        function topFunction() {
-            document.body.scrollTop = 0; // For Safari
-            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        function del() {
+            Swal.fire({
+                icon: "warning",
+                text: "해당 기능은 업데이트 중입니다."
+            });
         }
     </script>
 @endsection

@@ -65,6 +65,7 @@
             icon,
             html: `<img class="w-100" src="${image}"><h4 class="swal2-title mt-5">${message}</h4>`
         }).then(result => {
+            popupLoader(0, '페이지를 새로고침 중입니다.');
             location.reload();
         });
     }
@@ -109,5 +110,21 @@
         } else {
             swalWithReload(message, 'success');
         }
+    }
+
+    function createProductTable() {
+        popupLoader(1, "신규 상품 테이블을 생성 중입니다.");
+        const productTableName = $('#productTableName').val();
+        $.ajax({
+            url: "/api/partner/product/create-table",
+            type: "POST",
+            dataType: "JSON",
+            data: {
+                productTableName,
+                apiToken
+            },
+            success: ajaxSuccessHandling,
+            error: AjaxErrorHandling
+        });
     }
 </script>

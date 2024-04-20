@@ -50,6 +50,9 @@ use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
+use App\Http\Controllers\Partners\Products\ManageController;
+use App\Http\Controllers\Partners\Products\PartnerTableController;
+use App\Http\Controllers\Partners\Products\UploadController;
 use App\Http\Controllers\Partners\Products\ViewController;
 use App\Http\Controllers\Product\DownloadController;
 use App\Http\Controllers\ProductEditor\ExcelwingController as ProductEditorExcelwingController;
@@ -182,6 +185,9 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     });
     Route::prefix('product')->group(function () {
         Route::post('view', [ViewController::class, 'main']);
+        Route::post('create-table', [PartnerTableController::class, 'create']);
+        Route::post('collect', [ManageController::class, 'add']);
+        Route::post('upload', [UploadController::class, 'add']);
     });
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
