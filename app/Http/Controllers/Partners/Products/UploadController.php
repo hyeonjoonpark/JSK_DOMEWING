@@ -19,6 +19,7 @@ class UploadController extends Controller
             ->get();
         $partnerTables = DB::table('partner_tables')
             ->where("is_active", 'Y')
+            ->where('partner_id', Auth::guard('partner')->id())
             ->get();
         return view('partner.products_upload', [
             'openMarkets' => $openMarkets,

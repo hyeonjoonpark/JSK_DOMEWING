@@ -231,7 +231,7 @@
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
         $(document).ready(function() {
-            $("#partnerTable").select2({
+            $("#partnerTableToken").select2({
                 dropdownParent: $("#collectProductsModal")
             });
         });
