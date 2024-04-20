@@ -45,6 +45,7 @@
 @section('scripts')
     <script>
         function upload() {
+            popupLoader(0, "해당 상품 테이블을 스마트 스토어로 전송 중입니다.");
             const vendorId = $('input[name="openMakrets"]:checked').val();
             const partnerTableToken = $('#partnerTableToken').val();
             $.ajax({
