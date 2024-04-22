@@ -2,6 +2,13 @@
 <script src="{{ asset('assets/js/scripts.js') }}"></script>
 <script src="https://kit.fontawesome.com/0a14a1d42d.js" crossorigin="anonymous"></script>
 <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        const pageLoader = document.getElementById('pageLoader');
+        pageLoader.style.opacity = '0';
+        setTimeout(function() {
+            pageLoader.style.display = 'none';
+        }, 500);
+    });
     var audioError = new Audio('{{ asset('assets/audio/diring.mp3') }}');
     var apiToken = "{{ Auth::guard('partner')->user()->api_token }}";
 
@@ -126,5 +133,10 @@
             success: ajaxSuccessHandling,
             error: AjaxErrorHandling
         });
+    }
+
+    function numberFormatter(inputId, length) {
+        const filteredValue = $(inputId).val().replace(/\D/g, '').substring(0, length);
+        $(inputId).val(filteredValue ? parseInt(filteredValue) : '');
     }
 </script>

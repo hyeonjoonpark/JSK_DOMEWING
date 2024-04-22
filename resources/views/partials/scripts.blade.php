@@ -164,4 +164,9 @@
         // swalWithReload를 호출하여 사용자에게 결과 표시
         swalWithReload(response.return, statusType);
     }
+
+    function numberFormatter(inputId, length) {
+        const filteredValue = $(inputId).val().replace(/\D/g, '').substring(0, length);
+        $(inputId).val(filteredValue ? parseInt(filteredValue) : '');
+    }
 </script>

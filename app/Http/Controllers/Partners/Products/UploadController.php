@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Partners\Products;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\SmartStore\SmartStoreAccountController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
+use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,8 +16,16 @@ class UploadController extends Controller
 {
     public function index(Request $request)
     {
-        set_time_limit(0);
-        ini_set('memory_allow', '-1');
+        // 생성된 상품 테이블이 있는지 검사.
+        $partnerId = Auth::guard('partner')->id();
+        $hasTable = DB::table('partner_tables')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'Y')
+            ->exists();
+        if ($hasTable === false) {
+            // 없을시, 상품 관리관으로 리다이렉트.
+            return redirect('/partner/products/manage');
+        }
         $openMarkets = DB::table('vendors')
             ->where('is_active', 'ACTIVE')
             ->where('type', 'OPEN_MARKET')
@@ -30,14 +39,23 @@ class UploadController extends Controller
             'partnerTables' => $partnerTables
         ]);
     }
-    public function add(Request $request)
+    public function create(Request $request)
     {
+        set_time_limit(0);
+        ini_set('memory_allow', '-1');
+        // 데이터 유효성 검사.
         $validator = Validator::make($request->all(), [
             'partnerTableToken' => 'required|string',
-            'vendorId' => 'required'
+            'vendorId' => 'required|integer',
+            'partnerMargin' => 'required|integer|max:99',
+            'accountHash' => 'required|string'
         ], [
             'partnerTableToken' => '상품 업로드를 위한 상품 테이블을 생성해주세요.',
-            'vendorId' => '상품 업로드를 위한 오픈 마켓을 선택해주세요.'
+            'vendorId' => '상품 업로드를 위한 오픈 마켓을 선택해주세요.',
+            'partnerMargin.required' => '마진율을 입력해 주세요.',
+            'partnerMargin.integer' => '마진율은 정수여야 합니다.',
+            'partnerMargin.max' => '마진율은 99를 초과할 수 없습니다.',
+            'accountHash' => '계정을 선택해주세요.'
         ]);
         if ($validator->fails()) {
             return [
@@ -45,237 +63,56 @@ class UploadController extends Controller
                 'message' => $validator->errors()->first()
             ];
         }
+        // 데이터 전처리: 파라미터
         $partnerTableToken = $request->partnerTableToken;
-        $partnerTableId = DB::table('partner_tables')
-            ->where('token', $partnerTableToken)
-            ->where('is_active', 'Y')
-            ->first('id')
-            ->id;
         $vendorId = $request->vendorId;
-        $partnerId = DB::table('partners')
-            ->where('api_token', $request->apiToken)
-            ->first(['id'])
-            ->id;
-        return $this->upload($partnerTableId, $vendorId, $partnerId);
-    }
-    private function upload($partnerTableId, $vendorId, $partnerId)
-    {
-        $vendorEngName = DB::table('vendors')
+        $vendor = DB::table('vendors')
             ->where('id', $vendorId)
-            ->first('name_eng')
-            ->name_eng;
-        $products = DB::table('partner_products AS pp')
-            ->join('minewing_products AS mp', 'pp.product_id', '=', 'mp.id')
-            ->join('category_mapping AS cm', 'mp.categoryID', '=', 'cm.ownerclan')
-            ->join($vendorEngName . '_category AS vc', 'vc.id', '=', 'cm.' . $vendorEngName)
-            ->join('product_search AS ps', 'mp.sellerID', '=', 'ps.vendor_id')
-            ->where('mp.isActive', 'Y')
-            ->where('pp.partner_table_id', $partnerTableId)
-            ->get(['mp.productCode', 'mp.productName', 'mp.productPrice', 'mp.productImage', 'mp.productDetail', 'vc.code', 'ps.shipping_fee', 'ps.additional_shipping_fee']);
-        return $this->$vendorEngName($products, $partnerId);
-    }
-    private function smart_store($products, $partnerId)
-    {
-        $partner = DB::table('partners')->where('id', $partnerId)->first();
-        $margin = DB::table('product_register')
-            ->where('id', 18)
-            ->first(['margin_rate'])
-            ->margin_rate;
+            ->where('is_active', 'ACTIVE')
+            ->first(['name_eng']);
+        if ($vendor === null) {
+            return [
+                'status' => false,
+                'message' => '비활성화된 오픈 마켓입니다. 다시 시도해주세요.'
+            ];
+        }
+        $vendorEngName = $vendor->name_eng;
+        $partnerMargin = $request->partnerMargin;
+        $partnerMarginRate = $partnerMargin / 100 + 1;
+        $margin = DB::table('sellwing_config')
+            ->where('id', 1)
+            ->first(['value'])
+            ->value;
         $marginRate = $margin / 100 + 1;
-        $success = 0;
-        foreach ($products as $product) {
-            $productPrice = $product->productPrice;
-            $salePrice = ceil($productPrice * $marginRate / 10) * 10;
-            $productImage = $product->productImage;
-            $productImageUrl = $this->uploadImageFromUrl($productImage, $partner->id);
-            $productImageUrl = $productImageUrl['data']['images'][0]['url'];
-            $data = [
-                'originProduct' => [
-                    'statusType' => 'SALE',
-                    'leafCategoryId' => $product->code,
-                    'name' => $product->productName,
-                    'detailContent' => $product->productDetail,
-                    'images' => [
-                        'representativeImage' => [
-                            'url' => $productImageUrl
-                        ]
-                    ],
-                    'salePrice' => $salePrice,
-                    'stockQuantity' => 9999,
-                    'deliveryInfo' => [
-                        'deliveryType' => 'DELIVERY',
-                        'deliveryAttributeType' => 'NORMAL',
-                        'deliveryCompany' => 'HYUNDAI',
-                        'deliveryBundleGroupUsable' => false,
-                        'deliveryFee' => [
-                            'deliveryFeeType' => 'PAID',
-                            'baseFee' => $product->shipping_fee,
-                            'deliveryFeePayType' => 'PREPAID',
-                            'deliveryFeeByArea' => [
-                                'deliveryAreaType' => 'AREA_3',
-                                'area3extraFee' => $product->additional_shipping_fee,
-                                'area2extraFee' => $product->additional_shipping_fee
-                            ]
-                        ],
-                        'claimDeliveryInfo' => [
-                            'returnDeliveryFee' => (int)$product->shipping_fee,
-                            'exchangeDeliveryFee' => (int)$product->shipping_fee * 2
-                        ],
-                        'installationFee' => false,
-                    ],
-                    'detailAttribute' => [
-                        'afterServiceInfo' => [
-                            'afterServiceTelephoneNumber' => (string)$partner->phone,
-                            'afterServiceGuideContent' => '평일 09:00 ~ 17:00까지 응대가 가능하며, 주말 및 공휴일은 쉽니다.'
-                        ],
-                        'originAreaInfo' => [
-                            'originAreaCode' => '03'
-                        ],
-                        'sellerCodeInfo' => [
-                            'sellerManagementCode' => $product->productCode
-                        ],
-                        'taxType' => 'TAX',
-                        'minorPurchasable' => true,
-                        'productInfoProvidedNotice' => [
-                            'productInfoProvidedNoticeType' => 'ETC',
-                            'etc' => [
-                                'returnCostReason' => '상품상세 참조',
-                                'noRefundReason' => '상품상세 참조',
-                                'qualityAssuranceStandard' => '상품상세 참조',
-                                'compensationProcedure' => '상품상세 참조',
-                                'troubleShootingContents' => '상품상세 참조',
-                                'itemName' => $product->productName,
-                                'modelName' => '제이에스',
-                                'manufacturer' => '제이에스',
-                                'afterServiceDirector' => '제이에스',
-                            ]
-                        ]
-                    ]
-                ],
-                'smartstoreChannelProduct' => [
-                    'channelProductName' => $product->productName,
-                    'naverShoppingRegistration' => true,
-                    'channelProductDisplayStatusType' => 'ON'
-                ]
+        // 데이터 전처리: 상품
+        $products = DB::table('partner_products AS pp')
+            ->join('partner_tables AS pt', 'pt.id', '=', 'pp.partner_table_id')
+            ->join('minewing_products AS mp', 'mp.id', '=', 'pp.product_id')
+            ->join('category_mapping AS cm', 'cm.ownerclan', '=', 'mp.categoryID')
+            ->join($vendorEngName . '_category AS c', 'c.id', '=', 'cm.' . $vendorEngName)
+            ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
+            ->where('pp.is_active', 'Y')
+            ->where('pt.is_active', 'Y')
+            ->where('pt.token', $partnerTableToken)
+            ->select([DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate) / 10) * 10 AS productPrice"), 'mp.productCode', 'mp.productName', 'mp.productImage', 'mp.productDetail', 'c.code', 'ps.shipping_fee', 'ps.additional_shipping_fee'])
+            ->get();
+        if ($products->isEmpty()) {
+            return [
+                'status' => false,
+                'message' => '빈 테이블입니다. 상품 수집관에서 상품 수집을 진행해주세요.'
             ];
-            $ssac = new SmartStoreApiController();
-            $result = $ssac->builder($partnerId, 'application/json', 'POST', 'https://api.commerce.naver.com/external/v2/products', $data);
-            if ($result['status'] === true) {
-                $success++;
-            }
         }
-        return [
-            'status' => true,
-            'message' => "총 " . count($products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다."
-        ];
-    }
-    public function uploadImageFromUrl(string $imageUrl, int $partnerId): array
-    {
-        $imageContent = $this->downloadImage($imageUrl);
-        if ($imageContent === false) {
-            return ['status' => false, 'message' => 'Image download failed'];
-        }
-
-        $tempImagePath = $this->createTempImage($imageContent, $imageUrl);
-        if ($tempImagePath === false) {
-            return ['status' => false, 'message' => 'Failed to create temp file'];
-        }
-
-        $uploadResponse = $this->uploadToAPI($tempImagePath, $imageUrl, $partnerId);
-        $this->cleanupTempFile($tempImagePath);
-
-        return $uploadResponse;
-    }
-    protected function downloadImage(string $imageUrl)
-    {
-        try {
-            $response = Http::get($imageUrl);
-            return $response->successful() ? $response->body() : false;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-    protected function createTempImage(string $imageContent, string $imageUrl): string
-    {
-        $extension = pathinfo($imageUrl, PATHINFO_EXTENSION);
-        $tempPath = tempnam(sys_get_temp_dir(), 'upload') . '.' . $extension;
-        return file_put_contents($tempPath, $imageContent) ? $tempPath : false;
-    }
-    protected function uploadToAPI(string $tempImagePath, string $imageUrl, int $partnerId): array
-    {
-        // Ensure the file handle can be opened.
-        $fileHandle = fopen($tempImagePath, 'r');
-        if (!$fileHandle) {
-            return ['status' => false, 'message' => 'Failed to open file handle'];
-        }
-
-        $multipartData = [
-            [
-                'name' => 'imageFiles',
-                'contents' => $fileHandle,
-                'filename' => basename($imageUrl)
-            ]
-        ];
-
-        // Proceed with API upload.
-        $response = $this->builder($partnerId, 'multipart/form-data', 'POST', 'https://api.commerce.naver.com/external/v1/product-images/upload', $multipartData);
-
-        // Always close the file handle if it's valid.
-        if (is_resource($fileHandle)) {
-            fclose($fileHandle);
-        }
-
-        return $response;
-    }
-    protected function cleanupTempFile(string $tempImagePath): void
-    {
-        unlink($tempImagePath);
-    }
-    public function builder(int $partnerId, string $contentType, string $method, string $url, array $data): array
-    {
-        $account = DB::table('smart_store_accounts AS ssa')
-            ->join('partners AS p', 'ssa.partner_id', '=', 'p.id')
-            ->where('p.id', $partnerId)
+        $partner = DB::table('partners')
+            ->where('api_token', $request->apiToken)
             ->first();
-
-        $ssac = new SmartStoreAccountController();
-        $getAccessTokenResult = $ssac->getAccessToken($account->application_id, $account->secret, $account->username);
-
-        if (!$getAccessTokenResult['status']) {
-            return [
-                'status' => false,
-                'message' => '유효한 API 계정 정보가 아닙니다.',
-                'error' => $getAccessTokenResult['message']
-            ];
-        }
-
-        $accessToken = $getAccessTokenResult['data']->access_token;
-        $headers = [
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Accept' => 'application/json',
-        ];
-
-        $client = new \GuzzleHttp\Client();
-        $options = ['headers' => $headers];
-
-        if ($contentType == 'multipart/form-data') {
-            $options['multipart'] = $data;
-        } else {
-            $options['json'] = $data;
-        }
-
-        try {
-            $response = $client->request($method, $url, $options);
-            return [
-                'status' => true,
-                'data' => json_decode((string)$response->getBody(), true)
-            ];
-        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-            return [
-                'status' => false,
-                'message' => 'API 요청 실패',
-                'error' => $e->getMessage()
-            ];
-        }
+        $account = DB::table($vendorEngName . '_accounts')
+            ->where('hash', $request->accountHash)
+            ->first();
+        return $this->$vendorEngName($products, $partner, $account);
+    }
+    private function smart_store($products, $partner, $account)
+    {
+        $spu = new SmartstoreProductUpload($products, $partner, $account);
+        return $spu->main();
     }
 }

@@ -13,6 +13,11 @@ class ManageController extends Controller
     public function index(Request $request)
     {
         $partnerId = Auth::guard('partner')->id();
+        $hasTable = DB::table('partner_tables')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'Y')
+            ->exists();
+        $partnerId = Auth::guard('partner')->id();
         $partnerTables = DB::table('partner_tables')
             ->where('is_active', 'Y')
             ->where('partner_id', $partnerId)
@@ -29,7 +34,8 @@ class ManageController extends Controller
             'products' => $products,
             'searchKeyword' => $searchKeyword,
             'partnerTableToken' => $partnerTableToken,
-            'productCodesStr' => $productCodesStr
+            'productCodesStr' => $productCodesStr,
+            'hasTable' => $hasTable
         ]);
     }
     private function getProductList($searchKeyword, $partnerTableToken, $partnerId)

@@ -1,18 +1,46 @@
-.wing{
+.wing {
     width: 1rem;
 }
-.product-contents{
-    color:#364a63;
+
+.product-contents {
+    color: #364a63;
 }
-.font-weight-bold{
+
+.font-weight-bold {
     font-weight: bold;
 }
-.wing-font{
-    font-weight:bold;
-    color:goldenrod;
+
+.wing-font {
+    font-weight: bold;
+    color: goldenrod;
 }
-.btn-collect{
-    position:fixed;
-    right:5%;
-    top:50%;
+
+.btn-collect {
+    position: fixed;
+    right: 5%;
+    top: 50%;
+}
+
+#pageLoader {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    z-index: 10000;
+    text-align: center;
+    opacity: 1;
+    /* Start fully visible */
+    transition: opacity 0.5s ease-out;
+    /* Animate the opacity */
+}
+
+.hidden {
+    opacity: 0;
+    /* End fully transparent */
+    visibility: hidden;
+    /* Make non-interactive after animation */
+    transition: visibility 0s 0.5s, opacity 0.5s ease-out;
+    /* Delay hiding */
 }

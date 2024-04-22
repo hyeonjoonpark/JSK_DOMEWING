@@ -45,16 +45,10 @@ class SmartStoreApiController extends Controller
             'data' => $response
         ];
     }
-    public function builder($partnerId, $contentType, $method, $url, $data)
+    public function builder($account, $contentType, $method, $url, $data)
     {
-        $account = DB::table('smart_store_accounts AS ssa')
-            ->join('partners AS p', 'ssa.partner_id', '=', 'p.id')
-            ->where('p.id', $partnerId)
-            ->first();
-
         $ssac = new SmartStoreAccountController();
         $getAccessTokenResult = $ssac->getAccessToken($account->application_id, $account->secret, $account->username);
-
         if (!$getAccessTokenResult['status']) {
             return [
                 'status' => false,
@@ -62,14 +56,12 @@ class SmartStoreApiController extends Controller
                 'error' => $getAccessTokenResult['message']
             ];
         }
-
         $accessToken = $getAccessTokenResult['data']->access_token;
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $accessToken,
             'Content-Type' => $contentType
         ])->$method($url, $data);
-
-        if ($response->successful()) {
+        if ($response->successful() && $response->status() === 200) {
             return [
                 'status' => true,
                 'data' => $response->json()
@@ -77,7 +69,6 @@ class SmartStoreApiController extends Controller
         } else {
             return [
                 'status' => false,
-                'message' => 'API 요청 실패',
                 'error' => $response->body()
             ];
         }

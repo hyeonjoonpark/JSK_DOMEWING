@@ -11,6 +11,15 @@ class CollectController extends Controller
 {
     public function index(Request $request)
     {
+        $partnerId = Auth::guard('partner')->id();
+        $hasTable = DB::table('partner_tables')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'Y')
+            ->exists();
+        if ($hasTable === false) {
+            return redirect('/partner/products/manage');
+        }
+
         $productCodesStr = $request->input('productCodesStr', '');
         $searchKeyword = $request->input('searchKeyword', '');
         $categoryId = $request->input('categoryId', '');

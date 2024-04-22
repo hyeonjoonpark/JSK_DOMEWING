@@ -205,6 +205,17 @@
             $("#partnerTable").select2({
                 dropdownParent: $("#collectProductsModal")
             });
+            const hasTable = @json($hasTable);
+            if (hasTable === false) {
+                const html = `
+                <h6 class="title">생성된 상품 테이블이 없습니다.</h6>
+                <p>상품 테이블을 먼저 생성한 후 상품 수집을 진행해주세요.</p>
+                `;
+                Swal.fire({
+                    icon: "warning",
+                    html: html
+                });
+            }
         });
 
         function topFunction() {
