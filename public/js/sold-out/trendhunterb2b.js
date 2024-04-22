@@ -19,6 +19,7 @@ const fs = require('fs');
         await processPageList(page, searchStr);
 
         await doSoldOut(page, browser);
+        await delay(3000);
 
     } catch (error) {
         console.error('Error:', error);

@@ -14,6 +14,7 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doSoldOut(page);
+        await delay(3000);
         const response = await accessPopup(page);
         console.log(response);
     } catch (error) {
