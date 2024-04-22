@@ -2,17 +2,15 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.setViewport({
-        width: 1920,
-        height: 1080
-    });
-
     clearPopup(page);
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // const username = 'jskorea2024';
+        // const password = 'tjddlf88!@';
+        // const productCodes = ['Q6PEA'];
         const searchStr = productCodes.join(',');
 
         await login(page, username, password);
@@ -35,7 +33,7 @@ async function login(page, username, password) {
     await page.type('input[name="user_id"]', username);
     await page.type('input[name="user_pass"]', password);
     await page.click('button[class="btn btn-main btn-lg"]');
-    await page.waitForNavigation({ waitUntil: 'domcontentloaded' });
+    await page.waitForNavigation({ waitUntil: 'load' });
 }
 
 async function processPageList(page, searchStr) {

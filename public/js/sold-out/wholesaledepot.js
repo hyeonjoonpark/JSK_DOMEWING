@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,

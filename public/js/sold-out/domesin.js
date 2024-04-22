@@ -3,7 +3,7 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const pages = await browser.pages();
     const page = pages[0];
     await page.setViewport({
