@@ -17,6 +17,7 @@ const fs = require('fs');
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doSoldOut(page);
+        await delay(3000);
     } catch (error) {
         console.error('Error:', error);
     } finally {
@@ -36,11 +37,10 @@ async function processPageList(page, searchStr) {
     await page.goto('https://goods.funn.co.kr/goods/scm/goods_List.asp?openmenu=b03m00s00&Dealer=sungil2018', { waitUntil: 'networkidle0', timeout: 0 });
     await page.select('#sch > table > tbody > tr:nth-child(9) > td:nth-child(2) > select', 'VenderPCode');
     await delay(1000);
-    await page.select('#info > div.sort > select', '500');
-    await delay(1000);
     await page.type('#sch > table > tbody > tr:nth-child(9) > td:nth-child(2) > input[type=text]', searchStr);
-    await page.click('#sch > table > tbody > tr:nth-child(9) > td:nth-child(2) > a > span');
     await delay(1000);
+    await page.select('#info > div.sort > select', '500');
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
 }
 
 async function doSoldOut(page) {

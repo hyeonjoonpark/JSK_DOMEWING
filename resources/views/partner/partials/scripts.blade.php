@@ -2,6 +2,13 @@
 <script src="{{ asset('assets/js/scripts.js') }}"></script>
 <script src="https://kit.fontawesome.com/0a14a1d42d.js" crossorigin="anonymous"></script>
 <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        const pageLoader = document.getElementById('pageLoader');
+        pageLoader.style.opacity = '0';
+        setTimeout(function() {
+            pageLoader.style.display = 'none';
+        }, 500);
+    });
     var audioError = new Audio('{{ asset('assets/audio/diring.mp3') }}');
     var apiToken = "{{ Auth::guard('partner')->user()->api_token }}";
 
@@ -65,6 +72,7 @@
             icon,
             html: `<img class="w-100" src="${image}"><h4 class="swal2-title mt-5">${message}</h4>`
         }).then(result => {
+            popupLoader(0, '페이지를 새로고침 중입니다.');
             location.reload();
         });
     }
@@ -109,5 +117,26 @@
         } else {
             swalWithReload(message, 'success');
         }
+    }
+
+    function createProductTable() {
+        popupLoader(1, "신규 상품 테이블을 생성 중입니다.");
+        const productTableName = $('#productTableName').val();
+        $.ajax({
+            url: "/api/partner/product/create-table",
+            type: "POST",
+            dataType: "JSON",
+            data: {
+                productTableName,
+                apiToken
+            },
+            success: ajaxSuccessHandling,
+            error: AjaxErrorHandling
+        });
+    }
+
+    function numberFormatter(inputId, length) {
+        const filteredValue = $(inputId).val().replace(/\D/g, '').substring(0, length);
+        $(inputId).val(filteredValue ? parseInt(filteredValue) : '');
     }
 </script>

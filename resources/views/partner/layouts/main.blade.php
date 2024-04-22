@@ -7,6 +7,10 @@
 </head>
 
 <body class="nk-body bg-white has-sidebar ">
+    <div id="pageLoader" class="page-loader">
+        <img src="{{ asset('assets/images/search-loader.gif') }}" alt="페이지 로더 이미지"><br>
+        <h3 class="nk-block-title page-title">페이지를 로딩 중입니다</h3>
+    </div>
     <div class="nk-app-root">
         <!-- main @s -->
         <div class="nk-main ">

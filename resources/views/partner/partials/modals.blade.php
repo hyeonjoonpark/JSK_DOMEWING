@@ -86,3 +86,25 @@
         </div>
     </div>
 </div>
+<div class="modal" role="dialog" id="createProductTableModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">상품 테이블 생성</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="" class="form-label">테이블명</label>
+                    <input type="text" class="form-control" id="productTableName" placeholder="테이블명을 기입해주세요." />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="createProductTable();">생성하기</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소하기</button>
+            </div>
+        </div>
+    </div>
+</div>

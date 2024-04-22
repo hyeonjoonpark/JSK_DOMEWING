@@ -32,6 +32,38 @@
         .pagination:hover {
             background-color: #f8f9fa;
         }
+
+        #topBtn {
+            position: fixed;
+            /* 고정된 위치 */
+            bottom: 20px;
+            /* 하단에서 20px 떨어진 위치 */
+            right: 30px;
+            /* 우측에서 30px 떨어진 위치 */
+            z-index: 99;
+            /* 다른 요소 위에 표시 */
+            font-size: 18px;
+            /* 글자 크기 */
+            border: none;
+            /* 테두리 없음 */
+            outline: none;
+            /* 외곽선 없음 */
+            background-color: #555;
+            /* 배경색 */
+            color: white;
+            /* 글자색 */
+            cursor: pointer;
+            /* 마우스 커서를 포인터로 변경 */
+            padding: 15px;
+            /* 패딩 */
+            border-radius: 10px;
+            /* 모서리 둥글게 */
+        }
+
+        #topBtn:hover {
+            background-color: #333;
+            /* 호버 시 배경색 변경 */
+        }
     </style>
 @endsection
 @section('title')
@@ -104,7 +136,12 @@
                         <table class="table text-nowrap align-middle">
                             <thead>
                                 <tr>
-                                    <th scope="col"><input type="checkbox" id="selectAll"></th>
+                                    <th scope="col">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="selectAll">
+                                            <label class="custom-control-label" for="selectAll"></label>
+                                        </div>
+                                    </th>
                                     <th scope="col">대표 이미지</th>
                                     <th scope="col">상품</th>
                                 </tr>
@@ -112,8 +149,15 @@
                             <tbody>
                                 @foreach ($products as $product)
                                     <tr id="tr{{ $product->productCode }}">
-                                        <td scope="row"><input type="checkbox" name="selectedProducts"
-                                                value="{{ $product->productCode }}"></td>
+                                        <td scope="row">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input"
+                                                    id="check{{ $product->productCode }}" name="selectedProducts"
+                                                    value="{{ $product->productCode }}">
+                                                <label class="custom-control-label"
+                                                    for="check{{ $product->productCode }}"></label>
+                                            </div>
+                                        </td>
                                         <td>
                                             <img src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100 height=100>
                                         </td>
@@ -152,12 +196,44 @@
         </div>
     </div>
     <button class="btn btn-success btn-collect" onclick="initCollect();">수집하기</button>
+    <button id="topBtn" onclick="topFunction()">Top</button>
+    <div class="modal" role="dialog" id="collectProductsModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">저장할 상품 테이블 선택</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="" class="form-label">상품 테이블</label>
+                        <select name="partnerTable" id="partnerTableToken" class="form-select">
+                            @foreach ($partnerTables as $partnerTable)
+                                <option value="{{ $partnerTable->token }}">{{ $partnerTable->title }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="collectProducts();">수집하기</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
+        });
+        $(document).ready(function() {
+            $("#partnerTableToken").select2({
+                dropdownParent: $("#collectProductsModal")
+            });
         });
 
         function view(productCode) {
@@ -210,9 +286,46 @@
         }
 
         function initCollect() {
+            const partnerTables = @json($partnerTables);
+            if (partnerTables.length > 0) {
+                $('#collectProductsModal').modal('show')
+            } else {
+                $('#createProductTableModal').modal('show');
+            }
+        }
+
+        function collectProducts() {
+            popupLoader(1, '수집한 상품들을 내 테이블에 기록 중입니다.');
             const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
                 return $(this).val();
             }).get();
+            const partnerTableToken = $('#partnerTableToken').val();
+            $.ajax({
+                url: "/api/partner/product/collect",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    productCodes,
+                    partnerTableToken,
+                    apiToken
+                },
+                success: function(response) {
+                    closePopup();
+                    console.log(response);
+                    const status = response.status;
+                    if (status === true) {
+                        swalSuccess(response.message);
+                    } else {
+                        swalError(response.message);
+                    }
+                },
+                error: AjaxErrorHandling
+            });
+        }
+
+        function topFunction() {
+            document.body.scrollTop = 0; // For Safari
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
         }
     </script>
 @endsection

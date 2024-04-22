@@ -18,6 +18,8 @@ const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doRestock(page);
+        await delay(3000);
+
     } catch (error) {
         console.error('Error:', error);
     } finally {

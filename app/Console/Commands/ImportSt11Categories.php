@@ -4,8 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\DB;
-use GuzzleHttp\Client;
 use SimpleXMLElement;
 
 class ImportSt11Categories extends Command
@@ -16,34 +14,36 @@ class ImportSt11Categories extends Command
     public function handle()
     {
         $response = Http::get('http://api.11st.co.kr/rest/cateservice/category');
-        $xml = new SimpleXMLElement($response->body());
-        $categories = $xml->categorys->category;
+        $xmlBody = $response->body();
 
-        $this->storeCategories($categories);
-    }
+        // 인코딩 확인 및 변환 (EUC-KR -> UTF-8)
+        if (!mb_check_encoding($xmlBody, 'UTF-8')) {
+            $xmlBody = iconv("EUC-KR", "UTF-8", $xmlBody);
+        }
 
-    private function storeCategories($categories, $path = '')
-    {
-        foreach ($categories as $category) {
-            $currentPath = $path === '' ? $category->dispNm : $path . '>' . $category->dispNm;
-            if ($category->leafYn == 'Y') {
-                // It's a leaf node, store in the database
-                DB::table('st11_category')->insert([
-                    'name' => $currentPath,
-                    'code' => (string) $category->dispNo
-                ]);
-            } else {
-                // Not a leaf node, recurse
-                $subcategories = $this->fetchSubCategories($category->dispNo);
-                $this->storeCategories($subcategories, $currentPath);
-            }
+        try {
+            $xml = new SimpleXMLElement($xmlBody);
+            $categories = $xml->children('ns2', true)->category;
+            $arrayData = $this->xmlToArray($categories);
+            $jsonData = json_encode($arrayData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            echo $jsonData;
+        } catch (\Exception $e) {
+            echo 'Error: ' . $e->getMessage();
         }
     }
 
-    private function fetchSubCategories($dispNo)
+    private function xmlToArray($xml)
     {
-        $response = Http::get("http://api.11st.co.kr/rest/cateservice/category?parentDispNo={$dispNo}");
-        $xml = new SimpleXMLElement($response->body());
-        return $xml->categorys->category;
+        $result = [];
+
+        foreach ($xml as $element => $node) {
+            if ($node->children('ns2', true)->count() > 0) {
+                $result[$element] = $this->xmlToArray($node->children('ns2', true));
+            } else {
+                $result[$element] = (string) $node;
+            }
+        }
+
+        return $result;
     }
 }

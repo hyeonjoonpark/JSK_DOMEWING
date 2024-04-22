@@ -37,7 +37,14 @@
                                     <a href="/partner/products/collect" class="nk-menu-link"><span
                                             class="nk-menu-text">상품 수집관</span></a>
                                 </li>
-
+                                <li class="nk-menu-item">
+                                    <a href="/partner/products/manage" class="nk-menu-link"><span
+                                            class="nk-menu-text">상품 관리관</span></a>
+                                </li>
+                                <li class="nk-menu-item">
+                                    <a href="/partner/products/upload" class="nk-menu-link"><span
+                                            class="nk-menu-text">상품 업로드관</span></a>
+                                </li>
                             </ul>
                         </li>
                         <li class="nk-menu-item has-sub">

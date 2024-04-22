@@ -15,7 +15,7 @@ async function main() {
         await login(page, username, password);
         await processPageList(page, searchStr);
         await doSoldOut(page);
-
+        await delay(3000);
     } catch (error) {
         console.error('Error:', error);
     } finally {

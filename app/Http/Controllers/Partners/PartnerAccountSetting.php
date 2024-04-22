@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Partner;
+use Illuminate\Support\Facades\DB;
 
 class PartnerAccountSetting extends Controller
 {
@@ -55,5 +56,49 @@ class PartnerAccountSetting extends Controller
                 'message' => $e->getMessage()
             ];
         }
+    }
+    public function list(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorId' => 'required|integer',
+        ], [
+            'vendorId' => '오픈마켓을 선택해주세요.'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ];
+        }
+        $vendorEngName = DB::table('vendors')
+            ->where('id', $request->vendorId)
+            ->where('is_active', 'ACTIVE')
+            ->first(['name_eng']);
+        if ($vendorEngName === null) {
+            return [
+                'status' => false,
+                'message' => '유효한 오픈마켓이 아닙니다. 페이지를 새로고침 후, 다시 시도해주세요.'
+            ];
+        }
+        $vendorEngName = $vendorEngName->name_eng;
+        $partnerId = DB::table('partners')
+            ->where('api_token', $request->apiToken)
+            ->first(['id'])
+            ->id;
+        $accounts = DB::table($vendorEngName . '_accounts')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'ACTIVE')
+            ->get(['hash', 'username']);
+        if ($accounts->isEmpty()) {
+            return [
+                'status' => false,
+                'message' => '해당 오픈마켓과 연동된 계정이 없습니다. 환경설정에서 계정 연동을 선행해주세요.',
+                'redirect' => true
+            ];
+        }
+        return [
+            'status' => true,
+            'data' => $accounts
+        ];
     }
 }

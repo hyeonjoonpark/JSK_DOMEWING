@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const pages = await browser.pages();
@@ -14,6 +16,7 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
         const searchStr = productCodes.join(',');
         await login(page, username, password);
         const processDelProductResult = await processDelProduct(page, browser, searchStr);
+        await delay(3000);
         console.log(processDelProductResult);
     } catch (error) {
         console.error('Error:', error);
