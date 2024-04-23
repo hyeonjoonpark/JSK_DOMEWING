@@ -4,11 +4,8 @@ const puppeteer = require('puppeteer');
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
-        // const [tempFilePath, username, password] = process.argv.slice(2);
-        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const urls = ['https://www.79dome.com/shop/goods/goods_view.php?goodsno=435431&category=001'];
-        const username = "sungiltradekorea";
-        const password = "tjddlf88!@#";
+        const [tempFilePath, username, password] = process.argv.slice(2);
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
