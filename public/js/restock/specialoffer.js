@@ -34,13 +34,13 @@ async function login(page, username, password) {
 }
 
 async function processPageList(page, searchStr) {
-    await page.goto('https://specialoffer.kr/mypage/page.php?code=seller_goods_change', { waitUntil: 'networkidle0' });
-    await page.click('#fsearch > div.tbl_frm01 > table > tbody > tr:nth-child(1) > td > span > input:nth-child(7)');
+    await page.goto('https://specialoffer.kr/mypage/page.php?token=f56935fb2ae5b927c355e34a32bb3742&code=seller_goods_change&q_date_field=g.reg_time&fr_date=&to_date=&q_isopen=&q_sc_type=&option_soldout=&q_goods_price_type=&q_notax=&q_medical_yn=&q_healthfood_yn=&sfl=gname&stx=', { waitUntil: 'networkidle0' });
+    await page.select('select[id="page_rows"]', '150');
     await delay(2000);
     await page.select('select[name="sfl"]', 'seller_gcode');
     await delay(1000);
     await page.type('input[name="stx"]', searchStr);
-    await page.click('input[value="검색"]');
+    await page.click('#fsearch > div.btn_confirm > input:nth-child(1)');
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
 }
 
@@ -51,9 +51,10 @@ async function doRestock(page, browser) {
         return;
     }
     await page.evaluate(() => {
-        const inputElement = document.querySelector('#sodr_list > thead > tr:nth-child(1) > th:nth-child(1) > input');
+        const inputElement = document.querySelector('input[name="checkall"]');
         inputElement?.click();
     });
+    await delay(1000);
     const [newPage] = await Promise.all([
         new Promise(resolve => browser.once('targetcreated', target => resolve(target.page()))),
         page.click('#fgoodslist > div.local_frm01 > button:nth-child(4)')
