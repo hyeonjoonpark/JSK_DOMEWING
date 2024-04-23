@@ -80,6 +80,7 @@ async function clearPopup(page) {
             console.log(true);
         }
         else {
+            await dialog.accept();
             console.log(false);
         }
         return;
