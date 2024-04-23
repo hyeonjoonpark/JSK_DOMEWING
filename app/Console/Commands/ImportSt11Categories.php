@@ -3,8 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use SimpleXMLElement;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ImportSt11Categories extends Command
 {
@@ -13,37 +14,29 @@ class ImportSt11Categories extends Command
 
     public function handle()
     {
-        $response = Http::get('http://api.11st.co.kr/rest/cateservice/category');
-        $xmlBody = $response->body();
-
-        // 인코딩 확인 및 변환 (EUC-KR -> UTF-8)
-        if (!mb_check_encoding($xmlBody, 'UTF-8')) {
-            $xmlBody = iconv("EUC-KR", "UTF-8", $xmlBody);
-        }
-
-        try {
-            $xml = new SimpleXMLElement($xmlBody);
-            $categories = $xml->children('ns2', true)->category;
-            $arrayData = $this->xmlToArray($categories);
-            $jsonData = json_encode($arrayData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            echo $jsonData;
-        } catch (\Exception $e) {
-            echo 'Error: ' . $e->getMessage();
-        }
-    }
-
-    private function xmlToArray($xml)
-    {
-        $result = [];
-
-        foreach ($xml as $element => $node) {
-            if ($node->children('ns2', true)->count() > 0) {
-                $result[$element] = $this->xmlToArray($node->children('ns2', true));
-            } else {
-                $result[$element] = (string) $node;
+        set_time_limit(0);
+        ini_set('memory_allow', '-1');
+        $excelPath = public_path('assets/excel/categories/OpenmarketCategory.xlsx');
+        $spreadsheet = IOFactory::load($excelPath);
+        $sheet = $spreadsheet->getSheet(4);
+        $firstRow = true;
+        foreach ($sheet->getRowIterator() as $index => $row) {
+            if ($firstRow) {
+                $firstRow = false;
+                continue;
             }
+            $code = $sheet->getCell('B' . $index)->getValue();
+            $name = $sheet->getCell('C' . $index)->getValue();
+            $this->store($code, $name);
         }
-
-        return $result;
+        echo "success";
+    }
+    private function store($code, $name)
+    {
+        DB::table('interpark_category')
+            ->insert([
+                'code' => $code,
+                'name' => $name
+            ]);
     }
 }

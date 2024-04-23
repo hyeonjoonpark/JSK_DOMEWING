@@ -6,6 +6,9 @@
     <p>각종 판매 실적들을 파악하기 위한 차트 페이지입니다.</p>
 @endsection
 @section('content')
+    <pre>
+        {{ print_r($categories) }}
+    </pre>
     <div class="row g-gs">
         <div class="col-lg-8">
             <div class="card card-bordered h-100">
