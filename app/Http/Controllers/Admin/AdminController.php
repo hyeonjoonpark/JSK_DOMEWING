@@ -94,10 +94,8 @@ class AdminController extends Controller
 
     public function accountSetting(Request $request)
     {
-        $b2Bs = DB::table('product_register AS pr')
-            ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
-            ->where('pr.is_active', 'Y')
-            ->get();
+        $controller = new Controller();
+        $b2Bs = $controller->getActiveB2Bs();
         $vendors = DB::table('product_search AS ps')
             ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
             ->where('v.is_active', 'ACTIVE')
