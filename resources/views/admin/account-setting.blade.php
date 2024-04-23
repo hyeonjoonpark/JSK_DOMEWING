@@ -7,32 +7,62 @@
 @endsection
 @section('content')
     <div class="row g-gs">
-        <div class="col-12 col-md-6 mb-3">
-            <div class="card card-bordered">
-                <div class="card-inner">
-                    <h6 class="title">마진율</h6>
-                    <p>B2B 업체별로 각 상품의 원가에 적용될 마진율을 설정합니다.</p>
-                    @foreach ($b2Bs as $b2B)
-                        <div class="form-group">
-                            <label for="" class="form-label">{{ $b2B->name }}</label>
-                            <div class="d-flex text-nowrap">
-                                <div class="form-control-wrap w-100">
-                                    <div class="form-text-hint">
-                                        <span class="overline-title">%</span>
+        <div class="col-12 col-md-6">
+            <div class="row g-gs">
+                <div class="col-12">
+                    <div class="card card-bordered">
+                        <div class="card-inner">
+                            <h6 class="title">마진율</h6>
+                            <p>B2B 업체별로 각 상품의 원가에 적용될 마진율을 설정합니다.</p>
+                            @foreach ($b2Bs as $b2B)
+                                <div class="form-group">
+                                    <label for="" class="form-label">{{ $b2B->name }}</label>
+                                    <div class="d-flex text-nowrap">
+                                        <div class="form-control-wrap w-100">
+                                            <div class="form-text-hint">
+                                                <span class="overline-title">%</span>
+                                            </div>
+                                            <input type="number" class="form-control" id="marginRate{{ $b2B->vendor_id }}"
+                                                value="{{ $b2B->margin_rate }}" placeholder="마진율(%)를 기입해주세요."
+                                                onkeydown="handleEnter(event, 'marginBtn{{ $b2B->vendor_id }}')">
+                                        </div>
+                                        <button class="btn btn-primary" id="marginBtn{{ $b2B->vendor_id }}"
+                                            onclick="changeMarginRate({{ $b2B->vendor_id }});">변경</button>
                                     </div>
-                                    <input type="number" class="form-control" id="marginRate{{ $b2B->vendor_id }}"
-                                        value="{{ $b2B->margin_rate }}" placeholder="마진율(%)를 기입해주세요."
-                                        onkeydown="handleEnter(event, 'marginBtn{{ $b2B->vendor_id }}')">
                                 </div>
-                                <button class="btn btn-primary" id="marginBtn{{ $b2B->vendor_id }}"
-                                    onclick="changeMarginRate({{ $b2B->vendor_id }});">변경</button>
-                            </div>
+                            @endforeach
                         </div>
-                    @endforeach
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card card-bordered">
+                        <div class="card-inner">
+                            <h6 class="title">오픈 마켓 수수료</h6>
+                            <p>오픈 마켓 별 수수료를 책정합니다.</p>
+                            @foreach ($vendorCommissions as $vc)
+                                <div class="form-group">
+                                    <label for="" class="form-label">{{ $vc->name }}</label>
+                                    <div class="d-flex text-nowrap">
+                                        <div class="form-control-wrap w-100">
+                                            <div class="form-text-hint">
+                                                <span class="overline-title">%</span>
+                                            </div>
+                                            <input type="text" class="form-control" id="{{ $vc->name_eng }}Commission"
+                                                value="{{ $vc->commission }}" placeholder="수수료(%)를 기입해주세요."
+                                                onkeydown="handleEnter(event, '{{ $vc->name_eng }}CommissionBtn')"
+                                                oninput="numberFormatter(this, 2, 2);">
+                                        </div>
+                                        <button class="btn btn-primary" id="{{ $vc->name_eng }}CommissionBtn"
+                                            onclick="updateCommission('{{ $vc->name_eng }}');">변경</button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 mb-3">
+        <div class="col-12 col-md-6">
             <div class="card card-bordered">
                 <div class="card-inner">
                     <h6 class="title">배송비</h6>
@@ -68,6 +98,42 @@
                 event.preventDefault(); // 엔터키의 기본 동작(새 줄 삽입)을 방지
                 document.getElementById(btnID).click(); // 버튼 클릭 이벤트 실행
             }
+        }
+
+        function updateCommission(vendorEngName) {
+            const commission = $('#' + vendorEngName + 'Commission').val();
+            console.log(commission);
+        }
+
+        function numberFormatter(input, digitLength = 2, decimalLength = 1) {
+            let value = $(input).val();
+
+            // Remove non-numeric characters except '.'
+            value = value.replace(/[^0-9.]/g, '');
+
+            // Split into integer and decimal parts
+            let [integerPart, decimalPart = ''] = value.split('.');
+
+            // Limit length of integer part
+            integerPart = integerPart.substr(0, digitLength);
+
+            // Limit length of decimal part
+            decimalPart = decimalPart.substr(0, decimalLength);
+
+            // Prepend '0' if the value starts with '.'
+            if (integerPart === '' && value.startsWith('.')) {
+                integerPart = '0';
+            }
+
+            // Ensure decimal part is a valid number
+            if (decimalPart !== '') {
+                decimalPart = '.' + (isNaN(decimalPart) ? '' : decimalPart);
+            }
+
+            // Concatenate integer and decimal parts
+            value = integerPart + decimalPart;
+
+            $(input).val(value);
         }
 
         function changeMarginRate(mrID) {
