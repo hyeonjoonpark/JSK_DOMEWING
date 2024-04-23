@@ -103,9 +103,14 @@ class AdminController extends Controller
             ->where('v.is_active', 'ACTIVE')
             ->where('ps.is_active', 'Y')
             ->get();
+        $vendorCommissions = DB::table('vendor_commissions AS vc')
+            ->join('vendors AS v', 'v.id', '=', 'vc.vendor_id')
+            ->where('v.is_active', 'ACTIVE')
+            ->get(['v.name_eng', 'vc.commission', 'v.name']);
         return view('admin/account-setting', [
             'b2Bs' => $b2Bs,
-            'vendors' => $vendors
+            'vendors' => $vendors,
+            'vendorCommissions' => $vendorCommissions
         ]);
     }
 
@@ -194,6 +199,7 @@ class AdminController extends Controller
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where('v.is_active', 'ACTIVE')
             ->where('pr.is_active', 'Y')
+            ->where('v.type', 'B2B')
             ->whereNot('v.id', 57)
             ->get();
 
@@ -288,6 +294,7 @@ class AdminController extends Controller
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where('v.is_active', 'ACTIVE')
             ->where('pr.is_active', 'Y')
+            ->where('v.type', 'B2B')
             ->whereNot('v.id', 57)
             ->get();
 

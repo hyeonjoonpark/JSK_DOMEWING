@@ -14,6 +14,7 @@ class CollectOrderController extends Controller
     {
         set_time_limit(0);
         $this->requestExcelFile();
+        $this->requestExcelFile2();
         $userController = new UserController();
         $processController = new ProcessController();
         $extractOrderController = new ExtractOrderController();
@@ -53,6 +54,12 @@ class CollectOrderController extends Controller
         }
     }
     public function requestExcelFile($b2BEngName = 'domeggook', $username = 'sungil2018', $password = "tjddlf88!@")
+    {
+        $scriptPath = public_path('js/orderwing/' . $b2BEngName . '_process.js');
+        $command = 'node ' . $scriptPath . ' ' . $username . ' ' . $password;
+        exec($command, $output, $resultCode);
+    }
+    public function requestExcelFile2($b2BEngName = 'domeggook2', $username = 'luminous2020', $password = "fnalshtm88!@")
     {
         $scriptPath = public_path('js/orderwing/' . $b2BEngName . '_process.js');
         $command = 'node ' . $scriptPath . ' ' . $username . ' ' . $password;
