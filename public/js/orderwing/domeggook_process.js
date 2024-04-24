@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer');
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    clearPopup(page);
     try {
         const args = process.argv.slice(2);
         const [username, password] = args;
@@ -29,3 +30,10 @@ const puppeteer = require('puppeteer');
         await browser.close();
     }
 })();
+async function clearPopup(page) {
+    page.on('dialog', async dialog => {
+        await dialog.accept();
+        await new Promise((page) => setTimeout(page, 1000));
+        return;
+    });
+}

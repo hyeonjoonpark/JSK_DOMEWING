@@ -47,6 +47,12 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="nk-menu-item">
+                            <a href="/partner/orders/list" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-list-alt"></em></span>
+                                <span class="nk-menu-text">주문내역 확인</span>
+                            </a>
+                        </li>
                         <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-gear"></em></span>

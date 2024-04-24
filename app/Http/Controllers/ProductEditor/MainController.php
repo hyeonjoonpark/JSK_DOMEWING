@@ -22,6 +22,7 @@ class MainController extends Controller
     public function main(Request $request)
     {
         set_time_limit(0);
+        ini_set('memory_allow', '-1');
         $validator = Validator::make($request->all(), [
             'products' => 'required|file|mimes:xlsx'
         ], [
