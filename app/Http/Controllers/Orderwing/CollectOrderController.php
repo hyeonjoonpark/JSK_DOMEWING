@@ -37,6 +37,7 @@ class CollectOrderController extends Controller
     {
         return DB::table('product_register AS pr')
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
+            ->where('v.type', 'B2B')
             ->where('v.is_active', 'ACTIVE')
             ->where('pr.is_active', 'Y')
             ->whereNotIn('v.id', [6])
