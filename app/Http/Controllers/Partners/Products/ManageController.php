@@ -120,4 +120,8 @@ class ManageController extends Controller
             ];
         }
     }
+    public function deleteProduct(Request $request)
+    {
+        return $request;
+    }
 }
