@@ -67,6 +67,10 @@
                                                 {{ $partner->is_active === 'INACTIVE' ? 'selected' : '' }}>
                                                 INACTIVE
                                             </option>
+                                            <option value="PENDING"
+                                                {{ $partner->is_active === 'PENDING' ? 'selected' : '' }}>
+                                                PENDING
+                                            </option>
                                         </select>
                                         <select class="form-control js-select2"
                                             onchange="setDuration('{{ $partner->token }}', this.value);">
