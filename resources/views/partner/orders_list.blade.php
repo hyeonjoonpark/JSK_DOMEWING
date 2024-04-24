@@ -7,12 +7,12 @@
 @endsection
 @section('content')
     <div class="row g-gs">
-        <div class="col">
+        <div class="col-12">
             <div class="card card-bordered">
                 <div class="card-inner">
                     <div class="form-group">
                         <label class="form-label">선택 조회</label>
-                        <div class="row">
+                        <div class="row g-gs">
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
                                 <div class="custom-controls">
                                     <div class="custom-control custom-checkbox">
@@ -97,100 +97,98 @@
                 </div>
             </div>
         </div>
-    </div>
-    </div>
-
-    <div class="row g-gs">
-        <div class="col">
+        <div class="col-12">
             <div class="card card-bordered card-preview">
                 <div class="card-inner">
-                    <table class="datatable-init table">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" id="selectAll"></th>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Office</th>
-                                <th>Age</th>
-                                <th>Start date</th>
-                                <th>Salary</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Tiger Nixon</td>
-                                <td>System Architect</td>
-                                <td>Edinburgh</td>
-                                <td>61</td>
-                                <td>2011/04/25</td>
-                                <td>$320,800</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Shou Itou</td>
-                                <td>Regional Marketing</td>
-                                <td>Tokyo</td>
-                                <td>20</td>
-                                <td>2011/08/14</td>
-                                <td>$163,000</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Michelle House</td>
-                                <td>Integration Specialist</td>
-                                <td>Sydney</td>
-                                <td>37</td>
-                                <td>2011/06/02</td>
-                                <td>$95,400</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Suki Burks</td>
-                                <td>Developer</td>
-                                <td>London</td>
-                                <td>53</td>
-                                <td>2009/10/22</td>
-                                <td>$114,500</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Prescott Bartlett</td>
-                                <td>Technical Author</td>
-                                <td>London</td>
-                                <td>27</td>
-                                <td>2011/05/07</td>
-                                <td>$145,000</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Gavin Cortez</td>
-                                <td>Team Leader</td>
-                                <td>San Francisco</td>
-                                <td>22</td>
-                                <td>2008/10/26</td>
-                                <td>$235,500</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Martena Mccray</td>
-                                <td>Post-Sales support</td>
-                                <td>Edinburgh</td>
-                                <td>46</td>
-                                <td>2011/03/09</td>
-                                <td>$324,050</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Unity Butler</td>
-                                <td>Marketing Designer</td>
-                                <td>San Francisco</td>
-                                <td>47</td>
-                                <td>2009/12/09</td>
-                                <td>$85,675</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAll"></th>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Office</th>
+                                    <th>Age</th>
+                                    <th>Start date</th>
+                                    <th>Salary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Tiger Nixon</td>
+                                    <td>System Architect</td>
+                                    <td>Edinburgh</td>
+                                    <td>61</td>
+                                    <td>2011/04/25</td>
+                                    <td>$320,800</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Shou Itou</td>
+                                    <td>Regional Marketing</td>
+                                    <td>Tokyo</td>
+                                    <td>20</td>
+                                    <td>2011/08/14</td>
+                                    <td>$163,000</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Michelle House</td>
+                                    <td>Integration Specialist</td>
+                                    <td>Sydney</td>
+                                    <td>37</td>
+                                    <td>2011/06/02</td>
+                                    <td>$95,400</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Suki Burks</td>
+                                    <td>Developer</td>
+                                    <td>London</td>
+                                    <td>53</td>
+                                    <td>2009/10/22</td>
+                                    <td>$114,500</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Prescott Bartlett</td>
+                                    <td>Technical Author</td>
+                                    <td>London</td>
+                                    <td>27</td>
+                                    <td>2011/05/07</td>
+                                    <td>$145,000</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Gavin Cortez</td>
+                                    <td>Team Leader</td>
+                                    <td>San Francisco</td>
+                                    <td>22</td>
+                                    <td>2008/10/26</td>
+                                    <td>$235,500</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Martena Mccray</td>
+                                    <td>Post-Sales support</td>
+                                    <td>Edinburgh</td>
+                                    <td>46</td>
+                                    <td>2011/03/09</td>
+                                    <td>$324,050</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>Unity Butler</td>
+                                    <td>Marketing Designer</td>
+                                    <td>San Francisco</td>
+                                    <td>47</td>
+                                    <td>2009/12/09</td>
+                                    <td>$85,675</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div><!-- .card-preview -->
         </div>
