@@ -53,6 +53,8 @@ class ManageController extends Controller
             return null;
         }
         $partnerTableId = $partnerTableId->id;
+        $controller = new Controller();
+        $marginValue = $controller->getMarginValue();
         return DB::table('partner_products AS pp')
             ->join('minewing_products AS mp', 'pp.product_id', '=', 'mp.id')
             ->join('ownerclan_category AS oc', 'mp.categoryID', '=', 'oc.id')
@@ -60,6 +62,7 @@ class ManageController extends Controller
             ->where('pp.partner_table_id', $partnerTableId)
             ->where('pp.is_active', 'Y')
             ->where('mp.productName', 'like', "%{$searchKeyword}%")
+            ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name')
             ->paginate(500);
     }
     public function add(Request $request)

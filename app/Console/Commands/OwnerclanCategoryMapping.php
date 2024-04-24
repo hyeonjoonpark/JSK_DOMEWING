@@ -21,79 +21,107 @@ class OwnerclanCategoryMapping extends Command
      * @var string
      */
     protected $description = 'Command description';
+    protected $directory = 'assets/excel/ownerclan-mappings/';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        set_time_limit(0);
-        ini_set('memory_allow', '-1');
-        $directory = 'assets/excel/ownerclan-mappings/';
-        $files = scandir(public_path($directory));
-        foreach ($files as $file) {
-            if ($file !== '.' && $file !== '..') {
-                $extractExcelResult = $this->extractExcel(public_path($directory . $file));
+        $this->setResourceLimits();
+        $files = $this->getFiles($this->directory);
+        $openMarkets = $this->processFiles($files);
+        return $this->edit($openMarkets);
+    }
+
+    protected function edit($openMarkets)
+    {
+        echo "Start updating on DB.";
+        foreach ($openMarkets as $openMarket) {
+            foreach ($openMarket['vendors'] as $vendor) {
+                $ownerclanCode = $openMarket['ownerclanCode'];
+                $vendorEngName = $vendor['vendorEngName'];
+                $vendorCode = $vendor['code'];
+                $this->mapping($ownerclanCode, $vendorEngName, $vendorCode);
             }
         }
     }
-    private function extractExcel($excelPath)
+
+    protected function setResourceLimits()
+    {
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
+    }
+
+    protected function getFiles($directory)
+    {
+        $path = public_path($directory);
+        return array_diff(scandir($path), ['.', '..']);
+    }
+
+    protected function processFiles(array $files)
+    {
+        $openMarkets = [];
+        foreach ($files as $file) {
+            $filePath = public_path($this->directory . $file);
+            $extractedData = $this->extractExcel($filePath);
+            $openMarkets = array_merge($openMarkets, $extractedData);
+        }
+        return $openMarkets;
+    }
+
+    protected function extractExcel($excelPath)
     {
         $excel = IOFactory::load($excelPath);
         $sheet = $excel->getSheet(0);
+        return $this->extractDataFromSheet($sheet);
+    }
+
+    protected function extractDataFromSheet($sheet)
+    {
         $openMarkets = [];
         foreach ($sheet->getRowIterator() as $index => $row) {
-            if ($index < 3) {
+            if ($this->shouldSkipRow($index)) {
                 continue;
             }
-            $ownerclanCode = $sheet->getCell('D' . $index)->getValue();
-            $openMarketCodes = $sheet->getCell('F' . $index)->getValue();
-            $vendors = $this->processOpenMarketCodes();
-            $openMarket = [
-                'ownerclanCode' => $ownerclanCode,
-                'openMarketCodes' => $openMarketCodes
-            ];
-            $openMarkets[] = $openMarket;
+            $openMarket = $this->extractDataFromRow($sheet, $index);
+            if (!in_array($openMarket, $openMarkets)) {
+                $openMarkets[] = $openMarket;
+            }
         }
+        return $openMarkets;
+    }
+
+    protected function shouldSkipRow($index)
+    {
+        return $index < 3;
+    }
+
+    protected function extractDataFromRow($sheet, $index)
+    {
+        $ownerclanCode = $sheet->getCell('D' . $index)->getValue();
+        $openMarketCodes = $sheet->getCell('F' . $index)->getValue();
+        $vendors = $this->processOpenMarketCodes($openMarketCodes);
+        return [
+            'ownerclanCode' => $ownerclanCode,
+            'vendors' => $vendors
+        ];
     }
     private function processOpenMarketCodes($openMarketCodes)
     {
         $validOpenMarkets = ['auction', 'gmarket', 'st11', 'interpark', 'coupang'];
         $rows = explode("\n", $openMarketCodes);
+        $vendors = [];
         foreach ($rows as $row) {
-            $vendorEngName = $row[0];
-            $vendors = [];
+            $vendorInfo = explode(',', $row);
+            $vendorEngName = $vendorInfo[0];
             if (in_array($vendorEngName, $validOpenMarkets)) {
                 $vendor = [
                     'vendorEngName' => $vendorEngName,
-                    'code' => $row[1]
+                    'code' => $vendorInfo[1]
                 ];
                 $vendors[] = $vendor;
             }
         }
         return $vendors;
     }
-    // private function processOpenMarkets()
-    // {
-    //     $validOpenMarkets = ['auction', 'gmarket', 'st11', 'interpark', 'coupang'];
-    //     $processedCodes = explode("\n", $openMarketCodes);
-    //     foreach ($processedCodes as $codeRow) {
-    //         $openMarkets = explode(",", $codeRow);
-    //         foreach ($openMarkets as $om) {
-    //             $vendorEngName = $om[0];
-    //             if (in_array($vendorEngName, $validOpenMarkets)) {
-    //                 $vendorCode = $om[1];
-    //                 $mappingResult = $this->mapping($ownerclanCode, $vendorEngName, $vendorCode);
-    //                 if ($mappingResult === false) {
-    //                     continue;
-    //                 }
-    //                 if ($mappingResult['status'] === false) {
-    //                     continue;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
     private function mapping($ownerclanCode, $vendorEngName, $vendorCode)
     {
         $ocId = DB::table('ownerclan_category')
@@ -102,6 +130,7 @@ class OwnerclanCategoryMapping extends Command
         if ($ocId === null) {
             return false;
         }
+        $ocId = $ocId->id;
         $ocExists = DB::table('category_mapping')
             ->where("ownerclan", $ocId)
             ->exists();
@@ -114,6 +143,7 @@ class OwnerclanCategoryMapping extends Command
         if ($vcId === null) {
             return false;
         }
+        $vcId = $vcId->id;
         return $this->update($ocId, $vendorEngName, $vcId);
     }
     private function update($ocId, $vendorEngName, $vcId)

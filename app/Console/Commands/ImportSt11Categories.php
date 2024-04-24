@@ -18,7 +18,7 @@ class ImportSt11Categories extends Command
         ini_set('memory_allow', '-1');
         $excelPath = public_path('assets/excel/categories/OpenmarketCategory.xlsx');
         $spreadsheet = IOFactory::load($excelPath);
-        $sheet = $spreadsheet->getSheet(4);
+        $sheet = $spreadsheet->getSheet(2);
         $firstRow = true;
         foreach ($sheet->getRowIterator() as $index => $row) {
             if ($firstRow) {
@@ -33,7 +33,7 @@ class ImportSt11Categories extends Command
     }
     private function store($code, $name)
     {
-        DB::table('interpark_category')
+        DB::table('gmarket_category')
             ->insert([
                 'code' => $code,
                 'name' => $name

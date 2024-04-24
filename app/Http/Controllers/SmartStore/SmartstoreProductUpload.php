@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\SmartStore;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class SmartstoreProductUpload extends Controller
@@ -19,7 +20,6 @@ class SmartstoreProductUpload extends Controller
     {
         $success = 0;
         $error = '';
-        $successed_product_ids = [];
         $ssac = new SmartStoreApiController();
         foreach ($this->products as $product) {
             $uploadImageResult = $this->uploadImageFromUrl($product->productImage, $this->account);
@@ -31,6 +31,12 @@ class SmartstoreProductUpload extends Controller
             $result = $ssac->builder($this->account, 'application/json', 'POST', 'https://api.commerce.naver.com/external/v2/products', $data);
             if ($result['status'] === true) {
                 $success++;
+                $resultData = $result['data'];
+                $originProductNo = $resultData['originProductNo'];
+                $smartstoreChannelProductNo = $resultData['smartstoreChannelProductNo'];
+                $partnerId = $this->partner->id;
+                $productId = $product->id;
+                $this->store($partnerId, $productId, $originProductNo, $smartstoreChannelProductNo);
             } else {
                 $error = $result['error'];
             }
@@ -40,6 +46,16 @@ class SmartstoreProductUpload extends Controller
             'message' => "총 " . count($this->products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.",
             'error' => $error
         ];
+    }
+    protected function store($partnerId, $productId, $originProductNo, $smartstoreChannelProductNo)
+    {
+        DB::table('smart_store_uploaded_products')
+            ->insert([
+                'partner_id' => $partnerId,
+                'product_id' => $productId,
+                'origin_product_no' => $originProductNo,
+                'smartstore_channel_product_no' => $smartstoreChannelProductNo
+            ]);
     }
     private function generateParam($product, $productImage)
     {
