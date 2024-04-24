@@ -35,6 +35,7 @@ use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
 use App\Http\Controllers\Partners\ForgotPasswordController;
 use App\Http\Controllers\Partners\LoginController as PartnersLoginController;
+use App\Http\Controllers\Partners\OrderController;
 use App\Http\Controllers\Partners\Products\CollectController;
 use App\Http\Controllers\Partners\Products\ManageController;
 use App\Http\Controllers\Partners\Products\UploadController;
@@ -68,6 +69,9 @@ Route::prefix('partner')->group(function () {
             Route::get('collect', [CollectController::class, 'index'])->name('partner.products.collect');
             Route::get('manage', [ManageController::class, 'index'])->name('partner.products.manage');
             Route::get('upload', [UploadController::class, 'index']);
+        });
+        Route::prefix('orders')->group(function () {
+            Route::get('list', [OrderController::class, 'index'])->name('partner.orders.list');
         });
     });
 });
