@@ -140,7 +140,7 @@
         if (value.includes('.')) { // Decimal
             const splittedValue = value.split('.');
             const digit = integerFormatter(splittedValue[0], digitLength);
-            const decimal = integerFormatter(splittedValue[1], digitLength);
+            const decimal = integerFormatter(splittedValue[1], decimalLength);
             if (decimal.length < 1 && digit.length < 1) {
                 value = 0;
             } else {
