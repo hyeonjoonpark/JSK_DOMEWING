@@ -24,7 +24,8 @@
                                             </div>
                                             <input type="number" class="form-control" id="marginRate{{ $b2B->vendor_id }}"
                                                 value="{{ $b2B->margin_rate }}" placeholder="마진율(%)를 기입해주세요."
-                                                onkeydown="handleEnter(event, 'marginBtn{{ $b2B->vendor_id }}')">
+                                                onkeydown="handleEnter(event, 'marginBtn{{ $b2B->vendor_id }}')"
+                                                oninput="numberFormatter(this, 2, 0);">
                                         </div>
                                         <button class="btn btn-primary" id="marginBtn{{ $b2B->vendor_id }}"
                                             onclick="changeMarginRate({{ $b2B->vendor_id }});">변경</button>
