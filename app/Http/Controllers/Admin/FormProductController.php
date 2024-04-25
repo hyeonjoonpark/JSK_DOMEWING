@@ -17,9 +17,9 @@ class FormProductController extends Controller
         return DB::table('minewing_products AS mp')
             ->join('product_search AS ps', 'mp.sellerID', '=', 'ps.vendor_id')
             ->where('mp.id', $productId)
-            ->first(['shipping_fee', 'additional_shipping_fee']);
+            ->first(['mp.shipping_fee', 'additional_shipping_fee']);
     }
-    public function trendhunterb2b($products, $margin_rate, $vendorEngName, $shippingCost, $index)
+    public function trendhunterb2b($products, $margin_rate, $vendorEngName, $shippingCost, $index) // 잠정 중단.
     {
         try {
             // 엑셀 파일 로드
@@ -35,6 +35,7 @@ class FormProductController extends Controller
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate * 1.10);
                 $least_marginedPrice = $marginedPrice + 1;
+                $bq = $product->bundle_quantity; // !!!!!!!!!!!!!!!!! 수량별 배송(묶음배송) 반드시 로직 진행 !!!!!!!!!!!!!!!!!!
                 $data = [
                     '',
                     '',
@@ -122,7 +123,7 @@ class FormProductController extends Controller
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
 
                 $serialNumber = $rowIndexFirstSheet - 1;
-
+                $bq = $product->bundle_quantity;
                 $dataForFirstSheet = [
                     $serialNumber,
                     $product->productCode,
@@ -139,7 +140,7 @@ class FormProductController extends Controller
                     '일반상품',
                     '',
                     99999,
-                    1,
+                    $bq,
                     '과세',
                     '가격자율',
                     $marginedPrice,
@@ -244,6 +245,14 @@ class FormProductController extends Controller
                 $productKeywords = str_replace(',', '/', $product->productKeywords);
                 $customerMarginRate = 1.45;
                 $customerPrice = ceil(($marginedPrice * $customerMarginRate) / 10) * 10;
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = $bundleQuantity;
+                    $deliveryPolicy = 'Y';
+                } else {
+                    $bq = '';
+                    $deliveryPolicy = 'N';
+                }
                 $data = [
                     $categoryCode,
                     $product->productName,
@@ -258,8 +267,8 @@ class FormProductController extends Controller
                     '오후 1시/본사/당일출고',
                     $additionalShippingFee,
                     $additionalShippingFee,
-                    'N',
-                    0,
+                    $deliveryPolicy,
+                    $bq,
                     '왕복반품배송비: ' . $shippingCost * 2 . ', 공급사수거접수',
                     2,
                     1,
@@ -322,7 +331,14 @@ class FormProductController extends Controller
                 $gappedShippingFee = $shippingCost - $basicShippingFee;
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + $gappedShippingFee;
 
-
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = $bundleQuantity . '=' . $shippingCost;
+                    $deliveryPolicy = 3;
+                } else {
+                    $bq = '';
+                    $deliveryPolicy = 0;
+                }
                 $data = [
                     $categoryCode,
                     $product->productName,
@@ -406,6 +422,14 @@ class FormProductController extends Controller
                 $tobizonCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $tobizonCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = $bundleQuantity;
+                    $deliveryPolicy = 'FC';
+                } else {
+                    $bq = 0;
+                    $deliveryPolicy = 'FE';
+                }
                 $data = [
                     $categoryCode,
                     $product->productName,
@@ -422,8 +446,8 @@ class FormProductController extends Controller
                     '',
                     'N',
                     'N',
-                    'FE',
-                    0,
+                    $deliveryPolicy,
+                    $bq,
                     'S',
                     $shippingCost,
                     $shippingCost,
@@ -499,6 +523,8 @@ class FormProductController extends Controller
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $bundleQuantity = $product->bundle_quantity;
+                $bundleQuantity > 0 ? $deliveryPolicy = 4 : $deliveryPolicy = 3;
                 $data = [
                     '',
                     $categoryCode,
@@ -521,7 +547,7 @@ class FormProductController extends Controller
                     0,
                     '',
                     '',
-                    3,
+                    $deliveryPolicy,
                     0,
                     $shippingCost,
                     '',
@@ -602,6 +628,14 @@ class FormProductController extends Controller
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $shippingCost = $bundleQuantity . ':' . $shippingCost;
+                    $deliveryPolicy = '선결제:수량별비례';
+                } else {
+                    $shippingCost = $shippingCost;
+                    $deliveryPolicy = '선결제:기본배송비';
+                }
                 $data = [
                     '',
                     'Y',
@@ -636,7 +670,7 @@ class FormProductController extends Controller
                     '택배',
                     '',
                     0,
-                    '선결제:기본배송비',
+                    $deliveryPolicy,
                     $shippingCost,
                     'Y',
                     'A1705389919',
@@ -683,6 +717,14 @@ class FormProductController extends Controller
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + (int)($shippingCost - $fixedShippingCost);
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = $bundleQuantity;
+                    $deliveryPolicy = 3;
+                } else {
+                    $bq = '';
+                    $deliveryPolicy = 0;
+                }
                 $data = [
                     $categoryCode,
                     $product->productName,
@@ -692,8 +734,8 @@ class FormProductController extends Controller
                     'ISMRO',
                     'ISMRO',
                     0,
-                    0,
-                    '',
+                    $deliveryPolicy,
+                    $bq,
                     '',
                     $product->productKeywords,
                     $marginedPrice,
@@ -768,6 +810,12 @@ class FormProductController extends Controller
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
                 $minQuantity = ceil($minAmount / $marginedPrice);
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = 'SA0062116:' . $bundleQuantity;
+                } else {
+                    $bq = '';
+                }
                 $data = [
                     '',
                     '도매꾹,도매매',
@@ -820,7 +868,7 @@ class FormProductController extends Controller
                     $shippingCost,
                     '선결제:고정배송비',
                     $shippingCost,
-                    '',
+                    $bq,
                     'SA0058243',
                     $shippingCost,
                     'N',
@@ -867,6 +915,12 @@ class FormProductController extends Controller
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
                 $minQuantity = ceil($minAmount / $marginedPrice);
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = 'SA0062116:' . $bundleQuantity;
+                } else {
+                    $bq = '';
+                }
                 $data = [
                     '',
                     '도매꾹,도매매',
@@ -919,7 +973,7 @@ class FormProductController extends Controller
                     $shippingCost,
                     '선결제:고정배송비',
                     $shippingCost,
-                    '',
+                    $bq,
                     'SA0062116',
                     $shippingCost,
                     'N',
@@ -964,6 +1018,12 @@ class FormProductController extends Controller
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = $bundleQuantity;
+                } else {
+                    $bq = 0;
+                }
                 $data = [
                     $categoryCode,
                     '',
@@ -975,7 +1035,7 @@ class FormProductController extends Controller
                     '',
                     $marginedPrice,
                     '',
-                    0,
+                    $bq,
                     '배송비선불',
                     '',
                     $shippingCost,
@@ -1059,6 +1119,14 @@ class FormProductController extends Controller
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate) + (int)($shippingCost - $fixedShippingCost);
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = $bundleQuantity;
+                    $deliveryPolicy = 5;
+                } else {
+                    $bq = '';
+                    $deliveryPolicy = 0;
+                }
                 $data = [
                     $product->productName,
                     $product->productName,
@@ -1069,8 +1137,8 @@ class FormProductController extends Controller
                     'ISMRO',
                     'ISMRO',
                     1,
-                    0,
-                    '',
+                    $deliveryPolicy,
+                    $bq,
                     0,
                     $product->productKeywords,
                     $marginedPrice,
@@ -1160,6 +1228,12 @@ class FormProductController extends Controller
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = $bundleQuantity;
+                } else {
+                    $bq = '';
+                }
                 $data = [
                     '',
                     $product->productName,
@@ -1172,7 +1246,7 @@ class FormProductController extends Controller
                     '',
                     0,
                     0,
-                    '',
+                    $bq,
                     'N',
                     $shippingCost,
                     $shippingCost,
@@ -1266,11 +1340,17 @@ class FormProductController extends Controller
                 $ownerclanCategoryID = $product->categoryID;
                 $categoryCode = $this->getCategoryCode($vendorEngName, $ownerclanCategoryID);
                 $marginedPrice = (int)ceil($product->productPrice * $margin_rate);
+                $bundleQuantity = $product->bundle_quantity;
+                if ($bundleQuantity > 0) {
+                    $bq = $bundleQuantity;
+                } else {
+                    $bq = '';
+                }
                 $data = [
                     '', $categoryCode, '', '', '', $product->productName, $product->productName,
                     $product->productKeywords, '기타', "ISMRO", '', $marginedPrice, '자율', '',
                     '과세', '', '', '', "N," . $product->productCode, $product->productImage, '',
-                    $product->productDetail, '가능', '선불', $shippingCost, $shippingCost, '', '', '', 1, 0, '',
+                    $product->productDetail, '가능', '선불', $shippingCost, $shippingCost, $bq, '', '', 1, 0, '',
                     35, $detailedDescription, 0, '', '', '', '', ''
                 ];
 

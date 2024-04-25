@@ -80,6 +80,7 @@
                     rememberToken
                 },
                 success: function(response) {
+                    console.log(response);
                     closePopup();
                     const {
                         status,

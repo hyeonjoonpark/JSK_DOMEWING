@@ -24,7 +24,8 @@
                                             </div>
                                             <input type="number" class="form-control" id="marginRate{{ $b2B->vendor_id }}"
                                                 value="{{ $b2B->margin_rate }}" placeholder="마진율(%)를 기입해주세요."
-                                                onkeydown="handleEnter(event, 'marginBtn{{ $b2B->vendor_id }}')">
+                                                onkeydown="handleEnter(event, 'marginBtn{{ $b2B->vendor_id }}')"
+                                                oninput="numberFormatter(this, 2, 0);">
                                         </div>
                                         <button class="btn btn-primary" id="marginBtn{{ $b2B->vendor_id }}"
                                             onclick="changeMarginRate({{ $b2B->vendor_id }});">변경</button>
@@ -50,7 +51,7 @@
                                             <input type="text" class="form-control" id="{{ $vc->name_eng }}Commission"
                                                 value="{{ $vc->commission }}" placeholder="수수료(%)를 기입해주세요."
                                                 onkeydown="handleEnter(event, '{{ $vc->name_eng }}CommissionBtn')"
-                                                oninput="numberFormatter(this, 2, 2);">
+                                                oninput="numberFormatter(this, 2, 5);">
                                         </div>
                                         <button class="btn btn-primary" id="{{ $vc->name_eng }}CommissionBtn"
                                             onclick="updateCommission('{{ $vc->name_eng }}');">변경</button>
@@ -103,37 +104,6 @@
         function updateCommission(vendorEngName) {
             const commission = $('#' + vendorEngName + 'Commission').val();
             console.log(commission);
-        }
-
-        function numberFormatter(input, digitLength = 2, decimalLength = 1) {
-            let value = $(input).val();
-
-            // Remove non-numeric characters except '.'
-            value = value.replace(/[^0-9.]/g, '');
-
-            // Split into integer and decimal parts
-            let [integerPart, decimalPart = ''] = value.split('.');
-
-            // Limit length of integer part
-            integerPart = integerPart.substr(0, digitLength);
-
-            // Limit length of decimal part
-            decimalPart = decimalPart.substr(0, decimalLength);
-
-            // Prepend '0' if the value starts with '.'
-            if (integerPart === '' && value.startsWith('.')) {
-                integerPart = '0';
-            }
-
-            // Ensure decimal part is a valid number
-            if (decimalPart !== '') {
-                decimalPart = '.' + (isNaN(decimalPart) ? '' : decimalPart);
-            }
-
-            // Concatenate integer and decimal parts
-            value = integerPart + decimalPart;
-
-            $(input).val(value);
         }
 
         function changeMarginRate(mrID) {

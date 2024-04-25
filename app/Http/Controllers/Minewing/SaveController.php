@@ -172,7 +172,7 @@ class SaveController extends Controller
             ->has_watermark;
         return $hasWatermark;
     }
-    protected function insertMappingwing($ownerclanCategoryID)
+    public function insertMappingwing($ownerclanCategoryID)
     {
         try {
             $isExist = DB::table('category_mapping')
@@ -208,19 +208,21 @@ class SaveController extends Controller
             } else {
                 $hasOption = 'N';
             }
-            DB::table('minewing_products')
+            DB::table('minewing_products AS mp')
+                ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
                 ->insert([
-                    'sellerID' => $sellerID,
-                    'userID' => $userID,
-                    'categoryID' => $categoryID,
-                    'productCode' => $productCode,
-                    'productName' => $productName,
-                    'productKeywords' => $productKeywords,
-                    'productPrice' => $productPrice,
-                    'productImage' => $productImage,
-                    'productDetail' => $productDetail,
-                    'productHref' => $productHref,
-                    'hasOption' => $hasOption
+                    'mp.sellerID' => $sellerID,
+                    'mp.userID' => $userID,
+                    'mp.categoryID' => $categoryID,
+                    'mp.productCode' => $productCode,
+                    'mp.productName' => $productName,
+                    'mp.productKeywords' => $productKeywords,
+                    'mp.productPrice' => $productPrice,
+                    'mp.productImage' => $productImage,
+                    'mp.productDetail' => $productDetail,
+                    'mp.productHref' => $productHref,
+                    'mp.hasOption' => $hasOption,
+                    'mp.shipping_fee' => DB::raw('ps.shipping_fee')
                 ]);
             $response = $this->insertMappingwing($categoryID);
             if (!$response) {

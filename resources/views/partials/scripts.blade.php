@@ -93,28 +93,6 @@
         });
     }
 
-    function numberFormat(number, decimals = 0, decPoint = '.', thousandsSep = ',') {
-        // Ensure number is a float.
-        number = parseFloat(number);
-
-        // Check if number is NaN and return 0 in such case
-        if (isNaN(number)) {
-            return '0';
-        }
-
-        // Fix the number to specified decimal places and convert to string.
-        number = number.toFixed(decimals);
-
-        // Split the number by the decimal point.
-        const parts = number.split('.');
-
-        // Replace instances of thousand separator.
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
-
-        // Reassemble the number and return it.
-        return parts.join(decPoint);
-    }
-
     function AjaxErrorHandling(error) {
         console.log(error);
         closePopup();
@@ -165,8 +143,25 @@
         swalWithReload(response.return, statusType);
     }
 
-    function numberFormatter(inputId, length) {
-        const filteredValue = $(inputId).val().replace(/\D/g, '').substring(0, length);
-        $(inputId).val(filteredValue ? parseInt(filteredValue) : '');
+    function numberFormatter(input, digitLength, decimalLength) {
+        let value = $(input).val();
+        if (value.includes('.') && decimalLength > 0) { // Decimal
+            const splittedValue = value.split('.');
+            const digit = integerFormatter(splittedValue[0], digitLength);
+            const decimal = integerFormatter(splittedValue[1], decimalLength);
+            if (decimal.length < 1 && digit.length < 1) {
+                value = 0;
+            } else {
+                value = digit + '.' + decimal;
+            }
+        } else { // Integer
+            value = integerFormatter(value, digitLength);
+        }
+        $(input).val(value);
+    }
+
+    function integerFormatter(value, length) {
+        const filteredValue = value.replace(/\D/g, '').substring(0, length);
+        return filteredValue ? parseInt(filteredValue) : '';
     }
 </script>

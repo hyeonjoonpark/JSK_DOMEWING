@@ -492,23 +492,20 @@ class ProcessDataController extends Controller
         $isFirstRow = true;
 
         $columnMappings = [
-            'B' => 'senderName',
-            'C' => 'senderPhone',
-            'E' => 'receiverName',
-            'G' => 'receiverPhone',
-            'H' => 'postcode',
-            'I' => 'address',
-            'J' => 'productName',
-            'L' => 'quantity',
-            'M' => 'productPrice',
-            'N' => 'shippingCost',
-            'P' => 'orderCode',
-            'S' => 'shippingRemark',
-            'V' => 'productCode',
-            'W' => 'productCodeConditional', // Special handling for LADAM
-            'A' => 'orderedAt',
-            'O' => 'amount'
-            // ... Add more mappings if needed
+            'D' => 'receiverName',
+            'E' => 'receiverPhone',
+            'G' => 'postcode',
+            'H' => 'address',
+            'K' => 'productName',
+            'R' => 'quantity',
+            'Q' => 'productPrice',
+            'T' => 'shippingCost',
+            'A' => 'orderCode',
+            'X' => 'shippingRemark',
+            'J' => 'productCode',
+            'U' => 'orderedAt',
+            // 'O' => 'amount',
+            'V' => 'orderStatus'
         ];
 
         foreach ($worksheet->getRowIterator() as $row) {
@@ -520,7 +517,11 @@ class ProcessDataController extends Controller
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
 
-            $rowData = [];
+            $rowData = [
+                'senderName' => '', // default value
+                'senderPhone' => '' // default value
+            ]; // Initialize array to store the cell data
+
             foreach ($cellIterator as $cell) {
                 $columnLetter = $cell->getColumn();
                 if (isset($columnMappings[$columnLetter])) {
@@ -532,6 +533,9 @@ class ProcessDataController extends Controller
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
+            $quantity = (int) $rowData['quantity'];
+            $shippingCost = (int) $rowData['shippingCost'];
+            $rowData['amount'] = (int) $rowData['productPrice'] * $quantity + $shippingCost;
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);

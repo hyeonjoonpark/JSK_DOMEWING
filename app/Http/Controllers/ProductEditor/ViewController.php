@@ -14,7 +14,8 @@ class ViewController extends Controller
             ->join('vendors AS v', 'v.id', '=', 'pr.vendor_id')
             ->where([
                 'v.is_active' => 'ACTIVE',
-                'pr.is_active' => 'Y'
+                'pr.is_active' => 'Y',
+                'v.type' => 'B2B'
             ])->get();
         return view('admin/product_editor', [
             'b2bs' => $b2bs
