@@ -16,7 +16,6 @@ class ShippingFeeController extends Controller
         if (!$response['status']) {
             return $response;
         }
-        $user = $response['return'];
         $vendorID = $request->vendorID;
         $shippingFee = $request->shippingFee;
         $response = $this->editShippingFee($vendorID, $shippingFee);
@@ -27,6 +26,11 @@ class ShippingFeeController extends Controller
         try {
             DB::table('product_search')
                 ->where('vendor_id', $vendorID)
+                ->update([
+                    'shipping_fee' => $shippingFee
+                ]);
+            DB::table('minewing_products')
+                ->where('sellerID', $vendorID)
                 ->update([
                     'shipping_fee' => $shippingFee
                 ]);
