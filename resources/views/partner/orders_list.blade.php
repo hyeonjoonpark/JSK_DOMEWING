@@ -193,6 +193,9 @@
             </div><!-- .card-preview -->
         </div>
     </div>
+    <pre>
+        {{ print_r($response) }}
+    </pre>
 @endsection
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
