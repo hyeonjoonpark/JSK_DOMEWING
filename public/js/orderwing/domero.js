@@ -6,7 +6,7 @@ const path = require('path');
     const page = await browser.newPage();
     const client = await page.target().createCDPSession();
 
-    const downloadPath = path.resolve('C:\\xampp\\htdocs\\sellwing\\public\\assets\\excel\\orderwing\\ownerclan'); // Update your download path
+    const downloadPath = path.resolve('C:\\xampp\\htdocs\\sellwing\\public\\assets\\excel\\orderwing\\domero'); // Update your download path
 
     // Setting up Chrome to allow downloads
     await client.send('Page.setDownloadBehavior', {
