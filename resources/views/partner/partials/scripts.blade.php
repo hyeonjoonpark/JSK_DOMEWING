@@ -135,8 +135,25 @@
         });
     }
 
-    function numberFormatter(inputId, length) {
-        const filteredValue = $(inputId).val().replace(/\D/g, '').substring(0, length);
-        $(inputId).val(filteredValue ? parseInt(filteredValue) : '');
+    function numberFormatter(input, digitLength = 2, decimalLength = 0) {
+        let value = $(input).val();
+        if (value.includes('.')) { // Decimal
+            const splittedValue = value.split('.');
+            const digit = integerFormatter(splittedValue[0], digitLength);
+            const decimal = integerFormatter(splittedValue[1], digitLength);
+            if (decimal.length < 1 && digit.length < 1) {
+                value = 0;
+            } else {
+                value = digit + '.' + decimal;
+            }
+        } else { // Integer
+            value = integerFormatter(value, digitLength);
+        }
+        $(input).val(value);
+    }
+
+    function integerFormatter(value, length) {
+        const filteredValue = value.replace(/\D/g, '').substring(0, length);
+        return filteredValue ? parseInt(filteredValue) : '';
     }
 </script>

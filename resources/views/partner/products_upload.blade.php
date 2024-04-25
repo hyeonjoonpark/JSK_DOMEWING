@@ -69,6 +69,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="partnerMargin" class="form-label">오픈 마켓 수수료(%)</label>
+                        <div class="row">
+                            <div class="col-auto">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="vendorCommission"
+                                        placeholder="수수료(%)를 기입해주세요." oninput="numberFormatter(this, 2);" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" onclick="upload();">생성하기</button>
