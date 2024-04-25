@@ -143,7 +143,7 @@
         swalWithReload(response.return, statusType);
     }
 
-    function numberFormatter(input, digitLength, decimalLength = 0) {
+    function numberFormatter(input, digitLength, decimalLength) {
         let value = $(input).val();
         if (value.includes('.') && decimalLength > 0) { // Decimal
             const splittedValue = value.split('.');
