@@ -172,7 +172,7 @@ class SaveController extends Controller
             ->has_watermark;
         return $hasWatermark;
     }
-    protected function insertMappingwing($ownerclanCategoryID)
+    public function insertMappingwing($ownerclanCategoryID)
     {
         try {
             $isExist = DB::table('category_mapping')

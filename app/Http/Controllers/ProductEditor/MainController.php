@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ProductEditor;
 
 use App\Http\Controllers\Admin\ProductDataValidityController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Minewing\SaveController;
 use App\Http\Controllers\Product\NameController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -110,6 +111,8 @@ class MainController extends Controller
     {
         try {
             $productName = $this->nameController->index($product['productName']);
+            $sc = new SaveController();
+            $sc->insertMappingwing($product['categoryID']);
             DB::table('minewing_products')
                 ->where('productCode', $product['productCode'])
                 ->update([

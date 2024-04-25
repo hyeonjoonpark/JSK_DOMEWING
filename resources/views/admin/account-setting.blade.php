@@ -50,7 +50,7 @@
                                             <input type="text" class="form-control" id="{{ $vc->name_eng }}Commission"
                                                 value="{{ $vc->commission }}" placeholder="수수료(%)를 기입해주세요."
                                                 onkeydown="handleEnter(event, '{{ $vc->name_eng }}CommissionBtn')"
-                                                oninput="numberFormatter(this, 2, 1);">
+                                                oninput="numberFormatter(this, 2, 5);">
                                         </div>
                                         <button class="btn btn-primary" id="{{ $vc->name_eng }}CommissionBtn"
                                             onclick="updateCommission('{{ $vc->name_eng }}');">변경</button>

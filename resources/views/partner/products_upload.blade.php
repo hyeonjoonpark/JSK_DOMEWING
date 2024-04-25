@@ -75,7 +75,7 @@
                             <div class="col-auto">
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="vendorCommission"
-                                        placeholder="수수료(%)를 기입해주세요." oninput="numberFormatter(this, 2);" />
+                                        placeholder="수수료(%)를 기입해주세요." oninput="numberFormatter(this, 2, 1);" />
                                     <div class="input-group-append">
                                         <span class="input-group-text">%</span>
                                     </div>
