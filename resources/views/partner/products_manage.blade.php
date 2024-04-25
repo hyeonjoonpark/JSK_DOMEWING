@@ -122,6 +122,9 @@
                                 'searchKeyword' => $searchKeyword,
                             ])
                         </div>
+                        <div class="text-center">
+                            <button class="btn btn-danger" onclick="initDelete();">선택 상품 일괄삭제</button>
+                        </div>
                         <div class="table-responsive">
                             <table class="table text-nowrap align-middle">
                                 <thead>
@@ -165,10 +168,10 @@
                                                             class="wing-font">{{ number_format($product->productPrice, 0) }}</span>
                                                         <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
                                                             alt="윙"><br>
-                                                        배송비: <span
-                                                            class="wing-font">{{ number_format($product->shipping_fee, 0) }}</span>
-                                                        <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
-                                                            alt="윙">
+                                                        배송비: <spanbtn btn-danger class="wing-font">
+                                                            {{ number_format($product->shipping_fee, 0) }}</span>
+                                                            <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
+                                                                alt="윙">
                                                     </p>
                                                 </a>
                                             </td>
@@ -283,6 +286,47 @@
             Swal.fire({
                 icon: "warning",
                 text: "해당 기능은 업데이트 중입니다."
+            });
+        }
+
+        function initDelete() {
+            const html = `
+            <h6 class="title">상품 삭제</h6>
+            <p>정말로 해당 상품들을 삭제하시겠습니까?<br>이 작업은 돌이킬 수 없습니다.</p>
+            `;
+            Swal.fire({
+                icon: "warning",
+                html: html,
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    requestDelete();
+                }
+            });
+        }
+
+        function requestDelete() {
+            const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            $.ajax({
+                url: "/api/partner/product/delete-product",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    productCodes,
+                    hruits,
+                    human
+                },
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
             });
         }
     </script>
