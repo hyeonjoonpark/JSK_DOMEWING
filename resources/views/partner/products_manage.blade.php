@@ -317,9 +317,7 @@
                 dataType: "JSON",
                 data: {
                     apiToken,
-                    productCodes,
-                    hruits,
-                    human
+                    productCodes
                 },
                 success: function(response) {
                     console.log(response);
