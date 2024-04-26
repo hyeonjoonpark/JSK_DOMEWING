@@ -45,7 +45,9 @@ class SmartstoreProductUpload extends Controller
                 $originProductNo = $resultData['originProductNo'];
                 $smartstoreChannelProductNo = $resultData['smartstoreChannelProductNo'];
                 $productId = $product->id;
-                $this->store($smartstoreAccountId, $productId, $originProductNo, $smartstoreChannelProductNo);
+                $productPrice = $product->productPrice;
+                $shippingFee = $product->shipping_fee;
+                $this->store($smartstoreAccountId, $productId, $productPrice, $shippingFee, $originProductNo, $smartstoreChannelProductNo);
             } else {
                 $error = $result['error'];
             }
@@ -56,14 +58,16 @@ class SmartstoreProductUpload extends Controller
             'error' => $error
         ];
     }
-    protected function store($smartstoreAccountId, $productId, $originProductNo, $smartstoreChannelProductNo)
+    protected function store($smartstoreAccountId, $productId, $productPrice, $shippingFee, $originProductNo, $smartstoreChannelProductNo)
     {
         DB::table('smart_store_uploaded_products')
             ->insert([
                 'smart_store_account_id' => $smartstoreAccountId,
                 'product_id' => $productId,
                 'origin_product_no' => $originProductNo,
-                'smartstore_channel_product_no' => $smartstoreChannelProductNo
+                'smartstore_channel_product_no' => $smartstoreChannelProductNo,
+                'price' => $productPrice,
+                'shipping_fee' => $shippingFee
             ]);
     }
     private function generateParam($product, $productImage)

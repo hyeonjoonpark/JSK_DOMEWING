@@ -70,17 +70,19 @@ class PartnerAccountSetting extends Controller
                 'message' => $validator->errors()->first()
             ];
         }
-        $vendorEngName = DB::table('vendors')
-            ->where('id', $request->vendorId)
-            ->where('is_active', 'ACTIVE')
-            ->first(['name_eng']);
-        if ($vendorEngName === null) {
+        $vendor = DB::table('vendors AS v')
+            ->join('vendor_commissions AS vc', 'vc.vendor_id', '=', 'v.id')
+            ->where('v.id', $request->vendorId)
+            ->where('v.is_active', 'ACTIVE')
+            ->first(['v.name_eng', 'vc.commission']);
+        if ($vendor === null) {
             return [
                 'status' => false,
                 'message' => '유효한 오픈마켓이 아닙니다. 페이지를 새로고침 후, 다시 시도해주세요.'
             ];
         }
-        $vendorEngName = $vendorEngName->name_eng;
+        $vendorEngName = $vendor->name_eng;
+        $vendorCommission = $vendor->commission;
         $partnerId = DB::table('partners')
             ->where('api_token', $request->apiToken)
             ->first(['id'])
@@ -98,7 +100,10 @@ class PartnerAccountSetting extends Controller
         }
         return [
             'status' => true,
-            'data' => $accounts
+            'data' => [
+                'accounts' => $accounts,
+                'vendorCommission' => $vendorCommission
+            ]
         ];
     }
 }

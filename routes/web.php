@@ -51,7 +51,7 @@ Route::prefix('partner')->group(function () {
             Route::get('collect', [CollectController::class, 'index'])->name('partner.products.collect');
             Route::get('manage', [ManageController::class, 'index'])->name('partner.products.manage');
             Route::get('upload', [UploadController::class, 'index']);
-            Route::get('uploaded', [UploadedController::class, 'index']);
+            Route::get('sale', [UploadedController::class, 'index']);
         });
         Route::prefix('orders')->group(function () {
             Route::get('list', [OrderController::class, 'index'])->name('partner.orders.list');

@@ -26,9 +26,10 @@ class UploadController extends Controller
             // 없을시, 상품 관리관으로 리다이렉트.
             return redirect('/partner/products/manage');
         }
-        $openMarkets = DB::table('vendors')
-            ->where('is_active', 'ACTIVE')
-            ->where('type', 'OPEN_MARKET')
+        $openMarkets = DB::table('vendors AS v')
+            ->join('vendor_commissions AS vc', 'vc.vendor_id', '=', 'v.id')
+            ->where('v.is_active', 'ACTIVE')
+            ->where('v.type', 'OPEN_MARKET')
             ->get();
         $partnerTables = DB::table('partner_tables')
             ->where("is_active", 'Y')
@@ -48,14 +49,16 @@ class UploadController extends Controller
             'partnerTableToken' => 'required|string',
             'vendorId' => 'required|integer',
             'partnerMargin' => 'required|integer|max:99',
-            'accountHash' => 'required|string'
+            'accountHash' => 'required|string',
+            'vendorCommission' => 'required|numeric'
         ], [
             'partnerTableToken' => '상품 업로드를 위한 상품 테이블을 생성해주세요.',
             'vendorId' => '상품 업로드를 위한 오픈 마켓을 선택해주세요.',
             'partnerMargin.required' => '마진율을 입력해 주세요.',
             'partnerMargin.integer' => '마진율은 정수여야 합니다.',
             'partnerMargin.max' => '마진율은 99를 초과할 수 없습니다.',
-            'accountHash' => '계정을 선택해주세요.'
+            'accountHash' => '계정을 선택해주세요.',
+            'vendorCommission' => '올바른 마켓 수수료(%)를 기입해주세요.'
         ]);
         if ($validator->fails()) {
             return [
@@ -66,6 +69,7 @@ class UploadController extends Controller
         // 데이터 전처리: 파라미터
         $partnerTableToken = $request->partnerTableToken;
         $vendorId = $request->vendorId;
+        $vendorCommission = $request->vendorCommission;
         $vendor = DB::table('vendors')
             ->where('id', $vendorId)
             ->where('is_active', 'ACTIVE')
@@ -84,6 +88,7 @@ class UploadController extends Controller
             ->first(['value'])
             ->value;
         $marginRate = $margin / 100 + 1;
+        $commissionRate = $vendorCommission / 100 + 1;
         // 데이터 전처리: 상품
         $products = DB::table('partner_products AS pp')
             ->join('partner_tables AS pt', 'pt.id', '=', 'pp.partner_table_id')
@@ -93,7 +98,7 @@ class UploadController extends Controller
             ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
             ->where('pt.is_active', 'Y')
             ->where('pt.token', $partnerTableToken)
-            ->select([DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate) / 10) * 10 AS productPrice"), 'mp.productCode', 'mp.productName', 'mp.productImage', 'mp.productDetail', 'c.code', 'ps.shipping_fee', 'ps.additional_shipping_fee', 'mp.id'])
+            ->select([DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"), 'mp.productCode', 'mp.productName', 'mp.productImage', 'mp.productDetail', 'c.code', 'ps.shipping_fee', 'ps.additional_shipping_fee', 'mp.id'])
             ->get();
         if ($products->isEmpty()) {
             return [

@@ -20,7 +20,9 @@
                                         <input type="radio" id="openMarket{{ $openMarket->id }}" name="openMarkets"
                                             value="{{ $openMarket->id }}" class="custom-control-input">
                                         <label class="custom-control-label"
-                                            for="openMarket{{ $openMarket->id }}">{{ $openMarket->name }}</label>
+                                            for="openMarket{{ $openMarket->id }}">{{ $openMarket->name }}
+                                            ({{ $openMarket->commission }}%)
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -95,7 +97,7 @@
 @section('scripts')
     <script>
         function initUpload() {
-            popupLoader(1, "연동된 계정 리스트를 불러오는 중입니다.");
+            popupLoader(1, "상품 업로드를 위한 해당 마켓 정보들을 불러오는 중입니다.");
             const vendorId = $('input[name="openMarkets"]:checked').val();
             $.ajax({
                 url: '/api/partner/account-setting/list',
@@ -109,7 +111,8 @@
                     closePopup();
                     const status = response.status;
                     if (status === true) {
-                        const accounts = response.data;
+                        const accounts = response.data.accounts;
+                        const vendorCommission = response.data.vendorCommission;
                         let html = '';
                         let isFirst = true;
                         let index = 0;
@@ -127,6 +130,7 @@
                             </div>
                             `;
                         }
+                        $('#vendorCommission').val(vendorCommission);
                         $('#accountList').html(html);
                         $('#partnerMarginModal').modal('show');
                     } else {
@@ -140,7 +144,14 @@
                         });
                     }
                 },
-                error: AjaxErrorHandling
+                error: function(response) {
+                    closePopup();
+                    console.log(response);
+                    Swal.fire({
+                        icon: "warning",
+                        title: "해당 기능은 업데이트 중입니다."
+                    });
+                }
             });
         }
 
@@ -151,6 +162,7 @@
             const vendorId = $('input[name="openMarkets"]:checked').val();
             const partnerMargin = parseInt($('#partnerMargin').val());
             const accountHash = $('input[name="accounts[]"]:checked').val();
+            const vendorCommission = parseFloat($('#vendorCommission').val());
             $.ajax({
                 url: '/api/partner/product/upload',
                 type: 'POST',
@@ -160,6 +172,7 @@
                     partnerTableToken,
                     partnerMargin,
                     accountHash,
+                    vendorCommission,
                     apiToken
                 },
                 success: function(response) {

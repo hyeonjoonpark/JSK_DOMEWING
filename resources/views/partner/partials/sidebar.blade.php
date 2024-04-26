@@ -46,8 +46,9 @@
                                             class="nk-menu-text">상품 업로드관</span></a>
                                 </li>
                                 <li class="nk-menu-item">
-                                    <a href="/partner/products/uploaded" class="nk-menu-link"><span
-                                            class="nk-menu-text">업로드된 상품관</span></a>
+                                    <a href="/partner/products/sale" class="nk-menu-link">
+                                        <span class="nk-menu-text">업로드된 상품관</span>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
