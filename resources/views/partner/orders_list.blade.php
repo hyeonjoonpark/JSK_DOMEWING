@@ -200,6 +200,9 @@
     <pre>
         {{ print_r($responseDetail) }}
     </pre>
+    <pre>
+        {{ print_r($responseOrderDetail) }}
+    </pre>
 @endsection
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
