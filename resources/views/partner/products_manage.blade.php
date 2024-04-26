@@ -320,7 +320,21 @@
                     productCodes
                 },
                 success: function(response) {
-                    console.log(response);
+                    const status = response.status;
+                    const message = response.message;
+                    let icon = 'success';
+                    if (status === false) {
+                        console.log(response);
+                        icon = 'error';
+                    }
+                    Swal.fire({
+                        icon: icon,
+                        title: message
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
                 },
                 error: function(error) {
                     console.log(error);
