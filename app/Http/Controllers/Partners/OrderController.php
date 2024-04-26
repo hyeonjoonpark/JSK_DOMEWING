@@ -11,21 +11,32 @@ use Illuminate\Support\Facades\Request;
 
 class OrderController extends Controller
 {
+    private $ssac;
+    private $account;
+    private $contentType;
+
+    public function __construct()
+    {
+        $this->ssac = new SmartStoreApiController();
+        $this->account = $this->getAccount();
+        $this->contentType = 'application/json';
+    }
     public function index()
     {
-        $response = $this->smart_store();
+        $orderList = $this->getOrderList($this->ssac, $this->account, $this->contentType);
+        $orderIds = $this->getOrderIds($orderList);
+
+
         $responseDetail = $this->smart_storeDetail();
 
-        $getProductOrderIds = $this->get_smart_store_order_ids($response);
-
-        $responseOrderDetail = $this->smart_storeOrderDetail($getProductOrderIds);
+        $orderDetails = $this->getOrderDetails($orderIds);
         return view('partner.orders_list', [
-            'response' => $response,
+            'orderList' => $orderList,
             'responseDetail' => $responseDetail,
-            'responseOrderDetail' => $responseOrderDetail
+            'orderDetails' => $orderDetails
         ]);
     }
-    public function smart_store()
+    public function getOrderList($ssac, $account, $contentType)
     {
         $ssac = new SmartStoreApiController();
         $account = DB::table('smart_store_accounts')
@@ -37,12 +48,11 @@ class OrderController extends Controller
         $data = [
             'lastChangedFrom' => Carbon::now()->subDays(1)->format('Y-m-d\TH:i:s.vP'),
             'lastChangedTo' => Carbon::now()->subDays(0)->format('Y-m-d\TH:i:s.vP'),
-
         ];
         $response = $ssac->builder($account, $contentType, $method, $url, $data);
         return $response;
     }
-    private function get_smart_store_order_ids($request)
+    private function getOrderIds($request)
     {
         $orderIds = [];
         if (isset($request['data']['data']['lastChangeStatuses'])) {
@@ -67,7 +77,7 @@ class OrderController extends Controller
         $response = $ssac->builder($account, $contentType, $method, $url, $data);
         return $response;
     }
-    public function smart_storeOrderDetail($productOrderIds)
+    public function getOrderDetails($productOrderIds)
     {
         $ssac = new SmartStoreApiController();
         $account = DB::table('smart_store_accounts')
@@ -79,5 +89,11 @@ class OrderController extends Controller
         $data = ['productOrderIds' => $productOrderIds];
         $response = $ssac->builder($account, $contentType, $method, $url, $data);
         return $response;
+    }
+
+
+    protected function getAccount()
+    {
+        return DB::table('smart_store_accounts')->where('partner_id', Auth::guard('partner')->id())->first();
     }
 }

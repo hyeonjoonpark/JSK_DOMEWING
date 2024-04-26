@@ -195,13 +195,13 @@
     </div>
     </div>
     <pre>
-        {{ print_r($response) }}
+        {{ print_r($orderList) }}
     </pre>
     <pre>
         {{ print_r($responseDetail) }}
     </pre>
     <pre>
-        {{ print_r($responseOrderDetail) }}
+        {{ print_r($orderDetails) }}
     </pre>
 @endsection
 @section('scripts')
