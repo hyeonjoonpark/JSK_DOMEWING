@@ -7,6 +7,7 @@ use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 
 class OrderController extends Controller
 {
@@ -14,7 +15,10 @@ class OrderController extends Controller
     {
         $response = $this->smart_store();
         $responseDetail = $this->smart_storeDetail();
-        $responseOrderDetail = $this->smart_storeOrderDetail();
+
+        $getProductOrderIds = $this->get_smart_store_order_ids($response);
+
+        $responseOrderDetail = $this->smart_storeOrderDetail($getProductOrderIds);
         return view('partner.orders_list', [
             'response' => $response,
             'responseDetail' => $responseDetail,
@@ -38,6 +42,18 @@ class OrderController extends Controller
         $response = $ssac->builder($account, $contentType, $method, $url, $data);
         return $response;
     }
+    private function get_smart_store_order_ids($request)
+    {
+        $orderIds = [];
+        if (isset($request['data']['data']['lastChangeStatuses'])) {
+            foreach ($request['data']['data']['lastChangeStatuses'] as $status) {
+                if (isset($status['productOrderId'])) {
+                    $orderIds[] = $status['productOrderId'];
+                }
+            }
+        }
+        return $orderIds;
+    }
     public function smart_storeDetail()
     {
         $ssac = new SmartStoreApiController();
@@ -51,7 +67,7 @@ class OrderController extends Controller
         $response = $ssac->builder($account, $contentType, $method, $url, $data);
         return $response;
     }
-    public function smart_storeOrderDetail()
+    public function smart_storeOrderDetail($productOrderIds)
     {
         $ssac = new SmartStoreApiController();
         $account = DB::table('smart_store_accounts')
@@ -60,7 +76,7 @@ class OrderController extends Controller
         $contentType = 'application/json';
         $method = 'POST';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query';
-        $data = ['productOrderIds' => [2024042542436501]];
+        $data = ['productOrderIds' => $productOrderIds];
         $response = $ssac->builder($account, $contentType, $method, $url, $data);
         return $response;
     }
