@@ -17,10 +17,10 @@
                             <div class="col-12 col-md-3">
                                 <div class="custom-control custom-checkbox">
                                     <div class="custom-control custom-radio">
-                                        <input type="radio" id="openMarket{{ $openMarket->id }}" name="openMarkets"
-                                            value="{{ $openMarket->id }}" class="custom-control-input">
+                                        <input type="radio" id="openMarket{{ $openMarket->vendor_id }}" name="openMarkets"
+                                            value="{{ $openMarket->vendor_id }}" class="custom-control-input">
                                         <label class="custom-control-label"
-                                            for="openMarket{{ $openMarket->id }}">{{ $openMarket->name }}
+                                            for="openMarket{{ $openMarket->vendor_id }}">{{ $openMarket->name }}
                                             ({{ $openMarket->commission }}%)
                                         </label>
                                     </div>
@@ -99,6 +99,7 @@
         function initUpload() {
             popupLoader(1, "상품 업로드를 위한 해당 마켓 정보들을 불러오는 중입니다.");
             const vendorId = $('input[name="openMarkets"]:checked').val();
+            console.log(vendorId);
             $.ajax({
                 url: '/api/partner/account-setting/list',
                 type: 'POST',
