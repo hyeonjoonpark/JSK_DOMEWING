@@ -60,7 +60,6 @@ class ManageController extends Controller
             ->join('ownerclan_category AS oc', 'mp.categoryID', '=', 'oc.id')
             ->join('product_search AS ps', 'mp.sellerID', '=', 'ps.vendor_id')
             ->where('pp.partner_table_id', $partnerTableId)
-            ->where('pp.is_active', 'Y')
             ->where('mp.productName', 'like', "%{$searchKeyword}%")
             ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name')
             ->paginate(500);
@@ -94,7 +93,6 @@ class ManageController extends Controller
 
             $existingProductIds = DB::table('partner_products')
                 ->where('partner_table_id', $partnerTableId)
-                ->where('is_active', 'Y')
                 ->pluck('product_id')
                 ->toArray();
 
@@ -123,8 +121,44 @@ class ManageController extends Controller
             ];
         }
     }
+    /**
+     * 다중 상품을 삭제하는 메소드.
+     * @param Request $request
+     * @return array
+     */
     public function deleteProduct(Request $request)
     {
-        return $request;
+        $validator = Validator::make($request->all(), [
+            'productCodes' => 'required|array|min:1'
+        ], [
+            'productCodes' => '삭제할 상품을 최소 1개 이상 선택해주세요.'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ];
+        }
+        $productCodes = $request->productCodes;
+        return $this->destroy($productCodes);
+    }
+    public function destroy($productCodes)
+    {
+        try {
+            DB::table('partner_products AS pp')
+                ->join('minewing_products AS mp', 'mp.id', '=', 'pp.product_id')
+                ->whereIn('mp.productCode', $productCodes)
+                ->delete();
+            return [
+                'status' => true,
+                'message' => '선택된 상품들이 성공적으로 삭제되었습니다.'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '상품을 삭제하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
     }
 }
