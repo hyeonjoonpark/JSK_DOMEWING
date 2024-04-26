@@ -16,38 +16,46 @@
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
                                 <div class="custom-controls">
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="allOrders" name="orderStatus" value="allOrders">
-                                        <label for="allOrders">전체 주문</label>
+                                        <input type="checkbox" id="PAYMENT_WAITING" name="orderStatus"
+                                            class="status-checkbox">
+                                        <label for="PAYMENT_WAITING">결제 대기</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="pendingPayment" name="orderStatus"
-                                            value="pendingPayment">
-                                        <label for="pendingPayment">입금 예정</label>
+                                        <input type="checkbox" id="PAYED" name="orderStatus" class="status-checkbox">
+                                        <label for="PAYED">결제 완료</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="paymentComplete" name="orderStatus"
-                                            value="paymentComplete">
-                                        <label for="paymentComplete">입금 완료</label>
+                                        <input type="checkbox" id="DELIVERING" name="orderStatus" class="status-checkbox">
+                                        <label for="DELIVERING">배송 중</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="paymentConfirmed" name="orderStatus"
-                                            value="paymentConfirmed">
-                                        <label for="paymentConfirmed">결제 완료</label>
+                                        <input type="checkbox" id="DELIVERED" name="orderStatus" class="status-checkbox">
+                                        <label for="DELIVERED">배송 완료</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="shipping" name="orderStatus" value="shipping">
-                                        <label for="shipping">배송 중</label>
+                                        <input type="checkbox" id="EXCHANGED" name="orderStatus" class="status-checkbox">
+                                        <label for="EXCHANGED">교환</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="delivered" name="orderStatus" value="delivered">
-                                        <label for="delivered">배송 완료</label>
+                                        <input type="checkbox" id="CANCELED" name="orderStatus" class="status-checkbox">
+                                        <label for="CANCELED">취소</label>
                                     </div>
                                     <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="purchaseConfirmed" name="orderStatus"
-                                            value="purchaseConfirmed">
-                                        <label for="purchaseConfirmed">구매 확정</label>
+                                        <input type="checkbox" id="RETURNED" name="orderStatus" class="status-checkbox">
+                                        <label for="RETURNED">반품</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="CANCELED_BY_NOPAYMENT" name="orderStatus"
+                                            class="status-checkbox">
+                                        <label for="CANCELED_BY_NOPAYMENT">미결제 취소</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="PURCHASE_DECIDED" name="orderStatus"
+                                            class="status-checkbox">
+                                        <label for="PURCHASE_DECIDED">구매 확정</label>
                                     </div>
                                 </div>
+
                             </div>
                             <p> 날짜 선택</p>
                             <div class="date-shortcuts">
@@ -88,7 +96,7 @@
                                 <button class="btn btn-primary">
                                     검색
                                 </button>
-                                <button class="btn btn-primary">
+                                <button class="btn btn-primary btn-reset">
                                     검색초기화
                                 </button>
                             </div>
@@ -106,87 +114,41 @@
                         <thead>
                             <tr>
                                 <th><input type="checkbox" id="selectAll"></th>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Office</th>
-                                <th>Age</th>
-                                <th>Start date</th>
-                                <th>Salary</th>
+                                <th>주문마켓</th>
+                                <th>마켓주문번호</th>
+                                <th>마켓상품주문번호</th>
+                                <th>주문자</th>
+                                <th>상품명</th>
+                                <th>수량</th>
+                                <th>마켓 판매가</th>
+                                <th>총 판매가</th>
+                                <th>마켓배송비</th>
+                                <th>마켓주문상태</th>
+                                <th>마켓주문일</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Tiger Nixon</td>
-                                <td>System Architect</td>
-                                <td>Edinburgh</td>
-                                <td>61</td>
-                                <td>2011/04/25</td>
-                                <td>$320,800</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Shou Itou</td>
-                                <td>Regional Marketing</td>
-                                <td>Tokyo</td>
-                                <td>20</td>
-                                <td>2011/08/14</td>
-                                <td>$163,000</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Michelle House</td>
-                                <td>Integration Specialist</td>
-                                <td>Sydney</td>
-                                <td>37</td>
-                                <td>2011/06/02</td>
-                                <td>$95,400</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Suki Burks</td>
-                                <td>Developer</td>
-                                <td>London</td>
-                                <td>53</td>
-                                <td>2009/10/22</td>
-                                <td>$114,500</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Prescott Bartlett</td>
-                                <td>Technical Author</td>
-                                <td>London</td>
-                                <td>27</td>
-                                <td>2011/05/07</td>
-                                <td>$145,000</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Gavin Cortez</td>
-                                <td>Team Leader</td>
-                                <td>San Francisco</td>
-                                <td>22</td>
-                                <td>2008/10/26</td>
-                                <td>$235,500</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Martena Mccray</td>
-                                <td>Post-Sales support</td>
-                                <td>Edinburgh</td>
-                                <td>46</td>
-                                <td>2011/03/09</td>
-                                <td>$324,050</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>Unity Butler</td>
-                                <td>Marketing Designer</td>
-                                <td>San Francisco</td>
-                                <td>47</td>
-                                <td>2009/12/09</td>
-                                <td>$85,675</td>
-                            </tr>
+                            @foreach ($orderDetails['data']['data'] as $item)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="selected_orders[]"
+                                            value="{{ $item['productOrder']['productOrderId'] ?? '' }}">
+                                    </td>
+                                    <td>{{ $item['order']['market'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['order']['orderId'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productOrder']['productOrderId'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['order']['ordererName'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productOrder']['productName'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productOrder']['quantity'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productOrder']['unitPrice'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productOrder']['totalPaymentAmount'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productOrder']['deliveryFeeAmount'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productOrder']['productOrderStatus'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['order']['orderDate'] ?? 'N/A' }}</td>
+                                </tr>
+                            @endforeach
+
+
                         </tbody>
                     </table>
                 </div>
@@ -258,6 +220,79 @@
                 for (var checkbox of checkboxes) {
                     checkbox.checked = this.checked;
                 }
+            });
+        });
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const orders = @json($orderDetails['data']['data']);
+
+            document.querySelector('.btn-reset').addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // 모든 입력 필드 초기화
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                document.getElementById('product-name').value = '';
+                document.getElementById('product-code').value = '';
+
+                // 원래의 주문 목록을 다시 표시
+                displayOrders(originalOrders);
+            });
+
+            function filterOrders() {
+                const startDate = document.getElementById('startDate').value ? new Date(document.getElementById(
+                    'startDate').value + 'T00:00:00Z') : null;
+                const endDate = document.getElementById('endDate').value ? new Date(document.getElementById(
+                    'endDate').value + 'T23:59:59Z') : null;
+                const productName = document.getElementById('product-name').value.toLowerCase();
+                const productCode = document.getElementById('product-code').value;
+                const statusFilters = Array.from(document.querySelectorAll('.status-checkbox:checked')).map(el => el
+                    .id);
+
+                let filteredOrders = orders.filter(order => {
+                    const orderDate = new Date(order.order.orderDate + 'Z');
+                    const matchesDate = (!startDate || orderDate >= startDate) && (!endDate || orderDate <=
+                        endDate);
+                    const matchesName = !productName || order.productOrder.productName.toLowerCase()
+                        .includes(productName);
+                    const matchesCode = !productCode || order.productOrder.productCode === productCode;
+                    const matchesStatus = !statusFilters.length || statusFilters.includes(order.productOrder
+                        .productOrderStatus);
+
+                    return matchesDate && matchesName && matchesCode && matchesStatus;
+                });
+
+                displayOrders(filteredOrders);
+            }
+
+
+            function displayOrders(filteredOrders) {
+                const tbody = document.querySelector('.datatable-init tbody');
+                tbody.innerHTML = ''; // Clear current rows
+                filteredOrders.forEach(order => {
+                    const row = `<tr>
+                <td><input type="checkbox" name="selected_orders[]" value="${order.productOrder.productOrderId}"></td>
+                <td>${order.order.market}</td>
+                <td>${order.order.orderId}</td>
+                <td>${order.productOrder.productOrderId}</td>
+                <td>${order.order.ordererName}</td>
+                <td>${order.productOrder.productName}</td>
+                <td>${order.productOrder.quantity}</td>
+                <td>${order.productOrder.unitPrice}</td>
+                <td>${order.productOrder.totalPaymentAmount}</td>
+                <td>${order.productOrder.deliveryFeeAmount}</td>
+                <td>${order.productOrder.productOrderStatus}</td>
+                <td>${order.order.orderDate}</td>
+            </tr>`;
+                    tbody.insertAdjacentHTML('beforeend', row);
+                });
+            }
+
+            document.querySelector('.btn-primary').addEventListener('click', function(e) {
+                e.preventDefault();
+                filterOrders();
             });
         });
     </script>
