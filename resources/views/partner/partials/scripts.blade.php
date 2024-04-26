@@ -135,9 +135,9 @@
         });
     }
 
-    function numberFormatter(input, digitLength = 2, decimalLength = 0) {
+    function numberFormatter(input, digitLength, decimalLength) {
         let value = $(input).val();
-        if (value.includes('.')) { // Decimal
+        if (value.includes('.') && decimalLength > 0) { // Decimal
             const splittedValue = value.split('.');
             const digit = integerFormatter(splittedValue[0], digitLength);
             const decimal = integerFormatter(splittedValue[1], decimalLength);
@@ -154,6 +154,6 @@
 
     function integerFormatter(value, length) {
         const filteredValue = value.replace(/\D/g, '').substring(0, length);
-        return filteredValue ? parseInt(filteredValue) : '';
+        return filteredValue ? filteredValue : '';
     }
 </script>

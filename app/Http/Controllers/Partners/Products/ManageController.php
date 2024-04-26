@@ -18,10 +18,7 @@ class ManageController extends Controller
             ->where('is_active', 'Y')
             ->exists();
         $partnerId = Auth::guard('partner')->id();
-        $partnerTables = DB::table('partner_tables')
-            ->where('is_active', 'Y')
-            ->where('partner_id', $partnerId)
-            ->get();
+        $partnerTables = $this->getPartnerTables($partnerId);
 
         $searchKeyword = $request->input('searchKeyword', '');
         $partnerTableToken = $request->input('partnerTableToken', '');
@@ -37,6 +34,13 @@ class ManageController extends Controller
             'productCodesStr' => $productCodesStr,
             'hasTable' => $hasTable
         ]);
+    }
+    public function getPartnerTables($partnerId)
+    {
+        return DB::table('partner_tables')
+            ->where('is_active', 'Y')
+            ->where('partner_id', $partnerId)
+            ->get();
     }
     private function getProductList($searchKeyword, $partnerTableToken, $partnerId)
     {

@@ -21,7 +21,17 @@ class SmartstoreProductUpload extends Controller
         $success = 0;
         $error = '';
         $ssac = new SmartStoreApiController();
+        $smartstoreAccountId = $this->account->id;
+        $duplicated = [];
         foreach ($this->products as $product) {
+            $exists = DB::table('smart_store_uploaded_products')
+                ->where('smart_store_account_id', $smartstoreAccountId)
+                ->where('product_id', $product->id)
+                ->exists();
+            if ($exists === true) {
+                $duplicated[] = $product->productCode;
+                continue;
+            }
             $uploadImageResult = $this->uploadImageFromUrl($product->productImage, $this->account);
             if ($uploadImageResult['status'] === false) {
                 continue;
@@ -34,24 +44,23 @@ class SmartstoreProductUpload extends Controller
                 $resultData = $result['data'];
                 $originProductNo = $resultData['originProductNo'];
                 $smartstoreChannelProductNo = $resultData['smartstoreChannelProductNo'];
-                $partnerId = $this->partner->id;
                 $productId = $product->id;
-                $this->store($partnerId, $productId, $originProductNo, $smartstoreChannelProductNo);
+                $this->store($smartstoreAccountId, $productId, $originProductNo, $smartstoreChannelProductNo);
             } else {
                 $error = $result['error'];
             }
         }
         return [
             'status' => true,
-            'message' => "총 " . count($this->products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.",
+            'message' => "총 " . count($this->products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
             'error' => $error
         ];
     }
-    protected function store($partnerId, $productId, $originProductNo, $smartstoreChannelProductNo)
+    protected function store($smartstoreAccountId, $productId, $originProductNo, $smartstoreChannelProductNo)
     {
         DB::table('smart_store_uploaded_products')
             ->insert([
-                'partner_id' => $partnerId,
+                'smart_store_account_id' => $smartstoreAccountId,
                 'product_id' => $productId,
                 'origin_product_no' => $originProductNo,
                 'smartstore_channel_product_no' => $smartstoreChannelProductNo

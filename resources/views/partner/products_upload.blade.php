@@ -61,7 +61,7 @@
                             <div class="col-auto">
                                 <div class="input-group">
                                     <input type="text" class="form-control" value="15" id="partnerMargin"
-                                        placeholder="마진율(%)을 기입해주세요." oninput="numberFormatter(this, 2);" />
+                                        placeholder="마진율(%)을 기입해주세요." oninput="numberFormatter(this, 2, 0);" />
                                     <div class="input-group-append">
                                         <span class="input-group-text">%</span>
                                     </div>

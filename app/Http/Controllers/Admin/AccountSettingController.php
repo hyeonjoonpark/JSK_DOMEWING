@@ -46,4 +46,29 @@ class AccountSettingController extends Controller
     {
         return ['status' => $status, 'return' => $return];
     }
+    public function updateVendorCommission(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorEngName' => 'required|string',
+            'commission' => 'required|numeric'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first(),
+            ];
+        }
+        $vendorEngName = $request->vendorEngName;
+        $commission = $request->commission;
+        DB::table('vendor_commissions AS vc')
+            ->join('vendors AS v', 'v.id', '=', 'vc.vendor_id')
+            ->where('v.name_eng', $vendorEngName)
+            ->update([
+                'vc.commission' => $commission
+            ]);
+        return [
+            'status' => true,
+            'message' => '오픈 마켓 수수료를 성공적으로 업데이트했습니다.'
+        ];
+    }
 }

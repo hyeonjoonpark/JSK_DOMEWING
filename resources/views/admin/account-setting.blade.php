@@ -22,7 +22,7 @@
                                             <div class="form-text-hint">
                                                 <span class="overline-title">%</span>
                                             </div>
-                                            <input type="number" class="form-control" id="marginRate{{ $b2B->vendor_id }}"
+                                            <input type="text" class="form-control" id="marginRate{{ $b2B->vendor_id }}"
                                                 value="{{ $b2B->margin_rate }}" placeholder="마진율(%)를 기입해주세요."
                                                 onkeydown="handleEnter(event, 'marginBtn{{ $b2B->vendor_id }}')"
                                                 oninput="numberFormatter(this, 2, 0);">
@@ -51,7 +51,7 @@
                                             <input type="text" class="form-control" id="{{ $vc->name_eng }}Commission"
                                                 value="{{ $vc->commission }}" placeholder="수수료(%)를 기입해주세요."
                                                 onkeydown="handleEnter(event, '{{ $vc->name_eng }}CommissionBtn')"
-                                                oninput="numberFormatter(this, 2, 5);">
+                                                oninput="numberFormatter(this, 2, 1);">
                                         </div>
                                         <button class="btn btn-primary" id="{{ $vc->name_eng }}CommissionBtn"
                                             onclick="updateCommission('{{ $vc->name_eng }}');">변경</button>
@@ -102,8 +102,19 @@
         }
 
         function updateCommission(vendorEngName) {
-            const commission = $('#' + vendorEngName + 'Commission').val();
-            console.log(commission);
+            const commission = parseFloat($('#' + vendorEngName + 'Commission').val());
+            $.ajax({
+                url: '/api/account-setting/update-commission',
+                type: 'PUT',
+                dataType: 'JSON',
+                data: {
+                    rememberToken,
+                    vendorEngName,
+                    commission
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
         }
 
         function changeMarginRate(mrID) {
