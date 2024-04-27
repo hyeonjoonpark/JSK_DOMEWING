@@ -37,7 +37,7 @@
         <div class="col-12">
             <div class="card card-bordered">
                 <div class="card-inner">
-                    <p>총 수집된 상품의 갯수는 <b>{{ number_format(count($uploadedProducts), 0) }}</b>개입니다.</p>
+                    <p>총 판매 중인 상품의 갯수는 <b>{{ number_format(count($uploadedProducts), 0) }}</b>개입니다.</p>
                     <table class="table align-middle">
                         <thead>
                             <tr>
