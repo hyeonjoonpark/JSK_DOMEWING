@@ -18,7 +18,9 @@
                                 <div class="custom-control custom-checkbox">
                                     <div class="custom-control custom-radio">
                                         <input type="radio" id="openMarket{{ $openMarket->id }}" name="openMarket"
-                                            value="{{ $openMarket->id }}" class="custom-control-input">
+                                            value="{{ $openMarket->id }}" class="custom-control-input"
+                                            {{ $selectedOpenMarketId == $openMarket->id ? 'checked' : '' }}
+                                            {{ in_array($openMarket->id, [40, 51]) ? '' : 'disabled' }}>
                                         <label class="custom-control-label"
                                             for="openMarket{{ $openMarket->id }}">{{ $openMarket->name }}</label>
                                     </div>
@@ -35,6 +37,7 @@
         <div class="col-12">
             <div class="card card-bordered">
                 <div class="card-inner">
+                    <p>총 수집된 상품의 갯수는 <b>{{ number_format(count($uploadedProducts), 0) }}</b>개입니다.</p>
                     <table class="table text-nowrap align-middle">
                         <thead>
                             <tr>
@@ -47,6 +50,7 @@
                                 <th scope="col">대표 이미지</th>
                                 <th scope="col">업로드 상품 정보</th>
                                 <th scope="col">도매윙 상품 정보</th>
+                                <th scope="col">ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -97,6 +101,10 @@
                                             </p>
                                         </a>
                                     </td>
+                                    <td>
+                                        <button class="btn btn-success" onclick="onUpdate();">수정</button>
+                                        <button class="btn btn-danger" onclick="onUpdate();">삭제</button>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -108,6 +116,13 @@
 @endsection
 @section('scripts')
     <script>
+        function onUpdate() {
+            Swal.fire({
+                icon: "warning",
+                title: "해당 기능은 업데이트 중입니다."
+            });
+        }
+
         function view(productCode) {
             popupLoader(1, "상품 정보를 불러오는 중입니다.");
             $.ajax({

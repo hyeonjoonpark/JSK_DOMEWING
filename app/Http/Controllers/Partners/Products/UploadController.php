@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
 use App\Http\Controllers\SmartStore\SmartStoreAccountController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
@@ -118,5 +119,10 @@ class UploadController extends Controller
     {
         $spu = new SmartstoreProductUpload($products, $partner, $account);
         return $spu->main();
+    }
+    private function coupang($products, $partner, $account)
+    {
+        $cuc = new CoupangUploadController($products, $partner, $account);
+        return $cuc->main();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\OpenMarkets\Coupang;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class ApiController extends Controller
 {
@@ -32,5 +33,32 @@ class ApiController extends Controller
                 'httpcode' => $httpcode
             ]
         ];
+    }
+    public function builder($account, $contentType, $method, $path, $data)
+    {
+        date_default_timezone_set("GMT+0");
+        $datetime = date("ymd") . 'T' . date("His") . 'Z';
+        $message = $datetime . $method . $path;
+        $ACCESS_KEY = $account->access_key;
+        $SECRET_KEY = $account->secret_key;
+        $algorithm = "HmacSHA256";
+        $signature = hash_hmac('sha256', $message, $SECRET_KEY);
+        $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $ACCESS_KEY . ", signed-date=" . $datetime . ", signature=" . $signature;
+        $url = 'https://api-gateway.coupang.com' . $path;
+        $response = Http::withHeaders([
+            'Authorization' => $authorization,
+            'Content-Type' => $contentType
+        ])->$method($url, $data);
+        if ($response->successful() && $response->status() === 200) {
+            return [
+                'status' => true,
+                'data' => $response->json()
+            ];
+        } else {
+            return [
+                'status' => false,
+                'error' => $response->body()
+            ];
+        }
     }
 }

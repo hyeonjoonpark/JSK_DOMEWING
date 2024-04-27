@@ -45,7 +45,8 @@ class UploadedController extends Controller
         }
         return view('partner.products_uploaded', [
             'openMarkets' => $openMarkets,
-            'uploadedProducts' => $uploadedProducts
+            'uploadedProducts' => $uploadedProducts,
+            'selectedOpenMarketId' => $selectedOpenMarketId
         ]);
     }
 }

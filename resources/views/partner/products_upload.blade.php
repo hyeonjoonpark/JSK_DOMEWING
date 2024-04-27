@@ -177,6 +177,7 @@
                     apiToken
                 },
                 success: function(response) {
+                    console.log(response);
                     if (response.error !== '') {
                         console.log(response);
                     }
