@@ -176,14 +176,20 @@
                     apiToken
                 },
                 success: function(response) {
-                    console.log(response);
                     if (response.error !== '') {
                         console.log(response);
                     }
                     closePopup();
                     const status = response.status;
                     if (status === true) {
-                        swalSuccess(response.message);
+                        Swal.fire({
+                            icon: 'success',
+                            html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Success.svg') }}"><h4 class="swal2-title mt-5">' +
+                                response.message + '</h4>'
+                        }).then((result) => {
+                            window.location.replace('/partner/products/sale?openMarket=' + $(
+                                'input[name="openMarkets"]:checked').val());
+                        });
                     } else {
                         swalError(response.message);
                     }

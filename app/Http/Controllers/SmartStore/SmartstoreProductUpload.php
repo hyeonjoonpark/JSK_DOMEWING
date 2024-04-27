@@ -52,9 +52,14 @@ class SmartstoreProductUpload extends Controller
                 $error = $result['error'];
             }
         }
+        $status = true;
+        $numProducts = count($this->products);
+        if ($success < 1) {
+            $status = false;
+        }
         return [
-            'status' => true,
-            'message' => "총 " . count($this->products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
+            'status' => $status,
+            'message' => "총 " . $numProducts . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
             'error' => $error
         ];
     }
@@ -119,6 +124,11 @@ class SmartstoreProductUpload extends Controller
                     ],
                     'taxType' => 'TAX',
                     'minorPurchasable' => true,
+                    'certificationTargetExcludeContent' => [
+                        'childCertifiedProductExclusionYn' => true,
+                        'kcCertifiedProductExclusionYn' => "TRUE",
+                        'greenCertifiedProductExclusionYn' => true
+                    ],
                     'productInfoProvidedNotice' => [
                         'productInfoProvidedNoticeType' => 'ETC',
                         'etc' => [

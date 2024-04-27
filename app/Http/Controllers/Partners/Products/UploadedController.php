@@ -34,6 +34,7 @@ class UploadedController extends Controller
                 ->join('partners AS p', 'p.id', '=', 'va.partner_id')
                 ->where('up.is_active', 'Y')
                 ->where('va.partner_id', Auth::guard('partner')->id())
+                ->orderByDesc('up.created_at')
                 ->select([
                     'mp.productCode',
                     'mp.productName',
@@ -44,7 +45,8 @@ class UploadedController extends Controller
                     'oc.name',
                     'up.shipping_fee AS up_shipping_fee',
                     'up.origin_product_no',
-                    'va.username'
+                    'va.username',
+                    'up.created_at'
                 ])
                 ->get();
         }
