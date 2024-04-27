@@ -38,7 +38,7 @@
             <div class="card card-bordered">
                 <div class="card-inner">
                     <p>총 수집된 상품의 갯수는 <b>{{ number_format(count($uploadedProducts), 0) }}</b>개입니다.</p>
-                    <table class="table text-nowrap align-middle">
+                    <table class="table align-middle">
                         <thead>
                             <tr>
                                 <th scope="col">
@@ -66,21 +66,18 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <img src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100 height=100>
+                                        <img src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100>
                                     </td>
                                     <td>
                                         <div class="product-contents">
                                             <p>
                                                 {{ $product->name }}<br>
                                                 <span class="font-weight-bold">{{ $product->productName }}</span><br>
-                                                {{ $product->productCode }}<br>
-                                                <span class="wing-font">{{ number_format($product->price, 0) }}</span>
-                                                <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
-                                                    alt="윙"><br>
+                                                {{ $product->origin_product_no }}<br>
+                                                <span class="wing-font">{{ number_format($product->price, 0) }}</span>원 /
                                                 배송비: <span
-                                                    class="wing-font">{{ number_format($product->up_shipping_fee, 0) }}</span>
-                                                <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
-                                                    alt="윙">
+                                                    class="wing-font">{{ number_format($product->up_shipping_fee, 0) }}</span>원<br>
+                                                <b>{{ $product->username }}</b>
                                             </p>
                                         </div>
                                     </td>
@@ -101,7 +98,7 @@
                                             </p>
                                         </a>
                                     </td>
-                                    <td>
+                                    <td class="text-nowrap">
                                         <button class="btn btn-success" onclick="onUpdate();">수정</button>
                                         <button class="btn btn-danger" onclick="onUpdate();">삭제</button>
                                     </td>

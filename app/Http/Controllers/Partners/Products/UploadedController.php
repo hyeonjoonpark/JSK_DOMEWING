@@ -31,6 +31,9 @@ class UploadedController extends Controller
                 ->join('minewing_products AS mp', 'mp.id', '=', 'up.product_id')
                 ->join($vendorEngName . '_accounts AS va', 'va.id', '=', 'up.' . $vendorEngName . '_account_id')
                 ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
+                ->join('partners AS p', 'p.id', '=', 'va.partner_id')
+                ->where('up.is_active', 'Y')
+                ->where('va.partner_id', Auth::guard('partner')->id())
                 ->select([
                     'mp.productCode',
                     'mp.productName',
@@ -39,7 +42,9 @@ class UploadedController extends Controller
                     DB::raw("CEIL((mp.productPrice * $marginRate)) AS productPrice"), // 계산식 수정
                     'mp.shipping_fee AS mp_shipping_fee',
                     'oc.name',
-                    'up.shipping_fee AS up_shipping_fee'
+                    'up.shipping_fee AS up_shipping_fee',
+                    'up.origin_product_no',
+                    'va.username'
                 ])
                 ->get();
         }

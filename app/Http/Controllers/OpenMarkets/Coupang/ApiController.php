@@ -34,16 +34,40 @@ class ApiController extends Controller
             ]
         ];
     }
-    public function builder($account, $contentType, $method, $path, $data)
+    public function getBuilder($accessKey, $secretKey, $contentType, $path, $query)
+    {
+        date_default_timezone_set("GMT+0");
+        $datetime = date("ymd") . 'T' . date("His") . 'Z';
+        $method = 'GET';
+        $message = $datetime . $method . $path . $query;
+        $algorithm = "HmacSHA256";
+        $signature = hash_hmac('sha256', $message, $secretKey);
+        $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
+        $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
+        $response = Http::withHeaders([
+            'Authorization' => $authorization,
+            'Content-Type' => $contentType
+        ])->get($url);
+        if ($response->successful() && $response->status() === 200) {
+            return [
+                'status' => true,
+                'data' => $response->json()
+            ];
+        } else {
+            return [
+                'status' => false,
+                'error' => $response->body()
+            ];
+        }
+    }
+    public function builder($accessKey, $secretKey, $method, $contentType, $path, $data)
     {
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
         $message = $datetime . $method . $path;
-        $ACCESS_KEY = $account->access_key;
-        $SECRET_KEY = $account->secret_key;
         $algorithm = "HmacSHA256";
-        $signature = hash_hmac('sha256', $message, $SECRET_KEY);
-        $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $ACCESS_KEY . ", signed-date=" . $datetime . ", signature=" . $signature;
+        $signature = hash_hmac('sha256', $message, $secretKey);
+        $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path;
         $response = Http::withHeaders([
             'Authorization' => $authorization,
