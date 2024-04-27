@@ -130,6 +130,7 @@
                             'page' => $products->currentPage(),
                             'numPages' => $products->lastPage(),
                             'searchKeyword' => $searchKeyword,
+                            'categoryId' => $categoryId,
                         ])
                     </div>
                     <div class="table-responsive">
@@ -189,6 +190,7 @@
                             'page' => $products->currentPage(),
                             'numPages' => $products->lastPage(),
                             'searchKeyword' => $searchKeyword,
+                            'categoryId' => $categoryId,
                         ])
                     </div>
                 </div>

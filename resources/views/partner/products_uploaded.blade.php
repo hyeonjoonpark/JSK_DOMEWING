@@ -1,4 +1,71 @@
 @extends('partner.layouts.main')
+@section('style')
+    <style>
+        .product-list-image {
+            border: 1px solid black;
+            border-bottom: 2px solid black;
+            border-right: 2px solid black;
+            width: 100px;
+            height: 100px;
+        }
+
+        /* Active state for pagination */
+        .pagination.active {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+
+        /* Inactive state for pagination */
+        .pagination {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 4px;
+            font-size: 14px;
+            color: #007bff;
+            border: 1px solid #007bff;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination:hover {
+            background-color: #f8f9fa;
+        }
+
+        #topBtn {
+            position: fixed;
+            /* 고정된 위치 */
+            bottom: 20px;
+            /* 하단에서 20px 떨어진 위치 */
+            right: 30px;
+            /* 우측에서 30px 떨어진 위치 */
+            z-index: 99;
+            /* 다른 요소 위에 표시 */
+            font-size: 18px;
+            /* 글자 크기 */
+            border: none;
+            /* 테두리 없음 */
+            outline: none;
+            /* 외곽선 없음 */
+            background-color: #555;
+            /* 배경색 */
+            color: white;
+            /* 글자색 */
+            cursor: pointer;
+            /* 마우스 커서를 포인터로 변경 */
+            padding: 15px;
+            /* 패딩 */
+            border-radius: 10px;
+            /* 모서리 둥글게 */
+        }
+
+        #topBtn:hover {
+            background-color: #333;
+            /* 호버 시 배경색 변경 */
+        }
+    </style>
+@endsection
 @section('title')
     업로드된 상품
 @endsection
@@ -17,8 +84,9 @@
                             <div class="col-12 col-md-3">
                                 <div class="custom-control custom-checkbox">
                                     <div class="custom-control custom-radio">
-                                        <input type="radio" id="openMarket{{ $openMarket->id }}" name="openMarket"
-                                            value="{{ $openMarket->id }}" class="custom-control-input"
+                                        <input type="radio" id="openMarket{{ $openMarket->id }}"
+                                            name="selectedOpenMarketId" value="{{ $openMarket->id }}"
+                                            class="custom-control-input"
                                             {{ $selectedOpenMarketId == $openMarket->id ? 'checked' : '' }}
                                             {{ in_array($openMarket->id, [40, 51]) ? '' : 'disabled' }}>
                                         <label class="custom-control-label"
@@ -37,7 +105,14 @@
         <div class="col-12">
             <div class="card card-bordered">
                 <div class="card-inner">
-                    <p>총 판매 중인 상품의 갯수는 <b>{{ number_format(count($uploadedProducts), 0) }}</b>개입니다.</p>
+                    <p>검색된 상품이 총 {{ number_format($uploadedProducts->total(), 0) }}건입니다. 페이지 당 500건의 상품이 출력됩니다.</p>
+                    <div class="form-group">
+                        @include('partner.partials.uploaded_pagination', [
+                            'page' => $uploadedProducts->currentPage(),
+                            'numPages' => $uploadedProducts->lastPage(),
+                            'openMarket' => $openMarket,
+                        ])
+                    </div>
                     <table class="table align-middle">
                         <thead>
                             <tr>
@@ -76,7 +151,7 @@
                                                 {{ $product->origin_product_no }}<br>
                                                 <span class="wing-font">{{ number_format($product->price, 0) }}</span>원 /
                                                 배송비: <span
-                                                    class="wing-font">{{ number_format($product->up_shipping_fee, 0) }}</span>원<br>
+                                                    class="wing-font">{{ $selectedOpenMarketId == 40 ? '무료' : number_format($product->up_shipping_fee, 0) . '원' }}</span><br>
                                                 <b>{{ $product->username }}</b><br>
                                                 업로드 일시: {{ $product->created_at }}
                                             </p>
@@ -95,7 +170,8 @@
                                                 배송비: <span
                                                     class="wing-font">{{ number_format($product->mp_shipping_fee, 0) }}</span>
                                                 <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
-                                                    alt="윙">
+                                                    alt="윙"><br>
+                                                수집 일시: {{ $product->pca }}
                                             </p>
                                         </a>
                                     </td>

@@ -120,6 +120,7 @@
                                 'page' => $products->currentPage(),
                                 'numPages' => $products->lastPage(),
                                 'searchKeyword' => $searchKeyword,
+                                'partnerTableToken' => $partnerTableToken,
                             ])
                         </div>
                         <div class="text-center">
@@ -153,8 +154,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <img src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100
-                                                    height=100>
+                                                <img src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100>
                                             </td>
                                             <td>
                                                 <a class="product-contents"
@@ -168,10 +168,11 @@
                                                             class="wing-font">{{ number_format($product->productPrice, 0) }}</span>
                                                         <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
                                                             alt="윙"><br>
-                                                        배송비: <spanbtn btn-danger class="wing-font">
+                                                        배송비: <span class="wing-font">
                                                             {{ number_format($product->shipping_fee, 0) }}</span>
-                                                            <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
-                                                                alt="윙">
+                                                        <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
+                                                            alt="윙"><br>
+                                                        수집일: {{ $product->created_at }}
                                                     </p>
                                                 </a>
                                             </td>
@@ -189,6 +190,7 @@
                                 'page' => $products->currentPage(),
                                 'numPages' => $products->lastPage(),
                                 'searchKeyword' => $searchKeyword,
+                                'partnerTableToken' => $partnerTableToken,
                             ])
                         </div>
                     @endif
