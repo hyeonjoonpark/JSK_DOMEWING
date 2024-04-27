@@ -99,7 +99,6 @@
         function initUpload() {
             popupLoader(1, "상품 업로드를 위한 해당 마켓 정보들을 불러오는 중입니다.");
             const vendorId = $('input[name="openMarkets"]:checked').val();
-            console.log(vendorId);
             $.ajax({
                 url: '/api/partner/account-setting/list',
                 type: 'POST',
@@ -158,7 +157,7 @@
 
         function upload() {
             closePopup();
-            popupLoader(0, "해당 상품 테이블을 스마트 스토어로 전송 중입니다.");
+            popupLoader(0, "해당 상품 테이블을 오픈 마켓으로 전송 중입니다.");
             const partnerTableToken = $('#partnerTableToken').val();
             const vendorId = $('input[name="openMarkets"]:checked').val();
             const partnerMargin = parseInt($('#partnerMargin').val());
