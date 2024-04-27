@@ -4,14 +4,11 @@ namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
-use App\Http\Controllers\SmartStore\SmartStoreAccountController;
-use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Http;
 
 class UploadController extends Controller
 {

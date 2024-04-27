@@ -40,7 +40,7 @@ class CoupangUploadController extends Controller
     {
         $contentType = 'application/json;charset=UTF-8';
         $method = 'GET';
-        $path = '/v2/providers/seller_api/apis/api/v1/marketplace/vendors/' . $account->code . '/check-auto-category-agreed';
+        $path = '/v2/providers/marketplace_openapi/apis/api/v1/vendor/shipping-place/outbound?pageNum=1';
         $data = [
             'pageNum' => 1
         ];
