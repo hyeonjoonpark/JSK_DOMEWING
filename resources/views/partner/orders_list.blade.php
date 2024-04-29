@@ -128,23 +128,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($orderDetails['data']['data'] as $item)
+                            @foreach ($orderDetails as $item)
                                 <tr>
                                     <td>
                                         <input type="checkbox" name="selected_orders[]"
-                                            value="{{ $item['productOrder']['productOrderId'] ?? '' }}">
+                                            value="{{ $item['productOrderId'] ?? '' }}">
                                     </td>
-                                    <td>{{ $item['order']['market'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['order']['orderId'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['productOrder']['productOrderId'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['order']['ordererName'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['productOrder']['productName'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['productOrder']['quantity'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['productOrder']['unitPrice'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['productOrder']['totalPaymentAmount'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['productOrder']['deliveryFeeAmount'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['productOrder']['productOrderStatus'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['order']['orderDate'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['market'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['orderId'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productOrderId'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['ordererName'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productName'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['quantity'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['unitPrice'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['totalPaymentAmount'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['deliveryFeeAmount'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['productOrderStatus'] ?? 'N/A' }}</td>
+                                    <td>{{ $item['orderDate'] ?? 'N/A' }}</td>
                                 </tr>
                             @endforeach
 
@@ -158,9 +158,6 @@
     </div>
     <pre>
         {{ print_r($orderList) }}
-    </pre>
-    <pre>
-        {{ print_r($responseDetail) }}
     </pre>
     <pre>
         {{ print_r($orderDetails) }}
@@ -220,79 +217,6 @@
                 for (var checkbox of checkboxes) {
                     checkbox.checked = this.checked;
                 }
-            });
-        });
-
-
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const orders = @json($orderDetails['data']['data']);
-
-            document.querySelector('.btn-reset').addEventListener('click', function(e) {
-                e.preventDefault();
-
-                // 모든 입력 필드 초기화
-                document.getElementById('startDate').value = '';
-                document.getElementById('endDate').value = '';
-                document.getElementById('product-name').value = '';
-                document.getElementById('product-code').value = '';
-
-                // 원래의 주문 목록을 다시 표시
-                displayOrders(originalOrders);
-            });
-
-            function filterOrders() {
-                const startDate = document.getElementById('startDate').value ? new Date(document.getElementById(
-                    'startDate').value + 'T00:00:00Z') : null;
-                const endDate = document.getElementById('endDate').value ? new Date(document.getElementById(
-                    'endDate').value + 'T23:59:59Z') : null;
-                const productName = document.getElementById('product-name').value.toLowerCase();
-                const productCode = document.getElementById('product-code').value;
-                const statusFilters = Array.from(document.querySelectorAll('.status-checkbox:checked')).map(el => el
-                    .id);
-
-                let filteredOrders = orders.filter(order => {
-                    const orderDate = new Date(order.order.orderDate + 'Z');
-                    const matchesDate = (!startDate || orderDate >= startDate) && (!endDate || orderDate <=
-                        endDate);
-                    const matchesName = !productName || order.productOrder.productName.toLowerCase()
-                        .includes(productName);
-                    const matchesCode = !productCode || order.productOrder.productCode === productCode;
-                    const matchesStatus = !statusFilters.length || statusFilters.includes(order.productOrder
-                        .productOrderStatus);
-
-                    return matchesDate && matchesName && matchesCode && matchesStatus;
-                });
-
-                displayOrders(filteredOrders);
-            }
-
-
-            function displayOrders(filteredOrders) {
-                const tbody = document.querySelector('.datatable-init tbody');
-                tbody.innerHTML = ''; // Clear current rows
-                filteredOrders.forEach(order => {
-                    const row = `<tr>
-                <td><input type="checkbox" name="selected_orders[]" value="${order.productOrder.productOrderId}"></td>
-                <td>${order.order.market}</td>
-                <td>${order.order.orderId}</td>
-                <td>${order.productOrder.productOrderId}</td>
-                <td>${order.order.ordererName}</td>
-                <td>${order.productOrder.productName}</td>
-                <td>${order.productOrder.quantity}</td>
-                <td>${order.productOrder.unitPrice}</td>
-                <td>${order.productOrder.totalPaymentAmount}</td>
-                <td>${order.productOrder.deliveryFeeAmount}</td>
-                <td>${order.productOrder.productOrderStatus}</td>
-                <td>${order.order.orderDate}</td>
-            </tr>`;
-                    tbody.insertAdjacentHTML('beforeend', row);
-                });
-            }
-
-            document.querySelector('.btn-primary').addEventListener('click', function(e) {
-                e.preventDefault();
-                filterOrders();
             });
         });
     </script>
