@@ -129,6 +129,7 @@
                                 </div>
                             </div>
                             `;
+                            index++;
                         }
                         $('#vendorCommission').val(vendorCommission);
                         $('#accountList').html(html);
