@@ -178,7 +178,8 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                <button class="btn btn-success" onclick="edit();">수정</button>
+                                                <button class="btn btn-success"
+                                                    onclick="initEdit('{{ $product->productCode }}');">수정</button>
                                                 <button class="btn btn-danger"
                                                     onclick="del('{{ $product->productCode }}');">삭제</button>
                                             </td>
@@ -307,12 +308,66 @@
             });
         }
 
-        function edit() {
+        function initEdit(productCode) {
+            const html = `
+            <div class="form-group">
+                <label class="form-label">상품명</label>
+                <div class="d-flex">
+                    <input type="text" class="form-control" id="productName" placeholder="새 상품명을 입력해주세요.">
+                    <button class="btn btn-primary text-nowrap" onclick="requestEdit('${productCode}', 'TEST');">가공</button>
+                </div>
+            </div>
+            `;
             Swal.fire({
-                icon: "warning",
-                text: "해당 기능은 업데이트 중입니다."
+                icon: 'warning',
+                html,
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    requestEdit(productCode, 'CONFIRMED');
+                }
             });
         }
+
+        function requestEdit(productCode, type) {
+            const productName = $('#productName').val();
+            $.ajax({
+                url: "/api/partner/product/edit-product",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    productCode,
+                    productName,
+                    type
+                },
+                success: function(response) {
+                    if (type === 'TEST') {
+                        console.log('here');
+                        $('#productName').val(response.data.processedProductName);
+                    } else {
+                        closePopup();
+                        const status = response.status;
+                        const message = response.message;
+                        let icon = 'success';
+                        if (status === false) {
+                            console.log(response);
+                            icon = 'error';
+                        }
+                        Swal.fire({
+                            icon: icon,
+                            title: message
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    }
+                },
+                error: AjaxErrorHandling
+            });
+        };
+
 
         function del(productCode) {
             const html = `

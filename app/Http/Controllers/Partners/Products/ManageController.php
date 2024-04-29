@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Product\NameController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -162,6 +163,63 @@ class ManageController extends Controller
             return [
                 'status' => false,
                 'message' => '상품을 삭제하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    public function editProduct(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'productName' => 'required|min:2',
+            'productCode' => 'required|string|exists:minewing_products,productCode',
+            'type' => 'required|string|in:CONFIRMED,TEST'
+        ], [
+            'productName' => "상품명은 최소 2자 이상이어야 합니다.",
+            'productCode' => "유효한 상품이 아닙니다.",
+            'type' => '유효한 접근이 아닙니다.'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first(),
+                'error' => $validator->errors()
+            ];
+        }
+        $productCode = $request->productCode;
+        $productName = $request->productName;
+        $type = $request->type;
+        $nc = new NameController();
+        $processedProductName = $nc->index($productName);
+        if ($type === 'TEST') {
+            return [
+                'status' => true,
+                'message' => '',
+                'data' => [
+                    'processedProductName' => $processedProductName
+                ]
+            ];
+        }
+
+        return $this->editPartnerProduct($productCode, $productName);
+    }
+    public function editPartnerProduct($productCode, $productName)
+    {
+        try {
+            DB::table('partner_products AS pp')
+                ->join('minewing_products AS mp', 'mp.id', '=', 'pp.product_id')
+                ->where('mp.productCode', $productCode)
+                ->update([
+                    'pp.product_name' => $productName
+                ]);
+            return [
+                'status' => true,
+                'message' => '해당 상품을 성공적으로 수정했습니다.',
+                'data' => ''
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '상품을 수정하는 과정에서 오류가 발생했습니다.',
                 'error' => $e->getMessage()
             ];
         }
