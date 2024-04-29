@@ -53,9 +53,6 @@ class ImportCretecProducts extends Command
                 $isFirstRow = false;
                 continue;
             }
-            if ($index > 5) {
-                break;
-            }
             $product = $this->createProduct($sheet, $index);
             $this->insert($product);
         }
