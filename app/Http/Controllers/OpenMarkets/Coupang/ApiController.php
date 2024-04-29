@@ -34,7 +34,7 @@ class ApiController extends Controller
             ]
         ];
     }
-    public function getBuilder($accessKey, $secretKey, $contentType, $path, $query = '')
+    public function getBuilder(string $accessKey, string $secretKey, string $contentType, string $path, string $query = '')
     {
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
@@ -44,6 +44,7 @@ class ApiController extends Controller
         $signature = hash_hmac('sha256', $message, $secretKey);
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
+        echo $url;
         $response = Http::withHeaders([
             'Authorization' => $authorization,
             'Content-Type' => $contentType

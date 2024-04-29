@@ -27,17 +27,13 @@ class CoupangOrderController extends Controller
         $accessKey = $account->access_key;
         $secretKey = $account->secret_key;
         $vendorId = $account->code;
-
         $contentType = 'application/json';
-        $method = 'GET';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $vendorId . '/ordersheets';
-        $data = [
-            'createdAtFrom' => "2024-04-24",
-            'createdAtTo' => "2024-04-29",
-            'status' => "ACCEPT"
-        ];
-        $response = $this->ssac->builder($accessKey, $secretKey, $method, $contentType, $path, $data);
-
+        $createdAtFrom = "2024-04-24";
+        $createdAtTo = "2024-04-29";
+        $status = "ACCEPT";
+        $query = 'createdAtFrom=' . $createdAtFrom . '&createdAtTo=' . $createdAtTo . '&status=' . $status;
+        $response = $this->ssac->getBuilder($accessKey, $secretKey, $contentType, $path, $query);
         return $response;
     }
 
