@@ -6,8 +6,6 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\NaverShopController;
-use App\Http\Controllers\TestController;
 use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\Admin\DomainController;
@@ -22,6 +20,7 @@ use App\Http\Controllers\Partners\OrderController;
 use App\Http\Controllers\Partners\Products\CollectController;
 use App\Http\Controllers\Partners\Products\ManageController;
 use App\Http\Controllers\Partners\Products\UploadController;
+use App\Http\Controllers\Partners\Products\UploadedController;
 use App\Http\Controllers\Partners\RegisterController as PartnersRegisterController;
 use App\Http\Controllers\ProductEditor\ViewController;
 use App\Http\Controllers\Testmonial\TestmonialController;
@@ -52,6 +51,7 @@ Route::prefix('partner')->group(function () {
             Route::get('collect', [CollectController::class, 'index'])->name('partner.products.collect');
             Route::get('manage', [ManageController::class, 'index'])->name('partner.products.manage');
             Route::get('upload', [UploadController::class, 'index']);
+            Route::get('sale', [UploadedController::class, 'index'])->name('partner.products.uploaded');
         });
         Route::prefix('orders')->group(function () {
             Route::get('list', [OrderController::class, 'index'])->name('partner.orders.list');

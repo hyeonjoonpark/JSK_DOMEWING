@@ -109,8 +109,11 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('/namewing/power-namewing', [NamewingController::class, 'power']);
     Route::post('/namewing/multi-edit', [NamewingController::class, 'multiEdit']);
     // account-setting
-    Route::post('/account-setting/margin-rate', [AccountSettingController::class, 'changeMarginRate']);
-    Route::post('/account-setting/shipping-fee', [ShippingFeeController::class, 'index']);
+    Route::prefix('account-setting')->group(function () {
+        Route::post('margin-rate', [AccountSettingController::class, 'changeMarginRate']);
+        Route::post('shipping-fee', [ShippingFeeController::class, 'index']);
+        Route::put('update-commission', [AccountSettingController::class, 'updateVendorCommission']);
+    });
     // minewing
     Route::post('/minewing/unique-product-hrefs', [UniqueProductHrefsController::class, 'index']);
     Route::post('/minewing/manufacture', [MinewingManufactureController::class, 'index']);

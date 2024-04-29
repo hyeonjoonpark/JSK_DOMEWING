@@ -100,6 +100,19 @@
         swalError('"API 통신 요청 과정에서 에러가 발생했습니다."');
     }
 
+    function ajaxSuccessHandling(response) {
+        console.log(response);
+        const status = response.status;
+        const message = response.message;
+        closePopup();
+        if (status === false) {
+            console.log(response);
+            swalError(message);
+        } else {
+            swalWithReload(message, 'success');
+        }
+    }
+
     function initSoldOut(productCodes, type) {
         $('#runSoldOutBtn').off('click').on('click', function() {
             runSoldOut(productCodes, type);
@@ -162,6 +175,6 @@
 
     function integerFormatter(value, length) {
         const filteredValue = value.replace(/\D/g, '').substring(0, length);
-        return filteredValue ? parseInt(filteredValue) : '';
+        return filteredValue ? filteredValue : '';
     }
 </script>

@@ -18,10 +18,7 @@ class ManageController extends Controller
             ->where('is_active', 'Y')
             ->exists();
         $partnerId = Auth::guard('partner')->id();
-        $partnerTables = DB::table('partner_tables')
-            ->where('is_active', 'Y')
-            ->where('partner_id', $partnerId)
-            ->get();
+        $partnerTables = $this->getPartnerTables($partnerId);
 
         $searchKeyword = $request->input('searchKeyword', '');
         $partnerTableToken = $request->input('partnerTableToken', '');
@@ -37,6 +34,13 @@ class ManageController extends Controller
             'productCodesStr' => $productCodesStr,
             'hasTable' => $hasTable
         ]);
+    }
+    public function getPartnerTables($partnerId)
+    {
+        return DB::table('partner_tables')
+            ->where('is_active', 'Y')
+            ->where('partner_id', $partnerId)
+            ->get();
     }
     private function getProductList($searchKeyword, $partnerTableToken, $partnerId)
     {
@@ -61,7 +65,8 @@ class ManageController extends Controller
             ->join('product_search AS ps', 'mp.sellerID', '=', 'ps.vendor_id')
             ->where('pp.partner_table_id', $partnerTableId)
             ->where('mp.productName', 'like', "%{$searchKeyword}%")
-            ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name')
+            ->orderByDesc('pp.created_at')
+            ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name', 'pp.created_at')
             ->paginate(500);
     }
     public function add(Request $request)
