@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Admin\PartnersManagementController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\AccountManagementController;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
 use App\Http\Controllers\Partners\ForgotPasswordController;
@@ -54,7 +55,8 @@ Route::prefix('partner')->group(function () {
             Route::get('sale', [UploadedController::class, 'index'])->name('partner.products.uploaded');
         });
         Route::prefix('orders')->group(function () {
-            Route::get('list', [SmartStoreOrderController::class, 'index'])->name('partner.orders.list');
+            Route::get('smart-store-list', [SmartStoreOrderController::class, 'index'])->name('partner.orders.list');
+            Route::get('coupang-list', [CoupangOrderController::class, 'index'])->name('partner.orders.coupang-list');
         });
     });
 });

@@ -1,9 +1,9 @@
 @extends('partner.layouts.main')
 @section('title')
-    주문내역 확인
+    스마트스토어 주문내역 확인
 @endsection
 @section('subtitle')
-    <p>주문내역을 확인하는 페이지입니다.</p>
+    <p>스마트 스토어 주문내역을 확인하는 페이지입니다.</p>
 @endsection
 @section('content')
     <div class="row g-gs">

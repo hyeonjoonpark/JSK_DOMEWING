@@ -24,7 +24,7 @@ class SmartStoreOrderController extends Controller
 
         // $responseDetail = $this->smart_storeDetail($orderIds);
         $orderDetails = $this->getOrderDetails($orderIds);
-        return view('partner.orders_list', [
+        return view('partner.smart_store_order_list', [
             'orderList' => $orderList,
             // 'responseDetail' => $responseDetail,
             'orderDetails' => $orderDetails

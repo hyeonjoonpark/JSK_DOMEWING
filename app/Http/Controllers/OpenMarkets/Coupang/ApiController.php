@@ -34,7 +34,7 @@ class ApiController extends Controller
             ]
         ];
     }
-    public function getBuilder($accessKey, $secretKey, $contentType, $path, $query = '')
+    public function getBuilder(string $accessKey, string $secretKey, string $contentType, string $path, string $query = '')
     {
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
