@@ -55,7 +55,7 @@ Route::prefix('partner')->group(function () {
             Route::get('sale', [UploadedController::class, 'index'])->name('partner.products.uploaded');
         });
         Route::prefix('orders')->group(function () {
-            Route::get('list', [SmartStoreOrderController::class, 'index'])->name('partner.orders.list');
+            Route::get('smart-store-list', [SmartStoreOrderController::class, 'index'])->name('partner.orders.list');
             Route::get('coupang-list', [CoupangOrderController::class, 'index'])->name('partner.orders.coupang-list');
         });
     });
