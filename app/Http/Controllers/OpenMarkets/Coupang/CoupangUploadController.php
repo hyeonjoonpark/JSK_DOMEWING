@@ -56,7 +56,7 @@ class CoupangUploadController extends Controller
             if ($uploadResult['status'] === true) {
                 if ($uploadResult['data']['code'] === 'SUCCESS') {
                     $originProductNo = $uploadResult['data']['data'];
-                    $this->store($account->id, $product->id, $salePrice, $product->shipping_fee, $originProductNo);
+                    $this->store($account->id, $product->id, $salePrice, $product->shipping_fee, $originProductNo, $product->productName);
                     $success++;
                 } else {
                     $error = $uploadResult['data']['message'];
@@ -72,7 +72,7 @@ class CoupangUploadController extends Controller
             'data' => json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         ];
     }
-    protected function store($coupangAccountId, $productId, $price, $shippingFee, $originProductNo)
+    protected function store($coupangAccountId, $productId, $price, $shippingFee, $originProductNo, $productName)
     {
         DB::table('coupang_uploaded_products')
             ->insert([
@@ -80,7 +80,8 @@ class CoupangUploadController extends Controller
                 'product_id' => $productId,
                 'price' => $price,
                 'shipping_fee' => $shippingFee,
-                'origin_product_no' => $originProductNo
+                'origin_product_no' => $originProductNo,
+                'product_name' => $productName
             ]);
     }
     protected function getCategoryRelatedMeta($accessKey, $secretKey, $categoryCode)
