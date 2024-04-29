@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\Minewing\SaveController;
-use App\Http\Controllers\Product\NameController;
+use App\Http\Controllers\Admin\ProductImageController;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
@@ -54,6 +53,9 @@ class ImportCretecProducts extends Command
                 $isFirstRow = false;
                 continue;
             }
+            if ($index > 5) {
+                break;
+            }
             $product = $this->createProduct($sheet, $index);
             $this->insert($product);
         }
@@ -62,35 +64,23 @@ class ImportCretecProducts extends Command
     private function insert($product)
     {
         DB::table('minewing_products')
-            ->insert($product);
+            ->where('productHref', $product['productHref'])
+            ->update($product);
     }
     private function createProduct($sheet, $index)
     {
-        $saveController = new SaveController();
+        $originImageUrl = trim($sheet->getCell('I' . $index)->getValue());
+        $pic = new ProductImageController();
+        $productImage = $pic->index($originImageUrl, 'N')['return'];
         return [
-            'sellerID' => 61,
-            'userID' => 15,
-            'productName' => trim($this->createProductName($sheet, $index)),
-            'productCode' => trim($saveController->generateRandomProductCode(8)),
-            'productPrice' => (int)trim($sheet->getCell('O' . $index)->getValue()),
-            'productImage' => trim($sheet->getCell('I' . $index)->getValue()),
-            'productDetail' => $this->createProductDetail($sheet, $index),
-            'productHref' => trim('https://ctx.cretec.kr/CtxApp/ctx/selectItemDtlIfrm.do?itemCd=' . $sheet->getCell('B' . $index)->getValue()),
-            'hasOption' => 'N'
+            'productPrice' => (int)trim(ceil($sheet->getCell('O' . $index)->getValue() * $sheet->getCell('T' . $index)->getValue()),),
+            'productImage' => $productImage,
+            'productDetail' => $this->createProductDetail($sheet, $index, $productImage),
+            'productHref' => trim('https://ctx.cretec.kr/CtxApp/ctx/selectItemDtlIfrm.do?itemCd=' . $sheet->getCell('B' . $index)->getValue())
         ];
     }
-    private function createProductName($sheet, $index)
+    private function createProductDetail($sheet, $index, $productImage)
     {
-        $brandName = $sheet->getCell('F' . $index)->getValue();
-        $basicName = $sheet->getCell('G' . $index)->getValue();
-        $productDetail = $sheet->getCell('V' . $index)->getValue();
-        $productName = $brandName . ' ' . $basicName . ' ' . $productDetail;
-        $nameController = new NameController();
-        return $nameController->index($productName);
-    }
-    private function createProductDetail($sheet, $index)
-    {
-        $productDetailImageUrl = $sheet->getCell('AC' . $index)->getValue();
         $productDetailStr = $sheet->getCell('V' . $index)->getValue();
         $quantityNum = $sheet->getCell('T' . $index)->getValue();
         $quantityStr = $sheet->getCell('U' . $index)->getValue();
@@ -101,9 +91,17 @@ class ImportCretecProducts extends Command
             출고 단위: ' . $quantity . '
         </h1><br>
         <br>
+        <br>
         <center>
             <img src="https://www.sellwing.kr/images/CDN/cretec_header.jpg" style="width: 100% !important;"><br>
-            <img src="' . $productDetailImageUrl . '" style="width: 100% !important;">
+            <img src="' . $productImage . '" style="width: 100% !important;"><br>
+            <h1 style="color:red !important; font-weight:bold !important; font-size:3rem !important;">
+                상품 규격: ' . $productDetailStr . '<br>
+                출고 단위: ' . $quantity . '
+            </h1><br>
+            <br>
+            <br>
+            <img src="https://www.sellwing.kr/images/CDN/cretec_footer.jpg" style="width: 100% !important;">
         </center>
         ';
         return $productDetail;

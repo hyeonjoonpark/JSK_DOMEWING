@@ -39,7 +39,6 @@ class CoupangUploadController extends Controller
                 $duplicated[] = $product->productCode;
                 continue;
             }
-            $categoryRelatedMeta = $this->getCategoryRelatedMeta($accessKey, $secretKey, $product->code);
             $responseOutbound = $this->getOutbound($accessKey, $secretKey);
             $responseReturn = $this->getReturnCenter($accessKey, $secretKey, $account->code);
             if ($responseOutbound['status'] === false) {
