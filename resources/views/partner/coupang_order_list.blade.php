@@ -128,7 +128,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- @foreach ($orderDetails as $item)
+                            @foreach ($orderList as $item)
                                 <tr>
                                     <td>
                                         <input type="checkbox" name="selected_orders[]"
@@ -146,7 +146,7 @@
                                     <td>{{ $item['productOrderStatus'] ?? 'N/A' }}</td>
                                     <td>{{ $item['orderDate'] ?? 'N/A' }}</td>
                                 </tr>
-                            @endforeach --}}
+                            @endforeach
 
 
                         </tbody>
