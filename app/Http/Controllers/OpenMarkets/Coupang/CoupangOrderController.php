@@ -17,7 +17,7 @@ class CoupangOrderController extends Controller
     public function index()
     {
         $orderList = $this->getOrderList();
-        return view('partner.testOrderList', [
+        return view('partner.coupang_order_list', [
             'orderList' => $orderList
         ]);
     }
@@ -27,11 +27,11 @@ class CoupangOrderController extends Controller
         $accessKey = $account->access_key;
         $secretKey = $account->secret_key;
         $vendorId = $account->code;
-        $contentType = 'application/json';
+        $contentType = 'application/json;';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $vendorId . '/ordersheets';
-        $createdAtFrom = "2024-04-24";
-        $createdAtTo = "2024-04-29";
-        $status = "ACCEPT";
+        $createdAtFrom = '2024-04-28';
+        $createdAtTo = '2024-04-29';
+        $status = 'INSTRUCT';
         $query = 'createdAtFrom=' . $createdAtFrom . '&createdAtTo=' . $createdAtTo . '&status=' . $status;
         $response = $this->ssac->getBuilder($accessKey, $secretKey, $contentType, $path, $query);
         return $response;

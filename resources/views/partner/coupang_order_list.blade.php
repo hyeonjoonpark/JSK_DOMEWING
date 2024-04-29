@@ -1,9 +1,9 @@
 @extends('partner.layouts.main')
 @section('title')
-    주문내역 확인
+    쿠팡 주문내역 확인
 @endsection
 @section('subtitle')
-    <p>주문내역을 확인하는 페이지입니다.</p>
+    <p>쿠팡 주문내역을 확인하는 페이지입니다.</p>
 @endsection
 @section('content')
     <div class="row g-gs">
@@ -128,7 +128,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($orderDetails as $item)
+                            {{-- @foreach ($orderDetails as $item)
                                 <tr>
                                     <td>
                                         <input type="checkbox" name="selected_orders[]"
@@ -146,7 +146,7 @@
                                     <td>{{ $item['productOrderStatus'] ?? 'N/A' }}</td>
                                     <td>{{ $item['orderDate'] ?? 'N/A' }}</td>
                                 </tr>
-                            @endforeach
+                            @endforeach --}}
 
 
                         </tbody>
@@ -160,7 +160,7 @@
         {{ print_r($orderList) }}
     </pre>
     <pre>
-        {{ print_r($orderDetails) }}
+        {{-- {{ print_r($orderDetails) }} --}}
     </pre>
 @endsection
 @section('scripts')
