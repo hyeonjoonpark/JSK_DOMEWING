@@ -124,7 +124,7 @@
                                 </th>
                                 <th scope="col">대표 이미지</th>
                                 <th scope="col">업로드 상품 정보</th>
-                                <th scope="col">도매윙 상품 정보</th>
+                                <th scope="col">내 테이블 상품 정보</th>
                                 <th scope="col">ACTION</th>
                             </tr>
                         </thead>
@@ -147,7 +147,7 @@
                                         <div class="product-contents">
                                             <p>
                                                 {{ $product->name }}<br>
-                                                <span class="font-weight-bold">{{ $product->productName }}</span><br>
+                                                <span class="font-weight-bold">{{ $product->upName }}</span><br>
                                                 {{ $product->origin_product_no }}<br>
                                                 <span class="wing-font">{{ number_format($product->price, 0) }}</span>원 /
                                                 배송비: <span
@@ -161,7 +161,7 @@
                                         <a class="product-contents" href="javascript:view('{{ $product->productCode }}');">
                                             <p>
                                                 {{ $product->name }}<br>
-                                                <span class="font-weight-bold">{{ $product->productName }}</span><br>
+                                                <span class="font-weight-bold">{{ $product->ppName }}</span><br>
                                                 {{ $product->productCode }}<br>
                                                 <span
                                                     class="wing-font">{{ number_format($product->productPrice, 0) }}</span>

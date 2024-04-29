@@ -66,7 +66,7 @@ class ManageController extends Controller
             ->where('pp.partner_table_id', $partnerTableId)
             ->where('mp.productName', 'like', "%{$searchKeyword}%")
             ->orderByDesc('pp.created_at')
-            ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name', 'pp.created_at')
+            ->select('mp.productCode', 'mp.productImage', 'pp.product_name AS productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name', 'pp.created_at')
             ->paginate(500);
     }
     public function add(Request $request)
@@ -101,17 +101,17 @@ class ManageController extends Controller
                 ->pluck('product_id')
                 ->toArray();
 
-            $productIds = DB::table('minewing_products')
+            $products = DB::table('minewing_products')
                 ->whereIn('productCode', $productCodes)
-                ->whereNotIn('id', $existingProductIds) // 이미 수집된 상품 ID 제외
-                ->pluck('id')
-                ->toArray();
+                ->whereNotIn('id', $existingProductIds)
+                ->get(['id', 'productName']);
 
-            foreach ($productIds as $productId) {
+            foreach ($products as $product) {
                 DB::table('partner_products')
                     ->insert([
-                        'product_id' => $productId,
-                        'partner_table_id' => $partnerTableId
+                        'product_id' => $product->id,
+                        'partner_table_id' => $partnerTableId,
+                        'product_name' => $product->productName
                     ]);
             }
             return [

@@ -212,11 +212,13 @@
                 </div>
                 <div class="modal-body">
                     <div class="row g-gs">
-                        @foreach ($partnerTables as $partnerTable)
+                        @foreach ($partnerTables as $index => $partnerTable)
                             <div class="col-12">
                                 <div class="d-flex text-nowrap">
-                                    <input type="text" class="form-control" value="{{ $partnerTable->title }}">
-                                    <button class="btn btn-success">수정</button>
+                                    <input type="text" class="form-control" id="partnerTableTitle{{ $index }}"
+                                        value="{{ $partnerTable->title }}">
+                                    <button class="btn btn-success"
+                                        onclick="initUpdatePartnerTable('{{ $partnerTable->token }}', {{ $index }});">수정</button>
                                     <button class="btn btn-danger"
                                         onclick="initDeletePartnerTable('{{ $partnerTable->token }}')">삭제</button>
                                 </div>
@@ -384,12 +386,43 @@
             });
         }
 
+        function initUpdatePartnerTable(partnerTableToken, index) {
+            Swal.fire({
+                icon: 'warning',
+                title: '테이블 수정',
+                text: "정말로 해당 테이블의 별칭을 수정하시겠습니까?",
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const title = $('#partnerTableTitle' + index).val();
+                    UpdatePartnerTable(partnerTableToken, title);
+                }
+            });
+        }
+
+        function UpdatePartnerTable(token, title) {
+            $.ajax({
+                url: '/api/partner/product/update-table',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    apiToken,
+                    token,
+                    title
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
         function initDeletePartnerTable(partnerTableToken) {
             // 삭제 확인 대화 상자 설정
             Swal.fire({
+                icon: 'warning',
                 title: '테이블 삭제',
                 text: "정말 이 테이블을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
-                icon: 'warning',
                 showCancelButton: true,
                 cancelButtonText: "취소",
                 confirmButtonText: "확인"
@@ -401,77 +434,20 @@
         }
 
         // 테이블 삭제 로직을 별도의 함수로 분리하여 관리 및 유지보수 용이성 향상
-        function deletePartnerTable(apiToken, partnerTableToken) {
+        function deletePartnerTable(partnerTableToken) {
+            popupLoader(1, '해당 상품 테이블을 삭제하는 중입니다.');
             $.ajax({
-                url: '/partner/product/table-delete',
+                url: '/api/partner/product/delete-table',
                 type: 'POST',
                 dataType: 'JSON',
                 contentType: 'application/json', // 서버에서 JSON을 기대하는 경우 명시적으로 설정
                 data: JSON.stringify({ // 데이터를 JSON 문자열로 변환
-                    apiToken: apiToken,
-                    partnerTableToken: partnerTableToken
+                    apiToken,
+                    partnerTableToken
                 }),
-                success: function(response) {
-                    console.log('삭제 성공:', response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('삭제 오류:', status, error);
-                }
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
             });
-        }
-
-        // 응답 처리 로직 분리
-        function handleDeleteResponse(response) {
-            if (response.status) {
-                Swal.fire('삭제 완료!', '테이블이 성공적으로 삭제되었습니다.', 'success').then((result) => {
-                    if (result.isConfirmed) {
-                        location.reload(); // 성공 후 페이지 리로드
-                    }
-                });
-            } else {
-                Swal.fire('오류!', response.message, 'error');
-            }
-        }
-
-
-        function editPartnerTable() {
-            var partnerTableToken = $('#partnerTableToken').val(); // 현재 선택된 테이블 토큰
-            var newTableName = prompt("새 테이블 이름을 입력해 주세요:");
-
-            if (newTableName) {
-                $.ajax({
-                    url: '/partner/account-setting/table/edit', // 서버 엔드포인트
-                    type: 'POST',
-                    dataType: "JSON",
-                    data: {
-                        apiToken,
-                        productCodes,
-                        token: partnerTableToken,
-                        newName: newTableName
-                    },
-                    success: function(response) {
-                        if (response.status) {
-                            Swal.fire('업데이트 완료!', '테이블 이름이 업데이트 되었습니다.', 'success');
-                            // 페이지 또는 데이터 새로고침 로직 필요 시 여기에 추가
-                            Swal.fire({
-                                icon: icon,
-                                title: message
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    location.reload(); // 데이터 삭제 후 페이지 전체를 리로드
-                                }
-                            });
-                        } else {
-                            Swal.fire('오류!', response.message, 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.fire('오류!', '서버와의 통신 중 오류가 발생했습니다.', 'error');
-                    }
-                });
-            } else {
-                alert("테이블 이름은 비어 있을 수 없습니다.");
-            }
         }
     </script>
 @endsection

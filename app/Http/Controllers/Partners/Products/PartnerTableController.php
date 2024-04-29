@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Validator as ValidationValidator;
 
 class PartnerTableController extends Controller
 {
@@ -62,65 +63,84 @@ class PartnerTableController extends Controller
             ];
         }
     }
+    public function updatePartnerTable(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required|string|exists:partner_tables,token',
+            'title' => 'required|min:2'
+        ], [
+            'token' => "유효한 테이블을 선택해주세요.",
+            'title' => "테이블명은 최소 2자 이상이어야 합니다."
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first(),
+                'error' => $validator->errors()
+            ];
+        }
+        $token = $request->token;
+        $title = $request->title;
+        return $this->editPartnerTable($token, $title);
+    }
+    public function editPartnerTable($partnerTableToken, $title)
+    {
+        try {
+            DB::table('partner_tables')
+                ->where('token', $partnerTableToken)
+                ->update([
+                    'title' => $title
+                ]);
+            return [
+                'status' => true,
+                'message' => '테이블명을 성공적으로 수정했습니다.',
+                'data' => []
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '테이블을 수정하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
     public function deletePartnerTable(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'partnerTableToken' => 'required|uuid'
+            'partnerTableToken' => 'required|string|exists:partner_tables,token'
+        ], [
+            'partnerTableToken' => "유효한 테이블을 선택해주세요."
         ]);
-
         if ($validator->fails()) {
-            return response()->json([
+            return [
                 'status' => false,
-                'message' => $validator->errors()->first()
-            ], 422);
+                'message' => $validator->errors()->first(),
+                'error' => $validator->errors()
+            ];
         }
-
-        $partnerId = $this->getPartnerIdByToken($request->apiToken);
-
-        if (!$partnerId) {
-            return response()->json([
-                'status' => false,
-                'message' => '인증 실패'
-            ], 401);
-        }
-
-        return $this->destroy($partnerId, $request->partnerTableToken);
+        $partnerTableToken = $request->partnerTableToken;
+        return $this->destroyPartnerTable($partnerTableToken);
     }
 
-    protected function destroy($partnerId, $partnerTableToken)
+    protected function destroyPartnerTable($partnerTableToken)
     {
-        $table = DB::table('partner_tables')
-            ->where('partner_id', $partnerId)
-            ->where('token', $partnerTableToken)
-            ->first();
-
-        if (!$table) {
-            return response()->json([
-                'status' => false,
-                'message' => '테이블이 존재하지 않거나 접근 권한이 없습니다.'
-            ], 404);
-        }
-
         try {
-            DB::table('partner_tables')->where('id', $table->id)->delete();
-
-            return response()->json([
+            $partnerTable = DB::table('partner_tables')
+                ->where('token', $partnerTableToken)
+                ->update([
+                    'is_active' => 'N'
+                ]);
+            return [
                 'status' => true,
-                'message' => '테이블이 성공적으로 삭제되었습니다.'
-            ], 200);
+                'message' => "해당 테이블을 성공적으로 삭제했습니다.",
+                'data' => []
+            ];
         } catch (\Exception $e) {
-            return response()->json([
+            return [
                 'status' => false,
-                'message' => '테이블 삭제 중 오류가 발생했습니다.',
+                'message' => "테이블을 삭제하는 과정에서 오류가 발생했습니다.",
                 'error' => $e->getMessage()
-            ], 500);
+            ];
         }
-    }
-
-    private function getPartnerIdByToken($apiToken)
-    {
-        $partner = DB::table('partners')->where('api_token', $apiToken)->first('id');
-
-        return $partner ? $partner->id : null;
     }
 }

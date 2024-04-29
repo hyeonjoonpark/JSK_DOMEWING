@@ -191,7 +191,8 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     Route::prefix('product')->group(function () {
         Route::post('view', [ViewController::class, 'main']);
         Route::post('create-table', [PartnerTableController::class, 'create']);
-        Route::post('table-delete', [PartnerTableController::class, 'deletePartnerTable']);
+        Route::post('update-table', [PartnerTableController::class, 'updatePartnerTable']);
+        Route::post('delete-table', [PartnerTableController::class, 'deletePartnerTable']);
         Route::post('collect', [ManageController::class, 'add']);
         Route::post('upload', [UploadController::class, 'create']);
         Route::post('delete-product', [ManageController::class, 'deleteProduct']);

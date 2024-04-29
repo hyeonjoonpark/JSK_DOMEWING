@@ -36,7 +36,9 @@ class UploadedController extends Controller
             ->orderByDesc('up.created_at')
             ->select([
                 'mp.productCode',
-                'mp.productName',
+                'pp.product_name AS ppName',
+                'up.product_name AS upName',
+                'mp.productName AS mpName',
                 'mp.productImage',
                 'up.price',
                 DB::raw("CEIL((mp.productPrice * $marginRate)) AS productPrice"), // 계산식 수정
