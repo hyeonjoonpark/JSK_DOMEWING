@@ -74,4 +74,19 @@ class SmartStoreApiController extends Controller
             ];
         }
     }
+    public function smart_store()
+    {
+        $ssac = new SmartStoreApiController();
+        $account = DB::table('smart_store_accounts')
+            ->where('partner_id', Auth::guard('partner')->id())
+            ->first();
+        $contentType = 'application/json';
+        $method = 'DELETE';
+        $url = 'https://api.commerce.naver.com/external/v2/products/origin-products/GNSBE';
+        $data = [
+            'originProductNo' => 'GNSBE' //url 안되면    데이터코드 넣는법
+        ]; // gpt 라라벨 tinker로 메소드 실행하는법
+        $response = $ssac->builder($account, $contentType, $method, $url, $data);
+        return $response;
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use Carbon\Carbon;
 use DateTime;
+use DateTimeZone;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
@@ -23,51 +24,70 @@ class OrderController extends Controller
         $orderIds = $this->getOrderIds($orderList);
 
 
-        $responseDetail = $this->smart_storeDetail();
+        // $responseDetail = $this->smart_storeDetail($orderIds);
         $orderDetails = $this->getOrderDetails($orderIds);
         return view('partner.orders_list', [
             'orderList' => $orderList,
-            'responseDetail' => $responseDetail,
+            // 'responseDetail' => $responseDetail,
             'orderDetails' => $orderDetails
         ]);
     }
-    public function getOrderList()
+    public function getOrderList($start = null, $end = null)
     {
-
         $account = $this->getAccount();
         $contentType = 'application/json';
         $method = 'GET';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses';
-        $data = [
-            'lastChangedFrom' => Carbon::now()->subDays(1)->format('Y-m-d\TH:i:s.vP'),
-            'lastChangedTo' => Carbon::now()->subDays(0)->format('Y-m-d\TH:i:s.vP'),
-        ];
-        $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
-        return $response;
+
+
+        $startDate = $start ? new DateTime($start) : new DateTime('now - 6 days');
+        $endDate = $end ? new DateTime($end) : new DateTime('now');
+
+        $responses = [];
+        for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
+            $formattedDate = $this->convertDateFormat($date->format('Y-m-d'));
+            $data = ['lastChangedFrom' => $formattedDate];
+
+            $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
+            $responses[$formattedDate] = $response;
+        }
+        return $responses;
     }
-    private function getOrderIds($request)
+
+
+    private function convertDateFormat($inputDate)
+    {
+        $date = new DateTime($inputDate, new DateTimeZone('Asia/Seoul'));
+        return $date->format('Y-m-d\TH:i:s.vP');
+    }
+
+    private function getOrderIds($response)
     {
         $orderIds = [];
-        if (isset($request['data']['data']['lastChangeStatuses'])) {
-            foreach ($request['data']['data']['lastChangeStatuses'] as $status) {
-                if (isset($status['productOrderId'])) {
-                    $orderIds[] = $status['productOrderId'];
+        foreach ($response as $dateKey => $dateData) {
+            if (isset($dateData['data']['data']['lastChangeStatuses'])) {
+                foreach ($dateData['data']['data']['lastChangeStatuses'] as $status) {
+                    if (isset($status['productOrderId'])) {
+                        $orderIds[] = $status['productOrderId'];
+                    }
                 }
             }
         }
         return $orderIds;
     }
-    public function smart_storeDetail()
-    {
 
-        $account = $this->getAccount();
-        $contentType = 'application/json';
-        $method = 'GET';
-        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/orders/2024042534417071/product-order-ids';
-        $data = [];
-        $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
-        return $response;
-    }
+
+    // public function smart_storeDetail($productOrderIds)
+    // {
+    //     $account = $this->getAccount();
+    //     $contentType = 'application/json';
+    //     $method = 'GET';
+    //     $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/orders/' . $productOrderIds . '/product-order-ids';
+
+    //     $data = [];
+    //     $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
+    //     return $response;
+    // }
     public function getOrderDetails($productOrderIds)
     {
         $account = $this->getAccount();
@@ -76,6 +96,10 @@ class OrderController extends Controller
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query';
         $data = ['productOrderIds' => $productOrderIds];
         $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
+
+        if (!isset($response['data']['data'])) {
+            return ['error' => '응답 데이터가 올바르지 않습니다.'];
+        }
 
         $statusMap = [
             'PAYMENT_WAITING' => '결제 대기',
@@ -86,26 +110,27 @@ class OrderController extends Controller
             'CANCELED' => '취소',
             'RETURNED' => '반품',
             'CANCELED_BY_NOPAYMENT' => '미결제 취소',
-            'PURCHASE_DECIDED' => '구매 확정'
+            'PURCHASE_DECIDED' => '구매 확정',
         ];
-        if (isset($response['data']) && isset($response['data']['data'])) {
-            foreach ($response['data']['data'] as &$item) {
-                if (isset($item['productOrder']['productOrderStatus'])) {
-                    $item['productOrder']['productOrderStatus'] = $statusMap[$item['productOrder']['productOrderStatus']] ?? '상태 미정';
-                }
-                if (isset($item['order']['orderDate'])) {
-                    $date = new DateTime($item['order']['orderDate']);
-                    $item['order']['orderDate'] = $date->format('Y-m-d H:i:s');
-                }
-                $item['order']['market'] = '스마트스토어';
-            }
-        }
-        return $response;
+
+        $formattedResponse = array_map(function ($item) use ($statusMap) {
+            return [
+                'market' => $item['order']['market'] ?? '스마트스토어',
+                'orderId' => $item['order']['orderId'] ?? 'N/A',
+                'ordererName' => $item['order']['ordererName'] ?? 'N/A',
+                'orderDate' => isset($item['order']['orderDate']) ? (new DateTime($item['order']['orderDate']))->format('Y-m-d H:i:s') : 'N/A',
+                'productOrderId' => $item['productOrder']['productOrderId'] ?? 'N/A',
+                'productName' => $item['productOrder']['productName'] ?? 'N/A',
+                'quantity' => $item['productOrder']['quantity'] ?? 'N/A',
+                'unitPrice' => $item['productOrder']['unitPrice'] ?? 'N/A',
+                'totalPaymentAmount' => $item['productOrder']['totalPaymentAmount'] ?? 'N/A',
+                'deliveryFeeAmount' => $item['productOrder']['deliveryFeeAmount'] ?? 'N/A',
+                'productOrderStatus' => $statusMap[$item['productOrder']['productOrderStatus']] ?? '상태 미정',
+            ];
+        }, $response['data']['data']);
+
+        return $formattedResponse;
     }
-
-
-
-
     private function getAccount()
     {
         return DB::table('smart_store_accounts')->where('partner_id', Auth::guard('partner')->id())->first();
