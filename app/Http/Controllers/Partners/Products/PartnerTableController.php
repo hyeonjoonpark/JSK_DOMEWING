@@ -62,4 +62,55 @@ class PartnerTableController extends Controller
             ];
         }
     }
+    public function delete(Request $request)
+    {
+        // 컨트롤러
+        $validator = Validator::make($request->all(), [
+            'tableToken' => 'required|uuid'
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ];
+        }
+
+        $partnerId = DB::table('partners')
+            ->where('api_token', $request->apiToken)
+            ->first('id');
+
+        if (!$partnerId) {
+            return [
+                'status' => false,
+                'message' => '인증 실패'
+            ];
+        }
+
+        $partnerId = $partnerId->id;
+        $tableToken = $request->tableToken;
+
+        return $this->destroy($partnerId, $tableToken);
+    }
+    protected function destroy($partnerId, $tableToken)
+    {
+        $table = DB::table('partner_tables')
+            ->where('partner_id', $partnerId)
+            ->where('token', $tableToken)
+            ->first();
+
+        if (!$table) {
+            return response()->json(['status' => false, 'message' => '테이블이 존재하지 않거나 접근 권한이 없습니다.'], 404);
+        }
+
+        try {
+            DB::table('partner_tables')
+                ->where('id', $table->id)
+                ->delete();
+
+            return response()->json(['status' => true, 'message' => '테이블이 성공적으로 삭제되었습니다.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => '테이블 삭제 중 오류가 발생했습니다.', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

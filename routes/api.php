@@ -184,6 +184,7 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
             Route::post('edit', [SmartStoreAccountController::class, 'edit']);
             Route::post('delete', [SmartStoreAccountController::class, 'delete']);
         });
+        Route::post('table-delete', [PartnerTableController::class, 'deletePartnerTable']);
     });
     Route::prefix('product')->group(function () {
         Route::post('view', [ViewController::class, 'main']);
@@ -195,3 +196,4 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
 Route::post('sellwing-api/auth', [AuthController::class, 'main']);
+// Route::post('table/delete', [PartnerTableController::class, 'deleteTable']);

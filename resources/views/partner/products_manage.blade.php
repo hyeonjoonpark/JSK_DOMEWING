@@ -75,7 +75,8 @@
 @section('content')
     <div class="row g-gs">
         <div class="col-12 text-center">
-            <button class="btn btn-primary" onclick="$('#createProductTableModal').modal('show')">상품 테이블 생성</button>
+            <button class="btn btn-primary" onclick="$('#createProductTableModal').modal('show');">상품 테이블 생성</button>
+            <button class="btn btn-secondary ml-2" onclick="$('#partnerTableModal').modal('show');">상품 테이블 관리</button>
         </div>
         <div class="col-12">
             <div class="card card-bordered">
@@ -177,7 +178,8 @@
                                             </td>
                                             <td>
                                                 <button class="btn btn-success" onclick="edit();">수정</button>
-                                                <button class="btn btn-danger" onclick="del();">삭제</button>
+                                                <button class="btn btn-danger"
+                                                    onclick="del('{{ $product->productCode }}');">삭제</button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -197,6 +199,32 @@
         </div>
     </div>
     <button id="topBtn" onclick="topFunction()">Top</button>
+    <div class="modal" role="dialog" id="partnerTableModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">상품 테이블 관리</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-gs">
+                        @foreach ($partnerTables as $partnerTable)
+                            <div class="col-12">
+                                <div class="d-flex text-nowrap">
+                                    <input type="text" class="form-control" value="{{ $partnerTable->title }}">
+                                    <button class="btn btn-success">수정</button>
+                                    <button class="btn btn-danger"
+                                        onclick="initDeletePartnerTable('{{ $partnerTable->token }}')">삭제</button>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>
@@ -282,10 +310,22 @@
             });
         }
 
-        function del() {
+        function del(productCode) {
+            const html = `
+            <h6 class="title">상품 삭제</h6>
+            <p>정말로 해당 상품을 삭제하시겠습니까?<br>이 작업은 돌이킬 수 없습니다.</p>
+            `;
             Swal.fire({
                 icon: "warning",
-                text: "해당 기능은 업데이트 중입니다."
+                html: html,
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const productCodes = [productCode];
+                    requestDelete(productCodes);
+                }
             });
         }
 
@@ -302,15 +342,15 @@
                 confirmButtonText: "확인"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    requestDelete();
+                    const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
+                        return $(this).val();
+                    }).get();
+                    requestDelete(productCodes);
                 }
             });
         }
 
-        function requestDelete() {
-            const productCodes = $('input[name="selectedProducts"]:checked').map(function() {
-                return $(this).val();
-            }).get();
+        function requestDelete(productCodes) {
             $.ajax({
                 url: "/api/partner/product/delete-product",
                 type: "POST",
@@ -340,6 +380,96 @@
                     console.log(error);
                 }
             });
+        }
+
+        function initDeletePartnerTable(partnerTableToken) {
+            // 삭제 확인 대화 상자 설정
+            Swal.fire({
+                title: '테이블 삭제',
+                text: "정말 이 테이블을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deletePartnerTable(partnerTableToken);
+                }
+            });
+        }
+
+        // 테이블 삭제 로직을 별도의 함수로 분리하여 관리 및 유지보수 용이성 향상
+        function deletePartnerTable(tableToken) {
+            $.ajax({
+                url: '/partner/account-setting/table-delete', // 수정된 URL
+                type: 'POST',
+                dataType: "JSON",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    apiToken,
+                    tableToken
+                }),
+                success: function(response) {
+                    console.log('삭제 성공:', response);
+                },
+                error: function(xhr, status, error) {
+                    console.error('삭제 오류:', status, error);
+                }
+            });
+        }
+
+        // 응답 처리 로직 분리
+        function handleDeleteResponse(response) {
+            if (response.status) {
+                Swal.fire('삭제 완료!', '테이블이 성공적으로 삭제되었습니다.', 'success').then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload(); // 성공 후 페이지 리로드
+                    }
+                });
+            } else {
+                Swal.fire('오류!', response.message, 'error');
+            }
+        }
+
+
+        function editPartnerTable() {
+            var tableToken = $('#partnerTableToken').val(); // 현재 선택된 테이블 토큰
+            var newTableName = prompt("새 테이블 이름을 입력해 주세요:");
+
+            if (newTableName) {
+                $.ajax({
+                    url: '/partner/account-setting/table/edit', // 서버 엔드포인트
+                    type: 'POST',
+                    dataType: "JSON",
+                    data: {
+                        apiToken,
+                        productCodes,
+                        token: tableToken,
+                        newName: newTableName
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            Swal.fire('업데이트 완료!', '테이블 이름이 업데이트 되었습니다.', 'success');
+                            // 페이지 또는 데이터 새로고침 로직 필요 시 여기에 추가
+                            Swal.fire({
+                                icon: icon,
+                                title: message
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload(); // 데이터 삭제 후 페이지 전체를 리로드
+                                }
+                            });
+                        } else {
+                            Swal.fire('오류!', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('오류!', '서버와의 통신 중 오류가 발생했습니다.', 'error');
+                    }
+                });
+            } else {
+                alert("테이블 이름은 비어 있을 수 없습니다.");
+            }
         }
     </script>
 @endsection
