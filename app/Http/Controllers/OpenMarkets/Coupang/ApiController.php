@@ -44,7 +44,6 @@ class ApiController extends Controller
         $signature = hash_hmac('sha256', $message, $secretKey);
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
-        echo $url;
         $response = Http::withHeaders([
             'Authorization' => $authorization,
             'Content-Type' => $contentType
