@@ -16,13 +16,13 @@ use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
 use App\Http\Controllers\Partners\ForgotPasswordController;
 use App\Http\Controllers\Partners\LoginController as PartnersLoginController;
-use App\Http\Controllers\Partners\OrderController;
 use App\Http\Controllers\Partners\Products\CollectController;
 use App\Http\Controllers\Partners\Products\ManageController;
 use App\Http\Controllers\Partners\Products\UploadController;
 use App\Http\Controllers\Partners\Products\UploadedController;
 use App\Http\Controllers\Partners\RegisterController as PartnersRegisterController;
 use App\Http\Controllers\ProductEditor\ViewController;
+use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\Testmonial\TestmonialController;
 
 // 셀윙 파트너스.
@@ -54,7 +54,7 @@ Route::prefix('partner')->group(function () {
             Route::get('sale', [UploadedController::class, 'index'])->name('partner.products.uploaded');
         });
         Route::prefix('orders')->group(function () {
-            Route::get('list', [OrderController::class, 'index'])->name('partner.orders.list');
+            Route::get('list', [SmartStoreOrderController::class, 'index'])->name('partner.orders.list');
         });
     });
 });

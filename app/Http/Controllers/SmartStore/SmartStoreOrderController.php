@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Partners;
+namespace App\Http\Controllers\SmartStore;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
-use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 
-class OrderController extends Controller
+class SmartStoreOrderController extends Controller
 {
     private $ssac;
     public function __construct()
