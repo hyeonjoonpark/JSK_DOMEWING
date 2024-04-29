@@ -401,15 +401,15 @@
         }
 
         // 테이블 삭제 로직을 별도의 함수로 분리하여 관리 및 유지보수 용이성 향상
-        function deletePartnerTable(tableToken) {
+        function deletePartnerTable(apiToken, partnerTableToken) {
             $.ajax({
-                url: '/partner/account-setting/table-delete', // 수정된 URL
+                url: '/partner/product/table-delete',
                 type: 'POST',
-                dataType: "JSON",
-                contentType: "application/json",
-                data: JSON.stringify({
-                    apiToken,
-                    tableToken
+                dataType: 'JSON',
+                contentType: 'application/json', // 서버에서 JSON을 기대하는 경우 명시적으로 설정
+                data: JSON.stringify({ // 데이터를 JSON 문자열로 변환
+                    apiToken: apiToken,
+                    partnerTableToken: partnerTableToken
                 }),
                 success: function(response) {
                     console.log('삭제 성공:', response);
@@ -435,7 +435,7 @@
 
 
         function editPartnerTable() {
-            var tableToken = $('#partnerTableToken').val(); // 현재 선택된 테이블 토큰
+            var partnerTableToken = $('#partnerTableToken').val(); // 현재 선택된 테이블 토큰
             var newTableName = prompt("새 테이블 이름을 입력해 주세요:");
 
             if (newTableName) {
@@ -446,7 +446,7 @@
                     data: {
                         apiToken,
                         productCodes,
-                        token: tableToken,
+                        token: partnerTableToken,
                         newName: newTableName
                     },
                     success: function(response) {
