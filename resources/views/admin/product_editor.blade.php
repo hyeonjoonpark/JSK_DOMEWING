@@ -117,6 +117,7 @@
                     processData: false,
                     contentType: false,
                     success: function(response) {
+                        console.log(response);
                         closePopup();
                         const status = response.status;
                         if (status === true) {

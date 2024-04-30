@@ -125,11 +125,15 @@ class PartnerTableController extends Controller
     protected function destroyPartnerTable($partnerTableToken)
     {
         try {
-            $partnerTable = DB::table('partner_tables')
+            DB::table('partner_tables')
                 ->where('token', $partnerTableToken)
                 ->update([
                     'is_active' => 'N'
                 ]);
+            DB::table('partner_products AS pp')
+                ->join('partner_tables AS pt', 'pt.id', '=', 'pp.partner_table_id')
+                ->where('pt.token', $partnerTableToken)
+                ->delete();
             return [
                 'status' => true,
                 'message' => "해당 테이블을 성공적으로 삭제했습니다.",
