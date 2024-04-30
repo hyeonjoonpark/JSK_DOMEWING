@@ -47,10 +47,10 @@ class MainController extends Controller
             $columnMappings = [
                 'A' => 'productCode',
                 'B' => 'categoryID',
-                'C' => 'productName',
+                // 'C' => 'productName',
                 'D' => 'productKeywords',
-                'E' => 'productPrice',
-                'F' => 'productDetail',
+                // 'E' => 'productPrice',
+                // 'F' => 'productDetail',
             ];
             $errors = [];
             $products = [];
