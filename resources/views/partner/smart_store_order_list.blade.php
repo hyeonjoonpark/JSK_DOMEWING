@@ -138,7 +138,13 @@
                                     <td>{{ $item['orderId'] ?? 'N/A' }}</td>
                                     <td>{{ $item['productOrderId'] ?? 'N/A' }}</td>
                                     <td>{{ $item['ordererName'] ?? 'N/A' }}</td>
-                                    <td>{{ $item['productName'] ?? 'N/A' }}</td>
+                                    <!-- 상품명 클릭 시 모달을 표시하는 링크 -->
+                                    <td><a href="#" class="product-name" data-toggle="modal"
+                                            data-target="#exampleModal"
+                                            data-product-name="{{ $item['productName'] ?? 'N/A' }}"
+                                            data-quantity="{{ $item['quantity'] ?? 'N/A' }}"
+                                            data-price="{{ $item['unitPrice'] ?? '0' }}">{{ $item['productName'] ?? 'N/A' }}</a>
+                                    </td>
                                     <td>{{ $item['quantity'] ?? 'N/A' }}</td>
                                     <td>{{ $item['unitPrice'] ?? 'N/A' }}</td>
                                     <td>{{ $item['totalPaymentAmount'] ?? 'N/A' }}</td>
@@ -156,14 +162,41 @@
         </div><!-- .card-preview -->
     </div>
     </div>
-    <pre>
-        {{ print_r($orderList) }}
-    </pre>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">상품 상세 정보</h5>
+                    <!-- 모달 닫기 버튼 (상단의 X 버튼) -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- 여기에 콘텐츠를 넣습니다 -->
+                    <p id="modalProductContent">상품 정보가 여기에 표시됩니다.</p>
+                </div>
+                <div class="modal-footer">
+                    <!-- 모달 닫기 버튼 (하단의 닫기 버튼) -->
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <pre>
         {{ print_r($orderDetails) }}
     </pre>
 @endsection
 @section('scripts')
+    <!-- jQuery 라이브러리 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Bootstrap Bundle JS (Popper.js 포함) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -179,16 +212,10 @@
             });
 
             // 날짜 범위 설정 함수
-            function setDateRange(startId, endId, start, end) {
-                $(startId).data('daterangepicker').setStartDate(start);
-                $(endId).data('daterangepicker').setEndDate(end);
-            }
-
-            // 버튼 이벤트 설정
             $('.date-shortcuts button').click(function() {
-                let period = $(this).data('range');
-                let start = moment();
-                let end = moment();
+                var period = $(this).data('range');
+                var start = moment();
+                var end = moment();
 
                 switch (period) {
                     case 'today':
@@ -205,19 +232,38 @@
                         break;
                 }
 
-                setDateRange('#startDate', '#endDate', start, end);
+                $('#startDate').data('daterangepicker').setStartDate(start);
+                $('#endDate').data('daterangepicker').setEndDate(end);
             });
-        });
-        document.addEventListener('DOMContentLoaded', function() {
+
             // 전체 선택 체크박스
-            var selectAllCheckbox = document.getElementById('selectAll');
-            selectAllCheckbox.addEventListener('change', function() {
-                // 모든 체크박스
-                var checkboxes = document.querySelectorAll('.datatable-init tbody input[type="checkbox"]');
-                for (var checkbox of checkboxes) {
-                    checkbox.checked = this.checked;
-                }
+            $('#selectAll').change(function() {
+                $('.datatable-init tbody input[type="checkbox"]').prop('checked', this.checked);
             });
+
+
+            // 상품명 클릭 이벤트
+            $('.product-name').click(function(event) {
+                event.preventDefault();
+                var productName = $(this).data('productName');
+                var price = $(this).data('price');
+                var quantity = $(this).data('quantity');
+                var modalContentHtml = `
+        <p><strong>상품명:</strong> ${productName}</p>
+        <p><strong>가격:</strong> ₩${price}</p>
+        <p><strong>수량:</strong> ${quantity}</p>
+    `;
+
+                $('#modalProductContent').html(modalContentHtml);
+                $('#exampleModal').modal('show');
+            });
+
+            // 모달 닫기 이벤트
+            $('#exampleModal').on('hidden.bs.modal', function() {
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            });
+
         });
     </script>
 @endsection
