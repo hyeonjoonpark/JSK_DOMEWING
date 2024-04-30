@@ -902,7 +902,7 @@ class FormProductController extends Controller
     {
         try {
             // 엑셀 파일 로드
-            $spreadsheet = IOFactory::load(public_path('assets/excel/domeggook.xls'));
+            $spreadsheet = IOFactory::load(public_path('assets/excel/domeggook2.xls'));
             $sheet = $spreadsheet->getSheet(0);
             // 데이터 추가
             $rowIndex = 2;
@@ -990,7 +990,7 @@ class FormProductController extends Controller
                 $rowIndex++;
             }
             // 엑셀 파일 저장
-            $fileName = 'domeggook_' . now()->format('YmdHis') . '_' . $index . '.xls';
+            $fileName = 'domeggook2_' . now()->format('YmdHis') . '_' . $index . '.xls';
             $formedExcelFile = public_path('assets/excel/formed/' . $fileName);
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);

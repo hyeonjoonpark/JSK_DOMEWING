@@ -23,7 +23,11 @@ const puppeteer = require('puppeteer');
         await new Promise((page) => setTimeout(page, 3000));
         await frame.click('#lXlsReqNoticeBtnClose');
         await new Promise((page) => setTimeout(page, 70000));
-        console.log(true);
+        const elements = await page.$$('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody tr');
+        if (elements) {
+            return console.log(true);
+        }
+        else return console.log(false);
     } catch (error) {
         console.error('Error:', error);
     } finally {
