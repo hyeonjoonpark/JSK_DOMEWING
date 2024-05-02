@@ -134,6 +134,9 @@
                             });
                             swalSuccess(response.return);
                         } else {
+                            if (response.message) {
+                                swalError(response.message);
+                            }
                             const errors = response.errors;
                             let html = "";
                             for (const error of errors) {
