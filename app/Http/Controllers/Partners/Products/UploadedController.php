@@ -47,7 +47,8 @@ class UploadedController extends Controller
                 'up.origin_product_no',
                 'va.username',
                 'up.created_at',
-                'up.origin_product_no'
+                'up.origin_product_no',
+                'mp.createdAt AS mca'
             ])
             ->paginate(500);
         return view('partner.products_uploaded', [
