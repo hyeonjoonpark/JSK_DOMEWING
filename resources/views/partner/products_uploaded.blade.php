@@ -178,7 +178,7 @@
                                     <td class="text-nowrap">
                                         <button class="btn btn-success" onclick="onUpdate();">수정</button>
                                         <button class="btn btn-danger"
-                                            onclick="onUpdate(('{{ $product->origin_product_no }}'));">삭제</button>
+                                            onclick="onDelete(['{{ $product->origin_product_no }}']);">삭제</button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -196,19 +196,22 @@
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
 
-        function onDelete(origin_product_no) {
-            const html = `
-            <h6 class="title">상품 삭제</h6>
-            <p>정말로 해당 상품을 삭제하시겠습니까?<br>이 작업은 돌이킬 수 없습니다.</p>
-            `;
-            Swal.fire({
-                icon: "warning",
-                html: html,
-                showCancelButton: true,
-                cancelButtonText: "취소",
-                confirmButtonText: "확인"
-            })
-            console.log(origin_product_no);
+        function onDelete(originProductNo) {
+            $.ajax({
+                url: "/api/partner/product/delete-uploaded",
+                type: 'POST',
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    originProductNo
+                },
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
         }
 
         function view(productCode) {

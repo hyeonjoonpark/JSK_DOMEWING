@@ -58,22 +58,27 @@ class UploadedController extends Controller
     }
     public function delete(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'productCodes' => 'required|array|min:1',
-            'originProductNo' => 'required|array|min:2'
-        ], [
-            'productCodes' => '삭제할 상품을 최소 1개 이상 선택해주세요.',
-            'originProductNo' => '삭제할게 없어요 ㅠ'
-        ]);
-        if ($validator->fails()) {
-            return [
-                'status' => false,
-                'message' => $validator->errors()->first()
-            ];
-        }
-        $productCodes = $request->productCodes;
-        $originProductsNo = $request->originProductNo;
-        return $this->destroy($productCodes, $originProductsNo);
+        // $validator = Validator::make($request->all(), [
+        //     'productCodes' => 'required|array|min:1',
+        //     'originProductNo' => 'required|array|min:2'
+        // ], [
+        //     'productCodes' => '삭제할 상품을 최소 1개 이상 선택해주세요.',
+        //     'originProductNo' => '삭제할게 없어요 ㅠ'
+        // ]);
+        // if ($validator->fails()) {
+        //     return [
+        //         'status' => false,
+        //         'message' => $validator->errors()->first()
+        //     ];
+        // }
+        // $productCodes = $request->productCodes;
+        // $originProductsNo = $request->originProductNo;
+        // return $this->destroy($productCodes, $originProductsNo);
+        return [
+            'status' => true,
+            'message' => 'success',
+            'data' => $request
+        ];
     }
     public function destroy()
     {
