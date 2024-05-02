@@ -92,6 +92,10 @@
                                     <a href="/partner/account-setting/accounts-management" class="nk-menu-link"><span
                                             class="nk-menu-text">오픈마켓 계정 관리</span></a>
                                 </li>
+                                <li class="nk-menu-item">
+                                    <a href="/partner/account-setting/dowewing-integration" class="nk-menu-link"><span
+                                            class="nk-menu-text">도매윙 계정 연동</span></a>
+                                </li>
                             </ul>
                         </li>
                         <li class="nk-menu-item">
