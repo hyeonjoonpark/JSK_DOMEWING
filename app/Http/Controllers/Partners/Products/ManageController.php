@@ -154,7 +154,7 @@ class ManageController extends Controller
             DB::table('partner_products AS pp')
                 ->join('minewing_products AS mp', 'mp.id', '=', 'pp.product_id')
                 ->whereIn('mp.productCode', $productCodes)
-                ->delete(); //destroy
+                ->delete();
             return [
                 'status' => true,
                 'message' => '선택된 상품들이 성공적으로 삭제되었습니다.'
