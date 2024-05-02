@@ -79,6 +79,13 @@ class SmartstoreProductUpload extends Controller
     }
     private function generateParam($product, $productImage)
     {
+        $productKeywords = explode(',', $product->productKeywords);
+        $sellerTags = [];
+        foreach ($productKeywords as $keyword) {
+            $sellerTags[] = [
+                'text' => $keyword
+            ];
+        }
         $data = [
             'originProduct' => [
                 'statusType' => 'SALE',
@@ -90,7 +97,7 @@ class SmartstoreProductUpload extends Controller
                         'url' => $productImage
                     ]
                 ],
-                'salePrice' => $product->productPrice,
+                'salePrice' => $product->productPrice * 2,
                 'stockQuantity' => 9999,
                 'deliveryInfo' => [
                     'deliveryType' => 'DELIVERY',
@@ -144,6 +151,31 @@ class SmartstoreProductUpload extends Controller
                             'manufacturer' => '제이에스',
                             'afterServiceDirector' => '제이에스',
                         ]
+                    ]
+                ],
+                'customerBenefit' => [
+                    'immediateDiscountPolicy' => [
+                        'discountMethod' => [
+                            'value' => 50,
+                            'unitType' => 'PERCENT'
+                        ]
+                    ],
+                    'reviewPolicy' => [
+                        'textReviewPoint' => 100,
+                        'photoVideoReviewPoint' => 150,
+                        'afterUseTextReviewPoint' => 100,
+                        'afterUsePhotoVideoReviewPoint' => 150
+                    ],
+                    'giftPolicy' => [
+                        'presentContent' => '리뷰 이벤트'
+                    ],
+                    'multiPurchaseDiscountPolicy' => [
+                        'discountMethod' => [
+                            'value' => 1,
+                            'unitType' => 'PERCENT'
+                        ],
+                        'orderValue' => '5',
+                        'orderValueUnitType' => 'COUNT'
                     ]
                 ]
             ],

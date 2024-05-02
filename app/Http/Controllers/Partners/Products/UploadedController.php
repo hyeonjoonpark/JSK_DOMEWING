@@ -31,13 +31,11 @@ class UploadedController extends Controller
             ->join($vendorEngName . '_accounts AS va', 'va.id', '=', 'up.' . $vendorEngName . '_account_id')
             ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
             ->join('partners AS p', 'p.id', '=', 'va.partner_id')
-            ->join('partner_products AS pp', 'pp.product_id', '=', 'mp.id')
             ->where('up.is_active', 'Y')
             ->where('va.partner_id', Auth::guard('partner')->id())
             ->orderByDesc('up.created_at')
             ->select([
                 'mp.productCode',
-                'pp.product_name AS ppName',
                 'up.product_name AS upName',
                 'mp.productName AS mpName',
                 'mp.productImage',
@@ -49,7 +47,6 @@ class UploadedController extends Controller
                 'up.origin_product_no',
                 'va.username',
                 'up.created_at',
-                'pp.created_at AS pca',
                 'up.origin_product_no'
             ])
             ->paginate(500);
@@ -62,9 +59,11 @@ class UploadedController extends Controller
     public function delete(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'productCodes' => 'required|array|min:1'
+            'productCodes' => 'required|array|min:1',
+            'originProductNo' => 'required|array|min:2'
         ], [
-            'productCodes' => '삭제할 상품을 최소 1개 이상 선택해주세요.'
+            'productCodes' => '삭제할 상품을 최소 1개 이상 선택해주세요.',
+            'originProductNo' => '삭제할게 없어요 ㅠ'
         ]);
         if ($validator->fails()) {
             return [
@@ -73,7 +72,8 @@ class UploadedController extends Controller
             ];
         }
         $productCodes = $request->productCodes;
-        return $this->destroy($productCodes);
+        $originProductsNo = $request->originProductNo;
+        return $this->destroy($productCodes, $originProductsNo);
     }
     public function destroy()
     {

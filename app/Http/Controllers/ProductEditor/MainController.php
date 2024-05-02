@@ -43,31 +43,24 @@ class MainController extends Controller
         try {
             $spreadsheet = IOFactory::load($productsExcelFile->getRealPath());
             $sheet = $spreadsheet->getSheet(0);
-            $isFirstRow = true;
-            $columnMappings = [
-                'A' => 'productCode',
-                'B' => 'categoryID',
-                'C' => 'productName',
-                'D' => 'productKeywords',
-                'E' => 'productPrice',
-                'F' => 'productDetail',
-            ];
             $errors = [];
             $products = [];
-            foreach ($sheet->getRowIterator() as $row) {
-                if ($isFirstRow) {
-                    $isFirstRow = false;
-                    continue;
-                }
-                $cellIterator = $row->getCellIterator('A', 'F');
-                $cellIterator->setIterateOnlyExistingCells(false);
-                foreach ($cellIterator as $cell) {
-                    $columnLetter = $cell->getColumn();
-                    if (isset($columnMappings[$columnLetter])) {
-                        $value = $cell->getValue();
-                        $rowData[$columnMappings[$columnLetter]] = $value;
-                    }
-                }
+            $highestRow = $sheet->getHighestRow();
+            if ($highestRow >= 5002) {
+                return [
+                    'status' => false,
+                    'message' => '데이터는 헤더를 제외하고 2번째부터 5001번째 행까지, 총 5000개의 행 이하이어야 합니다.'
+                ];
+            }
+            for ($i = 2; $i <= $highestRow; $i++) {
+                $rowData = [
+                    'productCode' => $sheet->getCell('A' . $i)->getValue(),
+                    'categoryID' => $sheet->getCell('B' . $i)->getValue(),
+                    'productName' => $sheet->getCell('C' . $i)->getValue(),
+                    'productKeywords' => $sheet->getCell('D' . $i)->getValue(),
+                    'productPrice' => $sheet->getCell('E' . $i)->getValue(),
+                    'productDetail' => $sheet->getCell('F' . $i)->getValue()
+                ];
                 $validateColumnsResult = $this->validateColumns($rowData);
                 if ($validateColumnsResult['status'] === false) {
                     $productCode = $validateColumnsResult['return']['productCode'];

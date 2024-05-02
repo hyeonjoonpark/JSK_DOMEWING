@@ -161,7 +161,7 @@
                                         <a class="product-contents" href="javascript:view('{{ $product->productCode }}');">
                                             <p>
                                                 {{ $product->name }}<br>
-                                                <span class="font-weight-bold">{{ $product->ppName }}</span><br>
+                                                <span class="font-weight-bold">{{ $product->mpName }}</span><br>
                                                 {{ $product->productCode }}<br>
                                                 <span
                                                     class="wing-font">{{ number_format($product->productPrice, 0) }}</span>
@@ -171,7 +171,7 @@
                                                     class="wing-font">{{ number_format($product->mp_shipping_fee, 0) }}</span>
                                                 <img class="wing" src="{{ asset('assets/images/wing.svg') }}"
                                                     alt="윙"><br>
-                                                수집 일시: {{ $product->pca }}
+                                                상품 생성일: {{ $product->mca }}
                                             </p>
                                         </a>
                                     </td>
