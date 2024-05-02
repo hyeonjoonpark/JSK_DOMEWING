@@ -130,14 +130,14 @@
                         </thead>
                         <tbody>
                             @foreach ($uploadedProducts as $product)
-                                <tr id="tr{{ $product->productCode }}">
+                                <tr>
                                     <td scope="row">
                                         <div class="custom-control custom-checkbox">
                                             <input type="checkbox" class="custom-control-input"
-                                                id="check{{ $product->productCode }}" name="selectedProducts"
-                                                value="{{ $product->productCode }}">
+                                                id="{{ $product->origin_product_no }}" name="selectedProducts"
+                                                value="{{ $product->origin_product_no }}">
                                             <label class="custom-control-label"
-                                                for="check{{ $product->productCode }}"></label>
+                                                for="check{{ $product->origin_product_no }}"></label>
                                         </div>
                                     </td>
                                     <td>
@@ -177,7 +177,8 @@
                                     </td>
                                     <td class="text-nowrap">
                                         <button class="btn btn-success" onclick="onUpdate();">수정</button>
-                                        <button class="btn btn-danger" onclick="onUpdate();">삭제</button>
+                                        <button class="btn btn-danger"
+                                            onclick="onUpdate(('{{ $product->origin_product_no }}'));">삭제</button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -190,11 +191,24 @@
 @endsection
 @section('scripts')
     <script>
-        function onUpdate() {
+        $(document).on('click', '#selectAll', function() {
+            const isChecked = $(this).is(':checked');
+            $('input[name="selectedProducts"]').prop('checked', isChecked);
+        });
+
+        function onDelete(origin_product_no) {
+            const html = `
+            <h6 class="title">상품 삭제</h6>
+            <p>정말로 해당 상품을 삭제하시겠습니까?<br>이 작업은 돌이킬 수 없습니다.</p>
+            `;
             Swal.fire({
                 icon: "warning",
-                title: "해당 기능은 업데이트 중입니다."
-            });
+                html: html,
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            })
+            console.log(origin_product_no);
         }
 
         function view(productCode) {

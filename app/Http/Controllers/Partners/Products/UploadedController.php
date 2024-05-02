@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -48,7 +49,8 @@ class UploadedController extends Controller
                 'up.origin_product_no',
                 'va.username',
                 'up.created_at',
-                'pp.created_at AS pca'
+                'pp.created_at AS pca',
+                'up.origin_product_no'
             ])
             ->paginate(500);
         return view('partner.products_uploaded', [
@@ -56,5 +58,24 @@ class UploadedController extends Controller
             'uploadedProducts' => $uploadedProducts,
             'selectedOpenMarketId' => $selectedOpenMarketId
         ]);
+    }
+    public function delete(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'productCodes' => 'required|array|min:1'
+        ], [
+            'productCodes' => '삭제할 상품을 최소 1개 이상 선택해주세요.'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ];
+        }
+        $productCodes = $request->productCodes;
+        return $this->destroy($productCodes);
+    }
+    public function destroy()
+    {
     }
 }
