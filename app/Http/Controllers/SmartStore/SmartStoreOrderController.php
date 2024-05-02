@@ -20,13 +20,8 @@ class SmartStoreOrderController extends Controller
     {
         $orderList = $this->getOrderList();
         $orderIds = $this->getOrderIds($orderList);
-
-
-        // $responseDetail = $this->smart_storeDetail($orderIds);
         $orderDetails = $this->getOrderDetails($orderIds);
         return view('partner.smart_store_order_list', [
-            'orderList' => $orderList,
-            // 'responseDetail' => $responseDetail,
             'orderDetails' => $orderDetails
         ]);
     }
@@ -73,19 +68,6 @@ class SmartStoreOrderController extends Controller
         }
         return $orderIds;
     }
-
-
-    // public function smart_storeDetail($productOrderIds)
-    // {
-    //     $account = $this->getAccount();
-    //     $contentType = 'application/json';
-    //     $method = 'GET';
-    //     $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/orders/' . $productOrderIds . '/product-order-ids';
-
-    //     $data = [];
-    //     $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
-    //     return $response;
-    // }
     public function getOrderDetails($productOrderIds)
     {
         $account = $this->getAccount();

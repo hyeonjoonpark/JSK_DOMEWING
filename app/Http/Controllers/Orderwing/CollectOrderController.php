@@ -13,8 +13,8 @@ class CollectOrderController extends Controller
     public function index(Request $request)
     {
         set_time_limit(0);
-        $this->requestExcelFile();
-        $this->requestExcelFile2();
+        $result = $this->requestExcelFile();
+        $result2 = $this->requestExcelFile2();
         $userController = new UserController();
         $processController = new ProcessController();
         $extractOrderController = new ExtractOrderController();
@@ -29,6 +29,12 @@ class CollectOrderController extends Controller
             $username = $account->username;
             $password = $account->password;
             $this->deleteLegacy($b2BEngName);
+            if ($b2BEngName == 'domeggook' && $result != 'true') {
+                continue;
+            }
+            if ($b2BEngName == 'domeggook2' && $result2 != 'true') {
+                continue;
+            }
             $this->getOrderExcelFile($b2BEngName, $b2BVendorID, $username, $password);
         }
         return $extractOrderController->index($b2Bs);
@@ -58,13 +64,15 @@ class CollectOrderController extends Controller
     {
         $scriptPath = public_path('js/orderwing/' . $b2BEngName . '_process.js');
         $command = 'node ' . $scriptPath . ' ' . $username . ' ' . $password;
-        exec($command, $output, $resultCode);
+        $result = exec($command, $output, $resultCode);
+        return $result;
     }
     public function requestExcelFile2($b2BEngName = 'domeggook2', $username = 'luminous2020', $password = "fnalshtm88!@")
     {
         $scriptPath = public_path('js/orderwing/' . $b2BEngName . '_process.js');
         $command = 'node ' . $scriptPath . ' ' . $username . ' ' . $password;
-        exec($command, $output, $resultCode);
+        $result = exec($command, $output, $resultCode);
+        return $result;
     }
     public function getOrderExcelFile($b2BEngName, $b2BVendorID, $username, $password)
     {
