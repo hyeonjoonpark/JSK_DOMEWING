@@ -28,4 +28,10 @@ class AccountManagementController extends Controller
             'smartStoreAccounts' => $smartStoreAccounts
         ]);
     }
+    public function domewing()
+    {
+        $partner = Auth::guard('partner')->user();
+        $apiToken = $partner->api_token;
+        return view('partner/dowewing_integration', ['apiToken' => $apiToken]);
+    }
 }

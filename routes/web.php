@@ -47,9 +47,7 @@ Route::prefix('partner')->group(function () {
                 return view('partner/account_setting_open_market');
             });
             Route::get('/accounts-management', [AccountManagementController::class, 'index']);
-            Route::get('/dowewing-integration', function () {
-                return view('partner/dowewing_integration');
-            });
+            Route::get('/dowewing-integration', [AccountManagementController::class, 'domewing']);
         });
         Route::prefix('products')->group(function () {
             Route::get('collect', [CollectController::class, 'index'])->name('partner.products.collect');
