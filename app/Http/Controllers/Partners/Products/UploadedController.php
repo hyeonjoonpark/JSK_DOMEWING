@@ -59,29 +59,54 @@ class UploadedController extends Controller
     }
     public function delete(Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'productCodes' => 'required|array|min:1',
-        //     'originProductNo' => 'required|array|min:2'
-        // ], [
-        //     'productCodes' => '삭제할 상품을 최소 1개 이상 선택해주세요.',
-        //     'originProductNo' => '삭제할게 없어요 ㅠ'
-        // ]);
-        // if ($validator->fails()) {
-        //     return [
-        //         'status' => false,
-        //         'message' => $validator->errors()->first()
-        //     ];
-        // }
-        // $productCodes = $request->productCodes;
-        // $originProductsNo = $request->originProductNo;
-        // return $this->destroy($productCodes, $originProductsNo);
-        return [
-            'status' => true,
-            'message' => 'success',
-            'data' => $request
-        ];
+        $validator = Validator::make($request->all(), [
+            'originProductsNo' => 'required|array|min:1',
+            'vendorId' => 'required|integer|exists:vendors,id'
+        ], [
+            'originProductNo' => '유효한 상품이 아닙니다.',
+            'vendorId' => '유효한 오픈 마켓을 선택해주세요.'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first(),
+                'error' => $validator->errors()
+            ];
+        }
+        $vendorId = $request->vendorId;
+        $vendorEngName = DB::table('vendors')
+            ->where('id', $vendorId)
+            ->select(['name_eng'])
+            ->first()
+            ->name_eng;
+        $originProductsNo = DB::table($vendorEngName . '_uploaded_products')
+            ->where('is_active', 'Y')
+            ->whereIn('origin_product_no', $request->originProductsNo)
+            ->get();
     }
-    public function destroy()
+
+    public function destroy($originProductsNo)
     {
+        try {
+            DB::table('partner_products AS pp')
+                ->join('minewing_products AS mp', 'mp.id', '=', 'pp.product_id')
+                ->whereIn('mp.productCode', $originProductsNo)
+                ->delete();
+            return [
+                'status' => true,
+                'message' => '선택된 상품들이 성공적으로 삭제되었습니다.'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '상품을 삭제하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
     }
 }
+           // return [
+        //     'status' => true,
+        //     'message' => 'success',
+        //     'data' => $request
+        // ];

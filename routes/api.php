@@ -198,7 +198,7 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
         Route::post('upload', [UploadController::class, 'create']);
         Route::post('delete-product', [ManageController::class, 'deleteProduct']);
         Route::post('edit-product', [ManageController::class, 'editProduct']);
-        Route::delete('delete-uploaded', [UploadedController::class, 'delete']);
+        Route::post('delete-uploaded', [UploadedController::class, 'delete']);
     });
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
