@@ -48,7 +48,7 @@
                 const data = {
                     email: email,
                     password: password,
-                    api_token: apiToken
+                    apiToken: apiToken
                 };
                 fetch(url, {
                         method: 'POST',
@@ -59,11 +59,11 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.status === 'success') {
-                            alert('계정 연동을 성공하였습니다: ' + data.message);
+                        if (data.status === true) {
+                            alert(data.message);
                             console.log('연동된 데이터:', data.data);
                         } else {
-                            alert('계정 연동에 실패하였습니다: ' + data.message);
+                            alert(data.message);
                             console.error('오류 내용:', data.error);
                         }
                     })
