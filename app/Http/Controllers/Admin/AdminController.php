@@ -433,6 +433,14 @@ class AdminController extends Controller
             'vendors' => $vendors
         ]);
     }
+    public function openMarket(Request $request)
+    {
+        $controller = new Controller();
+        $openMarkets = $controller->getActiveOpenMarkets();
+        return view('admin/open_market', [
+            'openMarkets' => $openMarkets
+        ]);
+    }
     public function apiwing(Request $request)
     {
         $sellers = DB::table('product_search AS ps')

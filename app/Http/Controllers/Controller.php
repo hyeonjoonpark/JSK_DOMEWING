@@ -109,6 +109,13 @@ class Controller extends BaseController
             ->where('pr.is_active', 'Y')
             ->get();
     }
+    public function getActiveOpenMarkets()
+    {
+        return DB::table('vendors AS v')
+            ->where('v.type', 'OPEN_MARKET')
+            ->where('v.is_active', 'ACTIVE')
+            ->get();
+    }
     public function getProductWithCode($productCode)
     {
         $marginValue = $this->getMarginValue();

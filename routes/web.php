@@ -87,6 +87,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('mappingwing/unmapped', [AdminController::class, 'unmapped']);
     Route::get('mappingwing/mapped', [AdminController::class, 'mapped']);
     Route::get('/orderwing', [AdminController::class, 'orderwing']);
+    Route::get('open-market', [AdminController::class, 'openMarket']);
     Route::get('apiwing', [AdminController::class, 'apiwing']);
     Route::get('product-editor', [ViewController::class, 'index']);
     Route::get('namewing', [NamewingController::class, 'main']);
