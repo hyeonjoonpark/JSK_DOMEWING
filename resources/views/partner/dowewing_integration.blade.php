@@ -42,6 +42,12 @@
             const apiToken = "{{ $apiToken }}";
 
             function addAccount() {
+                if (!document.getElementById('email').value || !document.getElementById('password').value) {
+                    return Swal.fire({
+                        icon: 'warning',
+                        text: '이메일과 비밀번호를 모두 입력해야 합니다.'
+                    });
+                }
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
                 const url = 'https://domewing.com/api/sync';
@@ -60,16 +66,18 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === true) {
-                            alert(data.message);
-                            console.log('연동된 데이터:', data.data);
+                            Swal.fire({
+                                icon: 'success',
+                                text: data.message
+                            }).then((result) => {
+                                window.location.reload();
+                            });
                         } else {
-                            alert(data.message);
-                            console.error('오류 내용:', data.error);
+                            swalError(data.message);
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
-                        alert('계정 연동 중 오류가 발생하였습니다.');
+                        swalError('계정 연동 중 오류가 발생하였습니다.');
                     });
             }
             document.querySelector('.btn-primary').addEventListener('click', addAccount);
