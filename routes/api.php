@@ -203,10 +203,10 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
         Route::post('edit-product', [ManageController::class, 'editProduct']);
         Route::post('delete-uploaded', [UploadedController::class, 'delete']);
     });
+
+    Route::post('open-market-orders', [OpenMarketOrderController::class, 'indexPartner']);
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
 Route::post('sellwing-api/auth', [AuthController::class, 'main']);
 
 Route::post('open-market-orders', [OpenMarketOrderController::class, 'index'])->name('open.market.orders');
-
-Route::post('partner-open-market-orders', [OpenMarketOrderController::class, 'indexPartner'])->name('partner.open.market.orders');

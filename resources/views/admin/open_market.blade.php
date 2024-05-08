@@ -42,6 +42,12 @@
                                 </div>
                             @endforeach
                         </div>
+                        <div class="form-group">
+                            <label for="startDate">시작 날짜:</label>
+                            <input type="date" id="startDate" name="startDate" class="form-control">
+                            <label for="endDate">종료 날짜:</label>
+                            <input type="date" id="endDate" name="endDate" class="form-control">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,10 +118,12 @@
         });
 
         function initOrderwing() {
-            var checkedIds = [];
+            var openMarketIds = [];
             document.querySelectorAll('.market-checkbox:checked').forEach(function(checkbox) {
-                checkedIds.push(checkbox.value);
+                openMarketIds.push(checkbox.value);
             });
+            var startDate = document.getElementById('startDate').value;
+            var endDate = document.getElementById('endDate').value;
             popupLoader(0, '신규 주문 내역을 오픈마켓으로부터 추출하겠습니다.');
             $.ajax({
                 url: '/api/open-market-orders',
@@ -125,7 +133,9 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 data: {
-                    'openMarketIds': checkedIds
+                    openMarketIds,
+                    startDate,
+                    endDate
                 },
                 success: function(response) {
                     console.log(response);
