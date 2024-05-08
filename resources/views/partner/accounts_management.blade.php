@@ -12,10 +12,14 @@
                 <div class="card-inner">
                     <h6 class="title">쿠팡</h6>
                     <p>각 계정을 클릭하여 관리합니다.</p>
-                    @foreach ($coupangAccounts as $item)
-                        <button class="btn btn-primary"
-                            onclick="viewCoupangAccount('{{ $item->username }}','{{ $item->code }}','{{ $item->access_key }}','{{ $item->secret_key }}','{{ $item->hash }}','{{ date('Y-m-d', strtotime($item->expired_at)) }}');">{{ $item->username }}</button>
-                    @endforeach
+                    <div class="row g-gs">
+                        @foreach ($coupangAccounts as $item)
+                            <div class="col-auto">
+                                <button class="btn btn-primary"
+                                    onclick="viewCoupangAccount('{{ $item->username }}','{{ $item->code }}','{{ $item->access_key }}','{{ $item->secret_key }}','{{ $item->hash }}','{{ date('Y-m-d', strtotime($item->expired_at)) }}');">{{ $item->username }}</button>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
@@ -24,10 +28,14 @@
                 <div class="card-inner">
                     <h6 class="title">스마트 스토어</h6>
                     <p>각 계정을 클릭하여 관리합니다.</p>
-                    @foreach ($smartStoreAccounts as $item)
-                        <button class="btn btn-primary"
-                            onclick="viewSsAccount('{{ $item->username }}','{{ $item->application_id }}','{{ $item->secret }}','{{ $item->store_name }}','{{ $item->hash }}');">{{ $item->username }}</button>
-                    @endforeach
+                    <div class="row g-gs">
+                        @foreach ($smartStoreAccounts as $item)
+                            <div class="col-auto">
+                                <button class="btn btn-primary"
+                                    onclick="viewSsAccount('{{ $item->username }}','{{ $item->application_id }}','{{ $item->secret }}','{{ $item->store_name }}','{{ $item->hash }}');">{{ $item->username }}</button>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>

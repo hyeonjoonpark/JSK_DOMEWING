@@ -109,6 +109,11 @@ class ExcelwingController extends Controller
             ->where("sellerID", $sellerID)
             ->whereNot('categoryID', null)
             ->get();
+        DB::table("minewing_products")
+            ->where("isActive", "Y")
+            ->where("sellerID", $sellerID)
+            ->whereNotNull('categoryID')
+            ->update(['remark' => '1']);
         return [
             "status" => true,
             "return" => $products
