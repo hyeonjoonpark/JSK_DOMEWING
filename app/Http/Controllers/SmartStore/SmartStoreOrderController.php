@@ -18,15 +18,22 @@ class SmartStoreOrderController extends Controller
     }
     public function index($id)
     {
-        // $id = Auth::guard('partner')->id();
         $account = $this->getAccount($id);
         $orderList = $this->getOrderList($account);
         $orderIds = $this->getOrderIds($orderList);
         $orderDetails = $this->getOrderDetails($account, $orderIds);
         return $orderDetails;
-        // return view('partner.smart_store_order_list', [
-        //     'orderDetails' => $orderDetails
-        // ]);
+    }
+    public function indexPartner($start = null, $end = null)
+    {
+        $id = Auth::guard('partner')->id();
+        $account = $this->getAccount($id);
+        $orderList = $this->getOrderList($account, $start, $end);
+        $orderIds = $this->getOrderIds($orderList);
+        $orderDetails = $this->getOrderDetails($account, $orderIds);
+        return view('partner.smart_store_order_list', [
+            'orderDetails' => $orderDetails
+        ]);
     }
     public function getOrderList($account, $start = null, $end = null)
     {
@@ -99,7 +106,7 @@ class SmartStoreOrderController extends Controller
             return [
                 'market' => $item['order']['market'] ?? '스마트스토어',
                 'orderId' => $item['order']['orderId'] ?? 'N/A',
-                'ordererName' => $item['order']['ordererName'] ?? 'N/A',
+                'orderName' => $item['order']['ordererName'] ?? 'N/A',
                 'orderDate' => isset($item['order']['orderDate']) ? (new DateTime($item['order']['orderDate']))->format('Y-m-d H:i:s') : 'N/A',
                 'productOrderId' => $item['productOrder']['productOrderId'] ?? 'N/A',
                 'productName' => $item['productOrder']['productName'] ?? 'N/A',

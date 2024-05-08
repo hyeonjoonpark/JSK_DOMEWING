@@ -52,23 +52,11 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="nk-menu-item has-sub">
-                            <a href="#" class="nk-menu-link nk-menu-toggle">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-list-alt"></em></span>
-                                <span class="nk-menu-text">주문내역 확인</span>
+                        <li class="nk-menu-item">
+                            <a href="/partner/open-market" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-truck"></em></span>
+                                <span class="nk-menu-text">오픈마켓</span>
                             </a>
-                            <ul class="nk-menu-sub">
-                                <li class="nk-menu-item">
-                                    <a href="/partner/orders/smart-store-list" class="nk-menu-link">
-                                        <span class="nk-menu-text">스마트 스토어</span>
-                                    </a>
-                                </li>
-                                <li class="nk-menu-item">
-                                    <a href="/partner/orders/coupang-list" class="nk-menu-link"><span
-                                            class="nk-menu-text">쿠팡</span></a>
-                                </li>
-
-                            </ul>
                         </li>
                         <li class="nk-menu-item">
 

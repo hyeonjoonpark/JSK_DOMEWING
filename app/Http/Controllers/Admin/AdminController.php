@@ -441,6 +441,7 @@ class AdminController extends Controller
             'openMarkets' => $openMarkets
         ]);
     }
+
     public function apiwing(Request $request)
     {
         $sellers = DB::table('product_search AS ps')
