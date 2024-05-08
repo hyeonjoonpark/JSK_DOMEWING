@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -160,9 +161,26 @@ class UploadedController extends Controller
             ];
         }
     }
+    public function coupangDeleteRequest($originProductNo, $vendorEngName)
+    {
+        $account = DB::table($vendorEngName . '_accounts AS a')
+            ->join($vendorEngName . '_uploaded_products AS up', 'up.' . $vendorEngName . '_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.hash', 'a.secret_key', 'a.access_key'])
+            ->first();
+        $cpac = new ApiController();
+        $contentType = 'application/json;charset=UTF-8';
+        $method = "delete";
+        $url = 'https://api-gateway.coupang.com/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/' . $originProductNo;
+        return $cpac->builder($account->access_key, $account->secret_key, $method, $contentType, $url);
+    }
 }
-           // return [
-        //     'status' => true,
-        //     'message' => 'success',
-        //     'data' => $request
-        // ];
+//$method, $path, $accessKey, $secretKey
+//$accessKey, $secretKey, $method, $contentType, $path, $data
+
+
+// $account = DB::table($vendorEngName . '_accounts AS a')
+// ->join($vendorEngName . '_uploaded_products AS up', 'up.' . $vendorEngName . '_account_id', '=', 'a.id')
+// ->where('up.origin_product_no', $originProductNo)
+// ->select(['a.application_id', 'a.secret', 'a.username'])
+// ->first();

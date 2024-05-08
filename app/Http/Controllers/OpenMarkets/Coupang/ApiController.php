@@ -60,7 +60,7 @@ class ApiController extends Controller
             ];
         }
     }
-    public function builder($accessKey, $secretKey, $method, $contentType, $path, $data)
+    public function builder($accessKey, $secretKey, $method, $contentType, $path, $data = "")
     {
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
