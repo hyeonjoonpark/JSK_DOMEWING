@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Orderwing;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class ExtractOrderController extends Controller
 {
@@ -92,8 +93,11 @@ class ExtractOrderController extends Controller
 
     public function extractExcelData($excelPath, $b2BEngName)
     {
-        $processDataController = new ProcessDataController();
-        return $processDataController->$b2BEngName($excelPath);
+        if (File::exists($excelPath)) {
+            $processDataController = new ProcessDataController();
+            return $processDataController->$b2BEngName($excelPath);
+        }
+        return [];
     }
 
     private function getExcelPath($b2BEngName)
