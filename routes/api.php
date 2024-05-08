@@ -49,6 +49,7 @@ use App\Http\Controllers\Productwing\SoldOutController;
 use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\OpenMarketOrderController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\Products\ManageController;
@@ -64,6 +65,7 @@ use App\Http\Controllers\SellwingApis\AuthController;
 use App\Http\Controllers\SellwingApis\CategoryListController;
 use App\Http\Controllers\SellwingApis\VendorListController;
 use App\Http\Controllers\SmartStore\SmartStoreAccountController;
+use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
 use App\Http\Controllers\Testmonial\TestmonialController;
 
@@ -204,4 +206,7 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
 Route::post('sellwing-api/auth', [AuthController::class, 'main']);
+
 Route::post('open-market-orders', [OpenMarketOrderController::class, 'index'])->name('open.market.orders');
+
+Route::post('partner-open-market-orders', [OpenMarketOrderController::class, 'indexPartner'])->name('partner.open.market.orders');

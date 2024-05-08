@@ -15,8 +15,7 @@ const puppeteer = require('puppeteer');
         await page.goto('https://domeggook.com/sc/order/lstInprocess', { waitUntil: 'networkidle2' });
         const elements = await page.$$('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody tr');
         if (elements.length < 1) {
-            console.log(false);
-            return;
+            return false;
         }
         await page.click('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-header-area > table > tbody > tr > th.tui-grid-cell.tui-grid-cell-header.tui-grid-cell-row-header > span > input[type=checkbox]');
         await page.click('#lList > div.pHeader > form > a');
@@ -37,6 +36,6 @@ async function clearPopup(page) {
     page.on('dialog', async dialog => {
         await dialog.accept();
         await new Promise((page) => setTimeout(page, 1000));
-        return;
+        return false;
     });
 }

@@ -17,6 +17,7 @@ use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
 use App\Http\Controllers\Partners\ForgotPasswordController;
 use App\Http\Controllers\Partners\LoginController as PartnersLoginController;
+use App\Http\Controllers\Partners\PartnerController;
 use App\Http\Controllers\Partners\Products\CollectController;
 use App\Http\Controllers\Partners\Products\ManageController;
 use App\Http\Controllers\Partners\Products\UploadController;
@@ -55,10 +56,7 @@ Route::prefix('partner')->group(function () {
             Route::get('upload', [UploadController::class, 'index']);
             Route::get('sale', [UploadedController::class, 'index'])->name('partner.products.uploaded');
         });
-        Route::prefix('orders')->group(function () {
-            Route::get('smart-store-list', [SmartStoreOrderController::class, 'index'])->name('partner.orders.list');
-            Route::get('coupang-list', [CoupangOrderController::class, 'index'])->name('partner.orders.coupang-list');
-        });
+        Route::get('open-market', [PartnerController::class, 'partnerOpenMarket']);
     });
 });
 // 셀윙 관리자 패널.

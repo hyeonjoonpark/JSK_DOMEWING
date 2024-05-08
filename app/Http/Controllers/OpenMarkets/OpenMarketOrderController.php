@@ -3,26 +3,35 @@
 namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OpenMarketOrderController extends Controller
 {
     public function index(Request $request)
     {
-        $orderwingLists = $this->getOrderwingOpenMarkets($request);
+        $marketIds = $request->input('openMarketIds', []);
+        $orderwingEngNameLists = $this->getOrderwingOpenMarkets($marketIds);
         $domewingAndPartners = $this->getDomewingAndPartners();
         $results = [];
-        foreach ($domewingAndPartners as $domewingAndPartner) { // 파트너, 도매윙 연동한 계정들을 확인
-            $partner = $this->getPartner($domewingAndPartner->partner_id); // 연동한 계정의 파트너 계정 가져오기
-            $domewingUserName = $this->getDomewingUserName($domewingAndPartner->domewing_account_id); //연동한 계정의 도매윙 유저네임 가져오기
-            foreach ($orderwingLists as $orderwingList) { // 오픈마켓 반복문을 돌리면서 오픈마켓들의 orderwing 진행
-                //오픈마켓이랑 orderController연동해서 사용하면됌 그리고 결과값을 배열에 담아서 리턴
-                $smartStoreReuslt = $this->callSmartStoreOrderApi($partner->id);
+        foreach ($domewingAndPartners as $domewingAndPartner) {
+            $partner = $this->getPartner($domewingAndPartner->partner_id);
+            $domewingUserName = $this->getDomewingUserName($domewingAndPartner->domewing_account_id);
+            foreach ($orderwingEngNameLists as $orderwingEngNameList) {
+                $methodName = 'call' . ucfirst($orderwingEngNameList) . 'OrderApi';
+                if (method_exists($this, $methodName)) {
+                    $apiResult = call_user_func([$this, $methodName], $partner->id);
+                } else {
+                    $apiResult = null;
+                    Log::error("Method $methodName does not exist.");
+                }
                 $results[] = [
                     'domewing_user_name' => $domewingUserName->username,
-                    'api_result' => $smartStoreReuslt
+                    'api_result' => $apiResult
                 ];
             }
         }
@@ -31,20 +40,68 @@ class OpenMarketOrderController extends Controller
             'data' => $results
         ]);
     }
-    public function getOrderwingOpenMarkets(Request $request) //이걸로 선택한 오픈마켓 리스트들을 가져와
+    public function indexPartner(Request $request)
     {
-        return DB::table('vondros AS v')
-            // ->where('v.id', $request->id)
-            ->where('v.id', '51')
+        $currentPartnerId = Auth::guard('partner')->id();
+        return $currentPartnerId;
+        $marketIds = $request->input('openMarketIds', []);
+        $orderwingEngNameLists = $this->getOrderwingOpenMarkets($marketIds);
+        $domewingAndPartner = $this->getDomewingAndPartners($currentPartnerId);
+
+        if (!$domewingAndPartner) {
+            return response()->json([
+                'message' => 'No linked domewing account found for the current partner.',
+                'data' => []
+            ]);
+        }
+
+        $results = [];
+        $partner = $this->getPartner($domewingAndPartner->partner_id);
+        $domewingUserName = $this->getDomewingUserName($domewingAndPartner->domewing_account_id);
+        foreach ($orderwingEngNameLists as $orderwingEngNameList) {
+            $methodName = 'call' . ucfirst($orderwingEngNameList) . 'OrderApi';
+            if (method_exists($this, $methodName)) {
+                $apiResult = call_user_func([$this, $methodName], $partner->id);
+            } else {
+                $apiResult = null;
+                Log::error("Method $methodName does not exist.");
+            }
+            $results[] = [
+                'domewing_user_name' => $domewingUserName->username,
+                'api_result' => $apiResult
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Orders processed successfully',
+            'data' => $results
+        ]);
+    }
+
+
+
+
+    public function getOrderwingOpenMarkets($marketIds)
+    {
+        $result = DB::table('vendors AS v')
+            ->whereIn('v.id', $marketIds)
             ->where('v.is_active', 'active')
+            ->select('name_eng')
             ->get();
+
+        return $result->pluck('name_eng')->toArray();
     }
-    public function getDomewingAndPartners() //그리고 어떤 도매윙 아이디의 오픈마켓 정보들인가를 가져와
+    public function getDomewingAndPartners($partnerId = null) //그리고 어떤 도매윙 아이디의 오픈마켓 정보들인가를 가져와
     {
-        return DB::table('partner_domewing_accounts as da')
-            ->select('partner_id', 'domewing_account_id')
-            ->get();
+        $query = DB::table('partner_domewing_accounts as da')
+            ->where('is_active', 'Y')
+            ->select('partner_id', 'domewing_account_id');
+        if ($partnerId) {
+            return $query->where('partner_id', $partnerId)->first();
+        }
+        return $query->get();
     }
+
     public function getPartner($id) // 이걸로 파트너를 가져와서 그 파트너의 오픈마켓들을 싹 돌릴거야
     {
         return DB::table('partners')
@@ -58,11 +115,14 @@ class OpenMarketOrderController extends Controller
             ->select('username')
             ->first();
     }
-    private function callSmartStoreOrderApi($id)
+    private function callSmart_storeOrderApi($id)
     {
-        return new SmartStoreOrderController($id);
+        $controller = new SmartStoreOrderController();
+        return $controller->index($id);
     }
-    private function callCoupangOrderApi()
+    private function callCoupangOrderApi($id)
     {
+        $controller = new CoupangOrderController();
+        return $controller->index($id);
     }
 }

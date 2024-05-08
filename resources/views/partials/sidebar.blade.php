@@ -114,30 +114,6 @@
                                 <span class="nk-menu-text">오픈마켓</span>
                             </a>
                         </li>
-                        {{-- <li class="nk-menu-item">
-                            <a href="/admin/product/register" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
-                                <span class="nk-menu-text">신규 상품 생성</span>
-                            </a>
-                        </li> --}}
-                        {{-- <li class="nk-menu-item">
-                            <a href="/admin/product/keywords" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
-                                <span class="nk-menu-text">상품 키워드 테스트</span>
-                            </a>
-                        </li> --}}
-                        {{-- <li class="nk-menu-item">
-                            <a href="/admin/cms_dashboard" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
-                                <span class="nk-menu-text">CMS 저작물 관리 시스템</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/cms/{{ Auth::guard('user')->user()->remember_token }}" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-newspaper"></em></span>
-                                <span class="nk-menu-text">Seller CMS</span>
-                            </a>
-                        </li> --}}
                         <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-gear"></em></span>

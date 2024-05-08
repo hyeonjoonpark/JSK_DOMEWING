@@ -16,22 +16,36 @@ class CoupangOrderController extends Controller
         $this->ssac = new ApiController();
     }
 
-    public function index()
+    public function index($id = null)
     {
-        $orderList = $this->getOrderList('ACCEPT');
-        return view('partner.coupang_order_list', ['orderList' => $orderList]);
+        $orderList = $this->getOrderList($id, 'ACCEPT');
+        return $orderList;
+    }
+    public function indexPartner($start = null, $end = null)
+    {
+        $id = Auth::guard('partner')->id();
+        $orderDetails = $this->getOrderList($id, 'ACCEPT', $start, $end);
+        return view('partner.coupang_order_list', [
+            'orderDetails' => $orderDetails
+        ]);
     }
 
-    public function getOrderList($status)
+    public function getOrderList($id, $status, $start = null, $end = null)
     {
-        $account = $this->getAccount();
+        $account = $this->getAccount($id);
+        $startDate = $start ? new DateTime($start) : new DateTime('now - 6 days');
+        $endDate = $end ? new DateTime($end) : new DateTime('now');
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets';
-        $query = 'createdAtFrom=2024-04-16&createdAtTo=2024-04-29&status=' . $status;
-
-        $response = $this->ssac->getBuilder($account->access_key, $account->secret_key, 'application/json', $path, $query);
-
+        $baseQuery = [
+            'createdAtFrom' => $startDate->format('Y-m-d'),
+            'createdAtTo' => $endDate->format('Y-m-d'),
+            'status' => $status
+        ];
+        $queryString = http_build_query($baseQuery);
+        $response = $this->ssac->getBuilder($account->access_key, $account->secret_key, 'application/json', $path, $queryString);
         return $this->transformOrderDetails($response);
     }
+
 
     private function transformOrderDetails($response)
     {
@@ -70,8 +84,8 @@ class CoupangOrderController extends Controller
         return $statusMap[$status] ?? '상태미정';
     }
 
-    private function getAccount()
+    private function getAccount($id)
     {
-        return DB::table('coupang_accounts')->where('partner_id', Auth::guard('partner')->id())->first();
+        return DB::table('coupang_accounts')->where('partner_id', $id)->first();
     }
 }

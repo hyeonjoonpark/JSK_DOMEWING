@@ -140,7 +140,7 @@ class FormProductController extends Controller
                     '일반상품',
                     '',
                     99999,
-                    $bq,
+                    6,
                     '과세',
                     '가격자율',
                     $marginedPrice,
@@ -183,7 +183,7 @@ class FormProductController extends Controller
                     '상세정보 참조',
                     '상세정보 참조',
                     '상세정보 참조',
-                    '',
+                    'Y',
                     '상세정보 참조',
                     '상세정보 참조'
                 ];

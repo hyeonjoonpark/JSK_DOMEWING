@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('partner.layouts.main')
 @section('style')
     <style>
         .product-list-image {
@@ -118,7 +118,7 @@
             });
             popupLoader(0, '신규 주문 내역을 오픈마켓으로부터 추출하겠습니다.');
             $.ajax({
-                url: '/api/open-market-orders',
+                url: '/api/partner-open-market-orders',
                 type: 'POST',
                 dataType: 'JSON',
                 headers: {
