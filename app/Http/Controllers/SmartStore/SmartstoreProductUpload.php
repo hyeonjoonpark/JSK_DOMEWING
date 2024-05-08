@@ -27,6 +27,7 @@ class SmartstoreProductUpload extends Controller
             $exists = DB::table('smart_store_uploaded_products')
                 ->where('smart_store_account_id', $smartstoreAccountId)
                 ->where('product_id', $product->id)
+                ->where('is_active', 'Y')
                 ->exists();
             if ($exists === true) {
                 $duplicated[] = $product->productCode;

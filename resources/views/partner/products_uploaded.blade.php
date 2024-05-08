@@ -142,7 +142,7 @@
                                                 id="{{ $product->origin_product_no }}" name="selectedProducts"
                                                 value="{{ $product->origin_product_no }}">
                                             <label class="custom-control-label"
-                                                for="check{{ $product->origin_product_no }}"></label>
+                                                for="{{ $product->origin_product_no }}"></label>
                                         </div>
                                     </td>
                                     <td>
@@ -209,21 +209,29 @@
         }
 
         function onDelete(originProductsNo) {
-            const vendorId = $('input[name="selectedOpenMarketId"]:checked').val();
-            $.ajax({
-                url: "/api/partner/product/delete-uploaded",
-                type: 'POST',
-                dataType: "JSON",
-                data: {
-                    apiToken,
-                    originProductsNo,
-                    vendorId
-                },
-                success: function(response) {
-                    console.log(response);
-                },
-                error: function(response) {
-                    console.log(response);
+            Swal.fire({
+                icon: "warning",
+                title: "업로드된 상품 삭제",
+                text: "해당 오픈 마켓에 업로드된 해당 상품들이 삭제 처리 됩니다. 정말로 진행하시겠습니까?",
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "삭제"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    popupLoader(0, "해당 오픈 마켓으로부터 상품들을 삭제하는 중입니다.");
+                    const vendorId = $('input[name="selectedOpenMarketId"]:checked').val();
+                    $.ajax({
+                        url: "/api/partner/product/delete-uploaded",
+                        type: 'POST',
+                        dataType: "JSON",
+                        data: {
+                            apiToken,
+                            originProductsNo,
+                            vendorId
+                        },
+                        success: ajaxSuccessHandling,
+                        error: AjaxErrorHandling
+                    });
                 }
             });
         }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -76,13 +77,68 @@ class UploadedController extends Controller
         $vendorId = $request->vendorId;
         $vendorEngName = DB::table('vendors')
             ->where('id', $vendorId)
-            ->select(['name_eng'])
-            ->first()
-            ->name_eng;
+            ->value('name_eng');
         $originProductsNo = DB::table($vendorEngName . '_uploaded_products')
             ->where('is_active', 'Y')
             ->whereIn('origin_product_no', $request->originProductsNo)
-            ->get();
+            ->pluck('origin_product_no');
+        $errors = [];
+        $success = 0;
+        foreach ($originProductsNo as $originProductNo) {
+            $functionName = $vendorEngName . 'DeleteRequest';
+            $result = $this->$functionName($originProductNo, $vendorEngName);
+            if ($result['status'] === false) {
+                $error = $result['error'];
+                $errors = [
+                    'originProductNo' => $originProductNo,
+                    'error' => $error
+                ];
+            } else {
+                $success++;
+            }
+        }
+        $dupResult = $this->destroyUploadedProducts($originProductsNo, $vendorEngName);
+        return [
+            'status' => true,
+            'message' => '총 ' . count($originProductsNo) . '개의 상품들 중 ' . $success . '개의 상품들을 성공적으로 삭제했습니다.',
+            'data' => [
+                'success' => $success,
+                'errors' => $errors,
+                'dupResult' => $dupResult
+            ]
+        ];
+    }
+    public function destroyUploadedProducts($originProductsNo, $vendorEngName)
+    {
+        try {
+            DB::table($vendorEngName . '_uploaded_products')
+                ->whereIn('origin_product_no', $originProductsNo)
+                ->update(['is_active' => 'N']);
+            return [
+                'status' => true,
+                'message' => '상품셋을 성공적으로 삭제했습니다.',
+                'data' => []
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '상품셋을 삭제처리 하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    public function smart_storeDeleteRequest($originProductNo, $vendorEngName)
+    {
+        $ssac = new SmartStoreApiController();
+        $account = DB::table($vendorEngName . '_accounts AS a')
+            ->join($vendorEngName . '_uploaded_products AS up', 'up.' . $vendorEngName . '_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.application_id', 'a.secret', 'a.username'])
+            ->first();
+        $contentType = 'application/json;charset=UTF-8';
+        $method = "delete";
+        $url = 'https://api.commerce.naver.com/external/v2/products/origin-products/' . $originProductNo;
+        return $ssac->builder($account, $contentType, $method, $url);
     }
 
     public function destroy($originProductsNo)

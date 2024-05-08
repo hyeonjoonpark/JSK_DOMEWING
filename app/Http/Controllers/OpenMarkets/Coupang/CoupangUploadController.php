@@ -32,6 +32,7 @@ class CoupangUploadController extends Controller
         $error = '';
         foreach ($products as $product) {
             $exists = DB::table('coupang_uploaded_products')
+                ->where('is_active', 'Y')
                 ->where('coupang_account_id', $account->id)
                 ->where('product_id', $product->id)
                 ->exists();

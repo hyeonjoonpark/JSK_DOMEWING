@@ -46,7 +46,7 @@ class SmartStoreApiController extends Controller
             'data' => $response
         ];
     }
-    public function builder($account, $contentType, $method, $url, $data)
+    public function builder($account, $contentType, $method, $url, $data = "")
     {
         $ssac = new SmartStoreAccountController();
         $getAccessTokenResult = $ssac->getAccessToken($account->application_id, $account->secret, $account->username);
