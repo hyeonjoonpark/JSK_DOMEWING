@@ -29,14 +29,15 @@ class CollectOrderController extends Controller
             $username = $account->username;
             $password = $account->password;
             $this->deleteLegacy($b2BEngName);
-            if ($b2BEngName == 'domeggook' && $result != 'true') {
+            if ($result === false && $b2BEngName == 'domeggook') {
                 continue;
             }
-            if ($b2BEngName == 'domeggook2' && $result2 != 'true') {
+            if ($result2 === false && $b2BEngName == 'domeggook2') {
                 continue;
             }
             $this->getOrderExcelFile($b2BEngName, $b2BVendorID, $username, $password);
         }
+
         return $extractOrderController->index($b2Bs);
     }
     public function getOrderwingB2bs()

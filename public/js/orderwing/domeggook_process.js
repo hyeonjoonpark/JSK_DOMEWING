@@ -13,9 +13,12 @@ const puppeteer = require('puppeteer');
         await page.click('#formLogin > input.formSubmit');
         await page.waitForNavigation();
         await page.goto('https://domeggook.com/sc/order/lstInprocess', { waitUntil: 'networkidle2' });
+        const elements = await page.$$('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody tr');
+        if (elements.length < 1) {
+            return false;
+        }
         await page.click('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-header-area > table > tbody > tr > th.tui-grid-cell.tui-grid-cell-header.tui-grid-cell-row-header > span > input[type=checkbox]');
         await page.click('#lList > div.pHeader > form > a');
-        // Wait for the iframe to load and then perform actions inside the iframe
         await new Promise((page) => setTimeout(page, 3000));
         const frameElement = await page.waitForSelector('#gLayerFrame > div > iframe');
         const frame = await frameElement.contentFrame();
@@ -23,11 +26,6 @@ const puppeteer = require('puppeteer');
         await new Promise((page) => setTimeout(page, 3000));
         await frame.click('#lXlsReqNoticeBtnClose');
         await new Promise((page) => setTimeout(page, 70000));
-        const elements = await page.$$('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody tr');
-        if (elements) {
-            return console.log(true);
-        }
-        else return console.log(false);
     } catch (error) {
         console.error('Error:', error);
     } finally {
@@ -38,6 +36,6 @@ async function clearPopup(page) {
     page.on('dialog', async dialog => {
         await dialog.accept();
         await new Promise((page) => setTimeout(page, 1000));
-        return;
+        return false;
     });
 }

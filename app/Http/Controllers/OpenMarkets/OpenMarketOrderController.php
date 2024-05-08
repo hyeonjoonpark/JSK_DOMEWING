@@ -42,6 +42,7 @@ class OpenMarketOrderController extends Controller
     public function getDomewingAndPartners() //그리고 어떤 도매윙 아이디의 오픈마켓 정보들인가를 가져와
     {
         return DB::table('partner_domewing_accounts as da')
+            ->where('is_active', 'Y')
             ->select('partner_id', 'domewing_account_id')
             ->get();
     }
