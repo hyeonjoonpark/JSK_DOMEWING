@@ -47,9 +47,7 @@ Route::prefix('partner')->group(function () {
                 return view('partner/account_setting_open_market');
             });
             Route::get('/accounts-management', [AccountManagementController::class, 'index']);
-            Route::get('/dowewing-integration', function () {
-                return view('partner/dowewing_integration');
-            });
+            Route::get('/dowewing-integration', [AccountManagementController::class, 'domewing']);
         });
         Route::prefix('products')->group(function () {
             Route::get('collect', [CollectController::class, 'index'])->name('partner.products.collect');
@@ -89,6 +87,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('mappingwing/unmapped', [AdminController::class, 'unmapped']);
     Route::get('mappingwing/mapped', [AdminController::class, 'mapped']);
     Route::get('/orderwing', [AdminController::class, 'orderwing']);
+    Route::get('open-market', [AdminController::class, 'openMarket']);
     Route::get('apiwing', [AdminController::class, 'apiwing']);
     Route::get('product-editor', [ViewController::class, 'index']);
     Route::get('namewing', [NamewingController::class, 'main']);

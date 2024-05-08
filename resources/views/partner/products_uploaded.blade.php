@@ -113,6 +113,11 @@
                             'openMarket' => $openMarket,
                         ])
                     </div>
+                    <div class="text-center">
+                        <button class="btn btn-danger" onclick="initDelete();">선택
+                            상품
+                            일괄삭제</button>
+                    </div>
                     <table class="table align-middle">
                         <thead>
                             <tr>
@@ -196,14 +201,23 @@
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
 
-        function onDelete(originProductNo) {
+        function initDelete() {
+            const originProductsNo = $('input[name="selectedProducts"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            onDelete(originProductsNo);
+        }
+
+        function onDelete(originProductsNo) {
+            const vendorId = $('input[name="selectedOpenMarketId"]:checked').val();
             $.ajax({
                 url: "/api/partner/product/delete-uploaded",
                 type: 'POST',
                 dataType: "JSON",
                 data: {
                     apiToken,
-                    originProductNo
+                    originProductsNo,
+                    vendorId
                 },
                 success: function(response) {
                     console.log(response);

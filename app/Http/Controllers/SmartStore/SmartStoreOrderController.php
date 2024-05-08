@@ -16,18 +16,21 @@ class SmartStoreOrderController extends Controller
     {
         $this->ssac = new SmartStoreApiController();
     }
-    public function index()
+    public function index($id)
     {
-        $orderList = $this->getOrderList();
+        // $id = Auth::guard('partner')->id();
+        $account = $this->getAccount($id);
+        $orderList = $this->getOrderList($account);
         $orderIds = $this->getOrderIds($orderList);
-        $orderDetails = $this->getOrderDetails($orderIds);
-        return view('partner.smart_store_order_list', [
-            'orderDetails' => $orderDetails
-        ]);
+        $orderDetails = $this->getOrderDetails($account, $orderIds);
+        return $orderDetails;
+        // return view('partner.smart_store_order_list', [
+        //     'orderDetails' => $orderDetails
+        // ]);
     }
-    public function getOrderList($start = null, $end = null)
+    public function getOrderList($account, $start = null, $end = null)
     {
-        $account = $this->getAccount();
+
         $contentType = 'application/json';
         $method = 'GET';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses';
@@ -68,9 +71,8 @@ class SmartStoreOrderController extends Controller
         }
         return $orderIds;
     }
-    public function getOrderDetails($productOrderIds)
+    public function getOrderDetails($account, $productOrderIds)
     {
-        $account = $this->getAccount();
         $contentType = 'application/json';
         $method = 'POST';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query';
@@ -111,8 +113,8 @@ class SmartStoreOrderController extends Controller
 
         return $formattedResponse;
     }
-    private function getAccount()
+    private function getAccount($id)
     {
-        return DB::table('smart_store_accounts')->where('partner_id', Auth::guard('partner')->id())->first();
+        return DB::table('smart_store_accounts')->where('partner_id', $id)->first();
     }
 }
