@@ -73,10 +73,10 @@ class SmartStoreOrderController extends Controller
             return ['error' => '응답 데이터가 올바르지 않습니다.'];
         }
         $statusMap = [
-            'PAYMENT_WAITING' => '결제 대기',
-            'PAYED' => '결제 완료',
-            'DELIVERING' => '배송 중',
-            'DELIVERED' => '배송 완료',
+            'PAYMENT_WAITING' => '결제대기',
+            'PAYED' => '결제완료',
+            'DELIVERING' => '배송중',
+            'DELIVERED' => '배송완료',
             'EXCHANGED' => '교환',
             'CANCELED' => '취소',
             'RETURNED' => '반품',

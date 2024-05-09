@@ -122,8 +122,21 @@
             document.querySelectorAll('.market-checkbox:checked').forEach(function(checkbox) {
                 openMarketIds.push(checkbox.value);
             });
+
+            if (openMarketIds.length < 1) {
+                return Swal.fire({
+                    icon: 'warning',
+                    text: '최소 하나의 오픈마켓을 선택해야 합니다.'
+                });
+            }
             var startDate = document.getElementById('startDate').value;
             var endDate = document.getElementById('endDate').value;
+            if (new Date(startDate) > new Date(endDate)) {
+                return Swal.fire({
+                    icon: 'warning',
+                    text: '시작날짜는 종료날짜보다 전이어야 합니다.'
+                });
+            }
             popupLoader(0, '신규 주문 내역을 오픈마켓으로부터 추출하겠습니다.');
             $.ajax({
                 url: '/api/open-market-orders',

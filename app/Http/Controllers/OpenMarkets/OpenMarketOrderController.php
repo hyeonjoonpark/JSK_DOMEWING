@@ -17,6 +17,13 @@ class OpenMarketOrderController extends Controller
         $marketIds = $request->input('openMarketIds', []);
         $orderwingEngNameLists = $this->getOrderwingOpenMarkets($marketIds);
         $domewingAndPartners = $this->getDomewingAndPartners();
+        if (!$domewingAndPartners) {
+            return [
+                'status' => false,
+                'message' => '도매윙 계정연동한 파트너들이 없습니다.',
+                'data' => []
+            ];
+        }
         $results = [];
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
@@ -37,10 +44,11 @@ class OpenMarketOrderController extends Controller
                 ];
             }
         }
-        return response()->json([
-            'message' => 'Orders processed successfully',
+        return [
+            'status' => true,
+            'message' => '성공적으로 오더윙을 가동하였습니다.',
             'data' => $results
-        ]);
+        ];
     }
     public function indexPartner(Request $request)
     {
@@ -49,19 +57,14 @@ class OpenMarketOrderController extends Controller
             ->where('api_token', $apiToken)
             ->value('id');
         $marketIds = $request->input('openMarketIds', []);
-        if (!$marketIds) {
-            return response()->json([
-                'message' => 'No open market ids found.',
-                'data' => []
-            ]);
-        }
         $orderwingEngNameLists = $this->getOrderwingOpenMarkets($marketIds);
         $domewingAndPartner = $this->getDomewingAndPartners($currentPartnerId);
         if (!$domewingAndPartner) {
-            return response()->json([
-                'message' => 'No linked domewing account found for the current partner.',
+            return [
+                'status' => false,
+                'message' => '도매윙 계정연동을 해야합니다.',
                 'data' => []
-            ]);
+            ];
         }
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
@@ -82,7 +85,8 @@ class OpenMarketOrderController extends Controller
             ];
         }
         return [
-            'message' => 'Orders processed successfully',
+            'status' => true,
+            'message' => '성공적으로 오더윙을 가동하였습니다.',
             'data' => $results
         ];
     }
