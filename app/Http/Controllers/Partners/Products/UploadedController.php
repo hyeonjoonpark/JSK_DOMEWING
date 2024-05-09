@@ -171,16 +171,7 @@ class UploadedController extends Controller
         $cpac = new ApiController();
         $contentType = 'application/json;charset=UTF-8';
         $method = "delete";
-        $url = 'https://api-gateway.coupang.com/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/' . $originProductNo;
+        $url = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/' . $originProductNo;
         return $cpac->builder($account->access_key, $account->secret_key, $method, $contentType, $url);
     }
 }
-//$method, $path, $accessKey, $secretKey
-//$accessKey, $secretKey, $method, $contentType, $path, $data
-
-
-// $account = DB::table($vendorEngName . '_accounts AS a')
-// ->join($vendorEngName . '_uploaded_products AS up', 'up.' . $vendorEngName . '_account_id', '=', 'a.id')
-// ->where('up.origin_product_no', $originProductNo)
-// ->select(['a.application_id', 'a.secret', 'a.username'])
-// ->first();
