@@ -18,13 +18,15 @@ class OpenMarketOrderController extends Controller
         $orderwingEngNameLists = $this->getOrderwingOpenMarkets($marketIds);
         $domewingAndPartners = $this->getDomewingAndPartners();
         $results = [];
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
         foreach ($domewingAndPartners as $domewingAndPartner) {
             $partner = $this->getPartner($domewingAndPartner->partner_id);
             $domewingUserName = $this->getDomewingUserName($domewingAndPartner->domewing_account_id);
             foreach ($orderwingEngNameLists as $orderwingEngNameList) {
                 $methodName = 'call' . ucfirst($orderwingEngNameList) . 'OrderApi';
                 if (method_exists($this, $methodName)) {
-                    $apiResult = call_user_func([$this, $methodName], $partner->id);
+                    $apiResult = call_user_func([$this, $methodName], $partner->id, $startDate, $endDate);
                 } else {
                     $apiResult = null;
                     Log::error("Method $methodName does not exist.");
@@ -42,26 +44,34 @@ class OpenMarketOrderController extends Controller
     }
     public function indexPartner(Request $request)
     {
-        $currentPartnerId = Auth::guard('partner')->id();
-        return $currentPartnerId;
+        $apiToken = $request->apiToken;
+        $currentPartnerId = DB::table('partners')
+            ->where('api_token', $apiToken)
+            ->value('id');
         $marketIds = $request->input('openMarketIds', []);
+        if (!$marketIds) {
+            return response()->json([
+                'message' => 'No open market ids found.',
+                'data' => []
+            ]);
+        }
         $orderwingEngNameLists = $this->getOrderwingOpenMarkets($marketIds);
         $domewingAndPartner = $this->getDomewingAndPartners($currentPartnerId);
-
         if (!$domewingAndPartner) {
             return response()->json([
                 'message' => 'No linked domewing account found for the current partner.',
                 'data' => []
             ]);
         }
-
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
         $results = [];
         $partner = $this->getPartner($domewingAndPartner->partner_id);
         $domewingUserName = $this->getDomewingUserName($domewingAndPartner->domewing_account_id);
         foreach ($orderwingEngNameLists as $orderwingEngNameList) {
             $methodName = 'call' . ucfirst($orderwingEngNameList) . 'OrderApi';
             if (method_exists($this, $methodName)) {
-                $apiResult = call_user_func([$this, $methodName], $partner->id);
+                $apiResult = call_user_func([$this, $methodName], $partner->id, $startDate, $endDate);
             } else {
                 $apiResult = null;
                 Log::error("Method $methodName does not exist.");
@@ -71,17 +81,12 @@ class OpenMarketOrderController extends Controller
                 'api_result' => $apiResult
             ];
         }
-
-        return response()->json([
+        return [
             'message' => 'Orders processed successfully',
             'data' => $results
-        ]);
+        ];
     }
-
-
-
-
-    public function getOrderwingOpenMarkets($marketIds)
+    private function getOrderwingOpenMarkets($marketIds)
     {
         $result = DB::table('vendors AS v')
             ->whereIn('v.id', $marketIds)
@@ -91,7 +96,7 @@ class OpenMarketOrderController extends Controller
 
         return $result->pluck('name_eng')->toArray();
     }
-    public function getDomewingAndPartners($partnerId = null) //그리고 어떤 도매윙 아이디의 오픈마켓 정보들인가를 가져와
+    private function getDomewingAndPartners($partnerId = null) //그리고 어떤 도매윙 아이디의 오픈마켓 정보들인가를 가져와
     {
         $query = DB::table('partner_domewing_accounts as da')
             ->where('is_active', 'Y')
@@ -102,27 +107,27 @@ class OpenMarketOrderController extends Controller
         return $query->get();
     }
 
-    public function getPartner($id) // 이걸로 파트너를 가져와서 그 파트너의 오픈마켓들을 싹 돌릴거야
+    private function getPartner($id) // 이걸로 파트너를 가져와서 그 파트너의 오픈마켓들을 싹 돌릴거야
     {
         return DB::table('partners')
             ->where('id', $id)
             ->first();
     }
-    public function getDomewingUserName($id) //도매윙 계정을 가져와? 왜? 이름 줄려고
+    private function getDomewingUserName($id) //도매윙 계정을 가져와? 왜? 이름 줄려고
     {
         return DB::table('members')
             ->where('id', $id)
             ->select('username')
             ->first();
     }
-    private function callSmart_storeOrderApi($id)
+    private function callSmart_storeOrderApi($id, $startDate, $endDate)
     {
         $controller = new SmartStoreOrderController();
-        return $controller->index($id);
+        return $controller->index($id, $startDate, $endDate);
     }
-    private function callCoupangOrderApi($id)
+    private function callCoupangOrderApi($id, $startDate, $endDate)
     {
         $controller = new CoupangOrderController();
-        return $controller->index($id);
+        return $controller->index($id, $startDate, $endDate);
     }
 }

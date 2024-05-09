@@ -10,27 +10,19 @@ use Illuminate\Support\Facades\DB;
 class CoupangOrderController extends Controller
 {
     private $ssac;
-
     public function __construct()
     {
         $this->ssac = new ApiController();
     }
-
-    public function index($id = null)
+    public function index($id = null, $start = null, $end = null)
     {
-        $orderList = $this->getOrderList($id, 'ACCEPT');
+        if ($id == null) {
+            $id = Auth::guard('partner')->id();
+        }
+        $orderList = $this->getOrderList($id, 'FINAL_DELIVERY', $start, $end);
         return $orderList;
     }
-    public function indexPartner($start = null, $end = null)
-    {
-        $id = Auth::guard('partner')->id();
-        $orderDetails = $this->getOrderList($id, 'ACCEPT', $start, $end);
-        return view('partner.coupang_order_list', [
-            'orderDetails' => $orderDetails
-        ]);
-    }
-
-    public function getOrderList($id, $status, $start = null, $end = null)
+    private function getOrderList($id, $status, $start = null, $end = null)
     {
         $account = $this->getAccount($id);
         $startDate = $start ? new DateTime($start) : new DateTime('now - 6 days');
@@ -45,8 +37,6 @@ class CoupangOrderController extends Controller
         $response = $this->ssac->getBuilder($account->access_key, $account->secret_key, 'application/json', $path, $queryString);
         return $this->transformOrderDetails($response);
     }
-
-
     private function transformOrderDetails($response)
     {
         $orderDetails = [];
@@ -57,7 +47,7 @@ class CoupangOrderController extends Controller
                         'productOrderId' => $orderItem['vendorItemId'],
                         'market' => '쿠팡',
                         'orderId' => $item['orderId'],
-                        'ordererName' => $item['orderer']['name'],
+                        'orderName' => $item['orderer']['name'],
                         'productName' => $orderItem['vendorItemName'],
                         'quantity' => $orderItem['shippingCount'],
                         'unitPrice' => $orderItem['salesPrice'],
@@ -83,7 +73,6 @@ class CoupangOrderController extends Controller
         ];
         return $statusMap[$status] ?? '상태미정';
     }
-
     private function getAccount($id)
     {
         return DB::table('coupang_accounts')->where('partner_id', $id)->first();
