@@ -60,6 +60,58 @@ class ApiController extends Controller
             ];
         }
     }
+    public function deleteBuilder(string $accessKey, string $secretKey, string $contentType, string $path, string $query = '')
+    {
+        date_default_timezone_set("GMT+0");
+        $datetime = date("ymd") . 'T' . date("His") . 'Z';
+        $method = "DELETE";
+        $message = $datetime . $method . $path . $query;
+        $algorithm = "HmacSHA256";
+        $signature = hash_hmac('sha256', $message, $secretKey);
+        $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
+        $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
+        $response = Http::withHeaders([
+            'Authorization' => $authorization,
+            'Content-Type' => $contentType
+        ])->delete($url);
+        if ($response->successful() && $response->status() === 200) {
+            return [
+                'status' => true,
+                'data' => $response->json()
+            ];
+        } else {
+            return [
+                'status' => false,
+                'error' => $response->body()
+            ];
+        }
+    }
+    public function putBuilder(string $accessKey, string $secretKey, string $contentType, string $path, string $query = '')
+    {
+        date_default_timezone_set("GMT+0");
+        $datetime = date("ymd") . 'T' . date("His") . 'Z';
+        $method = "PUT";
+        $message = $datetime . $method . $path . $query;
+        $algorithm = "HmacSHA256";
+        $signature = hash_hmac('sha256', $message, $secretKey);
+        $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
+        $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
+        $response = Http::withHeaders([
+            'Authorization' => $authorization,
+            'Content-Type' => $contentType
+        ])->put($url);
+        if ($response->successful() && $response->status() === 200) {
+            return [
+                'status' => true,
+                'data' => $response->json()
+            ];
+        } else {
+            return [
+                'status' => false,
+                'error' => $response->body()
+            ];
+        }
+    }
     public function builder($accessKey, $secretKey, $method, $contentType, $path, $data = "")
     {
         date_default_timezone_set("GMT+0");

@@ -98,14 +98,14 @@ class UploadedController extends Controller
                 $success++;
             }
         }
-        $dupResult = $this->destroyUploadedProducts($originProductsNo, $vendorEngName);
+        // $dupResult = $this->destroyUploadedProducts($originProductsNo, $vendorEngName);
         return [
             'status' => true,
             'message' => '총 ' . count($originProductsNo) . '개의 상품들 중 ' . $success . '개의 상품들을 성공적으로 삭제했습니다.',
             'data' => [
                 'success' => $success,
                 'errors' => $errors,
-                'dupResult' => $dupResult
+                // 'dupResult' => $dupResult
             ]
         ];
     }
@@ -128,11 +128,11 @@ class UploadedController extends Controller
             ];
         }
     }
-    public function smart_storeDeleteRequest($originProductNo, $vendorEngName)
+    public function smart_storeDeleteRequest($originProductNo)
     {
         $ssac = new SmartStoreApiController();
-        $account = DB::table($vendorEngName . '_accounts AS a')
-            ->join($vendorEngName . '_uploaded_products AS up', 'up.' . $vendorEngName . '_account_id', '=', 'a.id')
+        $account = DB::table('smart_store_accounts AS a')
+            ->join('smart_store_uploaded_products AS up', 'up.smart_store_account_id', '=', 'a.id')
             ->where('up.origin_product_no', $originProductNo)
             ->select(['a.application_id', 'a.secret', 'a.username'])
             ->first();
@@ -141,7 +141,28 @@ class UploadedController extends Controller
         $url = 'https://api.commerce.naver.com/external/v2/products/origin-products/' . $originProductNo;
         return $ssac->builder($account, $contentType, $method, $url);
     }
-
+    public function coupangDeleteRequest($originProductNo)
+    {
+        // https://developers.coupangcorp.com/hc/ko/articles/360033644994-%EC%83%81%ED%92%88-%EC%A1%B0%ED%9A%8C
+        // 위 Path 로부터, vendorItemId 값을 추출한 후, 출력하는 것까지 코딩.
+        // 멋대로 진도 나가거나 다음 알고리즘 구현 절대 금지!!!.
+        // vendorItemId 출력하는 것까지만!!!
+        // Start.
+        $vendorItemId = '';
+        return [
+            'status' => false,
+            'error' => $vendorItemId
+        ];
+        // $account = DB::table('coupang_accounts AS a')
+        //     ->join('coupang_uploaded_products AS up', 'up.coupang_account_id', '=', 'a.id')
+        //     ->where('up.origin_product_no', $originProductNo)
+        //     ->select(['a.hash', 'a.secret_key', 'a.access_key'])
+        //     ->first();
+        // $cpac = new ApiController();
+        // $contentType = 'application/json;charset=UTF-8';
+        // $url = '/v2/providers/seller_api/apis/api/v1/marketplace/vendor-items/' . $originProductNo . '/sales/stop';
+        // return $cpac->putBuilder($account->access_key, $account->secret_key, $contentType, $url);
+    }
     public function destroy($originProductsNo)
     {
         try {
@@ -160,18 +181,5 @@ class UploadedController extends Controller
                 'error' => $e->getMessage()
             ];
         }
-    }
-    public function coupangDeleteRequest($originProductNo, $vendorEngName)
-    {
-        $account = DB::table($vendorEngName . '_accounts AS a')
-            ->join($vendorEngName . '_uploaded_products AS up', 'up.' . $vendorEngName . '_account_id', '=', 'a.id')
-            ->where('up.origin_product_no', $originProductNo)
-            ->select(['a.hash', 'a.secret_key', 'a.access_key'])
-            ->first();
-        $cpac = new ApiController();
-        $contentType = 'application/json;charset=UTF-8';
-        $method = "delete";
-        $url = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/' . $originProductNo;
-        return $cpac->builder($account->access_key, $account->secret_key, $method, $contentType, $url);
     }
 }
