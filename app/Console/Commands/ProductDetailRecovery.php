@@ -33,11 +33,46 @@ class ProductDetailRecovery extends Command
         $products = DB::table('minewing_products')
             ->whereIn('productCode', $productCodes)
             ->where('productDetail', 'like', '%옵션%')
-            ->get(['productCode']);
+            ->where('sellerID', 50)
+            ->get(['productCode', 'productHref', 'productDetail']);
+        echo (count($products));
+        $hrefs = [];
+        $productCodes = [];
+        $productDetails = [];
         foreach ($products as $product) {
-            echo $product->productCode . "\n";
+            $hrefs[] = $product->productHref;
+            $productCodes[] = $product->productCode;
+            $productDetails[] = $product->productDetail;
         }
+
+        // JSON 데이터를 임시 파일에 저장
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'hrefs_');
+        file_put_contents($tempFilePath, json_encode($hrefs));
+        // Node.js 스크립트 실행, 파일 경로를 인자로 전달
+        // $command = "node public/js/detail-recovery/vitsonmro.js $tempFilePath jskorea2023 Tjddlf88!@#"; //비츠온엠알오 13
+        // $command = "node public/js/detail-recovery/ds1008.js $tempFilePath sungil2018 tjddlf88!@#"; //씨오코리아 14
+        $command = "node public/js/detail-recovery/cheonyu.js $tempFilePath jskorea2023 Tjddlf88!@"; //천유닷컴 50
+        exec($command, $output, $return_var);
+
+        // 결과 출력
+        foreach ($output as $productInfoJson) {
+            $productInfos = json_decode($productInfoJson, true);  // JSON 문자열을 배열로 변환
+            foreach ($productInfos as $productInfo) {  // 모든 제품 정보를 반복 처리
+                if (isset($productInfo['productDetail']) && is_array($productInfo['productDetail'])) {
+                    $productDetailUrls = $productInfo['productDetail'];  // 상세 이미지 URL 배열
+                    $optionName = $this->processProductOption($productDetailUrls[0]);  // 옵션 이름 추출, 첫 번째 이미지 URL을 사용
+                    $finalHtml = $this->processProductDetail($productDetailUrls, $optionName);  // 최종 HTML 생성
+                    echo $finalHtml;  // 결과 출력
+                } else {
+                    echo "Product detail key missing or not an array for product: " . $productInfo['productName'] . "\n";
+                }
+            }
+        }
+        // 임시 파일 삭제
+        unlink($tempFilePath);
     }
+
+
     protected function processProductOption(string $originProductDetail): string
     {
         $doc = new DOMDocument();
@@ -51,6 +86,7 @@ class ProductDetailRecovery extends Command
         }
         return $optionName;
     }
+
     protected function processProductDetail(array $productDetailImages, string $optionName): string
     {
         if (strlen($optionName) > 0) {
