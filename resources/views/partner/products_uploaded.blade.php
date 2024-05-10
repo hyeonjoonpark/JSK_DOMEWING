@@ -181,7 +181,8 @@
                                         </a>
                                     </td>
                                     <td class="text-nowrap">
-                                        <button class="btn btn-success" onclick="onUpdate();">수정</button>
+                                        <button class="btn btn-success"
+                                            onclick="onEdit(['{{ $product->origin_product_no }}']);">수정</button>
                                         <button class="btn btn-danger"
                                             onclick="onDelete(['{{ $product->origin_product_no }}']);">삭제</button>
                                     </td>
@@ -200,6 +201,25 @@
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
+
+        function initEdit() {
+            const originProductsNo = $('input[name="selectedProducts"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+            onEdit(originProductsNo);
+        }
+
+        function onEdit() {
+            Swal.fire({
+                icon: "warning",
+                title: "업로드된 상품 수정",
+                text: "정말 해당 상품을 변경 하시겠습니까?",
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "수정"
+                popupLoader
+            });
+        }
 
         function initDelete() {
             const originProductsNo = $('input[name="selectedProducts"]:checked').map(function() {

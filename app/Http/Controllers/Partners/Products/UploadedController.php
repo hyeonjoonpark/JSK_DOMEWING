@@ -128,9 +128,18 @@ class UploadedController extends Controller
             ];
         }
     }
-    public function smart_storeEditRequest()
+    public function smart_storeEditRequest($originProductNo)
     {
         $ssac = new SmartStoreApiController();
+        $account = DB::table('smart_store_accouts AS a')
+            ->join('smart_store_uploaded_products AS up', 'up.smart_store_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.application_id', 'a.secret', 'a.username'])
+            ->first();
+        $contentType = 'application/json;charset=UTF-8';
+        $method = "put";
+        $url = "https://api-gateway.coupang.com/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/" . $originProductNo . "/partial";
+        return $ssac->builder($account, $contentType, $method, $url);
     }
     public function smart_storeDeleteRequest($originProductNo)
     {
