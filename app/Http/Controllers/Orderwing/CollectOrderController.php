@@ -47,7 +47,7 @@ class CollectOrderController extends Controller
             ->where('v.type', 'B2B')
             ->where('v.is_active', 'ACTIVE')
             ->where('pr.is_active', 'Y')
-            ->whereNotIn('v.id', [6])
+            ->whereNotIn('v.id', [6, 33])
             ->get();
     }
     public function deleteLegacy($b2BEngName)

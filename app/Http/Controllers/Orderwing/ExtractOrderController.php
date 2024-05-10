@@ -11,24 +11,14 @@ class ExtractOrderController extends Controller
     public function index($b2Bs)
     {
         $data = [];
-
         foreach ($b2Bs as $b2B) {
             $b2BEngName = $b2B->name_eng;
-
-            if ($b2BEngName == 'domesin') {
-                $data = array_merge($data, $this->processDomesin($b2BEngName));
-            } else if ($b2BEngName == 'funn') { // 오더윙 제외 필터링. 엑셀파일 깨져서옴
-                $data = array_merge($data, $this->processDomesin($b2BEngName));
-            } else {
-                $excelPath = $this->getExcelPath($b2BEngName);
-
-                if ($excelPath !== null) {
-                    $tmpData = $this->extractExcelData($excelPath, $b2BEngName);
-                    $data = array_merge($data, $tmpData);
-                }
+            $excelPath = $this->getExcelPath($b2BEngName);
+            if ($excelPath !== null) {
+                $tmpData = $this->extractExcelData($excelPath, $b2BEngName);
+                $data = array_merge($data, $tmpData);
             }
         }
-
         return $data;
     }
 
@@ -95,7 +85,15 @@ class ExtractOrderController extends Controller
     {
         if (File::exists($excelPath)) {
             $processDataController = new ProcessDataController();
-            return $processDataController->$b2BEngName($excelPath);
+            try {
+                return $processDataController->$b2BEngName($excelPath);
+            } catch (\Exception $e) {
+                return [
+                    'status' => false,
+                    'message' => '엑셀 파일로부터 데이터를 추출하는 과정에서 오류가 발생했습니다.<br>오류 업체명: ' . $b2BEngName,
+                    'error' => $e->getMessage()
+                ];
+            }
         }
         return [];
     }

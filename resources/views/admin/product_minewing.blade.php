@@ -174,8 +174,7 @@
                                             <div class="custom-control custom-checkbox">
                                                 <div class="custom-control custom-checkbox">
                                                     <input type="checkbox" id="b2b{{ $b2b->vendor_id }}" name="b2bs"
-                                                        value="{{ $b2b->vendor_id }}" class="custom-control-input"
-                                                        checked>
+                                                        value="{{ $b2b->vendor_id }}" class="custom-control-input">
                                                     <label class="custom-control-label"
                                                         for="b2b{{ $b2b->vendor_id }}">{{ $b2b->name }}</label>
                                                 </div>
