@@ -89,6 +89,9 @@ class FormProductController extends Controller
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -219,6 +222,9 @@ class FormProductController extends Controller
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -304,6 +310,9 @@ class FormProductController extends Controller
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -399,6 +408,9 @@ class FormProductController extends Controller
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -500,6 +512,9 @@ class FormProductController extends Controller
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -605,6 +620,9 @@ class FormProductController extends Controller
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -693,6 +711,9 @@ class FormProductController extends Controller
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (\Exception $e) {
             return [
@@ -785,6 +806,9 @@ class FormProductController extends Controller
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -890,6 +914,9 @@ class FormProductController extends Controller
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -995,6 +1022,9 @@ class FormProductController extends Controller
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -1095,6 +1125,9 @@ class FormProductController extends Controller
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -1204,6 +1237,9 @@ class FormProductController extends Controller
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -1313,6 +1349,9 @@ class FormProductController extends Controller
             $writer = new Xls($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return [
@@ -1369,6 +1408,9 @@ class FormProductController extends Controller
             $writer = new Xlsx($spreadsheet);
             $writer->save($formedExcelFile);
             $downloadURL = asset('assets/excel/formed/' . $fileName);
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+            unset($writer);
             return ['status' => true, 'return' => $downloadURL];
         } catch (Exception $e) {
             return ['status' => false, 'return' => $e->getMessage()];

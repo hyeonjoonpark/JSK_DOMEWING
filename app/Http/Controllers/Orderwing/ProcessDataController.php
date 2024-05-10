@@ -68,7 +68,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function ownerclan($excelPath)
@@ -133,7 +135,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function domeatoz($excelPath)
@@ -199,7 +203,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function wholesaledepot($excelPath)
@@ -269,7 +275,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function domeggook($excelPath)
@@ -342,7 +350,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData;
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function domeggook2($excelPath)
@@ -415,7 +425,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData;
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function domesin($excelPath)
@@ -482,6 +494,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data; // Return the extracted data
     }
     public function domero($excelPath)
@@ -550,7 +565,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function specialoffer($excelPath)
@@ -615,7 +632,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function tobizon($excelPath)
@@ -683,8 +702,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
-
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function kseller($excelPath)
@@ -758,7 +778,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function onch3($excelPath)
@@ -828,7 +850,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData; // Push the row data to the main data array if not empty
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function funn($excelPath)
@@ -909,7 +933,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData;
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
     public function trendhunterb2b()
@@ -965,8 +991,7 @@ class ProcessDataController extends Controller
                 }
             }
         }
-
-
+        gc_collect_cycles();
         return $finalData;
     }
 
@@ -1014,7 +1039,9 @@ class ProcessDataController extends Controller
                 $data[] = $rowData;
             }
         }
-
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        gc_collect_cycles();
         return $data;
     }
 }
