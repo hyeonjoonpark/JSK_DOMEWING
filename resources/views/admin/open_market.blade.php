@@ -59,7 +59,7 @@
                 <div class="card-inner">
                     <h6 class="title">신규 주문</h6>
                     <p>상품 정보를 클릭하면 해당 상품의 상세 페이지로 이동합니다.</p>
-                    <button class="btn btn-primary mb-5" onclick="initOrderwing();">오더윙 가동</button>
+                    <button class="btn btn-primary mb-5" onclick="initOrderwing();">조회하기</button>
                     <p>총 <span id="numOrders">0</span>개의 주문이 접수되었습니다.</p>
                     <div class="form-group">
                         <label class="form-label">금일 총 매출액</label>
