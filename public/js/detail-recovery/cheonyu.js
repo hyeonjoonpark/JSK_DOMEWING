@@ -117,7 +117,7 @@ async function scrapeProduct(page, productHref) {
             productDetail: productDetail,
             // hasOption: hasOption,
             // productOptions: productOptions,
-            // productHref: productHref,
+            productHref: productHref,
             // sellerID: 50
         };
     }, productHref);

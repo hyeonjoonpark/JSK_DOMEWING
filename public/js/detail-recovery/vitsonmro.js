@@ -1,32 +1,52 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const delay = (time) => new Promise(resolve => setTimeout(resolve, time));
+
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
+    await page.setViewport({ width: 1920, height: 1080 });
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
-        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        await signIn(page, username, password);
+        const items = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // 로그인 프로세스
+        await page.goto('https://vitsonmro.com/mro/login.do', { waitUntil: 'networkidle0' });
+        await page.type('#custId', username);
+        await page.type('#custPw', password);
+        await page.click('#loginForm > div > a:nth-child(3)');
+        await page.waitForSelector('#wrap');
+
         const products = [];
-        let index = 0;
-        for (const url of urls) {
-            let goToWithRepeatResult = null;
-            if (index === 0) {
-                goToWithRepeatResult = await goToWithRepeat(page, url, 0, 'networkidle0');
-                index++;
-            } else {
-                goToWithRepeatResult = await goToWithRepeat(page, url, 0, 'domcontentloaded');
-            }
-            if (goToWithRepeatResult === false) {
+        for (const item of items) {
+            const { href, code } = item;
+            await page.goto(href, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+            // 스크래핑 로직
+            const product = await page.evaluate((href, code) => {
+                const images = document.querySelectorAll('#detail_box > div > ul img');
+                const productDetail = Array.from(images, img => {
+                    let src = img.getAttribute('src');
+                    if (src.endsWith('.jpg')) { // .jpg 파일만 필터링
+                        return src;
+                    }
+                    return null; // .jpg가 아닌 파일은 null 반환
+                }).filter(src => src !== null); // null 값 제거하여 최종 배열 생성
+
+                return {
+                    productDetail: productDetail,
+                    productCode: code // 제품 코드를 추가
+                };
+            }, href, code); // href와 code를 인자로 전달합니다.
+
+
+            if (product === false) {
                 continue;
             }
-            const product = await scrapeProduct(page, url);
-            if (product !== false) {
-                products.push(product);
-            }
+
+            products.push(product);
         }
-        return products;
+
         console.log(JSON.stringify(products));
     } catch (error) {
         console.error('Error occurred:', error);
@@ -34,62 +54,3 @@ const fs = require('fs');
         await browser.close();
     }
 })();
-async function goToWithRepeat(page, url, index, wiatUntilType) {
-    try {
-        await page.goto(url, { waitUntil: wiatUntilType });
-        return true;
-    } catch (error) {
-        if (index < 3) {
-            index++
-            await goToWithRepeat(page, url, index, wiatUntilType);
-        } else {
-            return false;
-        }
-    }
-}
-async function signIn(page, username, password) {
-    await goToWithRepeat(page, 'https://vitsonmro.com/mro/login.do', 0, 'networkidle0');
-    await new Promise((page) => setTimeout(page, 3000));
-    // await page.evaluate(() => {
-    //     const isPopup = document.querySelector('#groobeeWrap');
-    //     if (isPopup) {
-    //         isPopup.style.display = 'none';
-    //         document.querySelector('body > div.grbDim.grbLayer').style.display = 'none';
-    //     }
-    // });
-    await page.type('#custId', username);
-    await page.type('#custPw', password);
-    await page.click('#loginForm > div > a:nth-child(3)');
-    await page.waitForSelector('#wrap');
-}
-async function scrapeProduct(page, productHref) {
-    try {
-        const product = await page.evaluate((productHref) => {
-            let productName = document.querySelector('body > div.container > div > div.content > div.wrap_deal > div.top_title_bar > h3').textContent.trim();
-            const productStandard = document.querySelector('#table > tbody > tr:nth-child(2) > td:nth-child(2)').textContent.trim();
-            productName += ' ' + productStandard;
-            const productPrice = document.querySelector('#negoPrice').textContent.trim().replace(/[^\d]/g, '');
-            const productImage = document.querySelector('body > div.container > div > div.content > div.wrap_deal > div.deal_view > div.deal_gallery > div.swiper-container.gallery-top.swiper-container-horizontal > div > div.swiper-slide.swiper-slide-active > img').src;
-            const images = document.querySelectorAll('#detail_box > div > ul img');
-            const productDetail = Array.from(images, img => {
-                let src = img.getAttribute('src');
-                return src;
-            });
-            const hasOption = false;
-            const productOptions = [];
-            return {
-                productName: productName,
-                // productPrice: productPrice,
-                // productImage: productImage,
-                productDetail: productDetail,
-                // hasOption: hasOption,
-                // productOptions: productOptions,
-                // productHref: productHref,
-                // sellerID: 13
-            };
-        }, productHref);
-        return product;
-    } catch (error) {
-        return false;
-    }
-}
