@@ -47,6 +47,7 @@
                             <input type="date" id="startDate" name="startDate" class="form-control">
                             <label for="endDate">종료 날짜:</label>
                             <input type="date" id="endDate" name="endDate" class="form-control">
+                            <p>날짜 미 선택시 현재일 기준 7일 동안의 내역이 보여집니다.</p>
                         </div>
                     </div>
                 </div>
@@ -60,11 +61,6 @@
                     <h6 class="title">신규 주문</h6>
                     <p>상품 정보를 클릭하면 해당 상품의 상세 페이지로 이동합니다.</p>
                     <button class="btn btn-primary mb-5" onclick="initOrderwing();">조회하기</button>
-                    <p>총 <span id="numOrders">0</span>개의 주문이 접수되었습니다.</p>
-                    <div class="form-group">
-                        <label class="form-label">금일 총 매출액</label>
-                        <h5 class="card-title" id="totalAmt"></h5>
-                    </div>
                     <div class="table-responsive">
                         <table class="table align-middle custom-table">
                             <thead>
@@ -72,12 +68,9 @@
                                     <th>도매윙 닉네임</th>
                                     <th>주문마켓</th>
                                     <th>마켓주문번호</th>
-                                    <th>마켓상품주문번호</th>
                                     <th>주문자</th>
                                     <th>상품명</th>
-                                    <th>수량</th>
-                                    <th>마켓 판매가</th>
-                                    <th>총 판매가</th>
+                                    <th>총 상품 판매가</th>
                                     <th>마켓배송비</th>
                                     <th>마켓주문상태</th>
                                     <th>마켓주문일</th>
@@ -91,6 +84,37 @@
                 </div>
             </div>
         </div>
+    </div>
+    <!-- 상품 상세 정보 모달 -->
+    <div class="modal fade" id="productDetailModal" tabindex="-1" role="dialog" aria-labelledby="productDetailModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productDetailModalLabel">상품 상세 정보</h5>
+                    <button type="button" class="close" aria-label="Close" onclick="closeModal()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <div class="info-section"><strong>도매윙 닉네임:</strong> <span id="modalUserName"></span></div>
+                    <div class="info-section"><strong>오픈 마켓:</strong> <span id="modalMarket"></span></div>
+                    <div class="info-section"><strong>마켓 주문 번호:</strong> <span id="modalOrderId"></span></div>
+                    <div class="info-section"><strong>마켓 상품 주문번호:</strong> <span id="modalProductOrderId"></span>
+                    </div>
+                    <div class="info-section"><strong>주문자:</strong> <span id="modalOrderName"></span></div>
+                    <div class="info-section"><strong>상품명:</strong> <span id="modalProductName"></span></div>
+                    <div class="info-section"><strong>수량:</strong> <span id="modalQuantity"></span></div>
+                    <div class="info-section"><strong>마켓 판매가:</strong> <span id="modalUnitPrice"></span></div>
+                    <div class="info-section"><strong>총 상품 판매가:</strong> <span id="modalTotalPayment"></span></div>
+                    <div class="info-section"><strong>마켓 배송비:</strong> <span id="modalDeliveryFee"></span></div>
+                    <div class="info-section"><strong>마켓 주문상태:</strong> <span id="modalOrderStatus"></span></div>
+                    <div class="info-section"><strong>마켓 주문일:</strong> <span id="modalOrderDate"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 @endsection
 
@@ -162,35 +186,60 @@
             });
         }
 
+
         function updateOrderTable(response) {
             let tableBody = document.getElementById('orderwingResult');
-            tableBody.innerHTML = ''; // 기존 행을 비우기
+            tableBody.innerHTML = '';
 
-            // 모든 data 요소를 반복
             response.data.forEach(dataItem => {
-                // 각 data 요소 내의 api_result를 반복
                 if (dataItem.api_result) {
                     dataItem.api_result.forEach(order => {
-                        let row = `
-                    <tr>
-                        <td>${escapeHTML(dataItem.domewing_user_name) || 'N/A'}</td>
-                        <td>${escapeHTML(order.market) || 'N/A'}</td>
-                        <td>${escapeHTML(order.orderId) || 'N/A'}</td>
-                        <td>${escapeHTML(order.productOrderId) || 'N/A'}</td>
-                        <td>${escapeHTML(order.orderName) || 'N/A'}</td>
-                        <td>${escapeHTML(order.productName) || 'N/A'}</td>
-                        <td>${escapeHTML(order.quantity) || 'N/A'}</td>
-                        <td>${escapeHTML(order.unitPrice) || 'N/A'}</td>
-                        <td>${escapeHTML(order.totalPaymentAmount) || 'N/A'}</td>
-                        <td>${escapeHTML(order.deliveryFeeAmount) || 'N/A'}</td>
-                        <td>${escapeHTML(order.productOrderStatus) || 'N/A'}</td>
-                        <td>${escapeHTML(order.orderDate) || 'N/A'}</td>
-                    </tr>
+                        let augmentedOrder = {
+                            ...order,
+                            domewing_user_name: dataItem.domewing_user_name
+                        };
+                        let row = document.createElement('tr');
+                        let orderDetailJson = encodeURIComponent(JSON.stringify(augmentedOrder));
+                        row.innerHTML = `
+                    <td>${escapeHTML(dataItem.domewing_user_name) || 'N/A'}</td>
+                    <td>${escapeHTML(order.market) || 'N/A'}</td>
+                    <td>${escapeHTML(order.orderId) || 'N/A'}</td>
+                    <td>${escapeHTML(order.orderName) || 'N/A'}</td>
+                    <td><a href="javascript:showProductDetail('${orderDetailJson}');">${escapeHTML(order.productName) || 'N/A'}</a></td>
+                    <td>${escapeHTML(order.totalPaymentAmount) || 'N/A'}</td>
+                    <td>${escapeHTML(order.deliveryFeeAmount) || 'N/A'}</td>
+                    <td>${escapeHTML(order.productOrderStatus) || 'N/A'}</td>
+                    <td>${escapeHTML(order.orderDate) || 'N/A'}</td>
                 `;
-                        tableBody.innerHTML += row; // 새로운 행 추가
+                        tableBody.appendChild(row);
                     });
                 }
             });
+        }
+
+        function showProductDetail(encodedOrder) {
+            var order = JSON.parse(decodeURIComponent(encodedOrder));
+            $('#modalUserName').text(order.domewing_user_name || 'N/A');
+            $('#modalMarket').text(order.market || 'N/A');
+            $('#modalOrderId').text(order.orderId || 'N/A');
+            $('#modalProductOrderId').text(order.productOrderId || 'N/A');
+            $('#modalOrderName').text(order.orderName || 'N/A');
+            $('#modalProductName').text(order.productName || 'N/A');
+            $('#modalQuantity').text(order.quantity || 'N/A');
+            $('#modalUnitPrice').text(order.unitPrice || 'N/A');
+            $('#modalTotalPayment').text(order.totalPaymentAmount || 'N/A');
+            $('#modalDeliveryFee').text(order.deliveryFeeAmount || '0');
+            $('#modalOrderStatus').text(order.productOrderStatus || 'N/A');
+            $('#modalOrderDate').text(order.orderDate || 'N/A');
+            $('#productDetailModal').modal('show');
+        }
+
+
+
+        function closeModal() {
+            var modal = document.getElementById('productDetailModal');
+            $('#productDetailModal').modal('hide');
+            modal.style.display = 'none';
         }
 
         function escapeHTML(text) {

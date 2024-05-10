@@ -92,9 +92,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="productDetailModalLabel">상품 상세 정보</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" aria-label="Close" onclick="closeModal()">
                         <span aria-hidden="true">&times;</span>
                     </button>
+
                 </div>
                 <div class="modal-body">
                     <div class="info-section"><strong>도매윙 닉네임:</strong> <span id="modalUserName"></span></div>
@@ -203,7 +204,7 @@
                     <td>${escapeHTML(order.market) || 'N/A'}</td>
                     <td>${escapeHTML(order.orderId) || 'N/A'}</td>
                     <td>${escapeHTML(order.orderName) || 'N/A'}</td>
-                    <td class="clickable" onclick="showProductDetail('${orderDetailJson}');">${escapeHTML(order.productName) || 'N/A'}</td>
+                    <td><a href="javascript:showProductDetail('${orderDetailJson}');">${escapeHTML(order.productName) || 'N/A'}</a></td>
                     <td>${escapeHTML(order.totalPaymentAmount) || 'N/A'}</td>
                     <td>${escapeHTML(order.deliveryFeeAmount) || 'N/A'}</td>
                     <td>${escapeHTML(order.productOrderStatus) || 'N/A'}</td>
@@ -236,6 +237,7 @@
 
         function closeModal() {
             var modal = document.getElementById('productDetailModal');
+            $('#productDetailModal').modal('hide');
             modal.style.display = 'none';
         }
 
