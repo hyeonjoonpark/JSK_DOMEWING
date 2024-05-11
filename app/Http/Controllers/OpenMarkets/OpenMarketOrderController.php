@@ -66,7 +66,7 @@ class OpenMarketOrderController extends Controller
                 'data' => []
             ];
         }
-        $wing = $this->calcWingById($domewingAndPartner->partner_id);
+        $wing = $this->calcWingById($domewingAndPartner->domewing_account_id);
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
         $results = [];
