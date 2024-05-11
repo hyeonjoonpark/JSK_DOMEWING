@@ -206,8 +206,8 @@
                     <td>${escapeHTML(order.orderId) || 'N/A'}</td>
                     <td>${escapeHTML(order.orderName) || 'N/A'}</td>
                     <td><a href="javascript:showProductDetail('${orderDetailJson}');">${escapeHTML(order.productName) || 'N/A'}</a></td>
-                    <td>${escapeHTML(order.totalPaymentAmount) || 'N/A'}</td>
-                    <td>${escapeHTML(order.deliveryFeeAmount) || 'N/A'}</td>
+                    <td>${formatCurrency(escapeHTML(order.totalPaymentAmount)) || 'N/A'}</td>
+                    <td>${formatCurrency(escapeHTML(order.deliveryFeeAmount)) || 'N/A'}</td>
                     <td>${escapeHTML(order.productOrderStatus) || 'N/A'}</td>
                     <td>${escapeHTML(order.orderDate) || 'N/A'}</td>
                 `;
@@ -225,14 +225,26 @@
             $('#modalProductOrderId').text(order.productOrderId || 'N/A');
             $('#modalOrderName').text(order.orderName || 'N/A');
             $('#modalProductName').text(order.productName || 'N/A');
+            $('#modalUnitPrice').text(formatCurrency(order.unitPrice) || 'N/A');
             $('#modalQuantity').text(order.quantity || 'N/A');
-            $('#modalUnitPrice').text(order.unitPrice || 'N/A');
-            $('#modalTotalPayment').text(order.totalPaymentAmount || 'N/A');
-            $('#modalDeliveryFee').text(order.deliveryFeeAmount || '0');
+            $('#modalTotalPayment').text(formatCurrency(order.totalPaymentAmount) || 'N/A');
+            $('#modalDeliveryFee').text(formatCurrency(order.deliveryFeeAmount) || '0');
             $('#modalOrderStatus').text(order.productOrderStatus || 'N/A');
             $('#modalOrderDate').text(order.orderDate || 'N/A');
             $('#productDetailModal').modal('show');
         }
+
+        function formatCurrency(value) {
+            // 숫자로 강제 변환
+            const numericValue = Number(value);
+            // 숫자 변환이 제대로 되지 않은 경우를 대비하여 검사
+            if (isNaN(numericValue)) {
+                return 'Invalid number'; // 숫자가 아니면 에러 메시지 반환
+            }
+            return numericValue.toLocaleString('ko-KR') + '원';
+        }
+
+
 
 
 
