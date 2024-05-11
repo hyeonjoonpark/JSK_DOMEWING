@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class OpenMarketOrderController extends Controller
 {
@@ -29,7 +30,7 @@ class OpenMarketOrderController extends Controller
         $endDate = $request->input('endDate');
         foreach ($domewingAndPartners as $domewingAndPartner) {
             $partner = $this->getPartner($domewingAndPartner->partner_id);
-            $domewingUserName = $this->getDomewingUserName($domewingAndPartner->domewing_account_id);
+            $domewingUser = $this->getDomewingUser($domewingAndPartner->domewing_account_id);
             foreach ($orderwingEngNameLists as $orderwingEngNameList) {
                 $methodName = 'call' . ucfirst($orderwingEngNameList) . 'OrderApi';
                 if (method_exists($this, $methodName)) {
@@ -39,7 +40,7 @@ class OpenMarketOrderController extends Controller
                     Log::error("Method $methodName does not exist.");
                 }
                 $results[] = [
-                    'domewing_user_name' => $domewingUserName->username,
+                    'domewing_user_name' => $domewingUser->username,
                     'api_result' => $apiResult
                 ];
             }
@@ -72,7 +73,7 @@ class OpenMarketOrderController extends Controller
         $results = [];
         $totalAmountRequired = 0;
         $partner = $this->getPartner($domewingAndPartner->partner_id);
-        $domewingUserName = $this->getDomewingUserName($domewingAndPartner->domewing_account_id);
+        $domewingUser = $this->getDomewingUser($domewingAndPartner->domewing_account_id);
         foreach ($orderwingEngNameLists as $orderwingEngNameList) {
             $methodName = 'call' . ucfirst($orderwingEngNameList) . 'OrderApi';
             if (method_exists($this, $methodName)) {
@@ -82,6 +83,24 @@ class OpenMarketOrderController extends Controller
                         if ($order['productOrderStatus'] == "결제완료") {
                             $totalAmountRequired += $order['totalPaymentAmount'] + $order['deliveryFeeAmount'];
                         }
+                        // DB::table('transaction_wing')->insert([
+                        //     'ref_no' => 'TRX' . Str::uuid()->toString(),
+                        //     'member_id' => $domewingAndPartner->domewing_account_id,
+                        //     'amount' => '입력예정',
+                        //     'type' => 'ORDER',
+                        //     'cart_id' => '입력예정'
+                        // ]);
+
+                        // DB::table('delivery_details')->insert([
+                        //     'transaction_id' => '위의 삽입한 ref_no',
+                        //     'contact_name' => $order['receiverName'],
+                        //     'phone_number' => $order['reciverPhone'],
+                        //     'email' => $domewingUser->email,
+                        //     'address_name' => $order['addressName'],
+                        //     'address' => $order['address'],
+                        //     'delivery_company_id'=>
+
+                        // ]);
                     }
                 }
             } else {
@@ -89,7 +108,7 @@ class OpenMarketOrderController extends Controller
                 Log::error("Method $methodName does not exist.");
             }
             $results[] = [
-                'domewing_user_name' => $domewingUserName->username,
+                'domewing_user_name' => $domewingUser->username,
                 'api_result' => $apiResult
             ];
         }
@@ -134,11 +153,10 @@ class OpenMarketOrderController extends Controller
             ->where('id', $id)
             ->first();
     }
-    private function getDomewingUserName($id) //도매윙 계정을 가져와? 왜? 이름 줄려고
+    private function getDomewingUser($id) //도매윙 계정을 가져와? 왜? 이름 줄려고
     {
         return DB::table('members')
             ->where('id', $id)
-            ->select('username')
             ->first();
     }
     private function calcWingById($id)
