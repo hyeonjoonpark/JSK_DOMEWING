@@ -202,6 +202,7 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
         Route::post('delete-product', [ManageController::class, 'deleteProduct']);
         Route::post('edit-product', [ManageController::class, 'editProduct']);
         Route::post('delete-uploaded', [UploadedController::class, 'delete']);
+        Route::post('edit-uploaded', [UploadedController::class, 'edit']);
     });
 
     Route::post('open-market-orders', [OpenMarketOrderController::class, 'indexPartner']);

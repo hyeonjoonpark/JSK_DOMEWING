@@ -202,22 +202,62 @@
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
 
-        function initEdit() {
-            const originProductsNo = $('input[name="selectedProducts"]:checked').map(function() {
-                return $(this).val();
-            }).get();
-            onEdit(originProductsNo);
-        }
-
         function onEdit() {
+            const html = `
+            <div class="form-group">
+                <label class="form-label">상품명</label>
+                <div class="d-flex">
+                    <input type="text" class="form-control" id="productName" placeholder="새 상품명을 입력해주세요.">
+                    <button class="btn btn-primary text-nowrap" onclick="requestEdit('${productCode}', 'TEST');">가공</button>
+                </div>
+            </div>
+            `;
             Swal.fire({
-                icon: "warning",
-                title: "업로드된 상품 수정",
-                text: "정말 해당 상품을 변경 하시겠습니까?",
+                icon: 'warning',
+                html,
                 showCancelButton: true,
                 cancelButtonText: "취소",
-                confirmButtonText: "수정"
-                popupLoader
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    requestEdit(productCode, 'CONFIRMED');
+                }
+            });
+        }
+
+        function initEdit() {
+            const productName = $('#productName').val();
+            $.ajax({
+                url: "/api/partner/product/edit-uploaded",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    originProductsNo,
+                    vendorId
+                },
+                success: function(response) {
+                    if (type === 'TEST') {
+                        console.log('here');
+                        $('#productName').val(response.data.processedProductName);
+                    } else {
+                        closePopup();
+                        const status = response.status;
+                        const message = response.message;
+                        let icon = 'success';
+                        if (status === false) {
+                            console.log(response);
+                            icon = 'error';
+                        }
+                        Swal.fire({
+                            icon: icon,
+                            title: message
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    }
+                },
+                error: AjaxErrorHandling
             });
         }
 
