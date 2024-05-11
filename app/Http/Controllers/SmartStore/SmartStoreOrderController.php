@@ -87,15 +87,15 @@ class SmartStoreOrderController extends Controller
             return [
                 'market' => $item['order']['market'] ?? '스마트스토어',
                 'orderId' => $item['order']['orderId'] ?? 'N/A',
-                'orderName' => $item['order']['ordererName'] ?? 'N/A',
-                'orderDate' => isset($item['order']['orderDate']) ? (new DateTime($item['order']['orderDate']))->format('Y-m-d H:i:s') : 'N/A',
                 'productOrderId' => $item['productOrder']['productOrderId'] ?? 'N/A',
+                'orderName' => $item['order']['ordererName'] ?? 'N/A',
                 'productName' => $item['productOrder']['productName'] ?? 'N/A',
                 'quantity' => $item['productOrder']['quantity'] ?? 'N/A',
                 'unitPrice' => $item['productOrder']['unitPrice'] ?? 'N/A',
                 'totalPaymentAmount' => $item['productOrder']['totalPaymentAmount'] ?? 'N/A',
                 'deliveryFeeAmount' => $item['productOrder']['deliveryFeeAmount'] ?? 'N/A',
                 'productOrderStatus' => $statusMap[$item['productOrder']['productOrderStatus']] ?? '상태 미정',
+                'orderDate' => isset($item['order']['orderDate']) ? (new DateTime($item['order']['orderDate']))->format('Y-m-d H:i:s') : 'N/A',
             ];
         }, $response['data']['data']);
         return $formattedResponse;

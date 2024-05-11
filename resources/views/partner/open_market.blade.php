@@ -174,13 +174,26 @@
                     apiToken
                 },
                 success: function(response) {
-                    console.log(response);
-                    updateOrderTable(response);
                     closePopup();
+                    if (!response.status) {
+                        // 서버로부터 반환된 오류 메시지와 부족한 금액을 표시
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            text: '추가 필요 금액: ' + formatCurrency(response.data)
+                        });
+                    } else {
+                        updateOrderTable(response);
+                    }
                 },
-                error: function(response) {
-                    console.error('Error:', response);
+                error: function(xhr, status, error) {
                     closePopup();
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: '네트워크 오류',
+                        text: '요청 처리 중 문제가 발생했습니다.'
+                    });
                 }
             });
         }

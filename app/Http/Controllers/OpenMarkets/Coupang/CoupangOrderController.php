@@ -76,9 +76,9 @@ class CoupangOrderController extends Controller
             foreach ($response['data']['data'] as $item) {
                 foreach ($item['orderItems'] as $orderItem) {
                     $orderDetails[] = [
-                        'productOrderId' => $orderItem['vendorItemId'],
                         'market' => '쿠팡',
                         'orderId' => $item['orderId'],
+                        'productOrderId' => $orderItem['vendorItemId'],
                         'orderName' => $item['orderer']['name'],
                         'productName' => $orderItem['vendorItemName'],
                         'quantity' => $orderItem['shippingCount'],

@@ -66,15 +66,24 @@ class OpenMarketOrderController extends Controller
                 'data' => []
             ];
         }
+        $wing = $this->calcWingById($domewingAndPartner->partner_id);
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
         $results = [];
+        $totalAmountRequired = 0;
         $partner = $this->getPartner($domewingAndPartner->partner_id);
         $domewingUserName = $this->getDomewingUserName($domewingAndPartner->domewing_account_id);
         foreach ($orderwingEngNameLists as $orderwingEngNameList) {
             $methodName = 'call' . ucfirst($orderwingEngNameList) . 'OrderApi';
             if (method_exists($this, $methodName)) {
                 $apiResult = call_user_func([$this, $methodName], $partner->id, $startDate, $endDate);
+                if (isset($apiResult) && is_array($apiResult)) {
+                    foreach ($apiResult as $order) {
+                        if ($order['productOrderStatus'] == "결제완료") {
+                            $totalAmountRequired += $order['totalPaymentAmount'] + $order['deliveryFeeAmount'];
+                        }
+                    }
+                }
             } else {
                 $apiResult = null;
                 Log::error("Method $methodName does not exist.");
@@ -84,12 +93,20 @@ class OpenMarketOrderController extends Controller
                 'api_result' => $apiResult
             ];
         }
+        if ($totalAmountRequired > $wing) {
+            return [
+                'status' => false,
+                'message' => 'wing 잔액이 부족합니다.',
+                'data' => $totalAmountRequired - $wing,
+            ];
+        }
         return [
             'status' => true,
             'message' => '성공적으로 오더윙을 가동하였습니다.',
             'data' => $results
         ];
     }
+
     private function getOrderwingOpenMarkets($marketIds)
     {
         $result = DB::table('vendors AS v')
@@ -123,6 +140,22 @@ class OpenMarketOrderController extends Controller
             ->where('id', $id)
             ->select('username')
             ->first();
+    }
+    private function calcWingById($id)
+    {
+        $balanceQuery = DB::table('transaction_wing')
+            ->selectRaw('SUM(CASE WHEN type = "DEPOSIT" AND status = "APPROVED" THEN amount ELSE 0 END) AS total_deposit')
+            ->selectRaw('SUM(CASE WHEN type = "ORDER" OR type = "WITHDRAW" THEN amount ELSE 0 END) AS total_withdrawal')
+            ->where('member_id', $id)
+            ->where('status', '!=', 'REJECTED')
+            ->get();
+
+        // Calculate the balance
+        $totalDeposit = $balanceQuery[0]->total_deposit ?? 0;
+        $totalWithdrawal = $balanceQuery[0]->total_withdrawal ?? 0;
+        $balance = $totalDeposit - $totalWithdrawal;
+
+        return $balance;
     }
     private function callSmart_storeOrderApi($id, $startDate, $endDate)
     {
