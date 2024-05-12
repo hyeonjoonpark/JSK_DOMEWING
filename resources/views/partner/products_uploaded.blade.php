@@ -237,10 +237,6 @@
             });
         }
 
-
-
-
-
         function initDelete() {
             const originProductsNo = $('input[name="selectedProducts"]:checked').map(function() {
                 return $(this).val();
