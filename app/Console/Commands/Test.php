@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -26,10 +27,14 @@ class Test extends Command
      */
     public function handle()
     {
-        DB::table('coupang_uploaded_products AS cup')
-            ->join('partner_products AS pp', 'pp.product_id', '=', 'cup.product_id')
-            ->update([
-                'cup.product_name' => DB::raw('pp.product_name')
-            ]);
+        $ac = new ApiController();
+        $account = DB::table('coupang_accounts')
+            ->where('id', 8)
+            ->first();
+        $contentType = 'application/json;charset=UTF-8';
+        $path = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/14904557493';
+        //string $accessKey, string $secretKey, string $contentType, string $path, string $query = ''
+        $response = $ac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
+        print_r($response);
     }
 }

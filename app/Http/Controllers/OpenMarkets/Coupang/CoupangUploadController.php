@@ -50,13 +50,21 @@ class CoupangUploadController extends Controller
             }
             $outboundCode = $responseOutbound['data'];
             $returnCenter = $responseReturn['data'];
-            $salePrice = (int)($product->productPrice + $product->shipping_fee);
-            $data = $this->generateData($product, $account, $outboundCode, $returnCenter, $salePrice);
+            // 5,000원 미만 상품들은 상품가와 배송비를 따로 구분
+            $productPrice = $product->productPrice;
+            $shippingFee = $product->shipping_fee;
+            $salePrice = $productPrice;
+            // 5,000원 이상 상품들은 상품가에 배송비를 더한 후, 배송비를 0원 처리
+            if ($productPrice >= 5000) {
+                $salePrice = (int)($product->productPrice + $product->shipping_fee);
+                $shippingFee = 0;
+            }
+            $data = $this->generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee);
             $uploadResult = $ac->builder($accessKey, $secretKey, $method, $contentType, $path, $data);
             if ($uploadResult['status'] === true) {
                 if ($uploadResult['data']['code'] === 'SUCCESS') {
                     $originProductNo = $uploadResult['data']['data'];
-                    $this->store($account->id, $product->id, $salePrice, $product->shipping_fee, $originProductNo, $product->productName);
+                    $this->store($account->id, $product->id, $salePrice, $shippingFee, $originProductNo, $product->productName);
                     $success++;
                 } else {
                     $error = $uploadResult['data']['message'];
@@ -118,7 +126,8 @@ class CoupangUploadController extends Controller
         }
         return [
             'status' => false,
-            'message' => '쿠팡윙에서 반품지 주소를 올바르게 설정해주세요.'
+            'message' => '쿠팡윙에서 반품지 주소를 올바르게 설정해주세요.<br>혹은 쿠팡 API 에 43.200.252.11 IP 주소를 기입해주세요.',
+            'error' => $response
         ];
     }
     public function getOutbound($accessKey, $secretKey)
@@ -150,12 +159,17 @@ class CoupangUploadController extends Controller
             'message' => '쿠팡윙에서 출고지 주소를 올바르게 설정해주세요.'
         ];
     }
-    protected function generateData($product, $account, $outboundCode, $returnCenter, $salePrice)
+    protected function generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee)
     {
         $optionName = '단일 상품';
         if ($product->hasOption === 'Y') {
             $optionName = $this->extractOptionName($product->productDetail);
         }
+        $deliveryChargeType = "NOT_FREE";
+        if ($salePrice >= 5000) {
+            $deliveryChargeType = "FREE";
+        }
+        $deliveryCharge = $shippingFee;
         return [
             'displayCategoryCode' => $product->code,
             'sellerProductName' => $product->productName,
@@ -167,8 +181,8 @@ class CoupangUploadController extends Controller
             'generalProductName' => $product->productName,
             'deliveryMethod' => 'SEQUENCIAL',
             'deliveryCompanyCode' => 'HYUNDAI',
-            'deliveryChargeType' => 'FREE',
-            'deliveryCharge' => 0,
+            'deliveryChargeType' => $deliveryChargeType,
+            'deliveryCharge' => $deliveryCharge,
             'freeShipOverAmount' => 0,
             'deliveryChargeOnReturn' => $product->shipping_fee,
             'remoteAreaDeliverable' => 'Y',

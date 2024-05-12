@@ -156,7 +156,7 @@
                                                 {{ $product->origin_product_no }}<br>
                                                 <span class="wing-font">{{ number_format($product->price, 0) }}</span>원 /
                                                 배송비: <span
-                                                    class="wing-font">{{ $selectedOpenMarketId == 40 ? '무료' : number_format($product->up_shipping_fee, 0) . '원' }}</span><br>
+                                                    class="wing-font">{{ number_format($product->up_shipping_fee, 0) . '원' }}</span><br>
                                                 <b>{{ $product->username }}</b><br>
                                                 업로드 일시: {{ $product->created_at }}
                                             </p>

@@ -111,6 +111,11 @@
                     <div class="info-section"><strong>마켓 배송비:</strong> <span id="modalDeliveryFee"></span></div>
                     <div class="info-section"><strong>마켓 주문상태:</strong> <span id="modalOrderStatus"></span></div>
                     <div class="info-section"><strong>마켓 주문일:</strong> <span id="modalOrderDate"></span></div>
+                    <div class="info-section"><strong>수신자:</strong> <span id="modalReceiverName"></span></div>
+                    <div class="info-section"><strong>수신자 전화번호:</strong> <span id="modalReceiverPhone"></span></div>
+                    <div class="info-section"><strong>우편번호:</strong> <span id="modalPostCode"></span></div>
+                    <div class="info-section"><strong>주소지명:</strong> <span id="modalAddressName"></span></div>
+                    <div class="info-section"><strong>주소:</strong> <span id="modalAddress"></span></div>
                 </div>
             </div>
         </div>
@@ -231,6 +236,11 @@
             $('#modalDeliveryFee').text(formatCurrency(order.deliveryFeeAmount) || '0');
             $('#modalOrderStatus').text(order.productOrderStatus || 'N/A');
             $('#modalOrderDate').text(order.orderDate || 'N/A');
+            $('#modalReceiverName').text(order.receiverName || 'N/A');
+            $('#modalReceiverPhone').text(order.receiverPhone || 'N/A');
+            $('#modalPostCode').text(order.postCode || 'N/A');
+            $('#modalAddress').text(order.address || 'N/A');
+            $('#modalAddressName').text(order.addressName || 'N/A');
             $('#productDetailModal').modal('show');
         }
 

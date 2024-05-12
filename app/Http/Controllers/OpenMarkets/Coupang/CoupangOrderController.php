@@ -87,6 +87,12 @@ class CoupangOrderController extends Controller
                         'deliveryFeeAmount' => $item['shippingPrice'],
                         'productOrderStatus' => $this->mapStatusToReadable($item['status']),
                         'orderDate' => isset($item['orderedAt']) ? (new DateTime($item['orderedAt']))->format('Y-m-d H:i:s') : 'N/A',
+                        'receiverName' => $item['receiver']['name'],
+                        'receiverPhone' => $item['receiver']['receiverNumber'],
+                        'postCode' => $item['receiver']['postCode'],
+                        'address' => $item['receiver']['addr1'],
+                        'addressName' => '기본배송지'
+
                     ];
                 }
             }
