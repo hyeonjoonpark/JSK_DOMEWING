@@ -92,9 +92,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="productDetailModalLabel">상품 상세 정보</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" aria-label="Close" onclick="closeModal()">
                         <span aria-hidden="true">&times;</span>
                     </button>
+
                 </div>
                 <div class="modal-body">
                     <div class="info-section"><strong>도매윙 닉네임:</strong> <span id="modalUserName"></span></div>
@@ -110,6 +111,11 @@
                     <div class="info-section"><strong>마켓 배송비:</strong> <span id="modalDeliveryFee"></span></div>
                     <div class="info-section"><strong>마켓 주문상태:</strong> <span id="modalOrderStatus"></span></div>
                     <div class="info-section"><strong>마켓 주문일:</strong> <span id="modalOrderDate"></span></div>
+                    <div class="info-section"><strong>수신자:</strong> <span id="modalReceiverName"></span></div>
+                    <div class="info-section"><strong>수신자 전화번호:</strong> <span id="modalReceiverPhone"></span></div>
+                    <div class="info-section"><strong>우편번호:</strong> <span id="modalPostCode"></span></div>
+                    <div class="info-section"><strong>주소지명:</strong> <span id="modalAddressName"></span></div>
+                    <div class="info-section"><strong>주소:</strong> <span id="modalAddress"></span></div>
                 </div>
             </div>
         </div>
@@ -173,13 +179,26 @@
                     apiToken
                 },
                 success: function(response) {
-                    console.log(response);
-                    updateOrderTable(response);
                     closePopup();
+                    if (!response.status) {
+                        // 서버로부터 반환된 오류 메시지와 부족한 금액을 표시
+                        Swal.fire({
+                            icon: 'error',
+                            title: response.message,
+                            text: '추가 필요 금액: ' + formatCurrency(response.data)
+                        });
+                    } else {
+                        updateOrderTable(response);
+                    }
                 },
-                error: function(response) {
-                    console.error('Error:', response);
+                error: function(xhr, status, error) {
                     closePopup();
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: '네트워크 오류',
+                        text: '요청 처리 중 문제가 발생했습니다.'
+                    });
                 }
             });
         }
@@ -203,9 +222,9 @@
                     <td>${escapeHTML(order.market) || 'N/A'}</td>
                     <td>${escapeHTML(order.orderId) || 'N/A'}</td>
                     <td>${escapeHTML(order.orderName) || 'N/A'}</td>
-                    <td class="clickable" onclick="showProductDetail('${orderDetailJson}');">${escapeHTML(order.productName) || 'N/A'}</td>
-                    <td>${escapeHTML(order.totalPaymentAmount) || 'N/A'}</td>
-                    <td>${escapeHTML(order.deliveryFeeAmount) || 'N/A'}</td>
+                    <td><a href="javascript:showProductDetail('${orderDetailJson}');">${escapeHTML(order.productName) || 'N/A'}</a></td>
+                    <td>${formatCurrency(escapeHTML(order.totalPaymentAmount)) || 'N/A'}</td>
+                    <td>${formatCurrency(escapeHTML(order.deliveryFeeAmount)) || 'N/A'}</td>
                     <td>${escapeHTML(order.productOrderStatus) || 'N/A'}</td>
                     <td>${escapeHTML(order.orderDate) || 'N/A'}</td>
                 `;
@@ -223,19 +242,37 @@
             $('#modalProductOrderId').text(order.productOrderId || 'N/A');
             $('#modalOrderName').text(order.orderName || 'N/A');
             $('#modalProductName').text(order.productName || 'N/A');
+            $('#modalUnitPrice').text(formatCurrency(order.unitPrice) || 'N/A');
             $('#modalQuantity').text(order.quantity || 'N/A');
-            $('#modalUnitPrice').text(order.unitPrice || 'N/A');
-            $('#modalTotalPayment').text(order.totalPaymentAmount || 'N/A');
-            $('#modalDeliveryFee').text(order.deliveryFeeAmount || '0');
+            $('#modalTotalPayment').text(formatCurrency(order.totalPaymentAmount) || 'N/A');
+            $('#modalDeliveryFee').text(formatCurrency(order.deliveryFeeAmount) || '0');
             $('#modalOrderStatus').text(order.productOrderStatus || 'N/A');
             $('#modalOrderDate').text(order.orderDate || 'N/A');
+            $('#modalReceiverName').text(order.receiverName || 'N/A');
+            $('#modalReceiverPhone').text(order.receiverPhone || 'N/A');
+            $('#modalPostCode').text(order.postCode || 'N/A');
+            $('#modalAddress').text(order.address || 'N/A');
+            $('#modalAddressName').text(order.addressName || 'N/A');
             $('#productDetailModal').modal('show');
         }
+
+        function formatCurrency(value) {
+            // 숫자로 강제 변환
+            const numericValue = Number(value);
+            // 숫자 변환이 제대로 되지 않은 경우를 대비하여 검사
+            if (isNaN(numericValue)) {
+                return 'Invalid number'; // 숫자가 아니면 에러 메시지 반환
+            }
+            return numericValue.toLocaleString('ko-KR') + '원';
+        }
+
+
 
 
 
         function closeModal() {
             var modal = document.getElementById('productDetailModal');
+            $('#productDetailModal').modal('hide');
             modal.style.display = 'none';
         }
 

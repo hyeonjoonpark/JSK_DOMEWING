@@ -128,9 +128,20 @@ class UploadedController extends Controller
             ];
         }
     }
-    public function smart_storeEditRequest()
+    public function smart_storeEditRequest($originProductNo, $shippingFee, $price)
     {
         $ssac = new SmartStoreApiController();
+        $account = DB::table('smart_store_accouts AS a')
+            ->join('smart_store_uploaded_products AS up', 'up.smart_store_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->where('up.shipping_fee', $shippingFee)
+            ->where('up.price', $price)
+            ->select(['a.application_id', 'a.secret', 'a.username'])
+            ->first();
+        $contentType = 'application/json;charset=UTF-8';
+        $method = "put";
+        $url = "https://api.commerce.naver.com/external/v2/products/origin-products/" . $originProductNo; //. "/partial";
+        return $ssac->builder($account, $contentType, $method, $url);
     }
     public function smart_storeDeleteRequest($originProductNo)
     {

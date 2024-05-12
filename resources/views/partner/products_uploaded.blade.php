@@ -181,7 +181,8 @@
                                         </a>
                                     </td>
                                     <td class="text-nowrap">
-                                        <button class="btn btn-success" onclick="onUpdate();">수정</button>
+                                        <button class="btn btn-success"
+                                            onclick="onEdit(['{{ $product->origin_product_no }}']);">수정</button>
                                         <button class="btn btn-danger"
                                             onclick="onDelete(['{{ $product->origin_product_no }}']);">삭제</button>
                                     </td>
@@ -200,6 +201,65 @@
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
+
+        function onEdit() {
+            const html = `
+            <div class="form-group">
+                <label class="form-label">상품명</label>
+                <div class="d-flex">
+                    <input type="text" class="form-control" id="productName" placeholder="새 상품명을 입력해주세요.">
+                    <button class="btn btn-primary text-nowrap" onclick="requestEdit('${productCode}', 'TEST');">가공</button>
+                </div>
+            </div>
+            `;
+            Swal.fire({
+                icon: 'warning',
+                html,
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    requestEdit(productCode, 'CONFIRMED');
+                }
+            });
+        }
+
+        function initEdit() {
+            const productName = $('#productName').val();
+            $.ajax({
+                url: "/api/partner/product/edit-uploaded",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    originProductsNo,
+                    vendorId
+                },
+                success: function(response) {
+                    if (type === 'TEST') {
+                        console.log('here');
+                        $('#productName').val(response.data.processedProductName);
+                    } else {
+                        closePopup();
+                        const status = response.status;
+                        const message = response.message;
+                        let icon = 'success';
+                        if (status === false) {
+                            console.log(response);
+                            icon = 'error';
+                        }
+                        Swal.fire({
+                            icon: icon,
+                            title: message
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    }
+                },
+                error: AjaxErrorHandling
+            });
+        }
 
         function initDelete() {
             const originProductsNo = $('input[name="selectedProducts"]:checked').map(function() {
