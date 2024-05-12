@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
+use App\Http\Controllers\Product\NameController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -132,37 +133,48 @@ class UploadedController extends Controller
     public function edit(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'originProductNo' => 'required|string',
+            'productName' => 'required|string',
+            'price' => 'required|integer|min:10|max:999999999',
+            'shippingFee' => 'required|integer|min:10|max:999999999',
             'vendorId' => 'required|integer|exists:vendors,id'
         ], [
-            'originProductNo.required' => '유효한 상품 번호를 입력해주세요.',
-            'vendorId.required' => '유효한 오픈 마켓을 선택해주세요.'
+            'productName' => '상품명을 입력해주세요.',
+            'price' => '상품가는 최소 10원부터 최대 999,999,999원까지 가능합니다.',
+            'shippingFee' => '배송비는 최소 10원부터 최대 999,999,999원까지 가능합니다.',
+            'vendorId' => '유효한 오픈 마켓이 아닙니다.'
         ]);
-
         if ($validator->fails()) {
-            return response()->json([
+            return [
                 'status' => false,
                 'message' => $validator->errors()->first(),
                 'error' => $validator->errors()
-            ]);
+            ];
         }
-
-        $productNumber = $request->input('originProductNo');
-
-        $productDetails = DB::table('smart_store_uploaded_products')
-            ->where('origin_product_no', $productNumber)
-            ->select([
-                'product_name',
-                'shipping_fee',
-                'price'
-            ])
-            ->first();
-
-        if (!$productDetails) {
-            return response()->json(['status' => false, 'message' => '상품 정보가 없습니다.'], 404);
+        $vendorId = $request->vendorId;
+        $vendorEngName = DB::table('vendors')
+            ->where('id', $vendorId)
+            ->first(['name_eng'])
+            ->name_eng;
+        $originProductNoValidator = DB::table($vendorEngName . '_uploaded_products')
+            ->where('origin_product_no', $request->originProductNo)
+            ->where('is_active', 'Y')
+            ->exists();
+        if ($originProductNoValidator === false) {
+            return [
+                'status' => false,
+                'message' => '유효한 상품이 아닙니다.',
+                'error' => [
+                    'originProductNo' => $request->originProductNo
+                ]
+            ];
         }
-
-        return response()->json(['status' => true, 'data' => $productDetails]);
+        $originProductNo = $request->originProductNo;
+        $nc = new NameController();
+        $productName = $nc->index($request->productName);
+        $price = $request->price;
+        $shippingFee = $request->shippingFee;
+        // 여기까지 상품을 수정하기 위한 요소들을 가공하고, 검사하고, 다 했어.
+        // 스마트 스토어부터 반영 시작. 나머지 일정 생각 금지. 고려 금지. 구현은 더더욱 금지.
     }
 
     public function smart_storeDeleteRequest($originProductNo)

@@ -77,28 +77,6 @@
         });
     }
 
-    function numberFormat(number, decimals = 0, decPoint = '.', thousandsSep = ',') {
-        // Ensure number is a float.
-        number = parseFloat(number);
-
-        // Check if number is NaN and return 0 in such case
-        if (isNaN(number)) {
-            return '0';
-        }
-
-        // Fix the number to specified decimal places and convert to string.
-        number = number.toFixed(decimals);
-
-        // Split the number by the decimal point.
-        const parts = number.split('.');
-
-        // Replace instances of thousand separator.
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
-
-        // Reassemble the number and return it.
-        return parts.join(decPoint);
-    }
-
     function AjaxErrorHandling(error) {
         console.log(error);
         closePopup();
