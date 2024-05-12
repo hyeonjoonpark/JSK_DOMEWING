@@ -44,17 +44,20 @@ class ProductDetailRecovery extends Command
         exec($command, $output, $resultCode);
         if ($resultCode === 0 && isset($output[0])) {
             $products = json_decode($output[0], true);
+            return $products;
         }
     }
     protected function processProducts($products)
     {
         $chunkedProducts = array_chunk($products, 100, false);
+        $fetchedProducts = [];
         foreach ($chunkedProducts as $products) {
             $tempProductCodeFilePath = public_path('js/detail-recovery/ds1008_targets.json');
             file_put_contents($tempProductCodeFilePath, json_encode($products));
-            $this->scrapeProductDetail($tempProductCodeFilePath);
+            $fetchedProducts = array_merge($fetchedProducts, $this->scrapeProductDetail($tempProductCodeFilePath));
             unlink($tempProductCodeFilePath);
         }
+        return $fetchedProducts;
     }
     protected function getTargetProducts()
     {

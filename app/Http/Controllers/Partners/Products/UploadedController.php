@@ -15,6 +15,7 @@ class UploadedController extends Controller
 {
     public function index(Request $request)
     {
+        set_time_limit(0);
         $openMarkets = DB::table('vendors')
             ->where('is_active', 'ACTIVE')
             ->where('type', 'OPEN_MARKET')
@@ -62,6 +63,7 @@ class UploadedController extends Controller
     }
     public function delete(Request $request)
     {
+        set_time_limit(0);
         $validator = Validator::make($request->all(), [
             'originProductsNo' => 'required|array|min:1',
             'vendorId' => 'required|integer|exists:vendors,id'
@@ -132,6 +134,7 @@ class UploadedController extends Controller
 
     public function edit(Request $request)
     {
+        set_time_limit(0);
         $validator = Validator::make($request->all(), [
             'originProductsNo' => 'required|array|min:1',
             'productName' => 'required|string',

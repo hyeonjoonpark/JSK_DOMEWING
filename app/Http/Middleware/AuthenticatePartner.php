@@ -2,11 +2,13 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\WingController;
 use App\Models\Partner;
 use App\Models\PartnerClass;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AuthenticatePartner
 {
@@ -41,7 +43,18 @@ class AuthenticatePartner
             return redirect()->route('partner.login')->withErrors(['invalidLogin' => '셀윙 파트너스 클래스가 만료되었습니다. 다시 로그인해주십시오.']);
         }
         $partner = Partner::with('partnerClass')->find($partner->id);
+        $wingBalance = 0;
+        $memberId = DB::table('members AS m')
+            ->join('partner_domewing_accounts AS pda', 'pda.domewing_account_id', '=', 'm.id')
+            ->where('pda.partner_id', $partnerId)
+            ->first(['m.id']);
+        if ($memberId !== null) {
+            $memberId = $memberId->id;
+            $wc = new WingController();
+            $wingBalance = $wc->getBalance($memberId);
+        }
         view()->share('partner', $partner);
+        view()->share('wingBalance', $wingBalance);
         return $next($request);
     }
 }
