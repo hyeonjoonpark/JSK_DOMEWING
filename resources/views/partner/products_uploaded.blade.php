@@ -182,7 +182,7 @@
                                     </td>
                                     <td class="text-nowrap">
                                         <button class="btn btn-success"
-                                            onclick="requestEdit('{{ $product->origin_product_no }}');">수정</button>
+                                            onclick="initEdit('{{ $product->productCode }}', '{{ $product->origin_product_no }}', '{{ $product->upName }}', '{{ $product->price }}', '{{ $product->up_shipping_fee }}');">수정</button>
                                         <button class="btn btn-danger"
                                             onclick="onDelete(['{{ $product->origin_product_no }}']);">삭제</button>
                                     </td>
@@ -202,38 +202,59 @@
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
 
-        // function onEdit(originProductNo) {
-        //     requestEdit(originProductNo); // 백엔드 데이터 로직을 호출하면서 상품 번호 전달
-        // }
+        function initEdit(productCode, originProductNo, productName, price, shippingFee) {
+            const html = `
+            <div class="text-start">
+                <div class="form-group">
+                    <label class="form-label">상품명</label>
+                    <div class="d-flex">
+                        <input type="text" class="form-control" id="productName" value="${productName}" placeholder="새 상품명을 입력해주세요.">
+                        <button class="btn btn-primary text-nowrap" onclick="validateProductName('${productCode}', 'TEST');">가공</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">상품가</label>
+                    <input type="text" class="form-control" id="price" value="${price}" placeholder="상품가를 입력해주세요." oninput="numberFormatter(this, 10, 0);">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">배송비</label>
+                    <input type="text" class="form-control" id="shippingFee" value="${shippingFee}" placeholder="배송비를 입력해주세요." oninput="numberFormatter(this, 10, 0);">
+                </div>
+            </div>
+            `;
+            Swal.fire({
+                title: "상품 수정",
+                html,
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const productName = $('#productName').val();
+                    const price = parseInt($('#price').val());
+                    const shippingFee = parseInt($('#shippingFee').val());
+                    requestEdit(originProductNo, productName, price, shippingFee);
+                }
+            });
+        }
 
-        function requestEdit(originProductNo, apiToken, productName, price, shippingFee, type) {
+        function requestEdit(originProductNo, productName, price, shippingFee) {
+            popupLoader(0, '수정된 상품 정보를 오픈 마켓 및 셀윙 DB에 반영 중입니다.');
+            const vendorId = $('input[name="selectedOpenMarketId"]:checked').val();
             $.ajax({
-                url: "/api/partner/product/edit-uploaded", // 백엔드 URL
-                type: "POST", // HTTP 메소드
-                dataType: "JSON", // 응답 데이터 형식
+                url: '/api/partner/product/edit-uploaded',
+                type: 'POST',
+                dataType: 'JSON',
                 data: {
                     apiToken,
+                    vendorId,
                     originProductNo,
                     productName,
-                    price, // 가격 정보 추가
-                    shippingFee, // 배송비 정보 추가
-                    type
+                    price,
+                    shippingFee
                 },
-                success: function(response) {
-                    console.log('Response:', response);
-                    if (response.status) {
-                        console.log('Product Name: ', response.data.product_name);
-                        console.log('Price: ', response.data.price);
-                        console.log('Shipping Fee: ', response.data.shipping_fee);
-                        alert('상품 정보가 성공적으로 업데이트 되었습니다.');
-                    } else {
-                        alert('상품 정보 업데이트 실패: ' + response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error:', status, error);
-                    alert('상품 정보 업데이트 중 오류 발생');
-                }
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
             });
         }
 
@@ -320,5 +341,44 @@
                 }
             });
         }
+
+        function validateProductName(productCode, type) {
+            $('.btn').prop('disabled', true);
+            const productName = $('#productName').val();
+            $.ajax({
+                url: "/api/partner/product/edit-product",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    productCode,
+                    productName,
+                    type
+                },
+                success: function(response) {
+                    $('.btn').prop('disabled', false);
+                    if (type === 'TEST') {
+                        console.log('here');
+                        $('#productName').val(response.data.processedProductName);
+                    } else {
+                        closePopup();
+                        const status = response.status;
+                        const message = response.message;
+                        let icon = 'success';
+                        if (status === false) {
+                            console.log(response);
+                            icon = 'error';
+                        }
+                        Swal.fire({
+                            icon: icon,
+                            title: message
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    }
+                },
+                error: AjaxErrorHandling
+            });
+        };
     </script>
 @endsection
