@@ -97,6 +97,7 @@ class SmartStoreOrderController extends Controller
 
             return [
                 'market' => $item['order']['market'] ?? '스마트스토어',
+                'marketEngName' => 'smart_store',
                 'orderId' => $item['order']['orderId'] ?? 'N/A',
                 'productOrderId' => $item['productOrder']['productOrderId'] ?? 'N/A',
                 'orderName' => $item['order']['ordererName'] ?? 'N/A',
@@ -112,6 +113,7 @@ class SmartStoreOrderController extends Controller
                 'postCode' => $shippingAddress ? $shippingAddress['zipCode'] ?? 'N/A' : 'N/A',
                 'address' => $shippingAddress ? ($shippingAddress['baseAddress'] . ' ' . ($shippingAddress['detailedAddress'] ?? '')) : 'N/A',
                 'addressName' => '기본배송지',
+                'productCode' => $item['productOrder']['sellerProductCode'] ?? 'N/A',
             ];
         }, $response['data']['data']);
         return $formattedResponse;

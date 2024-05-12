@@ -73,6 +73,7 @@ class OpenMarketOrderController extends Controller
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
         $results = [];
+        $saveResults = [];
         $totalAmountRequired = 0;
         $partner = $this->getPartner($domewingAndPartner->partner_id);
         $domewingUser = $this->getDomewingUser($domewingAndPartner->domewing_account_id);
@@ -84,25 +85,8 @@ class OpenMarketOrderController extends Controller
                     foreach ($apiResult as $order) {
                         if ($order['productOrderStatus'] == "결제완료") {
                             $totalAmountRequired += $order['totalPaymentAmount'] + $order['deliveryFeeAmount'];
+                            $saveResults[] = $order;
                         }
-                        // DB::table('transaction_wing')->insert([
-                        //     'ref_no' => 'TRX' . Str::uuid()->toString(),
-                        //     'member_id' => $domewingAndPartner->domewing_account_id,
-                        //     'amount' => '입력예정',
-                        //     'type' => 'ORDER',
-                        //     'cart_id' => '입력예정'
-                        // ]);
-
-                        // DB::table('delivery_details')->insert([
-                        //     'transaction_id' => '위의 삽입한 ref_no',
-                        //     'contact_name' => $order['receiverName'],
-                        //     'phone_number' => $order['reciverPhone'],
-                        //     'email' => $domewingUser->email,
-                        //     'address_name' => $order['addressName'],
-                        //     'address' => $order['address'],
-                        //     'delivery_company_id'=>
-
-                        // ]);
                     }
                 }
             } else {
@@ -120,6 +104,25 @@ class OpenMarketOrderController extends Controller
                 'message' => 'wing 잔액이 부족합니다.',
                 'data' => $totalAmountRequired - $wing,
             ];
+        }
+        foreach ($saveResults as $result) {
+            if ($result['productOrderStatus'] == "결제완료") {
+
+
+                $isExistOrder = DB::table('transaction_wing')
+                    ->where('product_order_id', $result['productOrderId'])
+                    ->exists();
+
+                if ($isExistOrder) continue;
+
+                $finishSave = $wc->saveOrder($result, $domewingAndPartner, $domewingUser);
+                if (!$finishSave['status']) {  // 배열 접근 방식을 사용
+                    return [
+                        'status' => false,
+                        'message' => $finishSave['message']  // 메시지도 배열에서 추출
+                    ];
+                }
+            }
         }
         return [
             'status' => true,
