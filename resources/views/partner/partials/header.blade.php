@@ -19,6 +19,11 @@
                         <img class="wing me-1" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />
                         <h6 class="text-warning">{{ number_format($wingBalance) }}</h6>
                     </li>
+                    <li class="dropdown">
+                        <h6 class="text-warning"><a class="text-warning" href="https://domewing.com/wallet"
+                                target="_blank">충전하기</a>
+                        </h6>
+                    </li>
                     <li class="dropdown user-dropdown">
                         <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
                             <div class="user-toggle">
