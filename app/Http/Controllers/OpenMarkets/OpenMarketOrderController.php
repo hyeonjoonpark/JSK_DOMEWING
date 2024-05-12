@@ -5,6 +5,7 @@ namespace App\Http\Controllers\OpenMarkets;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
+use App\Http\Controllers\WingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -67,7 +68,8 @@ class OpenMarketOrderController extends Controller
                 'data' => []
             ];
         }
-        $wing = $this->calcWingById($domewingAndPartner->domewing_account_id);
+        $wc = new WingController();
+        $wing = $wc->calcWingById($domewingAndPartner->domewing_account_id);
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
         $results = [];
@@ -159,22 +161,7 @@ class OpenMarketOrderController extends Controller
             ->where('id', $id)
             ->first();
     }
-    private function calcWingById($id)
-    {
-        $balanceQuery = DB::table('transaction_wing')
-            ->selectRaw('SUM(CASE WHEN type = "DEPOSIT" AND status = "APPROVED" THEN amount ELSE 0 END) AS total_deposit')
-            ->selectRaw('SUM(CASE WHEN type = "ORDER" OR type = "WITHDRAW" THEN amount ELSE 0 END) AS total_withdrawal')
-            ->where('member_id', $id)
-            ->where('status', '!=', 'REJECTED')
-            ->get();
 
-        // Calculate the balance
-        $totalDeposit = $balanceQuery[0]->total_deposit ?? 0;
-        $totalWithdrawal = $balanceQuery[0]->total_withdrawal ?? 0;
-        $balance = $totalDeposit - $totalWithdrawal;
-
-        return $balance;
-    }
     private function callSmart_storeOrderApi($id, $startDate, $endDate)
     {
         $controller = new SmartStoreOrderController();
