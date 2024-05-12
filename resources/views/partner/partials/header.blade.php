@@ -15,6 +15,10 @@
             </div><!-- .nk-header-brand -->
             <div class="nk-header-tools">
                 <ul class="nk-quick-nav">
+                    <li class="dropdown">
+                        <img class="wing me-1" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />
+                        <h6 class="text-warning">{{ number_format($wingBalance) }}</h6>
+                    </li>
                     <li class="dropdown user-dropdown">
                         <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
                             <div class="user-toggle">
