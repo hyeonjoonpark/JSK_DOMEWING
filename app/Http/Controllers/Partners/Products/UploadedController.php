@@ -177,7 +177,29 @@ class UploadedController extends Controller
         $shippingFee = $request->shippingFee;
         // 여기까지 상품을 수정하기 위한 요소들을 가공하고, 검사하고, 다 했어.
         // 스마트 스토어부터 반영 시작. 나머지 일정 생각 금지. 고려 금지. 구현은 더더욱 금지.
+        return $this->smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee);
     }
+    public function smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee)
+    {
+        $ssac = new SmartStoreApiController();
+        $account = DB::table('smart_store_accounts AS a')
+            ->join('smart_store_uploaded_products AS up', 'up.smart_store_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.application_id', 'a.secret', 'a.username'])
+            ->first();
+        $contentType = 'application/json;charset=UTF-8';
+        $method = "put";
+        $url = 'https://api.commerce.naver.com/external/v2/products/origin-products/' . $originProductNo;
+        $payload = [
+            'productName' => $productName['productName'] ?? null,
+            'price' => $price['price'] ?? null,
+            'shippingFee' => $shippingFee['shippingFee'] ?? null
+        ];
+
+        // API 요청을 위한 HTTP Client 설정 및 호출
+        return $ssac->builder($account, $contentType, $method, $url, $payload);
+    }
+
 
 
     public function smart_storeDeleteRequest($originProductNo)
