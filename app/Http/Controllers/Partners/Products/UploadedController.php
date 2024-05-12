@@ -128,21 +128,43 @@ class UploadedController extends Controller
             ];
         }
     }
-    public function smart_storeEditRequest($originProductNo, $shippingFee, $price)
+
+    public function edit(Request $request)
     {
-        $ssac = new SmartStoreApiController();
-        $account = DB::table('smart_store_accouts AS a')
-            ->join('smart_store_uploaded_products AS up', 'up.smart_store_account_id', '=', 'a.id')
-            ->where('up.origin_product_no', $originProductNo)
-            ->where('up.shipping_fee', $shippingFee)
-            ->where('up.price', $price)
-            ->select(['a.application_id', 'a.secret', 'a.username'])
+        $validator = Validator::make($request->all(), [
+            'originProductNo' => 'required|string',
+            'vendorId' => 'required|integer|exists:vendors,id'
+        ], [
+            'originProductNo.required' => '유효한 상품 번호를 입력해주세요.',
+            'vendorId.required' => '유효한 오픈 마켓을 선택해주세요.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first(),
+                'error' => $validator->errors()
+            ]);
+        }
+
+        $productNumber = $request->input('originProductNo');
+
+        $productDetails = DB::table('smart_store_uploaded_products')
+            ->where('origin_product_no', $productNumber)
+            ->select([
+                'product_name',
+                'shipping_fee',
+                'price'
+            ])
             ->first();
-        $contentType = 'application/json;charset=UTF-8';
-        $method = "put";
-        $url = "https://api.commerce.naver.com/external/v2/products/origin-products/" . $originProductNo; //. "/partial";
-        return $ssac->builder($account, $contentType, $method, $url);
+
+        if (!$productDetails) {
+            return response()->json(['status' => false, 'message' => '상품 정보가 없습니다.'], 404);
+        }
+
+        return response()->json(['status' => true, 'data' => $productDetails]);
     }
+
     public function smart_storeDeleteRequest($originProductNo)
     {
         $ssac = new SmartStoreApiController();

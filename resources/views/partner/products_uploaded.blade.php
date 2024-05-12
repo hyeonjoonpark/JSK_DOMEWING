@@ -182,7 +182,7 @@
                                     </td>
                                     <td class="text-nowrap">
                                         <button class="btn btn-success"
-                                            onclick="onEdit(['{{ $product->origin_product_no }}']);">수정</button>
+                                            onclick="requestEdit('{{ $product->origin_product_no }}');">수정</button>
                                         <button class="btn btn-danger"
                                             onclick="onDelete(['{{ $product->origin_product_no }}']);">삭제</button>
                                     </td>
@@ -202,64 +202,44 @@
             $('input[name="selectedProducts"]').prop('checked', isChecked);
         });
 
-        function onEdit() {
-            const html = `
-            <div class="form-group">
-                <label class="form-label">상품명</label>
-                <div class="d-flex">
-                    <input type="text" class="form-control" id="productName" placeholder="새 상품명을 입력해주세요.">
-                    <button class="btn btn-primary text-nowrap" onclick="requestEdit('${productCode}', 'TEST');">가공</button>
-                </div>
-            </div>
-            `;
-            Swal.fire({
-                icon: 'warning',
-                html,
-                showCancelButton: true,
-                cancelButtonText: "취소",
-                confirmButtonText: "확인"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    requestEdit(productCode, 'CONFIRMED');
+        // function onEdit(originProductNo) {
+        //     requestEdit(originProductNo); // 백엔드 데이터 로직을 호출하면서 상품 번호 전달
+        // }
+
+        function requestEdit(originProductNo, apiToken, productName, price, shippingFee, type) {
+            $.ajax({
+                url: "/api/partner/product/edit-uploaded", // 백엔드 URL
+                type: "POST", // HTTP 메소드
+                dataType: "JSON", // 응답 데이터 형식
+                data: {
+                    apiToken,
+                    originProductNo,
+                    productName,
+                    price, // 가격 정보 추가
+                    shippingFee, // 배송비 정보 추가
+                    type
+                },
+                success: function(response) {
+                    console.log('Response:', response);
+                    if (response.status) {
+                        console.log('Product Name: ', response.data.product_name);
+                        console.log('Price: ', response.data.price);
+                        console.log('Shipping Fee: ', response.data.shipping_fee);
+                        alert('상품 정보가 성공적으로 업데이트 되었습니다.');
+                    } else {
+                        alert('상품 정보 업데이트 실패: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', status, error);
+                    alert('상품 정보 업데이트 중 오류 발생');
                 }
             });
         }
 
-        function initEdit() {
-            const productName = $('#productName').val();
-            $.ajax({
-                url: "/api/partner/product/edit-uploaded",
-                type: "POST",
-                dataType: "JSON",
-                data: {
-                    apiToken,
-                    originProductsNo,
-                    vendorId
-                },
-                success: function(response) {
-                    if (type === 'TEST') {
-                        console.log('here');
-                        $('#productName').val(response.data.processedProductName);
-                    } else {
-                        closePopup();
-                        const status = response.status;
-                        const message = response.message;
-                        let icon = 'success';
-                        if (status === false) {
-                            console.log(response);
-                            icon = 'error';
-                        }
-                        Swal.fire({
-                            icon: icon,
-                            title: message
-                        }).then((result) => {
-                            location.reload();
-                        });
-                    }
-                },
-                error: AjaxErrorHandling
-            });
-        }
+
+
+
 
         function initDelete() {
             const originProductsNo = $('input[name="selectedProducts"]:checked').map(function() {
