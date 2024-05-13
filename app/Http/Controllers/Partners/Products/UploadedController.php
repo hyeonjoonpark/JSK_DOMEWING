@@ -136,7 +136,7 @@ class UploadedController extends Controller
     {
         set_time_limit(0);
         $validator = Validator::make($request->all(), [
-            'originProductsNo' => 'required|array|min:1',
+            'originProductNo' => 'required|array|min:1',
             'productName' => 'required|string',
             'price' => 'required|integer|min:10|max:999999999',
             'shippingFee' => 'required|integer|min:10|max:999999999',
@@ -158,8 +158,10 @@ class UploadedController extends Controller
         $vendorId = $request->vendorId;
         $vendorEngName = DB::table('vendors')
             ->where('id', $vendorId)
-            ->first(['name_eng'])
-            ->name_eng;
+            ->select('name_eng')
+            ->first();
+
+
         $originProductNoValidator = DB::table($vendorEngName . '_uploaded_products')
             ->where('origin_product_no', $request->originProductNo)
             ->where('is_active', 'Y')
@@ -169,7 +171,8 @@ class UploadedController extends Controller
                 'status' => false,
                 'message' => '유효한 상품이 아닙니다.',
                 'error' => [
-                    'originProductNo' => $request->originProductNo
+                    'originProductNo' => $vendorEngName
+
                 ]
             ];
         }
@@ -182,6 +185,7 @@ class UploadedController extends Controller
         // 스마트 스토어부터 반영 시작. 나머지 일정 생각 금지. 고려 금지. 구현은 더더욱 금지.
         return $this->smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee);
     }
+
     public function smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee)
     {
         $ssac = new SmartStoreApiController();
@@ -193,17 +197,24 @@ class UploadedController extends Controller
         $contentType = 'application/json;charset=UTF-8';
         $method = "put";
         $url = 'https://api.commerce.naver.com/external/v2/products/origin-products/' . $originProductNo;
-        $payload = [
-            'productName' => $productName['productName'] ?? null,
-            'price' => $price['price'] ?? null,
-            'shippingFee' => $shippingFee['shippingFee'] ?? null
+        $data = [
+            'statusType' => 'SALE',
+            'name' => $productName,
+            'url' => 'asdasdasdasdasdasdasd.jpg',
+            'salePrice' => $price,
+            'afterServiceTelephoneNumber' => '01012345678',
+            'afterServiceGuideContent' => '01012345678',
+            'originAreaCode' => '031',
+            'minorPurchasable' => false,
+            'naverShoppingRegistration' => false,
+            'channelProductDisplayStatusType' => 'ON',
+            'deliveryInfo' => [
+                'type' => 'STANDAR',
+                'fee' => $shippingFee
+            ]
         ];
-
-        // API 요청을 위한 HTTP Client 설정 및 호출
-        return $ssac->builder($account, $contentType, $method, $url, $payload);
+        return $ssac->putbuilder($account, $contentType, $method, $url, $data);
     }
-
-
 
     public function smart_storeDeleteRequest($originProductNo)
     {
@@ -216,8 +227,10 @@ class UploadedController extends Controller
         $contentType = 'application/json;charset=UTF-8';
         $method = "delete";
         $url = 'https://api.commerce.naver.com/external/v2/products/origin-products/' . $originProductNo;
-        return $ssac->builder($account, $contentType, $method, $url);
+        $data =  "";
+        return $ssac->builder($account, $contentType, $method, $url, $data);
     }
+
     public function coupangDeleteRequest($originProductNo)
     {
         $cpac = new ApiController();
@@ -240,6 +253,7 @@ class UploadedController extends Controller
         $url = '/v2/providers/seller_api/apis/api/v1/marketplace/vendor-items/' . $vendorItemId . '/sales/stop';
         return $cpac->putBuilder($account->access_key, $account->secret_key, $contentType, $url);
     }
+
     public function destroy($originProductsNo)
     {
         try {

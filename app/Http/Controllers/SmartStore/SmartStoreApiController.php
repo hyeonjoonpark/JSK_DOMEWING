@@ -46,7 +46,47 @@ class SmartStoreApiController extends Controller
             'data' => $response
         ];
     }
-    public function builder($account, $contentType, $method, $url, $data = "")
+    public function putBuilder($account, $contentType, $method, $url, $data)
+    {
+        $ssac = new SmartStoreAccountController();
+        $getAccessTokenResult = $ssac->getAccessToken($account->application_id, $account->secret, $account->username);
+        if (!$getAccessTokenResult['status']) {
+            return [
+                'status' => false,
+                'message' => 'Invalid API account information.',  // 메시지 개선
+                'error' => $getAccessTokenResult['message']
+            ];
+        }
+
+        $accessToken = $getAccessTokenResult['data']->access_token;
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => $contentType
+            ])->{$method}($url, $data);  // 동적 메서드 호출은 유지
+
+            if ($response->successful()) {
+                return [
+                    'status' => true,
+                    'data' => $response->json()
+                ];
+            } else {
+                return [
+                    'status' => false,
+                    'error' => $response->body(),
+                    'status_code' => $response->status()  // 상태 코드 추가
+                ];
+            }
+        } catch (\Exception $e) {  // 예외 처리 추가
+            return [
+                'status' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+
+    public function builder($account, $contentType, $method, $url, $data)
     {
         $ssac = new SmartStoreAccountController();
         $getAccessTokenResult = $ssac->getAccessToken($account->application_id, $account->secret, $account->username);
