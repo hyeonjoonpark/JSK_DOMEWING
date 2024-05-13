@@ -15,6 +15,15 @@ class UploadedController extends Controller
 {
     public function index(Request $request)
     {
+        $partnerId = Auth::guard('partner')->id();
+        // 연동된 도매윙 계정이 있는지 검사.
+        $hasSync = DB::table('partner_domewing_accounts')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'Y')
+            ->exists();
+        if ($hasSync === false) {
+            return redirect('/partner/account-setting/dowewing-integration/');
+        }
         set_time_limit(0);
         $openMarkets = DB::table('vendors')
             ->where('is_active', 'ACTIVE')
@@ -36,7 +45,7 @@ class UploadedController extends Controller
             ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
             ->join('partners AS p', 'p.id', '=', 'va.partner_id')
             ->where('up.is_active', 'Y')
-            ->where('va.partner_id', Auth::guard('partner')->id())
+            ->where('va.partner_id', $partnerId)
             ->orderByDesc('up.created_at')
             ->select([
                 'mp.productCode',
