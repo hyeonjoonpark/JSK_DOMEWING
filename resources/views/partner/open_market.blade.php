@@ -116,6 +116,7 @@
                     <div class="info-section"><strong>우편번호:</strong> <span id="modalPostCode"></span></div>
                     <div class="info-section"><strong>주소지명:</strong> <span id="modalAddressName"></span></div>
                     <div class="info-section"><strong>주소:</strong> <span id="modalAddress"></span></div>
+                    <div class="info-section"><strong>상품코드:</strong> <span id="modalProductCode"></span></div>
                 </div>
             </div>
         </div>
@@ -189,6 +190,7 @@
                         });
                     } else {
                         updateOrderTable(response);
+                        console.log(response);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -253,6 +255,7 @@
             $('#modalPostCode').text(order.postCode || 'N/A');
             $('#modalAddress').text(order.address || 'N/A');
             $('#modalAddressName').text(order.addressName || 'N/A');
+            $('#modalProductCode').text(order.productCode || 'N/A');
             $('#productDetailModal').modal('show');
         }
 

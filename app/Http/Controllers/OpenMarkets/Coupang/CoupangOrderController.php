@@ -77,6 +77,7 @@ class CoupangOrderController extends Controller
                 foreach ($item['orderItems'] as $orderItem) {
                     $orderDetails[] = [
                         'market' => '쿠팡',
+                        'marketEngName' => 'coupang',
                         'orderId' => $item['orderId'],
                         'productOrderId' => $orderItem['vendorItemId'],
                         'orderName' => $item['orderer']['name'],
@@ -86,12 +87,13 @@ class CoupangOrderController extends Controller
                         'totalPaymentAmount' => $orderItem['orderPrice'],
                         'deliveryFeeAmount' => $item['shippingPrice'],
                         'productOrderStatus' => $this->mapStatusToReadable($item['status']),
-                        'orderDate' => isset($item['orderedAt']) ? (new DateTime($item['orderedAt']))->format('Y-m-d H:i:s') : 'N/A',
+                        'orderDate' => isset($item['paidAt']) ? (new DateTime($item['paidAt']))->format('Y-m-d H:i:s') : 'N/A',
                         'receiverName' => $item['receiver']['name'],
-                        'receiverPhone' => $item['receiver']['receiverNumber'],
+                        'receiverPhone' => $item['receiver']['safeNumber'],
                         'postCode' => $item['receiver']['postCode'],
                         'address' => $item['receiver']['addr1'],
-                        'addressName' => '기본배송지'
+                        'addressName' => '기본배송지',
+                        'productCode' => $orderItem['externalVendorSkuCode'] ?? 'N/A',
 
                     ];
                 }

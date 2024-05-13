@@ -27,7 +27,7 @@
                         <small id="passwordHelp" class="form-text text-muted">로그인 비밀번호는 안전하게 보관됩니다.</small>
                     </div>
                     <div class="text-center">
-                        <button class="btn btn-primary" onclick="addAccount();">추가하기</button>
+                        <button class="btn btn-primary" onclick="addAccount();">신규 추가</button>
                     </div>
 
                 </div>
@@ -40,6 +40,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const apiToken = "{{ $apiToken }}";
+            const isExist = "{{ $isExistPartnerAndDomewing }}";
 
             function addAccount() {
                 if (!document.getElementById('email').value || !document.getElementById('password').value) {
@@ -79,6 +80,9 @@
                     .catch(error => {
                         swalError('계정 연동 중 오류가 발생하였습니다.');
                     });
+            }
+            if (isExist) {
+                document.querySelector('.btn-primary').textContent = '업데이트하기';
             }
             document.querySelector('.btn-primary').addEventListener('click', addAccount);
         });
