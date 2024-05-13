@@ -27,7 +27,13 @@
                         <small id="passwordHelp" class="form-text text-muted">로그인 비밀번호는 안전하게 보관됩니다.</small>
                     </div>
                     <div class="text-center">
-                        <button class="btn btn-primary" onclick="addAccount();">추가하기</button>
+                        <button class="btn btn-primary" onclick="addAccount();">
+                            @if ($isExistPartnerAndDomewing)
+                                업데이트하기
+                            @else
+                                신규 추가
+                            @endif
+                        </button>
                     </div>
 
                 </div>
@@ -38,49 +44,34 @@
 @endsection
 @section('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const apiToken = "{{ $apiToken }}";
-
-            function addAccount() {
-                if (!document.getElementById('email').value || !document.getElementById('password').value) {
-                    return Swal.fire({
-                        icon: 'warning',
-                        text: '이메일과 비밀번호를 모두 입력해야 합니다.'
-                    });
-                }
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const url = 'https://domewing.com/api/sync';
-                const data = {
-                    email: email,
-                    password: password,
-                    apiToken: apiToken
-                };
-                fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === true) {
-                            Swal.fire({
-                                icon: 'success',
-                                text: data.message
-                            }).then((result) => {
-                                window.location.reload();
-                            });
-                        } else {
-                            swalError(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        swalError('계정 연동 중 오류가 발생하였습니다.');
-                    });
+        $(document).ready(function() {
+            const isExistPartnerAndDomewing = '{{ $isExistPartnerAndDomewing }}';
+            if (!isExistPartnerAndDomewing) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '도매윙 계정을 연동해주세요'
+                });
             }
-            document.querySelector('.btn-primary').addEventListener('click', addAccount);
         });
+
+        function addAccount() {
+            const apiToken = "{{ $apiToken }}";
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const url = 'https://domewing.com/api/sync';
+            const data = {
+                email,
+                password,
+                apiToken
+            };
+            $.ajax({
+                url,
+                type: 'POST',
+                dataType: 'JSON',
+                data,
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
     </script>
 @endsection

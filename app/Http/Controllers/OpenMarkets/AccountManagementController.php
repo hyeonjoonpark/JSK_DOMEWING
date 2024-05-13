@@ -32,6 +32,14 @@ class AccountManagementController extends Controller
     {
         $partner = Auth::guard('partner')->user();
         $apiToken = $partner->api_token;
-        return view('partner/dowewing_integration', ['apiToken' => $apiToken]);
+        $isExistPartnerAndDomewing = DB::table('partner_domewing_accounts')
+            ->where('partner_id', $partner->id)
+            ->where('is_active', 'Y')
+            ->orderBy('created_at')
+            ->exists();
+        return view('partner/dowewing_integration', [
+            'apiToken' => $apiToken,
+            'isExistPartnerAndDomewing' => $isExistPartnerAndDomewing
+        ]);
     }
 }
