@@ -29,45 +29,52 @@ class ProductDetailRecovery extends Command
      */
     public function handle()
     {
-        $products = $this->getTargetProducts();
-        print_r($this->processProducts($products));
+        $file = file_get_contents(storage_path('app/public/product-codes/product_detail_recovery.json'));
+        $productCodes = json_decode($file);
+        $productCodeStr = join(',', $productCodes);
+        echo $productCodeStr;
     }
-    protected function scrapeProductDetail($filePath)
-    {
-        $scriptPath = public_path('js/detail-recovery/ds1008.js');
-        $account = DB::table('accounts')
-            ->where('vendor_id', 14)
-            ->first(['username', 'password']);
-        $username = $account->username;
-        $password = $account->password;
-        $command = "node {$scriptPath} {$filePath} {$username} $password";
-        exec($command, $output, $resultCode);
-        if ($resultCode === 0 && isset($output[0])) {
-            $products = json_decode($output[0], true);
-            return $products;
-        }
-    }
-    protected function processProducts($products)
-    {
-        $chunkedProducts = array_chunk($products, 100, false);
-        $fetchedProducts = [];
-        foreach ($chunkedProducts as $products) {
-            $tempProductCodeFilePath = public_path('js/detail-recovery/ds1008_targets.json');
-            file_put_contents($tempProductCodeFilePath, json_encode($products));
-            $fetchedProducts = array_merge($fetchedProducts, $this->scrapeProductDetail($tempProductCodeFilePath));
-            unlink($tempProductCodeFilePath);
-        }
-        return $fetchedProducts;
-    }
-    protected function getTargetProducts()
-    {
-        $productCodeFile = file_get_contents(storage_path('app/public/product-codes/product_detail_recovery.json'));
-        $productCodes = json_decode($productCodeFile);
-        $products = DB::table('minewing_products')
-            ->whereIn('productCode', $productCodes)
-            ->where('sellerID', 14) // 씨오코리아
-            ->get(['productDetail', 'productHref', 'id'])
-            ->toArray();
-        return $products;
-    }
+    // public function handle()
+    // {
+    //     $products = $this->getTargetProducts();
+    //     print_r($this->processProducts($products));
+    // }
+    // protected function scrapeProductDetail($filePath)
+    // {
+    //     $scriptPath = public_path('js/detail-recovery/ds1008.js');
+    //     $account = DB::table('accounts')
+    //         ->where('vendor_id', 14)
+    //         ->first(['username', 'password']);
+    //     $username = $account->username;
+    //     $password = $account->password;
+    //     $command = "node {$scriptPath} {$filePath} {$username} $password";
+    //     exec($command, $output, $resultCode);
+    //     if ($resultCode === 0 && isset($output[0])) {
+    //         $products = json_decode($output[0], true);
+    //         return $products;
+    //     }
+    // }
+    // protected function processProducts($products)
+    // {
+    //     $chunkedProducts = array_chunk($products, 100, false);
+    //     $fetchedProducts = [];
+    //     foreach ($chunkedProducts as $products) {
+    //         $tempProductCodeFilePath = public_path('js/detail-recovery/ds1008_targets.json');
+    //         file_put_contents($tempProductCodeFilePath, json_encode($products));
+    //         $fetchedProducts = array_merge($fetchedProducts, $this->scrapeProductDetail($tempProductCodeFilePath));
+    //         unlink($tempProductCodeFilePath);
+    //     }
+    //     return $fetchedProducts;
+    // }
+    // protected function getTargetProducts()
+    // {
+    //     $productCodeFile = file_get_contents(storage_path('app/public/product-codes/product_detail_recovery.json'));
+    //     $productCodes = json_decode($productCodeFile);
+    //     $products = DB::table('minewing_products')
+    //         ->whereIn('productCode', $productCodes)
+    //         ->where('sellerID', 14) // 씨오코리아
+    //         ->get(['productDetail', 'productHref', 'id'])
+    //         ->toArray();
+    //     return $products;
+    // }
 }
