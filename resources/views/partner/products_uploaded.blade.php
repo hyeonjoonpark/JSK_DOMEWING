@@ -203,40 +203,47 @@
         });
 
         function initEdit(productCode, originProductNo, productName, price, shippingFee) {
-            const html = `
-            <div class="text-start">
-                <div class="form-group">
-                    <label class="form-label">상품명</label>
-                    <div class="d-flex">
-                        <input type="text" class="form-control" id="productName" value="${productName}" placeholder="새 상품명을 입력해주세요.">
-                        <button class="btn btn-primary text-nowrap" onclick="validateProductName('${productCode}', 'TEST');">가공</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">상품가</label>
-                    <input type="text" class="form-control" id="price" value="${price}" placeholder="상품가를 입력해주세요." oninput="numberFormatter(this, 10, 0);">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">배송비</label>
-                    <input type="text" class="form-control" id="shippingFee" value="${shippingFee}" placeholder="배송비를 입력해주세요." oninput="numberFormatter(this, 10, 0);">
-                </div>
+            // 상품 수정 폼 HTML 생성
+            const editFormHTML = `
+    <div class="text-start">
+        <div class="form-group">
+            <label class="form-label">상품명</label>
+            <div class="d-flex">
+                <input type="text" class="form-control" id="productName" value="${productName}" placeholder="새 상품명을 입력해주세요.">
+                <button class="btn btn-primary text-nowrap" onclick="validateProductName('${productCode}', 'TEST');">가공</button>
             </div>
-            `;
+        </div>
+        <div class="form-group">
+            <label class="form-label">상품가</label>
+            <input type="text" class="form-control" id="price" value="${price}" placeholder="상품가를 입력해주세요." oninput="numberFormatter(this, 10, 0);">
+        </div>
+        <div class="form-group">
+            <label class="form-label">배송비</label>
+            <input type="text" class="form-control" id="shippingFee" value="${shippingFee}" placeholder="배송비를 입력해주세요." oninput="numberFormatter(this, 10, 0);">
+        </div>
+    </div>
+    `;
+
+            // 상품 수정 모달창 표시
             Swal.fire({
                 title: "상품 수정",
-                html,
+                html: editFormHTML,
                 showCancelButton: true,
                 cancelButtonText: "취소",
                 confirmButtonText: "확인"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const productName = $('#productName').val();
-                    const price = parseInt($('#price').val());
-                    const shippingFee = parseInt($('#shippingFee').val());
-                    requestEdit(originProductNo, productName, price, shippingFee);
+                    // 사용자 입력 값 추출
+                    const updatedProductName = $('#productName').val();
+                    const updatedPrice = parseInt($('#price').val());
+                    const updatedShippingFee = parseInt($('#shippingFee').val());
+
+                    // 수정 요청 함수 호출
+                    requestEdit(originProductNo, updatedProductName, updatedPrice, updatedShippingFee);
                 }
             });
         }
+
 
         function requestEdit(originProductNo, productName, price, shippingFee) {
             popupLoader(0, '수정된 상품 정보를 오픈 마켓 및 셀윙 DB에 반영 중입니다.');
