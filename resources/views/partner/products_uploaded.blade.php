@@ -203,7 +203,6 @@
         });
 
         function initEdit(productCode, originProductNo, productName, price, shippingFee) {
-            // 상품 수정 폼 HTML 생성
             const editFormHTML = `
     <div class="text-start">
         <div class="form-group">
@@ -223,8 +222,6 @@
         </div>
     </div>
     `;
-
-            // 상품 수정 모달창 표시
             Swal.fire({
                 title: "상품 수정",
                 html: editFormHTML,
@@ -233,17 +230,15 @@
                 confirmButtonText: "확인"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // 사용자 입력 값 추출
                     const updatedProductName = $('#productName').val();
                     const updatedPrice = parseInt($('#price').val());
                     const updatedShippingFee = parseInt($('#shippingFee').val());
 
-                    // 수정 요청 함수 호출
-                    requestEdit(originProductNo, updatedProductName, updatedPrice, updatedShippingFee);
+                    requestEdit(originProductNo, updatedProductName, updatedPrice,
+                        updatedShippingFee);
                 }
             });
         }
-
 
         function requestEdit(originProductNo, productName, price, shippingFee) {
             popupLoader(0, '수정된 상품 정보를 오픈 마켓 및 셀윙 DB에 반영 중입니다.');
