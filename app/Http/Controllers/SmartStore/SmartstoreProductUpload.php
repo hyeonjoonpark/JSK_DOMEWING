@@ -188,7 +188,7 @@ class SmartstoreProductUpload extends Controller
         ];
         return $data;
     }
-    private function uploadImageFromUrl(string $imageUrl, $account): array
+    public function uploadImageFromUrl(string $imageUrl, $account): array
     {
         $imageContent = $this->downloadImage($imageUrl);
         if ($imageContent === false) {

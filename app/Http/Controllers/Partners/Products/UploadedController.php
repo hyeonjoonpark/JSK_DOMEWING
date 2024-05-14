@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use App\Http\Controllers\Product\NameController;
+use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -145,7 +146,7 @@ class UploadedController extends Controller
     {
         set_time_limit(0);
         $validator = Validator::make($request->all(), [
-            'originProductNo' => 'required|array|min:1',
+            'originProductNo' => 'required',
             'productName' => 'required|string',
             'price' => 'required|integer|min:10|max:999999999',
             'shippingFee' => 'required|integer|min:10|max:999999999',
@@ -168,7 +169,8 @@ class UploadedController extends Controller
         $vendorEngName = DB::table('vendors')
             ->where('id', $vendorId)
             ->select('name_eng')
-            ->first();
+            ->first()
+            ->name_eng;
 
 
         $originProductNoValidator = DB::table($vendorEngName . '_uploaded_products')
@@ -180,22 +182,58 @@ class UploadedController extends Controller
                 'status' => false,
                 'message' => '유효한 상품이 아닙니다.',
                 'error' => [
-                    'originProductNo' => $vendorEngName
-
+                    'originProductNo' => $vendorEngName,
+                    'siabl' => $originProductNoValidator
                 ]
             ];
         }
+        $apiToken = $request->apiToken;
+        $partner = DB::table('partners')
+            ->where('api_token', $apiToken)
+            ->first();
         $originProductNo = $request->originProductNo;
         $nc = new NameController();
         $productName = $nc->index($request->productName);
         $price = $request->price;
         $shippingFee = $request->shippingFee;
-        // 여기까지 상품을 수정하기 위한 요소들을 가공하고, 검사하고, 다 했어.
-        // 스마트 스토어부터 반영 시작. 나머지 일정 생각 금지. 고려 금지. 구현은 더더욱 금지.
-        return $this->smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee);
+        $product = DB::table('minewing_products AS mp')
+            ->join($vendorEngName . '_uploaded_products AS up', 'up.product_id', '=', 'mp.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->first();
+        $response = $this->smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product);
+        if ($response['status'] === false) {
+            return $response;
+        }
+        return $this->editUploadedProducts($vendorEngName, $originProductNo, $productName, $price, $shippingFee);
     }
 
-    public function smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee)
+    protected function editUploadedProducts($vendorEngName, $originProductNo, $productName, $price, $shippingFee)
+    {
+        try {
+            DB::table($vendorEngName . '_uploaded_products')
+                ->where('origin_product_no', $originProductNo)
+                ->update([
+                    'product_name' => $productName,
+                    'price' => $price,
+                    'shipping_fee' => $shippingFee
+                ]);
+            return [
+                'status' => true,
+                'message' => '상품 정보를 성공적으로 수정 및 반영했습니다.',
+                'data' => [
+                    'originProductNo' => $originProductNo
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '상품 정보를 수정하는 과정에서 오류가 발생했습니다.',
+                'data' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
     {
         $ssac = new SmartStoreApiController();
         $account = DB::table('smart_store_accounts AS a')
@@ -203,26 +241,109 @@ class UploadedController extends Controller
             ->where('up.origin_product_no', $originProductNo)
             ->select(['a.application_id', 'a.secret', 'a.username'])
             ->first();
+        $spu = new SmartstoreProductUpload([$product], $partner, $account);
         $contentType = 'application/json;charset=UTF-8';
         $method = "put";
         $url = 'https://api.commerce.naver.com/external/v2/products/origin-products/' . $originProductNo;
+        $uploadImageResult = $spu->uploadImageFromUrl($product->productImage, $account);
+        if ($uploadImageResult['status'] === false) {
+            return $uploadImageResult;
+        }
+        $productImage = $uploadImageResult['data']['images'][0]['url'];
         $data = [
-            'statusType' => 'SALE',
-            'name' => $productName,
-            'url' => 'asdasdasdasdasdasdasd.jpg',
-            'salePrice' => $price,
-            'afterServiceTelephoneNumber' => '01012345678',
-            'afterServiceGuideContent' => '01012345678',
-            'originAreaCode' => '031',
-            'minorPurchasable' => false,
-            'naverShoppingRegistration' => false,
-            'channelProductDisplayStatusType' => 'ON',
-            'deliveryInfo' => [
-                'type' => 'STANDAR',
-                'fee' => $shippingFee
+            'originProduct' => [
+                'statusType' => 'SALE',
+                'name' => $productName,
+                'detailContent' => $product->productDetail,
+                'images' => [
+                    'representativeImage' => [
+                        'url' => $productImage
+                    ]
+                ],
+                'salePrice' => $price * 2,
+                'stockQuantity' => 9999,
+                'deliveryInfo' => [
+                    'deliveryType' => 'DELIVERY',
+                    'deliveryAttributeType' => 'NORMAL',
+                    'deliveryCompany' => 'HYUNDAI',
+                    'deliveryBundleGroupUsable' => false,
+                    'deliveryFee' => [
+                        'deliveryFeeType' => 'PAID',
+                        'deliveryFeePayType' => 'PREPAID',
+                        'baseFee' => $shippingFee,
+                    ],
+                    'claimDeliveryInfo' => [
+                        'returnDeliveryFee' => (int)$shippingFee,
+                        'exchangeDeliveryFee' => (int)$shippingFee * 2
+                    ],
+                    'installationFee' => false,
+                ],
+                'detailAttribute' => [
+                    'afterServiceInfo' => [
+                        'afterServiceTelephoneNumber' => (string)$partner->phone,
+                        'afterServiceGuideContent' => '평일 09:00 ~ 17:00까지 응대가 가능하며, 주말 및 공휴일은 쉽니다.'
+                    ],
+                    'originAreaInfo' => [
+                        'originAreaCode' => '03'
+                    ],
+                    'sellerCodeInfo' => [
+                        'sellerManagementCode' => $product->productCode
+                    ],
+                    'taxType' => 'TAX',
+                    'minorPurchasable' => true,
+                    'certificationTargetExcludeContent' => [
+                        'childCertifiedProductExclusionYn' => true,
+                        'kcCertifiedProductExclusionYn' => "TRUE",
+                        'greenCertifiedProductExclusionYn' => true
+                    ],
+                    'productInfoProvidedNotice' => [
+                        'productInfoProvidedNoticeType' => 'ETC',
+                        'etc' => [
+                            'returnCostReason' => '상품상세 참조',
+                            'noRefundReason' => '상품상세 참조',
+                            'qualityAssuranceStandard' => '상품상세 참조',
+                            'compensationProcedure' => '상품상세 참조',
+                            'troubleShootingContents' => '상품상세 참조',
+                            'itemName' => $productName,
+                            'modelName' => '제이에스',
+                            'manufacturer' => '제이에스',
+                            'afterServiceDirector' => '제이에스',
+                        ]
+                    ]
+                ],
+                'customerBenefit' => [
+                    'immediateDiscountPolicy' => [
+                        'discountMethod' => [
+                            'value' => 50,
+                            'unitType' => 'PERCENT'
+                        ]
+                    ],
+                    'reviewPolicy' => [
+                        'textReviewPoint' => 100,
+                        'photoVideoReviewPoint' => 150,
+                        'afterUseTextReviewPoint' => 100,
+                        'afterUsePhotoVideoReviewPoint' => 150
+                    ],
+                    'giftPolicy' => [
+                        'presentContent' => '리뷰 이벤트'
+                    ],
+                    'multiPurchaseDiscountPolicy' => [
+                        'discountMethod' => [
+                            'value' => 1,
+                            'unitType' => 'PERCENT'
+                        ],
+                        'orderValue' => '5',
+                        'orderValueUnitType' => 'COUNT'
+                    ]
+                ]
+            ],
+            'smartstoreChannelProduct' => [
+                'channelProductName' => $productName,
+                'naverShoppingRegistration' => true,
+                'channelProductDisplayStatusType' => 'ON'
             ]
         ];
-        return $ssac->putbuilder($account, $contentType, $method, $url, $data);
+        return $ssac->builder($account, $contentType, $method, $url, $data);
     }
 
     public function smart_storeDeleteRequest($originProductNo)
