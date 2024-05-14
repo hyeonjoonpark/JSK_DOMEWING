@@ -233,6 +233,32 @@ class UploadedController extends Controller
         }
     }
 
+    public function coupangEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
+    {
+    }
+    public function coupangDeleteRequest($originProductNo)
+    {
+        $cpac = new ApiController();
+        $account = DB::table('coupang_accounts AS a')
+            ->join('coupang_uploaded_products AS up', 'up.coupang_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.hash', 'a.secret_key', 'a.access_key'])
+            ->first();
+        $contentType = 'application/json;charset=UTF-8';
+        $path = "/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/" . $originProductNo;
+        $apiResult = $cpac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
+        if (isset($apiResult['error'])) {
+            return [
+                'status' => false,
+                'message' => '상품 정보를 불러오는 과정에서 오류가 발생했습니다.',
+                'error' => $apiResult['error']
+            ];
+        }
+        $vendorItemId = $apiResult['data']['data']['items'][0]['vendorItemId'];
+        $url = '/v2/providers/seller_api/apis/api/v1/marketplace/vendor-items/' . $vendorItemId . '/sales/stop';
+        return $cpac->putBuilder($account->access_key, $account->secret_key, $contentType, $url);
+    }
+
     public function smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
     {
         $ssac = new SmartStoreApiController();
@@ -359,29 +385,6 @@ class UploadedController extends Controller
         $url = 'https://api.commerce.naver.com/external/v2/products/origin-products/' . $originProductNo;
         $data =  "";
         return $ssac->builder($account, $contentType, $method, $url, $data);
-    }
-
-    public function coupangDeleteRequest($originProductNo)
-    {
-        $cpac = new ApiController();
-        $account = DB::table('coupang_accounts AS a')
-            ->join('coupang_uploaded_products AS up', 'up.coupang_account_id', '=', 'a.id')
-            ->where('up.origin_product_no', $originProductNo)
-            ->select(['a.hash', 'a.secret_key', 'a.access_key'])
-            ->first();
-        $contentType = 'application/json;charset=UTF-8';
-        $path = "/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/" . $originProductNo;
-        $apiResult = $cpac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
-        if (isset($apiResult['error'])) {
-            return [
-                'status' => false,
-                'message' => '상품 정보를 불러오는 과정에서 오류가 발생했습니다.',
-                'error' => $apiResult['error']
-            ];
-        }
-        $vendorItemId = $apiResult['data']['data']['items'][0]['vendorItemId'];
-        $url = '/v2/providers/seller_api/apis/api/v1/marketplace/vendor-items/' . $vendorItemId . '/sales/stop';
-        return $cpac->putBuilder($account->access_key, $account->secret_key, $contentType, $url);
     }
 
     public function destroy($originProductsNo)
