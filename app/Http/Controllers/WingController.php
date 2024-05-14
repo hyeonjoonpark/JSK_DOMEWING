@@ -22,26 +22,37 @@ class WingController extends Controller
             ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
             ->join('order_details AS od', 'od.order_id', '=', 'o.id')
             ->where('wt.member_id', $memberId)
-            ->where('od.type', 'PAID')
+            ->whereNot('od.type', 'CANCELLED')
             ->sum('wt.amount');
-        $refundAmount = DB::table('wing_transactions AS wt')
-            ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
+        $refundChangedMindAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
             ->join('order_details AS od', 'od.order_id', '=', 'o.id')
             ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
             ->where('wt.member_id', $memberId)
+            ->where('od.type', 'REFUND')
+            ->where('ed.status', 'APPROVED')
             ->where('ed.type', '단순변심')
-            ->sum(DB::raw('o.shipping_fee_then * 2'));
-        $exchangeAmount = DB::table('wing_transactions AS wt')
-            ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
+            ->sum(DB::raw('o.price_then-o.shipping_fee_then'));
+        $refundOtherAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
             ->join('order_details AS od', 'od.order_id', '=', 'o.id')
             ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
-            ->select(
-                DB::raw('SUM(CASE WHEN ed.type = "단순변심" THEN wt.amount + o.shipping_fee_then ELSE 0 END) AS simple_mind_sum'),
-                DB::raw('SUM(CASE WHEN ed.type != "단순변심" THEN wt.amount ELSE 0 END) AS other_sum')
-            )
             ->where('wt.member_id', $memberId)
-            ->first();
-        $balance = $depositAmount - $withdrawalAmount - $paidAmount - $refundAmount - $exchangeAmount->simple_mind_sum - $exchangeAmount->other_sum;
+            ->where('od.type', 'REFUND')
+            ->where('ed.status', 'APPROVED')
+            ->whereNot('ed.type', '단순변심')
+            ->sum(DB::raw('o.price_then+o.shipping_fee_then'));
+        $exchangeAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
+            ->join('order_details AS od', 'od.order_id', '=', 'o.id')
+            ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
+            ->where('wt.member_id', $memberId)
+            ->where('od.type', 'EXCHANGE')
+            ->where('ed.status', 'APPROVED')
+            ->where('ed.type', '단순변심')
+            ->sum(DB::raw('o.shipping_fee_then'));
+        $refundAmount = $refundChangedMindAmount + $refundOtherAmount;
+        $balance = $depositAmount - $withdrawalAmount - $paidAmount + $refundAmount - $exchangeAmount;
         return $balance;
     }
     public function saveOrder($order, $domewingAndPartner, $domewingUser)
