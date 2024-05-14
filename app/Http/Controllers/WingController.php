@@ -7,21 +7,54 @@ use Illuminate\Support\Str;
 
 class WingController extends Controller
 {
-    public function getBalance($memberId)
+    public function getBalance(int $memberId): int
     {
-        $result = DB::table('transaction_wing')
-            ->selectRaw('
-                    SUM(CASE WHEN type = "DEPOSIT" AND status = "APPROVED" THEN amount ELSE 0 END) AS total_deposits,
-                    SUM(CASE WHEN type IN ("ORDER", "WITHDRAW") THEN amount ELSE 0 END) AS total_withdrawals
-                ')
+        $depositAmount = DB::table('wing_transactions')
             ->where('member_id', $memberId)
-            ->where('status', '!=', 'REJECTED')
-            ->first();
-        $totalDeposits = $result->total_deposits ?? 0;
-        $totalWithdrawals = $result->total_withdrawals ?? 0;
-        return $totalDeposits - $totalWithdrawals;
+            ->where('type', 'DEPOSIT')
+            ->sum('amount');
+        $withdrawalAmount = DB::table('wing_transactions AS wt')
+            ->join('withdrawal_details AS wd', 'wd.wing_transaction_id', '=', 'wt.id')
+            ->where('wt.member_id', $memberId)
+            ->where('wd.status', 'APPROVED')
+            ->sum('wt.amount');
+        $paidAmount = DB::table('wing_transactions AS wt')
+            ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
+            ->join('order_details AS od', 'od.order_id', '=', 'o.id')
+            ->where('wt.member_id', $memberId)
+            ->whereNot('od.type', 'CANCELLED')
+            ->sum('wt.amount');
+        $refundChangedMindAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
+            ->join('order_details AS od', 'od.order_id', '=', 'o.id')
+            ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
+            ->where('wt.member_id', $memberId)
+            ->where('od.type', 'REFUND')
+            ->where('ed.status', 'APPROVED')
+            ->where('ed.type', '단순변심')
+            ->sum(DB::raw('o.price_then-o.shipping_fee_then'));
+        $refundOtherAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
+            ->join('order_details AS od', 'od.order_id', '=', 'o.id')
+            ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
+            ->where('wt.member_id', $memberId)
+            ->where('od.type', 'REFUND')
+            ->where('ed.status', 'APPROVED')
+            ->whereNot('ed.type', '단순변심')
+            ->sum(DB::raw('o.price_then+o.shipping_fee_then'));
+        $exchangeAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
+            ->join('order_details AS od', 'od.order_id', '=', 'o.id')
+            ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
+            ->where('wt.member_id', $memberId)
+            ->where('od.type', 'EXCHANGE')
+            ->where('ed.status', 'APPROVED')
+            ->where('ed.type', '단순변심')
+            ->sum(DB::raw('o.shipping_fee_then'));
+        $refundAmount = $refundChangedMindAmount + $refundOtherAmount;
+        $balance = $depositAmount - $withdrawalAmount - $paidAmount + $refundAmount - $exchangeAmount;
+        return $balance;
     }
-
     public function saveOrder($order, $domewingAndPartner, $domewingUser)
     {
         // 트랜잭션 시작

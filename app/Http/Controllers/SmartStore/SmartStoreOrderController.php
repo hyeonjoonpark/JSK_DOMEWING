@@ -8,7 +8,6 @@ use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class SmartStoreOrderController extends Controller
 {
