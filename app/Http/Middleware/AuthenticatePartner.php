@@ -46,6 +46,7 @@ class AuthenticatePartner
         $wingBalance = 0;
         $memberId = DB::table('members AS m')
             ->join('partner_domewing_accounts AS pda', 'pda.domewing_account_id', '=', 'm.id')
+            ->where('pda.is_active', 'Y')
             ->where('pda.partner_id', $partnerId)
             ->first(['m.id']);
         if ($memberId !== null) {
