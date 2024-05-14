@@ -24,24 +24,14 @@ class WingController extends Controller
             ->where('wt.member_id', $memberId)
             ->whereNot('od.type', 'CANCELLED')
             ->sum('wt.amount');
-        $refundChangedMindAmount = DB::table('orders AS o')
+        $refundAmount = DB::table('orders AS o')
             ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
             ->join('order_details AS od', 'od.order_id', '=', 'o.id')
             ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
             ->where('wt.member_id', $memberId)
             ->where('od.type', 'REFUND')
             ->where('ed.status', 'APPROVED')
-            ->where('ed.type', '단순변심')
-            ->sum(DB::raw('o.price_then-o.shipping_fee_then'));
-        $refundOtherAmount = DB::table('orders AS o')
-            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
-            ->join('order_details AS od', 'od.order_id', '=', 'o.id')
-            ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
-            ->where('wt.member_id', $memberId)
-            ->where('od.type', 'REFUND')
-            ->where('ed.status', 'APPROVED')
-            ->whereNot('ed.type', '단순변심')
-            ->sum(DB::raw('o.price_then+o.shipping_fee_then'));
+            ->sum('wt.amount');
         $exchangeAmount = DB::table('orders AS o')
             ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
             ->join('order_details AS od', 'od.order_id', '=', 'o.id')
@@ -49,9 +39,7 @@ class WingController extends Controller
             ->where('wt.member_id', $memberId)
             ->where('od.type', 'EXCHANGE')
             ->where('ed.status', 'APPROVED')
-            ->where('ed.type', '단순변심')
-            ->sum(DB::raw('o.shipping_fee_then'));
-        $refundAmount = $refundChangedMindAmount + $refundOtherAmount;
+            ->sum('wt.amount');
         $balance = $depositAmount - $withdrawalAmount - $paidAmount + $refundAmount - $exchangeAmount;
         return $balance;
     }
