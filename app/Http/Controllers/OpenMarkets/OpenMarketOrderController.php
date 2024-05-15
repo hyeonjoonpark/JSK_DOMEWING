@@ -103,25 +103,25 @@ class OpenMarketOrderController extends Controller
                 'data' => $totalAmountRequired - $wing,
             ];
         }
-        // foreach ($saveResults as $result) {
-        //     if ($result['productOrderStatus'] == "결제완료") {
+        foreach ($saveResults as $result) {
+            if ($result['productOrderStatus'] == "결제완료") {
 
 
-        //         $isExistOrder = DB::table('transaction_wing')
-        //             ->where('product_order_id', $result['productOrderId'])
-        //             ->exists();
+                $isExistOrder = DB::table('transaction_wing')
+                    ->where('product_order_id', $result['productOrderId'])
+                    ->exists();
 
-        //         if ($isExistOrder) continue;
+                if ($isExistOrder) continue;
 
-        //         $finishSave = $wc->saveOrder($result, $domewingAndPartner, $domewingUser);
-        //         if (!$finishSave['status']) {  // 배열 접근 방식을 사용
-        //             return [
-        //                 'status' => false,
-        //                 'message' => $finishSave['message']  // 메시지도 배열에서 추출
-        //             ];
-        //         }
-        //     }
-        // }
+                $finishSave = $wc->saveOrder($result, $domewingAndPartner, $domewingUser, $totalAmountRequired);
+                if (!$finishSave['status']) {  // 배열 접근 방식을 사용
+                    return [
+                        'status' => false,
+                        'message' => $finishSave['message']  // 메시지도 배열에서 추출
+                    ];
+                }
+            }
+        }
         return [
             'status' => true,
             'message' => '성공적으로 오더윙을 가동하였습니다.',

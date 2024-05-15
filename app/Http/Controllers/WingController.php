@@ -39,7 +39,7 @@ class WingController extends Controller
         $balance = $depositAmount - $withdrawalAmount - $paidAmount + $refundAmount - $exchangeAmount;
         return $balance;
     }
-    public function saveOrder($order, $domewingAndPartner, $domewingUser)
+    public function saveOrder($order, $domewingAndPartner, $domewingUser, $totalAmountRequired)
     {
         // 트랜잭션 시작
         DB::beginTransaction();
@@ -51,23 +51,44 @@ class WingController extends Controller
             $amount = $isPromotion ? $this->getPromotionProduct($product) : $this->getAmmount($order['productCode']);
 
 
-            // shopping_cart 테이블에 주문 삽입
-            $cartId = DB::table('shopping_cart')->insertGetId([
-                'product_id' => $product->id,
-                'user_id' => $domewingAndPartner->domewing_account_id,
+            $wintTransactionId = DB::table('wing_transactions')->insertGetId([
+                'member_id' => $domewingAndPartner->domewing_account_id,
+                'order_number' => Str::uuid(),
+                'type' => 'PAYMENT',
+                'amount' => $totalAmountRequired
+                // 'is_active' => 'PAID',
+                // 'price_at' => $order['totalPaymentAmount'],
+                // 'shipping_at' => $order['deliveryFeeAmount']
+            ]);
+
+            $cartId = DB::table('carts')->insertGetId([
+                'member_id' => $domewingAndPartner->domewing_account_id,
+                'product_id' => $product->product_id,
                 'quantity' => $order['quantity'],
-                'is_active' => 'PAID',
-                'price_at' => $order['totalPaymentAmount'],
-                'shipping_at' => $order['deliveryFeeAmount']
+                'code' => Str::uuid(),
+                'status' => 'PAID'
+                // 'order_id' => $order['orderId'],
+                // 'product_order_id' => $order['productOrderId'],
+                // 'user_id' => $domewingAndPartner->domewing_account_id,
+                // 'cart_id' => $cartId,
+                // 'order_from' => $order['marketEngName']
             ]);
-            // order_cart 테이블에 주문 삽입
-            DB::table('order_cart')->insert([
-                'order_id' => $order['orderId'],
-                'product_order_id' => $order['productOrderId'],
-                'user_id' => $domewingAndPartner->domewing_account_id,
+            $orderId = DB::table('orders')->insertGetId([
+                'wing_transaction_id' => $wintTransactionId,
                 'cart_id' => $cartId,
-                'order_from' => $order['marketEngName']
+                'product_order_number' => Str::uuid(),
+                'delivery_status' => 'PENDING',
+                // 'price_then'
+                // 'shipping_fee_then'
             ]);
+            DB::table('order_details')->insert([
+                'order_id' => $orderId,
+                'type' => 'PAID'
+            ]);
+            DB::table('partner_orders')->insert([]);
+
+
+
             // transaction_wing 테이블에 트랜잭션 삽입
             $uuid = Str::uuid()->toString();
             $uuidWithoutHyphens = str_replace('-', '', $uuid);
