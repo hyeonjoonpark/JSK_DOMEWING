@@ -20,25 +20,21 @@ class WingController extends Controller
             ->sum('wt.amount');
         $paidAmount = DB::table('wing_transactions AS wt')
             ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
-            ->join('order_details AS od', 'od.order_id', '=', 'o.id')
             ->where('wt.member_id', $memberId)
-            ->whereNot('od.type', 'CANCELLED')
+            ->where('o.type', 'PAID')
+            ->where('o.status', 'APPROVED')
             ->sum('wt.amount');
         $refundAmount = DB::table('orders AS o')
             ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
-            ->join('order_details AS od', 'od.order_id', '=', 'o.id')
-            ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
             ->where('wt.member_id', $memberId)
-            ->where('od.type', 'REFUND')
-            ->where('ed.status', 'APPROVED')
+            ->where('o.type', 'REFUND')
+            ->where('o.status', 'APPROVED')
             ->sum('wt.amount');
         $exchangeAmount = DB::table('orders AS o')
             ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
-            ->join('order_details AS od', 'od.order_id', '=', 'o.id')
-            ->join('exception_details AS ed', 'ed.order_detail_id', '=', 'od.id')
             ->where('wt.member_id', $memberId)
-            ->where('od.type', 'EXCHANGE')
-            ->where('ed.status', 'APPROVED')
+            ->where('o.type', 'EXCHANGE')
+            ->where('o.status', 'APPROVED')
             ->sum('wt.amount');
         $balance = $depositAmount - $withdrawalAmount - $paidAmount + $refundAmount - $exchangeAmount;
         return $balance;
