@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use App\Http\Controllers\Product\NameController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
@@ -148,8 +149,8 @@ class UploadedController extends Controller
         $validator = Validator::make($request->all(), [
             'originProductNo' => 'required',
             'productName' => 'required|string',
-            'price' => 'required|integer|min:10|max:999999999',
-            'shippingFee' => 'required|integer|min:10|max:999999999',
+            'price' => 'required|integer',
+            'shippingFee' => 'required|integer',
             'vendorId' => 'required|integer|exists:vendors,id'
         ], [
             'originProductNo' => '유효한 상품이 아닙니다.',
@@ -166,24 +167,21 @@ class UploadedController extends Controller
             ];
         }
         $vendorId = $request->vendorId;
-        $vendorEngName = DB::table('vendors')
+        $vendor = DB::table('vendors')
             ->where('id', $vendorId)
             ->select('name_eng')
-            ->first()
-            ->name_eng;
-
-
+            ->first();
+        $vendorEngName = $vendor->name_eng;
         $originProductNoValidator = DB::table($vendorEngName . '_uploaded_products')
             ->where('origin_product_no', $request->originProductNo)
             ->where('is_active', 'Y')
             ->exists();
-        if ($originProductNoValidator === false) {
+        if (!$originProductNoValidator) {
             return [
                 'status' => false,
                 'message' => '유효한 상품이 아닙니다.',
                 'error' => [
-                    'originProductNo' => $vendorEngName,
-                    'siabl' => $originProductNoValidator
+                    'originProductNo' => $vendorEngName
                 ]
             ];
         }
@@ -198,9 +196,18 @@ class UploadedController extends Controller
         $shippingFee = $request->shippingFee;
         $product = DB::table('minewing_products AS mp')
             ->join($vendorEngName . '_uploaded_products AS up', 'up.product_id', '=', 'mp.id')
+            ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
             ->where('up.origin_product_no', $originProductNo)
             ->first();
-        $response = $this->smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product);
+        if (!$product) {
+            return [
+                'status' => false,
+                'message' => 'Product not found.'
+            ];
+        }
+        // 벤더에 따라 올바른 메소드를 호출하도록 분기
+        $methodName = $vendorEngName . 'EditRequest';
+        $response = $this->$methodName($originProductNo, $productName, $price, $shippingFee, $partner, $product);
         if ($response['status'] === false) {
             return $response;
         }
@@ -235,7 +242,137 @@ class UploadedController extends Controller
 
     public function coupangEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
     {
+        $cpac = new ApiController();
+        $account = DB::table('coupang_accounts AS a')
+            ->join('coupang_uploaded_products AS up', 'up.coupang_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.hash', 'a.secret_key', 'a.access_key', 'a.code'])
+            ->first();
+        $cuc = new CoupangUploadController($product, $partner, $account);
+        $accessKey = $account->access_key;
+        $secretKey = $account->secret_key;
+        $responseOutbound = $cuc->getOutbound($accessKey, $secretKey);
+        $responseReturn = $cuc->getReturnCenter($accessKey, $secretKey, $account->code);
+        if ($responseOutbound['status'] === false) {
+            return $responseOutbound;
+        }
+        if ($responseReturn['status'] === false) {
+            return $responseReturn;
+        }
+        $outboundCode = $responseOutbound['data'];
+        $returnCenter = $responseReturn['data'];
+        return [
+            'status' => true,
+            'data' => $returnCenter
+        ];
+        //ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+        $optionName = '단일 상품';
+        if ($product->hasOption === 'Y') {
+            $optionName = $this->extractOptionName($product->productDetail);
+        }
+        $deliveryChargeType = "NOT_FREE";
+        if ($price >= 5000) { //애매한부분 %salePrice
+            $deliveryChargeType = "FREE";
+        }
+        $deliveryCharge = $shippingFee;
+        //ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+        $data = [
+            'sellerProductId' => $originProductNo,
+            'displayCategoryCode' => $product->code,
+            'sellerProductName' => $productName,
+            'saleStartedAt' => date("Y-m-d\TH:i:s"),
+            'saleEndedAt' => date("2099-12-31\TH:i:s"),
+            'displayProductName' => $productName,
+            'brand' => '제이에스',
+            'generalProductName' => $productName,
+            'deliveryMethod' => 'SEQUENCIAL',
+            'deliveryCompanyCode' => 'HYUNDAI',
+            'deliveryChargeType' => $deliveryChargeType,
+            'deliveryCharge' => $deliveryCharge,
+            'freeShipOverAmount' => 0,
+            'deliveryChargeOnReturn' => $shippingFee,
+            'remoteAreaDeliverable' => 'Y',
+            'unionDeliveryType' => 'NOT_UNION_DELIVERY',
+            'returnCenterCode' => "NO_RETURN_CENTERCODE",
+            'returnChargeName' => $returnCenter['shippingPlaceName'],
+            'companyContactNumber' => $returnCenter['placeAddresses'][0]['companyContactNumber'],
+            'returnZipCode' => $returnCenter['placeAddresses'][0]['returnZipCode'],
+            'returnAddress' => $returnCenter['placeAddresses'][0]['returnAddress'],
+            'returnAddressDetail' => $returnCenter['placeAddresses'][0]['returnAddressDetail'],
+            'returnCharge' => $shippingFee,
+            'outboundShippingPlaceCode' => $outboundCode,
+            'vendorUserId' => $account->username,
+            'requested' => true,
+            'items' => [
+                [
+                    'itemName' => $optionName,
+                    'originalPrice' => $price,
+                    'salePrice' => $price,
+                    'maximumBuyCount' => 9999,
+                    'maximumBuyForPerson' => 0,
+                    'maximumBuyForPersonPeriod' => 1,
+                    'outboundShippingTimeDay' => 1,
+                    'unitCount' => 0,
+                    'adultOnly' => 'EVERYONE',
+                    'taxType' => 'TAX',
+                    'parallelImported' => 'NOT_PARALLEL_IMPORTED',
+                    'overseasPurchased' => 'NOT_OVERSEAS_PURCHASED',
+                    'pccNeeded' => false,
+                    'images' => [
+                        [
+                            'imageOrder' => 0,
+                            'imageType' => 'REPRESENTATION',
+                            'vendorPath' => $product->productImage
+                        ]
+                    ],
+                    'notices' => [
+                        [
+                            'noticeCategoryName' => '기타 재화',
+                            'noticeCategoryDetailName' => '품명 및 모델명',
+                            'content' => '상세페이지 참조'
+                        ],
+                        [
+                            'noticeCategoryName' => '기타 재화',
+                            'noticeCategoryDetailName' => '인증/허가 사항',
+                            'content' => '상세페이지 참조'
+                        ],
+                        [
+                            'noticeCategoryName' => '기타 재화',
+                            'noticeCategoryDetailName' => '제조국(원산지)',
+                            'content' => '상세페이지 참조'
+                        ],
+                        [
+                            'noticeCategoryName' => '기타 재화',
+                            'noticeCategoryDetailName' => '제조자(수입자)',
+                            'content' => '상세페이지 참조'
+                        ],
+                        [
+                            'noticeCategoryName' => '기타 재화',
+                            'noticeCategoryDetailName' => '소비자상담 관련 전화번호',
+                            'content' => '상세페이지 참조'
+                        ],
+                    ],
+                    'contents' => [
+                        [
+                            'contentsType' => 'HTML',
+                            'contentDetails' => [
+                                [
+                                    'content' => $product->productDetail,
+                                    'detailType' => 'TEXT'
+                                ]
+                            ]
+                        ]
+                    ],
+                    'attributes' => []
+                ]
+            ]
+        ];
+        $contentType = 'application/json;charset=UTF-8';
+        $path = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products';
+        $apiResult = $cpac->putBuilder($account->access_key, $account->secret_key, $contentType, $path, $data);
+        return $apiResult;
     }
+
     public function coupangDeleteRequest($originProductNo)
     {
         $cpac = new ApiController();
