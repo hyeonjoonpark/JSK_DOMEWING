@@ -67,6 +67,7 @@ use App\Http\Controllers\SellwingApis\VendorListController;
 use App\Http\Controllers\SmartStore\SmartStoreAccountController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
+use App\Http\Controllers\SmartStore\SmartStoreShipmentController;
 use App\Http\Controllers\Testmonial\TestmonialController;
 
 /*
@@ -176,6 +177,9 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('vendor-list', [VendorListController::class, 'main']);
         Route::post('category-list', [CategoryListController::class, 'index']);
     });
+
+    //오픈마켓 발주넣기
+    Route::post('save-tracking-info', [SmartStoreShipmentController::class, 'index']);
 });
 Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     Route::prefix('account-setting')->group(function () {
@@ -209,5 +213,3 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
 Route::post('sellwing-api/auth', [AuthController::class, 'main']);
-
-Route::post('open-market-orders', [OpenMarketOrderController::class, 'index'])->name('open.market.orders');
