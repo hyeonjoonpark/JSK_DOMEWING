@@ -92,7 +92,7 @@ class SmartstoreProductUpload extends Controller
                 'statusType' => 'SALE',
                 'leafCategoryId' => $product->code,
                 'name' => $product->productName,
-                'detailContent' => $product->productDetail,
+                'detailContent' => '<center><img src="https://www.sellwing.kr/images/CDN/ss_header.jpg"><br></center>' . $product->productDetail,
                 'images' => [
                     'representativeImage' => [
                         'url' => $productImage
