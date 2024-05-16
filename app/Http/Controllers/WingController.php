@@ -20,9 +20,10 @@ class WingController extends Controller
             ->sum('wt.amount');
         $paidAmount = DB::table('wing_transactions AS wt')
             ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
-            ->where('wt.member_id', $memberId)
+            ->where('member_id', $memberId)
             ->where('o.type', 'PAID')
             ->where('o.status', 'APPROVED')
+            ->distinct()
             ->sum('wt.amount');
         $refundAmount = DB::table('orders AS o')
             ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')

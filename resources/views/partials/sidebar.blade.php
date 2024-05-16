@@ -102,17 +102,21 @@
                                 <span class="nk-menu-text">엑셀윙</span>
                             </a>
                         </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/orderwing" class="nk-menu-link">
+                        <li class="nk-menu-item has-sub">
+                            <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-truck"></em></span>
                                 <span class="nk-menu-text">오더윙</span>
                             </a>
-                        </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/open-market" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-truck"></em></span>
-                                <span class="nk-menu-text">오픈마켓</span>
-                            </a>
+                            <ul class="nk-menu-sub">
+                                <li class="nk-menu-item">
+                                    <a href="/admin/orderwing" class="nk-menu-link"><span
+                                            class="nk-menu-text">JSK홀딩스</span></a>
+                                </li>
+                                <li class="nk-menu-item">
+                                    <a href="/admin/open-market" class="nk-menu-link"><span
+                                            class="nk-menu-text">도매윙</span></a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
