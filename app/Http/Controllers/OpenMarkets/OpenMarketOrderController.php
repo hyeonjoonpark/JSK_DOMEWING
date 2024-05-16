@@ -9,6 +9,7 @@ use App\Http\Controllers\WingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class OpenMarketOrderController extends Controller
 {
@@ -25,12 +26,7 @@ class OpenMarketOrderController extends Controller
             ->where('o.delivery_status', 'PENDING')
             ->select(
                 'm.username as member_username',
-                'po.price_then as price_then',
                 'c.quantity as quantity',
-                'po.shipping_fee_then as shipping_fee_then',
-                'po.order_number as order_number',
-                'po.product_order_number as product_order_number',
-                'po.vendor_id as vendor_id',
                 'o.receiver_name as receiver_name',
                 'o.receiver_phone as receiver_phone',
                 'o.receiver_address as receiver_address',
@@ -43,7 +39,9 @@ class OpenMarketOrderController extends Controller
                 'm.email as senderEmail',
                 'm.last_name as lastName',
                 'm.first_name as firstName',
-
+                'po.order_number as orderNumber',
+                'o.product_order_number as productOrderNumber',
+                'm.id as memberId'
             )
             ->get();
         $processedOrders = $orders->map(function ($order) {
@@ -56,11 +54,23 @@ class OpenMarketOrderController extends Controller
                 ->where('mp.id', $uploadedProduct->product_id)
                 ->where('isActive', 'Y')
                 ->first();
+            $columns = Schema::getColumnListing('delivery_companies');
+
+            $query = DB::table('delivery_companies');
+
+            foreach ($columns as $column) {
+                $query->whereNotNull($column);
+            }
+
+            $deliveryCompanies = $query->get();
+
+            $isExistPartner = DB::table('partner_domewing_accounts as pda')
+                ->where('pda.domewing_account_id', $order->memberId)
+                ->exists();
 
             return [
                 'userName' => $order->member_username,
-                'orderNumber' => $order->order_number,
-                'productOrderNumber' => $order->product_order_number,
+                'orderNumber' => $order->orderNumber,
                 'receiverName' => $order->receiver_name,
                 'receiverPhone' => $order->receiver_phone,
                 'receiverAddress' => $order->receiver_address,
@@ -79,6 +89,9 @@ class OpenMarketOrderController extends Controller
                 'senderPhone' => $order->senderPhone,
                 'senderEmail' => $order->senderEmail,
                 'senderName' => $order->lastName . $order->firstName,
+                'deliveryCompanies' => $deliveryCompanies,
+                'productOrderNumber' => $order->productOrderNumber,
+                'isPartner' => $isExistPartner
             ];
         });
         return response()->json($processedOrders);

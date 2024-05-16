@@ -37,8 +37,8 @@
                                 <tr>
                                     <th scope="col">수취인 정보</th>
                                     <th scope="col">주문 정보</th>
-                                    <th scope="col">주문상태</th>
                                     <th scope="col">주문자 정보</th>
+                                    <th scope="col">주문상태</th>
                                 </tr>
 
                             </thead>
@@ -79,6 +79,7 @@
             $('#numOrders').html(response.length);
             $('#orderwingResult').html(generateOrdersHtml(response));
             $('#totalAmt').html(`${numberFormat(calculateTotalAmount(response))}원`);
+            $('.js-select2').select2();
             closePopup();
         }
 
@@ -87,6 +88,11 @@
         }
 
         function generateOrderRowHtml(order) {
+            let deliveryCompanyHtml = `<option value="-1">택배사 선택</option>`;
+            for (const deliveryCompany of order.deliveryCompanies) {
+                deliveryCompanyHtml += `<option value="${deliveryCompany.id}">${deliveryCompany.name}</option>`;
+            }
+            let partnerStatusHtml = order.isExistPartner ? '<b><p>파트너 계정입니다.</p></b>' : '<b><p>일반 회원입니다.</p></b>';
             return `
             <tr>
                 <td>
@@ -100,13 +106,21 @@
                     ${generateProductDetailsHtml(order)}
                 </td>
                 <td class="text-nowrap">
-                    <h6 class="title">${order.orderStatus}</h6>
+                    <div class="row g-gs mb-3">
+                        <div class="col-12">
+                            <p><b>닉네임:</b><br>${order.senderNickName}<br><b>이름:</b><br>${order.senderName}<br><b>연락처:</b><br>${order.senderPhone}<br><b>이메일:</b><br>${order.senderEmail}<br></p>
+                            ${partnerStatusHtml}
+                        </div>
+                    </div>
                 </td>
                 <td class="text-nowrap">
-                    <div class="row mb-3">
-                        <div class="col">
-                            <p><b>닉네임:</b><br>${order.senderNickName}<br><b>이름:</b><br>${order.senderName}<br><b>연락처:</b><br>${order.senderPhone}<br><b>이메일:</b><br>${order.senderEmail}<br></p>
-                        </div>
+                    <h6 class="title">${order.orderStatus}</h6>
+                    <div class="col-auto">
+                        <select class="form-select js-select2" id="deliveryCompany` + order.productOrderNumber + `">
+                            ` + deliveryCompanyHtml + `
+                        </select>
+                        <input type="text" class="form-control" id="trackingNumber${order.productOrderNumber}" placeholder="송장번호">
+                        <button class="btn btn-primary" onclick="initCreateDelivery('` + order.productOrderNumber + `');">확인</button>
                     </div>
                 </td>
             </tr>`;
@@ -136,6 +150,29 @@
 
         function calculateTotalAmount(orders) {
             return orders.reduce((accumulator, order) => accumulator + parseInt(order.amount || 0, 10), 0);
+        }
+
+        function initCreateDelivery(productOrderNumber) {
+            const trackingNumber = $('#trackingNumber' + productOrderNumber).val();
+            const deliveryCompanyId = $('#deliveryCompany' + productOrderNumber).val();
+            $.ajax({
+                url: '/api/save-tracking-info',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    rememberToken,
+                    trackingNumber,
+                    deliveryCompanyId,
+                    productOrderNumber,
+                },
+                success: function(response) {
+                    console.log('Tracking info saved:', response);
+                    closeModal();
+                },
+                error: function(response) {
+                    console.error('Error saving tracking info:', response);
+                }
+            });
         }
     </script>
 @endsection

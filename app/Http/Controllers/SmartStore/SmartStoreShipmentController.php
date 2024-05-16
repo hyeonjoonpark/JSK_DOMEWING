@@ -12,81 +12,140 @@ use Illuminate\Support\Facades\DB;
 class SmartStoreShipmentController extends Controller
 {
     private $ssac;
+
     public function __construct()
     {
         $this->ssac = new SmartStoreApiController();
     }
+
     public function index(Request $request)
     {
-        // $id = Auth::guard('partner')->id(); //파트너의 id를 받아와야함 그래야 api 쏠때 파트너 id의 토큰을 줌
-        $trackingNumber = $request->input('trackingNumber');
-        $deliveryCompany = $request->input('deliveryCompany');
-        $productOrderId = $request->input('productOrderId');
-        $orderId = $request->input('orderId');
+        try {
+            $trackingNumber = $request->input('trackingNumber');
+            $deliveryCompanyId = $request->input('deliveryCompanyId');
+            $productOrderNumber = $request->input('productOrderNumber');
 
-        // $account = $this->getAccount($id);
-        $responseApi = $this->posetApi($account, $productOrderId, $deliveryCompany, $trackingNumber);
-        if ($responseApi['response' == false]) {
+            $deliveryCompany = $this->getDeliveryCompany($deliveryCompanyId);
+            $order = $this->getOrder($productOrderNumber);
+            $wingTransaction = $this->getWingTransaction($order->wing_transaction_id);
+            $domewingPartner = $this->getDomewingPartner($wingTransaction->member_id);
+            $partner = $this->getPartner($domewingPartner->partner_id);
+            $account = $this->getAccount($partner->id);
+            $productOrder = $this->getProductOrder($order->id);
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '데이터 조회 중 오류가 발생했습니다: ' . $e->getMessage(),
+            ];
+        }
+
+        $responseApi = $this->postApi($account, $productOrder->product_order_number, $deliveryCompany, $trackingNumber);
+
+        if ($responseApi['response'] == false) {
             return [
                 'status' => false,
                 'message' => $responseApi['message'],
             ];
         }
-        return $this->create($orderId, $deliveryCompany, $trackingNumber);
+
+        return $this->create($order->id, $deliveryCompanyId, $trackingNumber);
     }
-    private function posetApi($account, $productOrderId, $deliveryCompany, $trackingNumber)
+
+    private function getDeliveryCompany($deliveryCompanyId)
+    {
+        return DB::table('delivery_companies as dc')
+            ->where('dc.id', $deliveryCompanyId)
+            ->select('smart_store')
+            ->first();
+    }
+
+    private function getOrder($productOrderNumber)
+    {
+        return DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->first();
+    }
+
+    private function getWingTransaction($wingTransactionId)
+    {
+        return DB::table('wing_transactions as wt')
+            ->where('wt.id', $wingTransactionId)
+            ->first();
+    }
+
+    private function getDomewingPartner($memberId)
+    {
+        return DB::table('partner_domewing_accounts as pda')
+            ->where('pda.domewing_account_id', $memberId)
+            ->where('is_active', 'Y')
+            ->first();
+    }
+
+    private function getPartner($partnerId)
+    {
+        return DB::table('partners as p')
+            ->where('p.id', $partnerId)
+            ->first();
+    }
+
+    private function getProductOrder($orderId)
+    {
+        return DB::table('partner_orders as ps')
+            ->where('ps.order_id', $orderId)
+            ->first();
+    }
+
+    private function postApi($account, $productOrderId, $deliveryCompany, $trackingNumber)
     {
         $contentType = 'application/json';
         $method = 'POST';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses';
         $dispatchDate = $this->getDispatchDate();
         $data = [
-            // $apiToken => apiToken,
-            $productOrderId,
+            'productOrderId' => $productOrderId,
             'deliveryMethod' => 'DELIVERY',
-            $deliveryCompany,
-            $trackingNumber,
-            $dispatchDate
+            'deliveryCompany' => $deliveryCompany,
+            'trackingNumber' => $trackingNumber,
+            'dispatchDate' => $dispatchDate,
         ];
         return $this->ssac->builder($account, $contentType, $method, $url, $data);
     }
-    private function create($orderId, $deliveryCompany, $trackingNumber)
+
+    private function create($orderId, $deliveryCompanyId, $trackingNumber)
     {
         try {
-            $deliveryCompanyId = DB::table('delivery_companies')
-                ->where('smart_store', $deliveryCompany)
-                ->value('id');
-
             DB::table('orders')
                 ->where('id', $orderId)
                 ->update([
                     'tracking_number' => $trackingNumber,
                     'delivery_company_id' => $deliveryCompanyId,
-                    'updated_at' => now()
+                    'delivery_status' => 'COMPLETE',
                 ]);
+            return [
+                'status' => true,
+                'message' => '송장번호 입력에 성공하였습니다',
+                'data' => []
+            ];
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'data' => []
             ];
         }
-        return [
-            'status' => 'success',
-            'message' => '송장번호 입력에 성공하였습니다',
-            'data' => []
-        ];
     }
-
 
     private function getAccount($id)
     {
-        return DB::table('smart_store_accounts')->where('partner_id', $id)->first();
+        return DB::table('smart_store_accounts')
+            ->where('partner_id', $id)
+            ->first();
     }
+
     private function getDispatchDate()
     {
         $dateTime = new DateTime('now', new DateTimeZone('Asia/Seoul'));
         $dateTime->modify('+3 days'); // 현재 날짜로부터 3일 뒤로 설정
-        $dispatchDate = $dateTime->format('Y-m-d\TH:i:s.vP');
-        return $dispatchDate;
+        return $dateTime->format('Y-m-d\TH:i:s.vP');
     }
 }
