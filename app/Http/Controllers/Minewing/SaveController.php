@@ -208,22 +208,23 @@ class SaveController extends Controller
             } else {
                 $hasOption = 'N';
             }
-            DB::table('minewing_products AS mp')
-                ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
-                ->insert([
-                    'mp.sellerID' => $sellerID,
-                    'mp.userID' => $userID,
-                    'mp.categoryID' => $categoryID,
-                    'mp.productCode' => $productCode,
-                    'mp.productName' => $productName,
-                    'mp.productKeywords' => $productKeywords,
-                    'mp.productPrice' => $productPrice,
-                    'mp.productImage' => $productImage,
-                    'mp.productDetail' => $productDetail,
-                    'mp.productHref' => $productHref,
-                    'mp.hasOption' => $hasOption,
-                    'mp.shipping_fee' => DB::raw('ps.shipping_fee')
-                ]);
+            $shippingFee = DB::table('product_search')
+                ->where('vendor_id', $sellerID)
+                ->value('shipping_fee');
+            DB::table('minewing_products')->insert([
+                'sellerID' => $sellerID,
+                'userID' => $userID,
+                'categoryID' => $categoryID,
+                'productCode' => $productCode,
+                'productName' => $productName,
+                'productKeywords' => $productKeywords,
+                'productPrice' => $productPrice,
+                'productImage' => $productImage,
+                'productDetail' => $productDetail,
+                'productHref' => $productHref,
+                'hasOption' => $hasOption,
+                'shipping_fee' => $shippingFee
+            ]);
             $response = $this->insertMappingwing($categoryID);
             if (!$response) {
                 return [
