@@ -86,20 +86,21 @@ class ApiController extends Controller
             ];
         }
     }
-    public function putBuilder(string $accessKey, string $secretKey, string $contentType, string $path, string $query = '')
+    public function putBuilder(string $accessKey, string $secretKey, string $contentType, string $path, array $data = [])
     {
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
         $method = "PUT";
-        $message = $datetime . $method . $path . $query;
+        $message = $datetime . $method . $path;
         $algorithm = "HmacSHA256";
         $signature = hash_hmac('sha256', $message, $secretKey);
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
-        $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
+        $url = 'https://api-gateway.coupang.com' . $path;
+        $jsonData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $response = Http::withHeaders([
             'Authorization' => $authorization,
             'Content-Type' => $contentType
-        ])->put($url);
+        ])->withBody($jsonData, 'application/json')->put($url);
         if ($response->successful() && $response->status() === 200) {
             return [
                 'status' => true,
@@ -112,7 +113,7 @@ class ApiController extends Controller
             ];
         }
     }
-    public function builder($accessKey, $secretKey, $method, $contentType, $path, $data = "")
+    public function builder($accessKey, $secretKey, $method, $contentType, $path, $data)
     {
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
@@ -125,7 +126,7 @@ class ApiController extends Controller
         $response = Http::withHeaders([
             'Authorization' => $authorization,
             'Content-Type' => $contentType
-        ])->withBody($jsonData, 'application/json')->$method($url);
+        ])->withBody($jsonData, 'application/json')->put($url);
         if ($response->successful() && $response->status() === 200) {
             return [
                 'status' => true,

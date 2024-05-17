@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\PartnersManagementController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\AccountManagementController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
+use App\Http\Controllers\OpenMarkets\OpenMarketOrderController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
 use App\Http\Controllers\Partners\ForgotPasswordController;
@@ -86,6 +87,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('mappingwing/mapped', [AdminController::class, 'mapped']);
     Route::get('/orderwing', [AdminController::class, 'orderwing']);
     Route::get('open-market', [AdminController::class, 'openMarket']);
+    Route::get('get-new-orders', [OpenMarketOrderController::class, 'index']);
     Route::get('apiwing', [AdminController::class, 'apiwing']);
     Route::get('product-editor', [ViewController::class, 'index']);
     Route::get('namewing', [NamewingController::class, 'main']);

@@ -69,13 +69,6 @@ class SmartStoreOrderController extends Controller
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query';
         $data = ['productOrderIds' => $productOrderIds];
         $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
-        // 전체 응답 로깅
-        // Log::info('API Response:', ['response' => $response]);
-
-        // if (!isset($response['data']['data'])) {
-        //     Log::error('Invalid API response structure', ['response' => $response]);
-        //     return ['error' => '응답 데이터가 올바르지 않습니다.'];
-        // }
         if (!isset($response['data']['data'])) {
             return ['error' => '응답 데이터가 올바르지 않습니다.'];
         }
@@ -91,7 +84,6 @@ class SmartStoreOrderController extends Controller
             'PURCHASE_DECIDED' => '구매 확정',
         ];
         $formattedResponse = array_map(function ($item) use ($statusMap) {
-            // shippingAddress 객체가 존재하는지 확인
             $shippingAddress = isset($item['productOrder']['shippingAddress']) ? $item['productOrder']['shippingAddress'] : null;
 
             return [
