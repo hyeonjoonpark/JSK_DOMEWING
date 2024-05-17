@@ -27,14 +27,17 @@ class Test extends Command
      */
     public function handle()
     {
-        $ac = new ApiController();
-        $account = DB::table('coupang_accounts')
-            ->where('id', 8)
-            ->first();
-        $contentType = 'application/json;charset=UTF-8';
-        $path = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/14904557493';
-        //string $accessKey, string $secretKey, string $contentType, string $path, string $query = ''
-        $response = $ac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
-        print_r($response);
+        $metaldiyProductCodes = DB::table('minewing_products')
+            ->where('sellerID', 2)
+            ->pluck('productCode')
+            ->toArray();
+        $chunkedCodes = array_chunk($metaldiyProductCodes, 500, false);
+        foreach ($chunkedCodes as $index => $codes) {
+            $codes = join(',', $codes);
+            $i = $index + 1;
+            $tempFilePath = public_path('assets/txt/metaldiy_product_codes_' . $i . '.txt');
+            file_put_contents($tempFilePath, $codes);
+        }
+        echo "success";
     }
 }

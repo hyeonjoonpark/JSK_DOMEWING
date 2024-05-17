@@ -160,4 +160,28 @@ class WingController extends Controller
         $ammount = $product->productPrice * $this->getMarginRate('margin');
         return $ammount;
     }
+    // 판매 가격 계산
+    protected function getSalePrice($productId)
+    {
+        $originProductPrice = DB::table('minewing_products')
+            ->where('id', $productId)
+            ->value('productPrice');
+
+        $promotion = DB::table('promotion_products AS pp')
+            ->join('promotion AS p', 'p.id', '=', 'pp.promotion_id')
+            ->where('product_id', $productId)
+            ->where('p.end_at', '>', now())
+            ->where('p.is_active', 'Y')
+            ->where('pp.is_active', 'Y')
+            ->where('p.band_promotion', 'N')
+            ->where('pp.band_product', 'N')
+            ->value('pp.product_price');
+
+        $productPrice = $promotion ?? $originProductPrice;
+
+        $margin = DB::table('sellwing_config')->where('id', 1)->value('value');
+        $marginRate = ($margin / 100) + 1;
+
+        return ceil($productPrice * $marginRate);
+    }
 }
