@@ -14,8 +14,32 @@ class OpenMarketShipmentController extends Controller
     {
         $productOrderNumber = $request->input('productOrderNumber');
         $vendor = $this->getVendorByProductOrderNumber($productOrderNumber);
-        $method = 'call' . ucfirst($vendor->name_eng) . 'ShipmentApi';
-        return $this->$method($request);
+        if ($vendor) {
+            $method = 'call' . ucfirst($vendor->name_eng) . 'ShipmentApi';
+            return $this->$method($request);
+        } else {
+            $checkDeliveryCompnayId = DB::table('delivery_companies as dc')
+                ->where('dc.id', $request->deliveryCompanyId)
+                ->exists();
+            if ($checkDeliveryCompnayId) {
+                DB::table('orders as o')
+                    ->where('o.product_order_number', $productOrderNumber)
+                    ->update([
+                        'delivery_company_id' => $request->input('deliveryCompanyId'),
+                        'tracking_number' => $request->input('trackingNumber'),
+                        'delivery_status' => 'COMPLETE'
+                    ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => '배송 정보가 성공적으로 업데이트되었습니다.',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => '유효하지 않은 배송 회사 ID입니다.',
+                ], 400);
+            }
+        }
     }
 
     private function getVendorByProductOrderNumber($productOrderNumber)
