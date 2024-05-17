@@ -114,6 +114,7 @@
                     </div>
                 </td>
                 <td class="text-nowrap">
+                    <h6 class="title">${order.vendorName}</h6>
                     <h6 class="title">${order.orderStatus}</h6>
                     <div class="col-auto">
                         <select class="form-select js-select2" id="deliveryCompany` + order.productOrderNumber + `">
