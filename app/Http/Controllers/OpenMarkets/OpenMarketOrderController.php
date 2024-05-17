@@ -226,14 +226,4 @@ class OpenMarketOrderController extends Controller
         $controller = new CoupangOrderController();
         return $controller->index($id, $startDate, $endDate);
     }
-
-
-    private function callSmart_storeShipmentApi()
-    {
-        $controller = new SmartStoreOrderController();
-    }
-    private function callCoupangShipmentApi()
-    {
-        $controller = new CoupangOrderController();
-    }
 }

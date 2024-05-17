@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class SmartStoreShipmentController extends Controller
@@ -48,7 +47,7 @@ class SmartStoreShipmentController extends Controller
             ];
         }
 
-        return $this->create($order->id, $deliveryCompanyId, $trackingNumber);
+        return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
     }
 
     private function getDeliveryCompany($deliveryCompanyId)
@@ -102,16 +101,16 @@ class SmartStoreShipmentController extends Controller
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses';
         $dispatchDate = $this->getDispatchDate();
         $data = [
-            'productOrderId' => $productOrderId,
+            $productOrderId,
             'deliveryMethod' => 'DELIVERY',
-            'deliveryCompany' => $deliveryCompany,
-            'trackingNumber' => $trackingNumber,
-            'dispatchDate' => $dispatchDate,
+            $deliveryCompany,
+            $trackingNumber,
+            $dispatchDate,
         ];
         return $this->ssac->builder($account, $contentType, $method, $url, $data);
     }
 
-    private function create($orderId, $deliveryCompanyId, $trackingNumber)
+    private function update($orderId, $deliveryCompanyId, $trackingNumber)
     {
         try {
             DB::table('orders')

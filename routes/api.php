@@ -51,6 +51,7 @@ use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\OpenMarketOrderController;
+use App\Http\Controllers\OpenMarkets\OpenMarketShipmentController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\Products\ManageController;
 use App\Http\Controllers\Partners\Products\PartnerTableController;
@@ -179,7 +180,7 @@ Route::middleware(['auth.custom'])->group(function () {
     });
 
     //오픈마켓 발주넣기
-    Route::post('save-tracking-info', [SmartStoreShipmentController::class, 'index']);
+    Route::post('save-tracking-info', [OpenMarketShipmentController::class, 'index']);
 });
 Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     Route::prefix('account-setting')->group(function () {
