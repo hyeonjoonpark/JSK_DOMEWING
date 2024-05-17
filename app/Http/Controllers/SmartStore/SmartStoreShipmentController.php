@@ -26,9 +26,7 @@ class SmartStoreShipmentController extends Controller
 
             $deliveryCompany = $this->getDeliveryCompany($deliveryCompanyId);
             $order = $this->getOrder($productOrderNumber);
-            $wingTransaction = $this->getWingTransaction($order->wing_transaction_id);
-            $domewingPartner = $this->getDomewingPartner($wingTransaction->member_id);
-            $partner = $this->getPartner($domewingPartner->partner_id);
+            $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
             $account = $this->getAccount($partner->id);
             $productOrder = $this->getProductOrder($order->id);
         } catch (\Exception $e) {
@@ -38,62 +36,17 @@ class SmartStoreShipmentController extends Controller
             ];
         }
 
-        $responseApi = $this->postApi($account, $productOrder->product_order_number, $deliveryCompany, $trackingNumber);
+        // $responseApi = $this->postApi($account, $productOrder->product_order_number, $deliveryCompany, $trackingNumber);
 
-        if ($responseApi['response'] == false) {
-            return [
-                'status' => false,
-                'message' => $responseApi['message'],
-            ];
-        }
+        // if ($responseApi['response'] == false) {
+        //     return [
+        //         'status' => false,
+        //         'message' => $responseApi['message'],
+        //     ];
+        // }
 
         return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
     }
-
-    private function getDeliveryCompany($deliveryCompanyId)
-    {
-        return DB::table('delivery_companies as dc')
-            ->where('dc.id', $deliveryCompanyId)
-            ->select('smart_store')
-            ->first();
-    }
-
-    private function getOrder($productOrderNumber)
-    {
-        return DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->first();
-    }
-
-    private function getWingTransaction($wingTransactionId)
-    {
-        return DB::table('wing_transactions as wt')
-            ->where('wt.id', $wingTransactionId)
-            ->first();
-    }
-
-    private function getDomewingPartner($memberId)
-    {
-        return DB::table('partner_domewing_accounts as pda')
-            ->where('pda.domewing_account_id', $memberId)
-            ->where('is_active', 'Y')
-            ->first();
-    }
-
-    private function getPartner($partnerId)
-    {
-        return DB::table('partners as p')
-            ->where('p.id', $partnerId)
-            ->first();
-    }
-
-    private function getProductOrder($orderId)
-    {
-        return DB::table('partner_orders as ps')
-            ->where('ps.order_id', $orderId)
-            ->first();
-    }
-
     private function postApi($account, $productOrderId, $deliveryCompany, $trackingNumber)
     {
         $contentType = 'application/json';
@@ -132,6 +85,40 @@ class SmartStoreShipmentController extends Controller
                 'data' => []
             ];
         }
+    }
+
+    private function getDeliveryCompany($deliveryCompanyId)
+    {
+        return DB::table('delivery_companies as dc')
+            ->where('dc.id', $deliveryCompanyId)
+            ->select('smart_store')
+            ->first();
+    }
+
+    private function getOrder($productOrderNumber)
+    {
+        return DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->first();
+    }
+
+    private function getPartnerByWingTransactionId($wingTransactionId)
+    {
+        return DB::table('wing_transactions as wt')
+            ->join('partner_domewing_accounts as pda', 'wt.member_id', '=', 'pda.domewing_account_id')
+            ->join('partners as p', 'pda.partner_id', '=', 'p.id')
+            ->where('wt.id', $wingTransactionId)
+            ->where('pda.is_active', 'Y')
+            ->select('p.*')
+            ->first();
+    }
+
+
+    private function getProductOrder($orderId)
+    {
+        return DB::table('partner_orders as ps')
+            ->where('ps.order_id', $orderId)
+            ->first();
     }
 
     private function getAccount($id)
