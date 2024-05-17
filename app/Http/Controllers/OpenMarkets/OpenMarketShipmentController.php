@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\SmartStore\CoupangShipmentController;
 use App\Http\Controllers\SmartStore\SmartStoreShipmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +31,11 @@ class OpenMarketShipmentController extends Controller
     private function callSmart_storeShipmentApi(Request $request)
     {
         $controller = new SmartStoreShipmentController();
+        return $controller->index($request);
+    }
+    private function callCoupangShipmentApi(Request $request)
+    {
+        $controller = new CoupangShipmentController();
         return $controller->index($request);
     }
 }

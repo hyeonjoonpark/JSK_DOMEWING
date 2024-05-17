@@ -15,84 +15,9 @@ class OpenMarketOrderController extends Controller
 {
     public function index()
     {
-        $orders = DB::table('partner_orders as po')
-            ->join('orders as o', 'po.order_id', '=', 'o.id')
-            ->join('vendors as v', 'v.id', '=', 'po.vendor_id')
-            ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
-            ->join('members as m', 'm.id', '=', 'wt.member_id')
-            ->join('carts as c', 'c.id', '=', 'o.cart_id')
-            ->where('o.type', 'PAID')
-            ->where('o.status', 'APPROVED')
-            ->where('o.delivery_status', 'PENDING')
-            ->select(
-                'm.username as member_username',
-                'c.quantity as quantity',
-                'o.receiver_name as receiver_name',
-                'o.receiver_phone as receiver_phone',
-                'o.receiver_address as receiver_address',
-                'v.name as vendor_name',
-                'v.name_eng as vendor_name_eng',
-                'po.uploaded_product_id as uploadedProductId',
-                'o.id as order_id',
-                'm.username as senderNickName',
-                'm.phone_number as senderPhone',
-                'm.email as senderEmail',
-                'm.last_name as lastName',
-                'm.first_name as firstName',
-                'po.order_number as orderNumber',
-                'o.product_order_number as productOrderNumber',
-                'm.id as memberId'
-            )
-            ->get();
+        $orders = $this->getPendingOrders();
         $processedOrders = $orders->map(function ($order) {
-            $uploadedProductsTable = $order->vendor_name_eng . '_uploaded_products';
-            $uploadedProduct = DB::table($uploadedProductsTable)
-                ->where('id', $order->uploadedProductId)
-                ->where('is_active', 'Y')
-                ->first();
-            $product = DB::table('minewing_products as mp')
-                ->where('mp.id', $uploadedProduct->product_id)
-                ->where('isActive', 'Y')
-                ->first();
-            $columns = Schema::getColumnListing('delivery_companies');
-
-            $query = DB::table('delivery_companies');
-
-            foreach ($columns as $column) {
-                $query->whereNotNull($column);
-            }
-
-            $deliveryCompanies = $query->get();
-
-            $isExistPartner = DB::table('partner_domewing_accounts as pda')
-                ->where('pda.domewing_account_id', $order->memberId)
-                ->exists();
-
-            return [
-                'userName' => $order->member_username,
-                'orderNumber' => $order->orderNumber,
-                'receiverName' => $order->receiver_name,
-                'receiverPhone' => $order->receiver_phone,
-                'receiverAddress' => $order->receiver_address,
-                'vendorName' => $order->vendor_name,
-                'vendorNameEng' => $order->vendor_name_eng,
-                'productName' => $product ? $product->productName : null,
-                'orderId' => $order->order_id,
-                'productHref' => $product ? $product->productHref : null,
-                'productImage' => $product ? $product->productImage : null,
-                'productPrice' => $product ? $this->calcProductPrice($product->productPrice) : null,
-                'shippingFee' => $product ? $product->shipping_fee : null,
-                'quantity' => $order->quantity,
-                'amount' => $product ? $this->calcProductPrice($product->productPrice) * $order->quantity + $product->shipping_fee : null,
-                'orderStatus' => '신규주문',
-                'senderNickName' => $order->senderNickName,
-                'senderPhone' => $order->senderPhone,
-                'senderEmail' => $order->senderEmail,
-                'senderName' => $order->lastName . $order->firstName,
-                'deliveryCompanies' => $deliveryCompanies,
-                'productOrderNumber' => $order->productOrderNumber,
-                'isPartner' => $isExistPartner
-            ];
+            return $this->processOrder($order);
         });
         return response()->json($processedOrders);
     }
@@ -142,13 +67,13 @@ class OpenMarketOrderController extends Controller
                 'api_result' => $apiResult
             ];
         }
-        if ($totalAmountRequired > $wing) {
-            return [
-                'status' => false,
-                'message' => 'wing 잔액이 부족합니다.',
-                'data' => $totalAmountRequired - $wing,
-            ];
-        }
+        // if ($totalAmountRequired > $wing) {
+        //     return [
+        //         'status' => false,
+        //         'message' => 'wing 잔액이 부족합니다.',
+        //         'data' => $totalAmountRequired - $wing,
+        //     ];
+        // }
         // foreach ($saveResults as $result) {
         //     if ($result['productOrderStatus'] == "결제완료") {
 
@@ -174,6 +99,91 @@ class OpenMarketOrderController extends Controller
             'data' => $results
         ];
     }
+    private function getPendingOrders()
+    {
+        return DB::table('orders as o')
+            ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
+            ->leftJoin('vendors as v', 'v.id', '=', 'po.vendor_id')
+            ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
+            ->join('members as m', 'm.id', '=', 'wt.member_id')
+            ->join('carts as c', 'c.id', '=', 'o.cart_id')
+            ->where('o.type', 'PAID')
+            ->where('o.status', 'APPROVED')
+            ->where('o.delivery_status', 'PENDING')
+            ->select(
+                'm.username as member_username',
+                'c.quantity as quantity',
+                'o.receiver_name as receiver_name',
+                'o.receiver_phone as receiver_phone',
+                'o.receiver_address as receiver_address',
+                'v.name as vendor_name',
+                'v.name_eng as vendor_name_eng',
+                'po.uploaded_product_id as uploadedProductId',
+                'o.id as order_id',
+                'm.username as senderNickName',
+                'm.phone_number as senderPhone',
+                'm.email as senderEmail',
+                'm.last_name as lastName',
+                'm.first_name as firstName',
+                'po.order_number as orderNumber',
+                'o.product_order_number as productOrderNumber',
+                'm.id as memberId',
+                'c.product_id as productId',
+                DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist')
+            )
+            ->get();
+    }
+    private function processOrder($order)
+    {
+        $product = null;
+        if ($order->vendor_name_eng && $order->uploadedProductId) {
+            $uploadedProductsTable = $order->vendor_name_eng . '_uploaded_products';
+            $uploadedProduct = DB::table($uploadedProductsTable)
+                ->where('id', $order->uploadedProductId)
+                ->where('is_active', 'Y')
+                ->first();
+
+            if ($uploadedProduct) {
+                $product = DB::table('minewing_products as mp')
+                    ->where('mp.id', $uploadedProduct->product_id)
+                    ->where('isActive', 'Y')
+                    ->first();
+            }
+        } else {
+            $product = DB::table('minewing_products as mp')
+                ->where('mp.id', $order->productId)
+                ->where('isActive', 'Y')
+                ->first();
+        }
+
+        $deliveryCompanies = $this->getDeliveryCompanies();
+
+        return [
+            'userName' => $order->member_username,
+            'orderNumber' => $order->orderNumber,
+            'receiverName' => $order->receiver_name,
+            'receiverPhone' => $order->receiver_phone,
+            'receiverAddress' => $order->receiver_address,
+            'vendorName' => $order->vendor_name,
+            'vendorNameEng' => $order->vendor_name_eng,
+            'productName' => $product ? $product->productName : null,
+            'orderId' => $order->order_id,
+            'productHref' => $product ? $product->productHref : null,
+            'productImage' => $product ? $product->productImage : null,
+            'productPrice' => $product ? $this->calcProductPrice($product->productPrice) : null,
+            'shippingFee' => $product ? $product->shipping_fee : null,
+            'quantity' => $order->quantity,
+            'amount' => $product ? $this->calcProductPrice($product->productPrice) * $order->quantity + $product->shipping_fee : null,
+            'orderStatus' => '신규주문',
+            'senderNickName' => $order->senderNickName,
+            'senderPhone' => $order->senderPhone,
+            'senderEmail' => $order->senderEmail,
+            'senderName' => $order->lastName . $order->firstName,
+            'deliveryCompanies' => $deliveryCompanies,
+            'productOrderNumber' => $order->productOrderNumber,
+            'isPartner' => $order->isExist
+        ];
+    }
     private function calcProductPrice($productPrice)
     {
         $config = DB::table('sellwing_config')->first();
@@ -182,6 +192,15 @@ class OpenMarketOrderController extends Controller
         return $productPrice * $processMarginRate;
     }
 
+    private function getDeliveryCompanies()
+    {
+        $columns = Schema::getColumnListing('delivery_companies');
+        $query = DB::table('delivery_companies');
+        foreach ($columns as $column) {
+            $query->whereNotNull($column);
+        }
+        return $query->get();
+    }
     private function getOrderwingOpenMarkets($marketIds)
     {
         $result = DB::table('vendors AS v')

@@ -58,7 +58,7 @@
         <div class="col">
             <div class="card card-bordered">
                 <div class="card-inner">
-                    <h6 class="title">신규 주문</h6>
+                    <h6 class="title">주문 내역</h6>
                     <p>상품 정보를 클릭하면 해당 상품의 상세 페이지로 이동합니다.</p>
                     <button class="btn btn-primary mb-5" onclick="initOrderwing();">조회하기</button>
                     <div class="table-responsive">

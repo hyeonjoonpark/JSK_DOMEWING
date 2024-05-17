@@ -92,7 +92,9 @@
             for (const deliveryCompany of order.deliveryCompanies) {
                 deliveryCompanyHtml += `<option value="${deliveryCompany.id}">${deliveryCompany.name}</option>`;
             }
-            let partnerStatusHtml = order.isExistPartner ? '<b><p>파트너 계정입니다.</p></b>' : '<b><p>일반 회원입니다.</p></b>';
+            let partnerStatusHtml = order.isPartner ? '<b><p>파트너 계정입니다.</p></b>' : '<b><p>일반 회원입니다.</p></b>';
+            let orderVendorHtml = order.vendorName ? `<b><p>${order.vendorName}</p></b>` : '<b><p>도매윙</p></b>';
+
             return `
             <tr>
                 <td>
@@ -114,7 +116,7 @@
                     </div>
                 </td>
                 <td class="text-nowrap">
-                    <h6 class="title">${order.vendorName}</h6>
+                    <h6 class="title">${orderVendorHtml}</h6>
                     <h6 class="title">${order.orderStatus}</h6>
                     <div class="col-auto">
                         <select class="form-select js-select2" id="deliveryCompany` + order.productOrderNumber + `">
