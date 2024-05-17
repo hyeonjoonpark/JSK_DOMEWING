@@ -10,16 +10,160 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class OpenMarketOrderController extends Controller
 {
     public function index()
     {
+        $allPartners = $this->getAllPartners();
+        $allOpenMarkets = $this->getAllOpenMarkets();
+        foreach ($allPartners as $partner) {
+            $memberId = $this->getMemberId($partner->id);
+            foreach ($allOpenMarkets as $openMarket) {
+                $openMarketEngName = $openMarket->name_eng;
+                $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi';
+                $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';
+                $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null);
+                if ($apiResults === false || $apiResults == []) continue;
+                // orderId를 기준으로 그룹화
+                $groupedResults = [];
+                foreach ($apiResults as $apiResult) {
+                    if ($apiResult->productOrderStatus !== '결제완료') continue;
+                    $orderId = $apiResult->orderId;
+                    if (!isset($groupedResults[$orderId])) {
+                        $groupedResults[$orderId] = [];
+                    }
+                    $groupedResults[$orderId][] = $apiResult;
+                }
+
+                foreach ($groupedResults as $orderId => $orders) {
+                    $amount = array_reduce($orders, function ($carry, $order) {
+                        $productId = $this->getProduct($order->productCode)->id;
+                        $productSale = $this->getSalePrice($productId);
+                        return $carry + ($productSale * $order->quantity);
+                    }, 0);
+                    $wingTransaction = $this->storeWingTransaction($memberId, 'PAYMENT', $amount, $remark = '');
+                    $wingTransactionId = $wingTransaction['data']['wingTransactionId'];
+
+                    foreach ($orders as $order) {
+                        $product = $this->getProduct($order->productCode);
+                        $cartResult = $this->storeCart($memberId, $product->id, $order->quantity);
+                        $priceThen = $this->getSalePrice($product->id);
+                        $cartId = $cartResult['data']['cartId'];
+                        $orderResult = $this->storeOrder($wingTransactionId, $cartId, $order->receiverName, $order->receiverPhone, $order->address, $order->Remark, $priceThen, $product->shipping_fee, $product->bundle_quantity);
+                        $orderId = $orderResult['data']['orderId'];
+                        $uploadedProductId = call_user_func([$this, $uploadedProductMethod], $product->id);
+                        $this->storePartnerOrder($orderId, $openMarket->id, $uploadedProductId, $priceThen, $product->shipping_fee, $order->orderId, $order->productOrderId);
+                    }
+                }
+            }
+        }
         $orders = $this->getPendingOrders();
         $processedOrders = $orders->map(function ($order) {
             return $this->processOrder($order);
         });
         return response()->json($processedOrders);
+    }
+    private function getMemberId($partnerId)
+    {
+        return DB::table('partner_domewing_accounts')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'Y')
+            ->select('domewing_account_id')
+            ->first();
+    }
+    private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen)
+    {
+        try {
+            $orderId = DB::table('orders')
+                ->insertGetId([
+                    'wing_transaction_id' => $wingTransactionId,
+                    'cart_id' => $cartId,
+                    'product_order_number' => (string) Str::uuid(),
+                    'receiver_name' => $receiverName,
+                    'receiver_phone' => $receiverPhone,
+                    'receiver_address' => $receiverAddress,
+                    'receiver_remark' => $receiverRemark,
+                    'status' => 'APPROVED',
+                    'type' => 'PAID',
+                    'price_then' => $priceThen,
+                    'shipping_fee_then' => $shippingFeeThen,
+                    'bundle_quantity_then' => $bundleQuantityThen
+                ]);
+            return [
+                'status' => true,
+                'data' => $orderId
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '주문 내역을 저장하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    private function storePartnerOrder($orderId, $vendorId, $uploadedProductId, $price, $shippingFee, $orderNumber, $productOrderNumber)
+    {
+        try {
+            DB::table('partner_orders')
+                ->insertGetId([
+                    'order_id' => $orderId,
+                    'vendor_id' => $vendorId,
+                    'uploaded_product_id' => $uploadedProductId,
+                    'price_then' => $price,
+                    'shipping_fee_then' => $shippingFee,
+                    'order_number' => $orderNumber,
+                    'product_order_number' => $productOrderNumber,
+                ]);
+            return [
+                'status' => true
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '주문 내역을 저장하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    // 카트 금액 계산
+    private function getCartAmount($cartCode)
+    {
+        $cart = DB::table('carts AS c')
+            ->join('minewing_products AS mp', 'mp.id', '=', 'c.product_id')
+            ->where('c.code', $cartCode)
+            ->first();
+
+        $salePrice = $this->getSalePrice($cart->product_id);
+        $shippingRate = $cart->bundle_quantity === 0 ? 1 : ceil($cart->quantity / $cart->bundle_quantity);
+        return $salePrice * $cart->quantity + $cart->shipping_fee * $shippingRate;
+    }
+    // 판매 가격 계산
+    private function getSalePrice($productId)
+    {
+        $originProductPrice = DB::table('minewing_products')
+            ->where('id', $productId)
+            ->value('productPrice');
+
+        $promotion = DB::table('promotion_products AS pp')
+            ->join('promotion AS p', 'p.id', '=', 'pp.promotion_id')
+            ->where('product_id', $productId)
+            ->where('p.end_at', '>', now())
+            ->where('p.is_active', 'Y')
+            ->where('pp.is_active', 'Y')
+            ->where('p.band_promotion', 'N')
+            ->where('pp.band_product', 'N')
+            ->value('pp.product_price');
+
+        $productPrice = $promotion ?? $originProductPrice;
+
+        $margin = DB::table('sellwing_config')->where('id', 1)->value('value');
+        $marginRate = ($margin / 100) + 1;
+
+        return ceil($productPrice * $marginRate);
     }
     public function indexPartner(Request $request)
     {
@@ -67,32 +211,13 @@ class OpenMarketOrderController extends Controller
                 'api_result' => $apiResult
             ];
         }
-        // if ($totalAmountRequired > $wing) {
-        //     return [
-        //         'status' => false,
-        //         'message' => 'wing 잔액이 부족합니다.',
-        //         'data' => $totalAmountRequired - $wing,
-        //     ];
-        // }
-        // foreach ($saveResults as $result) {
-        //     if ($result['productOrderStatus'] == "결제완료") {
-
-
-        //         $isExistOrder = DB::table('transaction_wing')
-        //             ->where('product_order_id', $result['productOrderId'])
-        //             ->exists();
-
-        //         if ($isExistOrder) continue;
-
-        //         $finishSave = $wc->saveOrder($result, $domewingAndPartner, $domewingUser, $totalAmountRequired);
-        //         if (!$finishSave['status']) {  // 배열 접근 방식을 사용
-        //             return [
-        //                 'status' => false,
-        //                 'message' => $finishSave['message']  // 메시지도 배열에서 추출
-        //             ];
-        //         }
-        //     }
-        // }
+        if ($totalAmountRequired > $wing) {
+            return [
+                'status' => false,
+                'message' => 'wing 잔액이 부족합니다.',
+                'data' => $totalAmountRequired - $wing,
+            ];
+        }
         return [
             'status' => true,
             'message' => '성공적으로 오더윙을 가동하였습니다.',
@@ -184,6 +309,22 @@ class OpenMarketOrderController extends Controller
             'isPartner' => $order->isExist
         ];
     }
+    private function getAllPartners()
+    {
+        return DB::table('partners as p')
+            ->join('partner_domewing_accounts as pda', 'p.id', '=', 'pda.partner_id')
+            ->where('p.is_active', 'ACTIVE')
+            ->where('pda.is_active', 'Y')
+            ->select('p.*')
+            ->get();
+    }
+    private function getAllOpenMarkets()
+    {
+        return DB::table('vendors')
+            ->where('is_active', 'ACTIVE')
+            ->where('type', 'OPEN_MARKET')
+            ->get();
+    }
     private function calcProductPrice($productPrice)
     {
         $config = DB::table('sellwing_config')->first();
@@ -222,16 +363,77 @@ class OpenMarketOrderController extends Controller
         return $query->get();
     }
 
-    private function getPartner($id) // 이걸로 파트너를 가져와서 그 파트너의 오픈마켓들을 싹 돌릴거야
+    private function getPartner($id)
     {
         return DB::table('partners')
             ->where('id', $id)
             ->first();
     }
-    private function getDomewingUser($id) //도매윙 계정을 가져와? 왜? 이름 줄려고
+    private function getDomewingUser($id)
     {
         return DB::table('members')
             ->where('id', $id)
+            ->first();
+    }
+    // 카트 테이블 저장
+    private function storeCart($memberId, $productId, $quantity)
+    {
+        try {
+            $cartId = DB::table('carts')
+                ->insertGetId([
+                    'member_id' => $memberId,
+                    'product_id' => $productId,
+                    'quantity' => $quantity,
+                    'code' => (string) Str::uuid(),
+                    'status' => 'PAID'
+                ]);
+
+            return [
+                'status' => true,
+                'data' => [
+                    'cartId' => $cartId
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '신규 주문을 저장하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    // Wing 거래 저장
+    private function storeWingTransaction($memberId, $type, $amount, $remark = null)
+    {
+        try {
+            $wingTransactionId = DB::table('wing_transactions')
+                ->insertGetId([
+                    'member_id' => $memberId,
+                    'order_number' => (string) Str::uuid(),
+                    'type' => $type,
+                    'amount' => $amount,
+                    'remark' => $remark
+                ]);
+
+            return [
+                'status' => true,
+                'data' => [
+                    'wingTransactionId' => $wingTransactionId
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '주문 내역을 저장하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    private function getProduct($productCode)
+    {
+        return DB::table('minewing_products')
+            ->where('productCode', $productCode)
+            ->where('isActive', 'Y')
             ->first();
     }
 
@@ -244,5 +446,21 @@ class OpenMarketOrderController extends Controller
     {
         $controller = new CoupangOrderController();
         return $controller->index($id, $startDate, $endDate);
+    }
+    private function getSmart_stroeUploadedProductId($productId)
+    {
+        return DB::table('smart_store_uploaded_products')
+            ->where('product_id', $productId)
+            ->where('is_active', 'Y')
+            ->select('id')
+            ->first();
+    }
+    private function getCoupangUploadedProductId($productId)
+    {
+        return DB::table('coupang_uploaded_products')
+            ->where('product_id', $productId)
+            ->where('is_active', 'Y')
+            ->select('id')
+            ->first();
     }
 }

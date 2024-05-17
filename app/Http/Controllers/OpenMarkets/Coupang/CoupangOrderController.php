@@ -27,7 +27,10 @@ class CoupangOrderController extends Controller
     private function getOrderList($id, $start = null, $end = null)
     {
         $account = $this->getAccount($id);
-        $startDate = $start ? new DateTime($start) : new DateTime('now - 6 days');
+        if (!$account) {
+            return false;
+        }
+        $startDate = $start ? new DateTime($start) : new DateTime('now - 4 days');
         $endDate = $end ? new DateTime($end) : new DateTime('now');
 
 
@@ -94,7 +97,7 @@ class CoupangOrderController extends Controller
                         'address' => $item['receiver']['addr1'],
                         'addressName' => '기본배송지',
                         'productCode' => $orderItem['externalVendorSkuCode'] ?? 'N/A',
-
+                        'remark' => $item['parcelPrintMessage'] ?? 'N/A',
                     ];
                 }
             }
@@ -115,6 +118,6 @@ class CoupangOrderController extends Controller
     }
     private function getAccount($id)
     {
-        return DB::table('coupang_accounts')->where('partner_id', $id)->first();
+        return DB::table('coupang_accounts')->where('partner_id', $id)->where('is_active', 'ACTIVE')->first();
     }
 }
