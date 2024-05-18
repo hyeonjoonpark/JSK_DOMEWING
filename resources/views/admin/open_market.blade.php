@@ -66,7 +66,11 @@
                 data: {
                     rememberToken
                 },
-                success: updateOrderTable,
+                // success: updateOrderTable,
+                success: function(response) {
+                    closePopup();
+                    console.log(response);
+                },
                 error: function(response) {
                     closePopup();
                     console.log(response);

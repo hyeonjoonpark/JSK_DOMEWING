@@ -22,6 +22,9 @@ class SmartStoreOrderController extends Controller
             $id = Auth::guard('partner')->id();
         }
         $account = $this->getAccount($id);
+        if (!$account) {
+            return false;
+        }
         $orderList = $this->getOrderList($account, $start, $end);
         $orderIds = $this->getOrderIds($orderList);
         $orderDetails = $this->getOrderDetails($account, $orderIds);
@@ -32,7 +35,7 @@ class SmartStoreOrderController extends Controller
         $contentType = 'application/json';
         $method = 'GET';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses';
-        $startDate = $start ? new DateTime($start) : new DateTime('now - 6 days');
+        $startDate = $start ? new DateTime($start) : new DateTime('now - 4 days');
         $endDate = $end ? new DateTime($end) : new DateTime('now');
         $responses = [];
         for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
@@ -105,6 +108,7 @@ class SmartStoreOrderController extends Controller
                 'address' => $shippingAddress ? ($shippingAddress['baseAddress'] . ' ' . ($shippingAddress['detailedAddress'] ?? '')) : 'N/A',
                 'addressName' => '기본배송지',
                 'productCode' => $item['productOrder']['sellerProductCode'] ?? 'N/A',
+                'remark' => $item['productOrder']['shippingMemo'] ?? 'N/A',
             ];
         }, $response['data']['data']);
         return $formattedResponse;
