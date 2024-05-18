@@ -126,7 +126,7 @@ class ApiController extends Controller
         $response = Http::withHeaders([
             'Authorization' => $authorization,
             'Content-Type' => $contentType
-        ])->withBody($jsonData, 'application/json')->put($url);
+        ])->withBody($jsonData, 'application/json')->$method($url);
         if ($response->successful() && $response->status() === 200) {
             return [
                 'status' => true,
