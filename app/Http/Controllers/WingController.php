@@ -9,35 +9,34 @@ class WingController extends Controller
 {
     public function getBalance(int $memberId): int
     {
-        $depositAmount = DB::table('wing_transactions AS wt')
-            ->join('deposit_details AS dd', 'dd.wing_transaction_id', '=', 'wt.id')
-            ->where('dd.status', 'APPROVED')
-            ->where('wt.member_id', $memberId)
-            ->where('wt.type', 'DEPOSIT')
-            ->sum('wt.amount');
+        $depositAmount = DB::table('wing_transactions')
+            ->where('member_id', $memberId)
+            ->where('type', 'DEPOSIT')
+            ->where('status', 'APPROVED')
+            ->sum('amount');
         $withdrawalAmount = DB::table('wing_transactions AS wt')
             ->join('withdrawal_details AS wd', 'wd.wing_transaction_id', '=', 'wt.id')
             ->where('wt.member_id', $memberId)
-            ->where('wd.status', 'APPROVED')
+            ->where('wt.status', 'APPROVED')
             ->sum('wt.amount');
         $paidAmount = DB::table('wing_transactions AS wt')
             ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
             ->where('member_id', $memberId)
             ->where('o.type', 'PAID')
-            ->where('o.status', 'APPROVED')
+            ->where('wt.status', 'APPROVED')
             ->distinct()
             ->sum('wt.amount');
         $refundAmount = DB::table('orders AS o')
             ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
             ->where('wt.member_id', $memberId)
             ->where('o.type', 'REFUND')
-            ->where('o.status', 'APPROVED')
+            ->where('wt.status', 'APPROVED')
             ->sum('wt.amount');
         $exchangeAmount = DB::table('orders AS o')
             ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
             ->where('wt.member_id', $memberId)
             ->where('o.type', 'EXCHANGE')
-            ->where('o.status', 'APPROVED')
+            ->where('wt.status', 'APPROVED')
             ->sum('wt.amount');
         $balance = $depositAmount - $withdrawalAmount - $paidAmount + $refundAmount - $exchangeAmount;
         return $balance;
