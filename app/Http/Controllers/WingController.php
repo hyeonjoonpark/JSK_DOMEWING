@@ -9,10 +9,12 @@ class WingController extends Controller
 {
     public function getBalance(int $memberId): int
     {
-        $depositAmount = DB::table('wing_transactions')
-            ->where('member_id', $memberId)
-            ->where('type', 'DEPOSIT')
-            ->sum('amount');
+        $depositAmount = DB::table('wing_transactions AS wt')
+            ->join('deposit_details AS dd', 'dd.wing_transaction_id', '=', 'wt.id')
+            ->where('dd.status', 'APPROVED')
+            ->where('wt.member_id', $memberId)
+            ->where('wt.type', 'DEPOSIT')
+            ->sum('wt.amount');
         $withdrawalAmount = DB::table('wing_transactions AS wt')
             ->join('withdrawal_details AS wd', 'wd.wing_transaction_id', '=', 'wt.id')
             ->where('wt.member_id', $memberId)
