@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class OpenMarketOrderController extends Controller
@@ -59,11 +60,70 @@ class OpenMarketOrderController extends Controller
         //         }
         //     }
         // }
+
+
+
+
         $orders = $this->getPaidOrders();
         $processedOrders = $orders->map(function ($order) {
             return $this->processOrder($order);
         });
         return response()->json($processedOrders);
+    }
+
+    public function cancleOrder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'remark' => 'required',
+        ], [
+            'remark.required' => '취소 사유를 입력해야합니다.'
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => '취소 사유를 입력해야합니다.',
+                'error' => $validator->errors(),
+            ];
+        }
+        $productOrderNumber = $request->input('productOrderNumber');
+        $remark = $request->input('remark');
+        $order = DB::table('orders as o')
+            ->where('product_order_number', $productOrderNumber)
+            ->where('delivery_status', 'PENDING')
+            ->where('type', 'PAID')
+            ->first();
+        DB::beginTransaction();
+
+        try {
+            // orders 테이블 업데이트
+            DB::table('orders')
+                ->where('product_order_number', $productOrderNumber)
+                ->where('delivery_status', 'PENDING')
+                ->update(['type' => 'CANCELLED']);
+
+            // wing_transactions 테이블 업데이트
+            DB::table('wing_transactions')
+                ->where('id', $order->wing_transaction_id)
+                ->update(['remark' => $remark]);
+
+            // 트랜잭션 커밋
+            DB::commit();
+
+            return [
+                'status' => true,
+                'message' => '주문이 성공적으로 취소되었습니다.',
+            ];
+        } catch (\Exception $e) {
+            // 트랜잭션 롤백
+            DB::rollBack();
+
+            return [
+                'status' => false,
+                'message' => '주문 취소 중 오류가 발생했습니다.',
+                'error' => $e->getMessage(),
+            ];
+        }
     }
     private function getMemberId($partnerId)
     {

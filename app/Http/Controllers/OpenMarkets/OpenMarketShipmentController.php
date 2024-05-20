@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class OpenMarketShipmentController extends Controller
 {
-    public function index(Request $request)
+    public function saveShipment(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'trackingNumber' => 'required|numeric',

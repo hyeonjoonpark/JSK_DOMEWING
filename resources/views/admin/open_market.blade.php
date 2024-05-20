@@ -128,6 +128,7 @@
                         </select>
                         <input type="text" class="form-control" id="trackingNumber${order.productOrderNumber}" placeholder="송장번호">
                         <button class="btn btn-primary" onclick="initCreateDelivery('` + order.productOrderNumber + `');">확인</button>
+                        <button class="btn btn-danger" onclick="cancelDelivery('${order.productOrderNumber}');">취소</button>
                     </div>
                 </td>
             </tr>`;
@@ -188,6 +189,56 @@
                 },
                 error: function(response) {
                     console.error('Error saving tracking info:', response);
+                }
+            });
+        }
+
+        function cancelDelivery(productOrderNumber) {
+            Swal.fire({
+                title: '주문 취소',
+                input: 'textarea',
+                showCancelButton: true,
+                confirmButtonText: '취소하기',
+                cancelButtonText: '닫기',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return '취소 사유를 입력해야 합니다!'
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const remark = result.value;
+                    $.ajax({
+                        url: '/api/cancel-order',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            rememberToken,
+                            productOrderNumber,
+                            remark
+                        },
+                        success: function(response) {
+                            if (response.status === false) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    text: response.message,
+                                });
+                            } else {
+                                console.log('Order cancelled:', response);
+                                Swal.fire({
+                                    icon: 'success',
+                                    text: '주문 취소에 성공하였습니다.'
+                                });
+                            }
+                        },
+                        error: function(response) {
+                            console.error('Error cancelling order:', response);
+                            Swal.fire({
+                                icon: 'error',
+                                text: '주문 취소 중 오류가 발생했습니다.'
+                            });
+                        }
+                    });
                 }
             });
         }
