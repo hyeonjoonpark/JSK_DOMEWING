@@ -16,50 +16,50 @@ class OpenMarketOrderController extends Controller
 {
     public function index()
     {
-        $allPartners = $this->getAllPartners();
-        $allOpenMarkets = $this->getAllOpenMarkets();
-        foreach ($allPartners as $partner) {
-            $memberId = $this->getMemberId($partner->id);
-            foreach ($allOpenMarkets as $openMarket) {
-                $openMarketEngName = $openMarket->name_eng;
-                $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi';
-                $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';
-                $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null);
-                if ($apiResults === false || $apiResults == []) continue;
-                // orderId를 기준으로 그룹화
-                $groupedResults = [];
-                foreach ($apiResults as $apiResult) {
-                    if ($apiResult->productOrderStatus !== '결제완료') continue;
-                    $orderId = $apiResult->orderId;
-                    if (!isset($groupedResults[$orderId])) {
-                        $groupedResults[$orderId] = [];
-                    }
-                    $groupedResults[$orderId][] = $apiResult;
-                }
+        // $allPartners = $this->getAllPartners();
+        // $allOpenMarkets = $this->getAllOpenMarkets();
+        // foreach ($allPartners as $partner) {
+        //     $memberId = $this->getMemberId($partner->id);
+        //     foreach ($allOpenMarkets as $openMarket) {
+        //         $openMarketEngName = $openMarket->name_eng;
+        //         $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi';
+        //         $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';
+        //         $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null);
+        //         if ($apiResults === false || $apiResults == []) continue;
+        //         // orderId를 기준으로 그룹화
+        //         $groupedResults = [];
+        //         foreach ($apiResults as $apiResult) {
+        //             if ($apiResult->productOrderStatus !== '결제완료') continue;
+        //             $orderId = $apiResult->orderId;
+        //             if (!isset($groupedResults[$orderId])) {
+        //                 $groupedResults[$orderId] = [];
+        //             }
+        //             $groupedResults[$orderId][] = $apiResult;
+        //         }
 
-                foreach ($groupedResults as $orderId => $orders) {
-                    $amount = array_reduce($orders, function ($carry, $order) {
-                        $productId = $this->getProduct($order->productCode)->id;
-                        $productSale = $this->getSalePrice($productId);
-                        return $carry + ($productSale * $order->quantity);
-                    }, 0);
-                    $wingTransaction = $this->storeWingTransaction($memberId, 'PAYMENT', $amount, $remark = '');
-                    $wingTransactionId = $wingTransaction['data']['wingTransactionId'];
+        //         foreach ($groupedResults as $orderId => $orders) {
+        //             $amount = array_reduce($orders, function ($carry, $order) {
+        //                 $productId = $this->getProduct($order->productCode)->id;
+        //                 $productSale = $this->getSalePrice($productId);
+        //                 return $carry + ($productSale * $order->quantity);
+        //             }, 0);
+        //             $wingTransaction = $this->storeWingTransaction($memberId, 'PAYMENT', $amount, $remark = '');
+        //             $wingTransactionId = $wingTransaction['data']['wingTransactionId'];
 
-                    foreach ($orders as $order) {
-                        $product = $this->getProduct($order->productCode);
-                        $cartResult = $this->storeCart($memberId, $product->id, $order->quantity);
-                        $priceThen = $this->getSalePrice($product->id);
-                        $cartId = $cartResult['data']['cartId'];
-                        $orderResult = $this->storeOrder($wingTransactionId, $cartId, $order->receiverName, $order->receiverPhone, $order->address, $order->Remark, $priceThen, $product->shipping_fee, $product->bundle_quantity);
-                        $orderId = $orderResult['data']['orderId'];
-                        $uploadedProductId = call_user_func([$this, $uploadedProductMethod], $product->id);
-                        $this->storePartnerOrder($orderId, $openMarket->id, $uploadedProductId, $priceThen, $product->shipping_fee, $order->orderId, $order->productOrderId);
-                    }
-                }
-            }
-        }
-        $orders = $this->getPendingOrders();
+        //             foreach ($orders as $order) {
+        //                 $product = $this->getProduct($order->productCode);
+        //                 $cartResult = $this->storeCart($memberId, $product->id, $order->quantity);
+        //                 $priceThen = $this->getSalePrice($product->id);
+        //                 $cartId = $cartResult['data']['cartId'];
+        //                 $orderResult = $this->storeOrder($wingTransactionId, $cartId, $order->receiverName, $order->receiverPhone, $order->address, $order->Remark, $priceThen, $product->shipping_fee, $product->bundle_quantity);
+        //                 $orderId = $orderResult['data']['orderId'];
+        //                 $uploadedProductId = call_user_func([$this, $uploadedProductMethod], $product->id);
+        //                 $this->storePartnerOrder($orderId, $openMarket->id, $uploadedProductId, $priceThen, $product->shipping_fee, $order->orderId, $order->productOrderId);
+        //             }
+        //         }
+        //     }
+        // }
+        $orders = $this->getPaidOrders();
         $processedOrders = $orders->map(function ($order) {
             return $this->processOrder($order);
         });
@@ -224,7 +224,7 @@ class OpenMarketOrderController extends Controller
             'data' => $results
         ];
     }
-    private function getPendingOrders()
+    private function getPaidOrders()
     {
         return DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
@@ -233,7 +233,7 @@ class OpenMarketOrderController extends Controller
             ->join('members as m', 'm.id', '=', 'wt.member_id')
             ->join('carts as c', 'c.id', '=', 'o.cart_id')
             ->where('o.type', 'PAID')
-            ->where('o.status', 'APPROVED')
+            ->where('wt.status', 'APPROVED')
             ->where('o.delivery_status', 'PENDING')
             ->select(
                 'm.username as member_username',

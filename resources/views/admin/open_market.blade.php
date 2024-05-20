@@ -66,8 +66,8 @@
                 data: {
                     rememberToken
                 },
-                // success: updateOrderTable,
                 success: function(response) {
+                    updateOrderTable(response);
                     closePopup();
                     console.log(response);
                 },
@@ -174,7 +174,10 @@
                 },
                 success: function(response) {
                     console.log('Tracking info saved:', response);
-                    closeModal();
+                    Swal.fire({
+                        icon: 'success',
+                        text: '택배사 및 송장번호 기입에 성공하였습니다.'
+                    });
                 },
                 error: function(response) {
                     console.error('Error saving tracking info:', response);
