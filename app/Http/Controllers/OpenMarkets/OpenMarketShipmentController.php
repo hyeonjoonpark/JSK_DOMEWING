@@ -7,11 +7,28 @@ use App\Http\Controllers\SmartStore\CoupangShipmentController;
 use App\Http\Controllers\SmartStore\SmartStoreShipmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class OpenMarketShipmentController extends Controller
 {
     public function index(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'trackingNumber' => 'required|numeric',
+            'deliveryCompanyId' => 'required',
+        ], [
+            'trackingNumber.required' => '송장번호 입력 후 확인 부탁드립니다.',
+            'trackingNumber.numeric' => '송장번호는 숫자만 입력 가능합니다.',
+            'deliveryCompanyId.required' => '택배사를 지정 후 확인 부탁드립니다.',
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => '기입 정보가 올바르지 않습니다.',
+                'error' => $validator->errors(),
+            ];
+        }
         $productOrderNumber = $request->input('productOrderNumber');
         $vendor = $this->getVendorByProductOrderNumber($productOrderNumber);
         if ($vendor) {
@@ -29,15 +46,10 @@ class OpenMarketShipmentController extends Controller
                         'tracking_number' => $request->input('trackingNumber'),
                         'delivery_status' => 'COMPLETE'
                     ]);
-                return response()->json([
+                return [
                     'status' => true,
                     'message' => '배송 정보가 성공적으로 업데이트되었습니다.',
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => '유효하지 않은 배송 회사 ID입니다.',
-                ], 400);
+                ];
             }
         }
     }
