@@ -93,6 +93,10 @@ class OpenMarketOrderController extends Controller
             ->where('delivery_status', 'PENDING')
             ->where('type', 'PAID')
             ->first();
+        if (!$order) return [
+            'status' => false,
+            'message' => '이미 취소되었거나 유효한 주문이 아닙니다.',
+        ];
         DB::beginTransaction();
 
         try {

@@ -30,6 +30,11 @@ class OpenMarketShipmentController extends Controller
             ];
         }
         $productOrderNumber = $request->input('productOrderNumber');
+        $order = $this->getOrder($productOrderNumber);
+        if (!$order) return [
+            'status' => false,
+            'message' => '이미 취소되었거나 유효한 주문이 아닙니다.',
+        ];
         $vendor = $this->getVendorByProductOrderNumber($productOrderNumber);
         if ($vendor) {
             $method = 'call' . ucfirst($vendor->name_eng) . 'ShipmentApi';
@@ -62,6 +67,14 @@ class OpenMarketShipmentController extends Controller
             ->where('o.product_order_number', $productOrderNumber)
             ->where('v.is_active', 'ACTIVE')
             ->select('v.*')
+            ->first();
+    }
+    private function getOrder($productOrderNumber)
+    {
+        return DB::table('orders as o')
+            ->where('product_order_number', $productOrderNumber)
+            ->where('delivery_status', 'PENDING')
+            ->where('type', 'PAID')
             ->first();
     }
     private function callSmart_storeShipmentApi(Request $request)
