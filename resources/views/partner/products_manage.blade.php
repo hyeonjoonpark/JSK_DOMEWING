@@ -410,6 +410,7 @@
         }
 
         function requestDelete(productCodes) {
+            popupLoader(1, '상품을 삭제 처리하는 중입니다.');
             $.ajax({
                 url: "/api/partner/product/delete-product",
                 type: "POST",

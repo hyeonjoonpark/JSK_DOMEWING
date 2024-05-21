@@ -4,11 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
-use PhpParser\Node\Expr\Cast\Object_;
 
 class UpdateCretecProducts extends Command
 {
@@ -32,53 +29,66 @@ class UpdateCretecProducts extends Command
     public function handle()
     {
         set_time_limit(0);
+        ini_set('memory_limit', '-1');
         $this->info("========== 크레텍 상품 전처리 프로토콜 ==========");
         $this->info("크레텍 상품셋 엑셀 파일을 불러오는 중입니다.");
-        $reader = IOFactory::createReader('Csv');
+        $reader = new Csv();
+        $reader->setDelimiter(',');
+        $reader->setEnclosure('"');
+        $reader->setInputEncoding('CP949');
+        $reader->setSheetIndex(0);
         $spreadsheet = $reader->load(public_path('assets/excel/cretec_products.csv'));
         $sheet = $spreadsheet->getActiveSheet();
         $this->info("엑셀 파일로부터 품번들을 추출하는 중입니다.");
-        $productHrefs = [];
-        for ($i = 2; $i <= 71840; $i++) {
+        $newProducts = [];
+        for ($i = 2; $i <= $sheet->getHighestRow(); $i++) {
             $productNumber = $sheet->getCell('B' . $i)->getValue();
-            echo $productNumber . "\n";
-            $productHrefs[] = 'https://ctx.cretec.kr/CtxApp/ctx/selectItemDtlIfrm.do?itemCd=' . $productNumber;
+            $newProducts[] = [
+                'index' => $i,
+                'productHref' => "https://ctx.cretec.kr/CtxApp/ctx/selectItemDtlIfrm.do?itemCd=" . $productNumber
+            ];
         }
-        $this->info("품절된 상품들을 DB 에 반영 중입니다.");
-        if (!$this->soldOutProducts($productHrefs)) {
+        $this->info("품절 및 재입고된 상품들을 DB 에 반영 중입니다.");
+        if (!$this->soldOutProducts($newProducts)) {
             return false;
         }
+        $this->info("신상품들을 DB에 반영 중입니다.");
+        $existingProductHrefs = DB::table('minewing_products')
+            ->where('sellerID', 61)
+            ->pluck('productHref')
+            ->toArray();
+        $newProductHrefs = array_column($newProducts, 'productHref');
+        $newProductHrefs = array_diff($newProductHrefs, $existingProductHrefs);
+        $newProducts = array_filter($newProducts, function ($product) use ($newProductHrefs) {
+            return in_array($product['productHref'], $newProductHrefs);
+        });
+        $newProducts = array_values($newProducts);
+        print_r($newProducts);
         $this->info("크레텍 상품 전처리 프로토콜 완료");
         return true;
     }
-    protected function soldOutProducts($productHrefs)
+    protected function soldOutProducts($newProducts)
     {
         try {
-            $this->info('품절 대상 상품들의 상품 코드들을 추출하는 중입니다.');
-            $chunkedProductHrefs = array_chunk($productHrefs, 1000);
-            $productCodes = [];
-            foreach ($chunkedProductHrefs as $hrefs) {
-                $tempProductCodes = DB::table('minewing_products')
-                    ->where('sellerID', 61)
-                    ->whereNotIn('productHref', $productHrefs)
-                    ->pluck('productCode')
-                    ->toArray();
-                $productCodes = array_merge($productCodes, $tempProductCodes);
+            DB::table('minewing_products')
+                ->where('sellerID', 61)
+                ->update([
+                    'isActive' => 'N'
+                ]);
+            $chunkedProducts = array_chunk($newProducts, 10000);
+            foreach ($chunkedProducts as $products) {
+                $productHrefs = array_column($products, 'productHref');
                 DB::table('minewing_products')
                     ->where('sellerID', 61)
-                    ->whereNotIn('productHref', $productHrefs)
+                    ->whereIn('productHref', $productHrefs)
                     ->update([
-                        'isActive' => 'N'
+                        'isActive' => 'Y'
                     ]);
             }
-            $this->info('품절된 상품들을 DB 에 성공적으로 반영했습니다.');
-            $codeStr = join(',', $productCodes);
-            $filePath = public_path('assets/txt/cretec/sold_out_product_codes.txt');
-            file_put_contents($filePath, $codeStr);
-            $this->info('품절 상품 코드들을 파일에 저장하였습니다. 파일 경로: ' . $filePath);
+            $this->info('품절 및 재입고된 상품들을 DB 에 성공적으로 반영했습니다.');
             return true;
         } catch (\Exception $e) {
-            $this->info('품절된 상품들을 DB 에 반영하는 과정에서 오류가 발생했습니다.');
+            $this->info('품절 및 재입고된 상품들을 DB 에 반영하는 과정에서 오류가 발생했습니다.');
             Log::error($e->getMessage());
             return false;
         }

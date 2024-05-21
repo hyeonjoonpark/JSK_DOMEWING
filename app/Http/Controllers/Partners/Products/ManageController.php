@@ -151,9 +151,13 @@ class ManageController extends Controller
     public function destroy($productCodes)
     {
         try {
-            DB::table('partner_products AS pp')
+            $idsToDelete = DB::table('partner_products AS pp')
                 ->join('minewing_products AS mp', 'mp.id', '=', 'pp.product_id')
                 ->whereIn('mp.productCode', $productCodes)
+                ->pluck('pp.id');
+
+            DB::table('partner_products')
+                ->whereIn('id', $idsToDelete)
                 ->delete();
             return [
                 'status' => true,
