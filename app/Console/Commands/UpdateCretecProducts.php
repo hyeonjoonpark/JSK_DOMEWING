@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpParser\Node\Expr\Cast\Object_;
 
@@ -29,62 +30,37 @@ class UpdateCretecProducts extends Command
      */
     public function handle()
     {
-        $scrapeResult = $this->scrapeProducts();
-        if ($scrapeResult['status'] === false) {
-            print_r($scrapeResult);
+        $this->info("========== 크레텍 상품 전처리 프로토콜 ==========");
+        $this->info("크레텍 상품셋 엑셀 파일을 불러오는 중입니다.");
+        $spreadsheet = IOFactory::load(public_path('assets/excel/cretec_products.csv'));
+        $sheet = $spreadsheet->getSheet(0);
+        $this->info("엑셀 파일로부터 품번들을 추출하는 중입니다.");
+        $productHrefs = [];
+        for ($i = 2; $i <= 71840; $i++) {
+            $productNumber = $sheet->getCell('B' . $i)->getValue();
+            $productHrefs[] = 'https://ctx.cretec.kr/CtxApp/ctx/selectItemDtlIfrm.do?itemCd=' . $productNumber;
         }
-        $fetchedProducts = $scrapeResult['data'];
-        print_r($fetchedProducts);
-        echo count($fetchedProducts);
+        $this->info("품절된 상품들을 DB 에 반영 중입니다.");
+        $this->soldOutProducts($productHrefs);
     }
-    protected function scrapeProducts()
+    protected function soldOutProducts($productHrefs)
     {
-        $products = [];
-        for ($i = 0; $i < 3; $i++) {
-            $tempFilePath = storage_path('app/public/urls/cretec_products_' . $i . '.json');
-            $scriptPath = public_path('js/minewing/details/cretec.js');
-            $command = "node {$scriptPath} {$tempFilePath}";
-            exec($command, $output, $returnCode);
-            if ($returnCode === 0 && isset($output[0])) {
-                $tmpProducts = json_decode($output[0], true);
-                $products = array_merge($products, $tmpProducts);
-            } else {
-                return [
-                    'status' => false,
-                    'message' => $i . '번째 상품군에서 에러가 발생했습니다.',
-                    'error' => ''
-                ];
-            }
+        try {
+            $soldOutProductCodes = DB::table('minewing_products')
+                ->whereNotIn('productHref', $productHrefs)
+                ->get('productCode')
+                ->toArray();
+            $codeStr = join(',', $soldOutProductCodes);
+            file_put_contents(public_path('assets/txt/cretec/sold_out_product_codes.txt'), $codeStr);
+            DB::table('minewing_products')
+                ->whereNotIn('productHref', $productHrefs)
+                ->update([
+                    'isActive' => 'N'
+                ]);
+            $this->info('품절된 상품들을 DB 에 성공적으로 반영했습니다.');
+        } catch (\Exception $e) {
+            $this->info('품절된 상품들을 DB 에 반영하는 과정에서 오류가 발생했습니다.');
+            $this->error($e->getMessage());
         }
-        return [
-            'status' => true,
-            'message' => 'success',
-            'data' => $products
-        ];
-    }
-    protected function getCretecProducts()
-    {
-        return DB::table('minewing_products')
-            ->where('sellerID', 61)
-            ->where('isActive', 'Y')
-            ->limit(101)
-            ->select(['id', 'productHref'])
-            ->get();
-    }
-    protected function extractProductUrls(Object $products)
-    {
-        $productUrls = [];
-        foreach ($products as $product) {
-            $parsedUrl = parse_url($product->productHref);
-            $queryStr = $parsedUrl['query'];
-            parse_str($queryStr, $queryParams);
-            $itemCd = $queryParams['itemCd'];
-            $productUrl = "https://jsktec.toolpark.kr/product/product-detail.do?goods_code=" . $itemCd;
-            $productUrls[] = [
-                'id' => $product->id,
-                'productUrl' => $productUrl
-            ];
-        }
-        return $productUrls;
     }
 }
