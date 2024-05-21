@@ -30,6 +30,7 @@ class CollectController extends Controller
             ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
             ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
             ->where('mp.isActive', 'Y')
+            ->whereNot('categoryID', null)
             ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name');
 
         if ($searchKeyword) {

@@ -66,6 +66,8 @@ class ManageController extends Controller
             ->join('product_search AS ps', 'mp.sellerID', '=', 'ps.vendor_id')
             ->where('pp.partner_table_id', $partnerTableId)
             ->where('mp.productName', 'like', "%{$searchKeyword}%")
+            ->where('mp.isActive', 'Y')
+            ->whereNot('mp.categoryID', null)
             ->orderByDesc('pp.created_at')
             ->select('mp.productCode', 'mp.productImage', 'pp.product_name AS productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name', 'pp.created_at')
             ->paginate(500);

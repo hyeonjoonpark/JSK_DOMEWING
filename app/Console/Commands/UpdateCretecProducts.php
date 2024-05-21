@@ -62,7 +62,8 @@ class UpdateCretecProducts extends Command
         $newProducts = array_filter($newProducts, function ($product) use ($newProductHrefs) {
             return in_array($product['productHref'], $newProductHrefs);
         });
-        $newProducts = array_values($newProducts);
+        foreach ($newProducts as $newProduct) {
+        }
         print_r($newProducts);
         $this->info("크레텍 상품 전처리 프로토콜 완료");
         return true;
