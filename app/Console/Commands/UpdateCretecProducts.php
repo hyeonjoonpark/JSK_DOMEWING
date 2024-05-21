@@ -46,12 +46,14 @@ class UpdateCretecProducts extends Command
     protected function soldOutProducts($productHrefs)
     {
         try {
+            $this->info('품절 대상 상품들의 상품 코드들을 추출하는 중입니다.');
             $soldOutProductCodes = DB::table('minewing_products')
                 ->whereNotIn('productHref', $productHrefs)
                 ->get('productCode')
                 ->toArray();
             $codeStr = join(',', $soldOutProductCodes);
-            file_put_contents(public_path('assets/txt/cretec/sold_out_product_codes.txt'), $codeStr);
+            $filePath=public_path('assets/txt/cretec/sold_out_product_codes.txt');
+            file_put_contents(, $codeStr);
             DB::table('minewing_products')
                 ->whereNotIn('productHref', $productHrefs)
                 ->update([
