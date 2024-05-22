@@ -34,7 +34,7 @@ class DeleteBanniepet extends Command
             ->pluck('cup.origin_product_no')
             ->toArray();
         $request = new Request([
-            'originProductsNo' => [$coupangBanniepetOriginProductsNo[0]],
+            'originProductsNo' => $coupangBanniepetOriginProductsNo,
             'vendorId' => 40
         ]);
         $uc = new UploadedController();
