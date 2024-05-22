@@ -37,7 +37,8 @@ class DeleteBanniepet extends Command
             'originProductsNo' => $coupangBanniepetOriginProductsNo,
             'vendorId' => 40
         ]);
-        $uc = new UploadedController();
-        print_r($uc->delete($request));
+        echo count($coupangBanniepetOriginProductsNo);
+        // $uc = new UploadedController();
+        // print_r($uc->delete($request));
     }
 }

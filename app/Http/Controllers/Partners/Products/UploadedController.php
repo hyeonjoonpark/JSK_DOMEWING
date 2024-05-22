@@ -393,7 +393,7 @@ class UploadedController extends Controller
         }
         $vendorItemId = $apiResult['data']['data']['items'][0]['vendorItemId'];
         $url = '/v2/providers/seller_api/apis/api/v1/marketplace/vendor-items/' . $vendorItemId . '/sales/stop';
-        return $cpac->putBuilder($account->access_key, $account->secret_key, $contentType, $url);
+        return $cpac->deleteBuilder($account->access_key, $account->secret_key, $contentType, $url);
     }
 
     public function smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
