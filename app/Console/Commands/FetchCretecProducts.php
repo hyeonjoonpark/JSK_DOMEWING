@@ -71,16 +71,13 @@ class FetchCretecProducts extends Command
                 return $createResult;
             }
         }
-        print_r($newProducts);
         $this->info("크레텍 상품 패치 완료");
         return true;
     }
     private function createProduct($sheet, $index)
     {
         $originImageUrl = trim($sheet->getCell('I' . $index)->getValue());
-        $pic = new ProductImageController();
         $nc = new NameController();
-        $productImage = $pic->index($originImageUrl, 'N')['return'];
         $productName = $sheet->getCell('F' . $index)->getValue() . ' ' . $sheet->getCell('G' . $index)->getValue() . ' ' . $sheet->getCell('H' . $index)->getValue();
         $productName = $nc->index($productName);
         $newProduct = [
