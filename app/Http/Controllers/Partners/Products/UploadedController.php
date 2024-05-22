@@ -382,8 +382,18 @@ class UploadedController extends Controller
             ->select(['a.hash', 'a.secret_key', 'a.access_key'])
             ->first();
         $contentType = 'application/json;charset=UTF-8';
-        $url = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/' . $originProductNo;
-        return $cpac->builder($account->access_key, $account->secret_key, 'delete', $contentType, $url, null);
+        $path = "/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/" . $originProductNo;
+        $apiResult = $cpac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
+        if (isset($apiResult['error'])) {
+            return [
+                'status' => false,
+                'message' => '상품 정보를 불러오는 과정에서 오류가 발생했습니다.',
+                'error' => $apiResult['error']
+            ];
+        }
+        $vendorItemId = $apiResult['data']['data']['items'][0]['vendorItemId'];
+        $url = '/v2/providers/seller_api/apis/api/v1/marketplace/vendor-items/' . $vendorItemId . '/sales/stop';
+        return $cpac->putBuilder($account->access_key, $account->secret_key, $contentType, $url);
     }
 
     public function smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
