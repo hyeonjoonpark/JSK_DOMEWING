@@ -37,6 +37,7 @@ class ExcelwingCretec extends Command
     {
         return DB::table('minewing_products')
             ->where('sellerID', 61)
+            ->where('categoryID', null)
             ->get(['productCode', 'categoryID', 'productName', 'productKeywords', 'productPrice', 'productDetail', 'productHref'])
             ->toArray();
     }
@@ -49,7 +50,7 @@ class ExcelwingCretec extends Command
     private function writeProducts($products, $sheet)
     {
         $spreadsheet = $sheet->getParent();
-        $productChunks = array_chunk($products, 1000);
+        $productChunks = array_chunk($products, 5000);
         foreach ($productChunks as $index => $products) {
             $rowIndex = 2;
             foreach ($products as $product) {
