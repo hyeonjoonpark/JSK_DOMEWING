@@ -91,7 +91,7 @@ class ManageController extends Controller
         $partnerTableToken = $request->partnerTableToken;
         return $this->create($productCodes, $partnerTableToken);
     }
-    private function create($productCodes, $partnerTableToken)
+    public function create($productCodes, $partnerTableToken)
     {
         try {
             $partnerTableId = DB::table('partner_tables')

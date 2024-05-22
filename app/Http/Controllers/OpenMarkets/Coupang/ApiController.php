@@ -44,7 +44,7 @@ class ApiController extends Controller
         $signature = hash_hmac('sha256', $message, $secretKey);
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
-        $response = Http::withHeaders([
+        $response = Http::timeout(0)->withHeaders([
             'Authorization' => $authorization,
             'Content-Type' => $contentType
         ])->get($url);
@@ -70,7 +70,7 @@ class ApiController extends Controller
         $signature = hash_hmac('sha256', $message, $secretKey);
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
-        $response = Http::withHeaders([
+        $response = Http::timeout(0)->withHeaders([
             'Authorization' => $authorization,
             'Content-Type' => $contentType
         ])->delete($url);
@@ -97,7 +97,7 @@ class ApiController extends Controller
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path;
         $jsonData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $response = Http::withHeaders([
+        $response = Http::timeout(0)->withHeaders([
             'Authorization' => $authorization,
             'Content-Type' => $contentType
         ])->withBody($jsonData, 'application/json')->put($url);
@@ -123,7 +123,7 @@ class ApiController extends Controller
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path;
         $jsonData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $response = Http::withHeaders([
+        $response = Http::timeout(0)->withHeaders([
             'Authorization' => $authorization,
             'Content-Type' => $contentType
         ])->withBody($jsonData, 'application/json')->$method($url);

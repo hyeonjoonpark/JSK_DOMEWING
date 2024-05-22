@@ -60,7 +60,7 @@ class SmartStoreApiController extends Controller
 
         $accessToken = $getAccessTokenResult['data']->access_token;
         try {
-            $response = Http::withHeaders([
+            $response = Http::timeout(0)->withHeaders([
                 'Authorization' => 'Bearer ' . $accessToken,
                 'Content-Type' => $contentType
             ])->{$method}($url, $data);  // 동적 메서드 호출은 유지
@@ -98,7 +98,7 @@ class SmartStoreApiController extends Controller
             ];
         }
         $accessToken = $getAccessTokenResult['data']->access_token;
-        $response = Http::withHeaders([
+        $response = Http::timeout(0)->withHeaders([
             'Authorization' => 'Bearer ' . $accessToken,
             'Content-Type' => $contentType
         ])->$method($url, $data);

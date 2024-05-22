@@ -45,15 +45,18 @@ class PartnerTableController extends Controller
             ];
         }
         try {
-            DB::table('partner_tables')
-                ->insert([
+            $tableId = DB::table('partner_tables')
+                ->insertGetId([
                     'partner_id' => $partnerId,
                     'title' => $productTableName,
                     'token' => Str::uuid()
                 ]);
             return [
                 'status' => true,
-                'message' => '상품 테이블을 성공적으로 생성했습니다.'
+                'message' => '상품 테이블을 성공적으로 생성했습니다.',
+                'data' => [
+                    'tableId' => $tableId
+                ]
             ];
         } catch (\Exception $e) {
             return [
