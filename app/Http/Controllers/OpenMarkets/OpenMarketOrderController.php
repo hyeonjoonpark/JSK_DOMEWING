@@ -17,20 +17,20 @@ class OpenMarketOrderController extends Controller
 {
     public function index()
     {
-        // $allPartners = $this->getAllPartners();
-        // $allOpenMarkets = $this->getAllOpenMarkets();
-        // foreach ($allPartners as $partner) {
-        //     $memberId = $this->getMemberId($partner->id);
-        //     foreach ($allOpenMarkets as $openMarket) {
-        //         $openMarketEngName = $openMarket->name_eng;
-        //         $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi';
-        //         $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';
-        //         $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null);
-        //         if ($apiResults === false || $apiResults == []) continue;
+        // $allPartners = $this->getAllPartners(); //모든 파트너 조회
+        // $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
+        // foreach ($allPartners as $partner) { //모든 파트너 반복문
+        //     $memberId = $this->getMemberId($partner->id); // 반복분 해당 파트너 id조회
+        //     foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
+        //         $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
+        //         $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi'; //오픈마켓별 주문내역조회 api 쏠려고 영어이름을 메소드명으로 지정
+        //         $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';  // 오픈마켓별 업로드된 상품인지 조회하려고 메소드명 지정
+        //         $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null); //api 결과 저장
+        //         if ($apiResults === false || $apiResults == []) continue; //api의 결과값이 비어있으면 continue 곧 아무런 결과값이 없는거지
         //         // orderId를 기준으로 그룹화
-        //         $groupedResults = [];
+        //         $groupedResults = []; // wing_transaction에 주문의 총합으로 넣으려고 그룹화
         //         foreach ($apiResults as $apiResult) {
-        //             if ($apiResult->productOrderStatus !== '결제완료') continue;
+        //             if ($apiResult->productOrderStatus !== '결제완료') continue; // 결제완료만 db에 저장하려고 검증
         //             $orderId = $apiResult->orderId;
         //             if (!isset($groupedResults[$orderId])) {
         //                 $groupedResults[$orderId] = [];
@@ -329,19 +329,16 @@ class OpenMarketOrderController extends Controller
             $uploadedProductsTable = $order->vendor_name_eng . '_uploaded_products';
             $uploadedProduct = DB::table($uploadedProductsTable)
                 ->where('id', $order->uploadedProductId)
-                ->where('is_active', 'Y')
                 ->first();
 
             if ($uploadedProduct) {
                 $product = DB::table('minewing_products as mp')
                     ->where('mp.id', $uploadedProduct->product_id)
-                    ->where('isActive', 'Y')
                     ->first();
             }
         } else {
             $product = DB::table('minewing_products as mp')
                 ->where('mp.id', $order->productId)
-                ->where('isActive', 'Y')
                 ->first();
         }
 
@@ -370,7 +367,8 @@ class OpenMarketOrderController extends Controller
             'senderName' => $order->lastName . $order->firstName,
             'deliveryCompanies' => $deliveryCompanies,
             'productOrderNumber' => $order->productOrderNumber,
-            'isPartner' => $order->isExist
+            'isPartner' => $order->isExist,
+            'isActive' => $product->isActive
         ];
     }
     private function getAllPartners()

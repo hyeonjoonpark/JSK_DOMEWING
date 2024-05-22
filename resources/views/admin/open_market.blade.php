@@ -79,7 +79,6 @@
         }
 
         function updateOrderTable(response) {
-            console.log(response);
             $('#numOrders').html(response.length);
             $('#orderwingResult').html(generateOrdersHtml(response));
             $('#totalAmt').html(`${numberFormat(calculateTotalAmount(response))}원`);
@@ -98,6 +97,7 @@
             }
             let partnerStatusHtml = order.isPartner ? '<b><p>파트너 계정입니다.</p></b>' : '<b><p>일반 회원입니다.</p></b>';
             let orderVendorHtml = order.vendorName ? `<b><p>${order.vendorName}</p></b>` : '<b><p>도매윙</p></b>';
+            let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
 
             return `
             <tr>
@@ -109,7 +109,7 @@
                     </div>
                 </td>
                 <td>
-                    ${generateProductDetailsHtml(order)}
+                    ${generateProductDetailsHtml(order, isActive)}
                 </td>
                 <td class="text-nowrap">
                     <div class="row g-gs mb-3">
@@ -134,7 +134,7 @@
             </tr>`;
         }
 
-        function generateProductDetailsHtml(order) {
+        function generateProductDetailsHtml(order, isActive) {
             return `
             <div class="row mb-3">
                 <div class="col">
@@ -143,7 +143,7 @@
             </div>
             <div class="row mb-3">
                 <div class="col">
-                    <h6 class='title'><a href="${order.productHref}" target="_blank">${order.productName}</a></h6>
+                    <h6 class='title'><a href="${order.productHref}" target="_blank">${order.productName}</a><br>${isActive}</h6>
                     <p><a href="${order.productHref}" target="_blank">${numberFormat(order.productPrice)}원</a></p>
                 </div>
             </div>
