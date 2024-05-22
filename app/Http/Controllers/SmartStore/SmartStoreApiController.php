@@ -60,7 +60,7 @@ class SmartStoreApiController extends Controller
 
         $accessToken = $getAccessTokenResult['data']->access_token;
         try {
-            $response = Http::timeout(0)->withHeaders([
+            $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $accessToken,
                 'Content-Type' => $contentType
             ])->{$method}($url, $data);  // 동적 메서드 호출은 유지
@@ -98,10 +98,18 @@ class SmartStoreApiController extends Controller
             ];
         }
         $accessToken = $getAccessTokenResult['data']->access_token;
-        $response = Http::timeout(0)->withHeaders([
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type' => $contentType
-        ])->$method($url, $data);
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => $contentType
+            ])->$method($url, $data);
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '마켓으로부터의 응답 시간이 초과하였습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
         if ($response->successful() && $response->status() === 200) {
             return [
                 'status' => true,

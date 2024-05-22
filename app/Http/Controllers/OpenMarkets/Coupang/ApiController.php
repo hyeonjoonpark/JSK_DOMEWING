@@ -44,10 +44,18 @@ class ApiController extends Controller
         $signature = hash_hmac('sha256', $message, $secretKey);
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
-        $response = Http::timeout(0)->withHeaders([
-            'Authorization' => $authorization,
-            'Content-Type' => $contentType
-        ])->get($url);
+        try {
+            $response = Http::timeout(0)->withHeaders([
+                'Authorization' => $authorization,
+                'Content-Type' => $contentType
+            ])->get($url);
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '마켓으로부터의 응답 시간이 초과하였습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
         if ($response->successful() && $response->status() === 200) {
             return [
                 'status' => true,
@@ -70,10 +78,18 @@ class ApiController extends Controller
         $signature = hash_hmac('sha256', $message, $secretKey);
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
-        $response = Http::timeout(0)->withHeaders([
-            'Authorization' => $authorization,
-            'Content-Type' => $contentType
-        ])->delete($url);
+        try {
+            $response = Http::timeout(0)->withHeaders([
+                'Authorization' => $authorization,
+                'Content-Type' => $contentType
+            ])->delete($url);
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '마켓으로부터의 응답 시간이 초과하였습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
         if ($response->successful() && $response->status() === 200) {
             return [
                 'status' => true,
@@ -97,10 +113,18 @@ class ApiController extends Controller
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path;
         $jsonData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $response = Http::timeout(0)->withHeaders([
-            'Authorization' => $authorization,
-            'Content-Type' => $contentType
-        ])->withBody($jsonData, 'application/json')->put($url);
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => $authorization,
+                'Content-Type' => $contentType
+            ])->withBody($jsonData, 'application/json')->put($url);
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '마켓으로부터의 응답 시간이 초과하였습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
         if ($response->successful() && $response->status() === 200) {
             return [
                 'status' => true,
@@ -123,10 +147,18 @@ class ApiController extends Controller
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path;
         $jsonData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $response = Http::timeout(0)->withHeaders([
-            'Authorization' => $authorization,
-            'Content-Type' => $contentType
-        ])->withBody($jsonData, 'application/json')->$method($url);
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => $authorization,
+                'Content-Type' => $contentType
+            ])->withBody($jsonData, 'application/json')->$method($url);
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '마켓으로부터의 응답 시간이 초과하였습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
         if ($response->successful() && $response->status() === 200) {
             return [
                 'status' => true,
