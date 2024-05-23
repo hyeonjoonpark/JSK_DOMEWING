@@ -10,6 +10,7 @@ class ApiController extends Controller
 {
     public function build($method, $path, $accessKey, $secretKey, $params = "")
     {
+        ini_set('max_execution_time', 120);
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
         $message = $datetime . $method . $path;
@@ -36,6 +37,7 @@ class ApiController extends Controller
     }
     public function getBuilder(string $accessKey, string $secretKey, string $contentType, string $path, string $query = '')
     {
+        ini_set('max_execution_time', 120);
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
         $method = 'GET';
@@ -70,6 +72,7 @@ class ApiController extends Controller
     }
     public function deleteBuilder(string $accessKey, string $secretKey, string $contentType, string $path, string $query = '')
     {
+        ini_set('max_execution_time', 120);
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
         $method = "DELETE";
@@ -104,6 +107,7 @@ class ApiController extends Controller
     }
     public function putBuilder(string $accessKey, string $secretKey, string $contentType, string $path, array $data = [])
     {
+        ini_set('max_execution_time', 120);
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd") . 'T' . date("His") . 'Z';
         $method = "PUT";
@@ -139,6 +143,7 @@ class ApiController extends Controller
     }
     public function builder($accessKey, $secretKey, $method, $contentType, $path, $data)
     {
+        ini_set('max_execution_time', 120);
         date_default_timezone_set("GMT+0");
         $datetime = gmdate("ymd") . 'T' . gmdate("His") . 'Z';
         $message = $datetime . $method . $path;

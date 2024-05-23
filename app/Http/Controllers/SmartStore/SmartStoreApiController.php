@@ -12,6 +12,7 @@ class SmartStoreApiController extends Controller
 {
     public function build($method, $path, $params, $token = "")
     {
+        ini_set('max_execution_time', 120);
         $curl = curl_init();
         $url = "https://api.commerce.naver.com/external" . $path;
         $postFields = http_build_query($params);
@@ -48,6 +49,7 @@ class SmartStoreApiController extends Controller
     }
     public function putBuilder($account, $contentType, $method, $url, $data)
     {
+        ini_set('max_execution_time', 120);
         $ssac = new SmartStoreAccountController();
         $getAccessTokenResult = $ssac->getAccessToken($account->application_id, $account->secret, $account->username);
         if (!$getAccessTokenResult['status']) {
@@ -88,6 +90,7 @@ class SmartStoreApiController extends Controller
 
     public function builder($account, $contentType, $method, $url, $data)
     {
+        ini_set('max_execution_time', 120);
         $ssac = new SmartStoreAccountController();
         $getAccessTokenResult = $ssac->getAccessToken($account->application_id, $account->secret, $account->username);
         if (!$getAccessTokenResult['status']) {
