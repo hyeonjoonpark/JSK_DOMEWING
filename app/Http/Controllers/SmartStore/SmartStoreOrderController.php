@@ -21,14 +21,21 @@ class SmartStoreOrderController extends Controller
         if ($id == null) {
             $id = Auth::guard('partner')->id();
         }
-        $account = $this->getAccount($id);
-        if (!$account) {
+        $accounts = $this->getAccount($id);
+        if (!$accounts) {
             return false;
         }
-        $orderList = $this->getOrderList($account, $start, $end);
-        $orderIds = $this->getOrderIds($orderList);
-        $orderDetails = $this->getOrderDetails($account, $orderIds);
-        return  $orderDetails;
+        $allOrderDetails = [];
+        foreach ($accounts as $account) {
+            $orderList = $this->getOrderList($account, $start, $end);
+            $orderIds = $this->getOrderIds($orderList);
+            $orderDetails = $this->getOrderDetails($account, $orderIds);
+            if (isset($orderDetails['error'])) {
+                continue; // 오류가 있으면 다음 계정으로 넘어감
+            }
+            $allOrderDetails = array_merge($allOrderDetails, $orderDetails);
+        }
+        return  $allOrderDetails;
     }
     private function getOrderList($account, $start = null, $end = null)
     {
@@ -83,8 +90,8 @@ class SmartStoreOrderController extends Controller
             'EXCHANGED' => '교환',
             'CANCELED' => '취소',
             'RETURNED' => '반품',
-            'CANCELED_BY_NOPAYMENT' => '미결제 취소',
-            'PURCHASE_DECIDED' => '구매 확정',
+            'CANCELED_BY_NOPAYMENT' => '미결제취소',
+            'PURCHASE_DECIDED' => '구매확정',
         ];
         $formattedResponse = array_map(function ($item) use ($statusMap) {
             $shippingAddress = isset($item['productOrder']['shippingAddress']) ? $item['productOrder']['shippingAddress'] : null;
@@ -115,6 +122,9 @@ class SmartStoreOrderController extends Controller
     }
     private function getAccount($id)
     {
-        return DB::table('smart_store_accounts')->where('partner_id', $id)->first();
+        return DB::table('smart_store_accounts')
+            ->where('partner_id', $id)
+            ->where('is_active', 'ACTIVE')
+            ->get();
     }
 }

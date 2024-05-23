@@ -26,8 +26,8 @@ class CoupangOrderController extends Controller
     }
     private function getOrderList($id, $start = null, $end = null)
     {
-        $account = $this->getAccount($id);
-        if (!$account) {
+        $accounts = $this->getAccount($id);
+        if (!$accounts) {
             return false;
         }
         $startDate = $start ? new DateTime($start) : new DateTime('now - 4 days');
@@ -47,35 +47,43 @@ class CoupangOrderController extends Controller
         $interval = new DateInterval('P1M'); // 1 month interval
         $period = new DatePeriod($startDate, $interval, $endDate);
         $allOrders = [];
+        foreach ($accounts as $account) {
+            foreach ($statusMap as $status => $description) {
+                foreach ($period as $dt) {
+                    $currentStart = $dt;
+                    $currentEnd = clone $currentStart;
+                    $currentEnd->add($interval)->sub(new DateInterval('P1D'));
 
-        foreach ($statusMap as $status => $description) {
-            foreach ($period as $dt) {
-                $currentStart = $dt;
-                $currentEnd = clone $currentStart;
-                $currentEnd->add($interval)->sub(new DateInterval('P1D'));
-
-                if ($currentEnd > $endDate) {
-                    $currentEnd = $endDate;
+                    if ($currentEnd > $endDate) {
+                        $currentEnd = $endDate;
+                    }
+                    $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets';
+                    $baseQuery = [
+                        'createdAtFrom' => $currentStart->format('Y-m-d'),
+                        'createdAtTo' => $currentEnd->format('Y-m-d'),
+                        'status' => $status
+                    ];
+                    $queryString = http_build_query($baseQuery);
+                    $response = $this->ssac->getBuilder($account->access_key, $account->secret_key, 'application/json', $path, $queryString);
+                    if (isset($response['error'])) {
+                        continue; // 오류가 있으면 다음 계정으로 넘어감
+                    }
+                    $transformedResponse = $this->transformOrderDetails($response);
+                    if ($transformedResponse !== false) {
+                        $allOrders = array_merge($allOrders, $transformedResponse);
+                    }
                 }
-                $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets';
-                $baseQuery = [
-                    'createdAtFrom' => $currentStart->format('Y-m-d'),
-                    'createdAtTo' => $currentEnd->format('Y-m-d'),
-                    'status' => $status
-                ];
-                $queryString = http_build_query($baseQuery);
-                $response = $this->ssac->getBuilder($account->access_key, $account->secret_key, 'application/json', $path, $queryString);
-                $transformedResponse = $this->transformOrderDetails($response);
-                $allOrders = array_merge($allOrders, $transformedResponse);
             }
         }
-
-        return $allOrders;
+        return empty($allOrders) ? false : $allOrders;
     }
     private function transformOrderDetails($response)
     {
+        if (!isset($response['data']['data'])) {
+            return ['error' => '응답 데이터가 올바르지 않습니다.'];
+        }
         $orderDetails = [];
-        if (isset($response['data']['data'])) {
+        if (!empty($response['data']['data'])) {
             foreach ($response['data']['data'] as $item) {
                 foreach ($item['orderItems'] as $orderItem) {
                     $orderDetails[] = [
@@ -102,7 +110,7 @@ class CoupangOrderController extends Controller
                 }
             }
         }
-        return $orderDetails;
+        return empty($orderDetails) ? false : $orderDetails;
     }
     private function mapStatusToReadable($status)
     {
@@ -118,6 +126,9 @@ class CoupangOrderController extends Controller
     }
     private function getAccount($id)
     {
-        return DB::table('coupang_accounts')->where('partner_id', $id)->where('is_active', 'ACTIVE')->first();
+        return DB::table('coupang_accounts')
+            ->where('partner_id', $id)
+            ->where('is_active', 'ACTIVE')
+            ->get();
     }
 }
