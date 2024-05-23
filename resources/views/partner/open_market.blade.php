@@ -26,15 +26,9 @@
                     <div class="form-group">
                         <label class="form-label">오픈마켓 리스트 ({{ count($openMarkets) }})</label>
                         <div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="select-all">
-                                <label class="form-check-label" for="select-all">
-                                    전체 선택
-                                </label>
-                            </div>
                             @foreach ($openMarkets as $openMarket)
                                 <div class="form-check">
-                                    <input class="form-check-input market-checkbox" type="checkbox"
+                                    <input class="form-check-input market-radio" type="radio" name="openMarket"
                                         value="{{ $openMarket->id }}" id="market-{{ $openMarket->id }}">
                                     <label class="form-check-label" for="market-{{ $openMarket->id }}">
                                         {{ $openMarket->name }}
@@ -47,7 +41,7 @@
                             <input type="date" id="startDate" name="startDate" class="form-control">
                             <label for="endDate">종료 날짜:</label>
                             <input type="date" id="endDate" name="endDate" class="form-control">
-                            <p>날짜 미 선택시 현재일 기준 7일 동안의 내역이 보여집니다.</p>
+                            <p>날짜 미 선택시 현재일 기준 4일 동안의 내역이 보여집니다.</p>
                         </div>
                     </div>
                 </div>
@@ -126,36 +120,15 @@
 
 @section('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectAllCheckbox = document.getElementById('select-all');
-            const marketCheckboxes = document.querySelectorAll('.market-checkbox');
-
-            selectAllCheckbox.addEventListener('change', function() {
-                marketCheckboxes.forEach(checkbox => {
-                    checkbox.checked = selectAllCheckbox.checked;
-                });
-            });
-
-            marketCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    if ([...marketCheckboxes].every(mark => mark.checked)) {
-                        selectAllCheckbox.checked = true;
-                    } else {
-                        selectAllCheckbox.checked = false;
-                    }
-                });
-            });
-        });
-
         function initOrderwing() {
             var openMarketIds = [];
-            document.querySelectorAll('.market-checkbox:checked').forEach(function(checkbox) {
-                openMarketIds.push(checkbox.value);
-            });
-            if (openMarketIds.length < 1) {
+            var selectedMarket = document.querySelector('.market-radio:checked');
+            if (selectedMarket) {
+                openMarketIds.push(selectedMarket.value);
+            } else {
                 return Swal.fire({
                     icon: 'warning',
-                    text: '최소 하나의 오픈마켓을 선택해야 합니다.'
+                    text: '하나의 오픈마켓을 선택해야 합니다.'
                 });
             }
 

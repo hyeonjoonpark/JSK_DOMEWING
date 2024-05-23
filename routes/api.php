@@ -183,6 +183,8 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('save-tracking-info', [OpenMarketShipmentController::class, 'saveShipment']);
     //주문 취소처리
     Route::post('cancel-order', [OpenMarketOrderController::class, 'cancleOrder']);
+    // 파트너스 주문 조회
+    Route::post('get-new-orders', [OpenMarketOrderController::class, 'index']);
 });
 Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     Route::prefix('account-setting')->group(function () {
