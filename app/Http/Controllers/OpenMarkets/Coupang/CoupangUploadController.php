@@ -29,7 +29,7 @@ class CoupangUploadController extends Controller
         $secretKey = $account->secret_key;
         $success = 0;
         $duplicated = [];
-        $error = '';
+        $error = [];
         foreach ($products as $product) {
             $exists = DB::table('coupang_uploaded_products')
                 ->where('is_active', 'Y')
@@ -61,16 +61,12 @@ class CoupangUploadController extends Controller
             }
             $data = $this->generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee);
             $uploadResult = $ac->builder($accessKey, $secretKey, $method, $contentType, $path, $data);
-            if ($uploadResult['status'] === true) {
-                if ($uploadResult['data']['code'] === 'SUCCESS') {
-                    $originProductNo = $uploadResult['data']['data'];
-                    $this->store($account->id, $product->id, $salePrice, $shippingFee, $originProductNo, $product->productName);
-                    $success++;
-                } else {
-                    $error = $uploadResult['data']['message'];
-                }
+            if ($uploadResult['status'] === true && $uploadResult['data']['code'] === 'SUCCESS') {
+                $originProductNo = $uploadResult['data']['data'];
+                $this->store($account->id, $product->id, $salePrice, $shippingFee, $originProductNo, $product->productName);
+                $success++;
             } else {
-                $error = $uploadResult['error'];
+                $error[] = $uploadResult;
             }
         }
         return [

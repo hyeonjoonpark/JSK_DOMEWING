@@ -140,34 +140,37 @@ class ApiController extends Controller
     public function builder($accessKey, $secretKey, $method, $contentType, $path, $data)
     {
         date_default_timezone_set("GMT+0");
-        $datetime = date("ymd") . 'T' . date("His") . 'Z';
+        $datetime = gmdate("ymd") . 'T' . gmdate("His") . 'Z';
         $message = $datetime . $method . $path;
         $algorithm = "HmacSHA256";
         $signature = hash_hmac('sha256', $message, $secretKey);
-        $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
+        $authorization = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path;
         $jsonData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         try {
             $response = Http::withHeaders([
                 'Authorization' => $authorization,
-                'Content-Type' => $contentType
-            ])->withBody($jsonData, 'application/json')->$method($url);
+                'Content-Type' => $contentType,
+            ])
+                ->timeout(60)
+                ->withBody($jsonData, 'application/json')
+                ->{$method}($url);
+            if ($response->successful() && $response->status() === 200) {
+                return [
+                    'status' => true,
+                    'data' => $response->json(),
+                ];
+            } else {
+                return [
+                    'status' => false,
+                    'error' => $response->json(),
+                ];
+            }
         } catch (\Exception $e) {
             return [
                 'status' => false,
                 'message' => '마켓으로부터의 응답 시간이 초과하였습니다.',
-                'error' => $e->getMessage()
-            ];
-        }
-        if ($response->successful() && $response->status() === 200) {
-            return [
-                'status' => true,
-                'data' => $response->json()
-            ];
-        } else {
-            return [
-                'status' => false,
-                'error' => $response->json()
+                'error' => $e->getMessage(),
             ];
         }
     }
