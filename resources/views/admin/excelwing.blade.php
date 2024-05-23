@@ -38,7 +38,7 @@
                                     <div class="custom-control custom-radio">
                                         <input type="radio" id="seller{{ $seller->vendor_id }}" name="sellers"
                                             value="{{ $seller->vendor_id }}" class="custom-control-input"
-                                            {{ $loop->first ? 'checked' : '' }}>
+                                            {{ $seller->vendor_id === 61 ? 'checked' : '' }}>
                                         <label class="custom-control-label"
                                             for="seller{{ $seller->vendor_id }}">{{ $seller->name }}</label>
                                     </div>
