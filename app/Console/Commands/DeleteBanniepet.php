@@ -28,14 +28,14 @@ class DeleteBanniepet extends Command
      */
     public function handle()
     {
-        $coupangBanniepetOriginProductsNo = DB::table('coupang_uploaded_products AS cup')
-            ->join('minewing_products AS mp', 'mp.id', '=', 'cup.product_id')
+        $coupangBanniepetOriginProductsNo = DB::table('smart_store_uploaded_products AS ssup')
+            ->join('minewing_products AS mp', 'mp.id', '=', 'ssup.product_id')
             ->where('mp.sellerID', 38)
-            ->pluck('cup.origin_product_no')
+            ->pluck('ssup.origin_product_no')
             ->toArray();
         $request = new Request([
             'originProductsNo' => $coupangBanniepetOriginProductsNo,
-            'vendorId' => 40
+            'vendorId' => 51
         ]);
         $uc = new UploadedController();
         print_r($uc->delete($request));

@@ -95,6 +95,13 @@
                                 </div>
                             </div>
                         @endforeach
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="" class="form-label">키워드 검색</label>
+                                <input type="text" class="form-control" name="searchKeyword"
+                                    placeholder="검색 키워드를 입력해주세요." value="{{ $searchKeyword }}">
+                            </div>
+                        </div>
                         <div class="col-12 text-center">
                             <button type="submit" class="btn btn-primary">조회하기</button>
                         </div>
@@ -111,6 +118,7 @@
                             'page' => $uploadedProducts->currentPage(),
                             'numPages' => $uploadedProducts->lastPage(),
                             'openMarket' => $openMarket,
+                            'searchKeyword' => $searchKeyword,
                         ])
                     </div>
                     <div class="text-center">

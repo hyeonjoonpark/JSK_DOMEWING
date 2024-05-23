@@ -41,6 +41,7 @@ class UploadedController extends Controller
             ->first(['value'])
             ->value;
         $marginRate = $margin / 100 + 1;
+        $searchKeyword = $request->input('searchKeyword', '');
         $uploadedProducts = DB::table($vendorEngName . '_uploaded_products AS up')
             ->join('minewing_products AS mp', 'mp.id', '=', 'up.product_id')
             ->join($vendorEngName . '_accounts AS va', 'va.id', '=', 'up.' . $vendorEngName . '_account_id')
@@ -48,6 +49,15 @@ class UploadedController extends Controller
             ->join('partners AS p', 'p.id', '=', 'va.partner_id')
             ->where('up.is_active', 'Y')
             ->where('va.partner_id', $partnerId)
+            ->where(function ($query) use ($searchKeyword) {
+                if (!empty($searchKeyword)) {
+                    $query->where('mp.productName', 'LIKE', "%{$searchKeyword}%")
+                        ->orWhere('mp.productKeywords', 'LIKE', "%{$searchKeyword}%")
+                        ->orWhere('oc.name', 'LIKE', "%{$searchKeyword}%")
+                        ->orWhere('mp.productCode', 'LIKE', "%{$searchKeyword}%")
+                        ->orWhere('up.origin_product_no', 'LIKE', "%{$searchKeyword}%");
+                }
+            })
             ->orderByDesc('up.created_at')
             ->select([
                 'mp.productCode',
@@ -69,7 +79,8 @@ class UploadedController extends Controller
         return view('partner.products_uploaded', [
             'openMarkets' => $openMarkets,
             'uploadedProducts' => $uploadedProducts,
-            'selectedOpenMarketId' => $selectedOpenMarketId
+            'selectedOpenMarketId' => $selectedOpenMarketId,
+            'searchKeyword' => $searchKeyword
         ]);
     }
     public function delete(Request $request)
