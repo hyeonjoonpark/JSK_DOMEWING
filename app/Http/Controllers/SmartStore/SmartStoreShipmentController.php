@@ -42,7 +42,6 @@ class SmartStoreShipmentController extends Controller
                 'message' => $responseApi['message'],
             ];
         }
-        $this->update($order->id, $deliveryCompanyId, $trackingNumber);
         return [
             'status' => true,
             'data' => $responseApi
@@ -67,31 +66,6 @@ class SmartStoreShipmentController extends Controller
         ];
         return $this->ssac->builder($account, $contentType, $method, $url, $data);
     }
-
-    private function update($orderId, $deliveryCompanyId, $trackingNumber)
-    {
-        try {
-            DB::table('orders')
-                ->where('id', $orderId)
-                ->update([
-                    'tracking_number' => $trackingNumber,
-                    'delivery_company_id' => $deliveryCompanyId,
-                    'delivery_status' => 'COMPLETE',
-                ]);
-            return [
-                'status' => true,
-                'message' => '송장번호 입력에 성공하였습니다',
-                'data' => []
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'message' => $e->getMessage(),
-                'data' => []
-            ];
-        }
-    }
-
     private function getDeliveryCompany($deliveryCompanyId)
     {
         return DB::table('delivery_companies as dc')

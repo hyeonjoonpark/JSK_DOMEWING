@@ -55,14 +55,13 @@ class CoupangShipmentController extends Controller
             //singleOrderd의 orderId와 setProductd의 shipmentBoxId를 사용해서 postApi사용
 
             $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId, $preSplitShipped);
-            return $responseApi;
             if ($responseApi['response'] == false) {
                 return [
                     'status' => false,
                     'message' => $responseApi['message'],
                 ];
             }
-            return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
+            return $responseApi;
         } catch (\Exception $e) {
             return [
                 'status' => false,
