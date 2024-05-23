@@ -35,6 +35,15 @@ class OpenMarketShipmentController extends Controller
             'status' => false,
             'message' => '이미 취소되었거나 유효한 주문이 아닙니다.',
         ];
+        $isExistTrackingNumber = DB::table('orders')
+            ->where('tracking_number', $request->input('trackingNumber'))
+            ->exists();
+        if ($isExistTrackingNumber) {
+            return [
+                'status' => false,
+                'message' => '이미 존재하는 송장번호입니다.',
+            ];
+        }
         $vendor = $this->getVendorByProductOrderNumber($productOrderNumber);
         if ($vendor) {
             $method = 'call' . ucfirst($vendor->name_eng) . 'ShipmentApi';

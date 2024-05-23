@@ -23,8 +23,8 @@ class SmartStoreShipmentController extends Controller
             $trackingNumber = $request->input('trackingNumber');
             $deliveryCompanyId = $request->input('deliveryCompanyId');
             $productOrderNumber = $request->input('productOrderNumber');
-
             $deliveryCompany = $this->getDeliveryCompany($deliveryCompanyId);
+
             $order = $this->getOrder($productOrderNumber);
             $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
             $account = $this->getAccount($partner->id);
@@ -35,30 +35,35 @@ class SmartStoreShipmentController extends Controller
                 'message' => '데이터 조회 중 오류가 발생했습니다: ' . $e->getMessage(),
             ];
         }
-
-        // $responseApi = $this->postApi($account, $productOrder->product_order_number, $deliveryCompany, $trackingNumber);
-
-        // if ($responseApi['response'] == false) {
-        //     return [
-        //         'status' => false,
-        //         'message' => $responseApi['message'],
-        //     ];
-        // }
-
+        $responseApi = $this->postApi($account, $productOrder->product_order_number, $deliveryCompany->smart_store, $trackingNumber);
+        if ($responseApi['response'] == false) {
+            return [
+                'status' => false,
+                'message' => $responseApi['message'],
+            ];
+        }
         return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
+        return [
+            'status' => true,
+            'data' => $responseApi
+        ];
     }
     private function postApi($account, $productOrderId, $deliveryCompany, $trackingNumber)
     {
         $contentType = 'application/json';
         $method = 'POST';
-        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses';
+        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/dispatch';
         $dispatchDate = $this->getDispatchDate();
         $data = [
-            $productOrderId,
-            'deliveryMethod' => 'DELIVERY',
-            $deliveryCompany,
-            $trackingNumber,
-            $dispatchDate,
+            'dispatchProductOrders' => [
+                [
+                    'productOrderId' => $productOrderId,
+                    'deliveryMethod' => 'DELIVERY',
+                    'deliveryCompanyCode' => $deliveryCompany,
+                    'trackingNumber' => $trackingNumber,
+                    'dispatchDate' => $dispatchDate,
+                ]
+            ]
         ];
         return $this->ssac->builder($account, $contentType, $method, $url, $data);
     }
@@ -91,7 +96,6 @@ class SmartStoreShipmentController extends Controller
     {
         return DB::table('delivery_companies as dc')
             ->where('dc.id', $deliveryCompanyId)
-            ->select('smart_store')
             ->first();
     }
 

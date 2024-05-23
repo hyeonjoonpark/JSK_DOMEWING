@@ -32,8 +32,6 @@ class CoupangOrderController extends Controller
         }
         $startDate = $start ? new DateTime($start) : new DateTime('now - 4 days');
         $endDate = $end ? new DateTime($end) : new DateTime('now');
-
-
         $statusMap = [
             'ACCEPT' => '결제완료',
             'INSTRUCT' => '상품준비중',
@@ -42,11 +40,9 @@ class CoupangOrderController extends Controller
             'FINAL_DELIVERY' => '배송완료',
             'NONE_TRACKING' => '업체 직접 배송(배송 연동 미적용), 추적불가',
         ];
-
         $allOrders = [];
         $interval = new DateInterval('P1M'); // 1 month interval
         $period = new DatePeriod($startDate, $interval, $endDate);
-        $allOrders = [];
         foreach ($accounts as $account) {
             foreach ($statusMap as $status => $description) {
                 foreach ($period as $dt) {
@@ -75,12 +71,12 @@ class CoupangOrderController extends Controller
                 }
             }
         }
-        return empty($allOrders) ? false : $allOrders;
+        return $allOrders;
     }
     private function transformOrderDetails($response)
     {
         if (!isset($response['data']['data'])) {
-            return ['error' => '응답 데이터가 올바르지 않습니다.'];
+            return false;
         }
         $orderDetails = [];
         if (!empty($response['data']['data'])) {
@@ -110,7 +106,7 @@ class CoupangOrderController extends Controller
                 }
             }
         }
-        return empty($orderDetails) ? false : $orderDetails;
+        return $orderDetails;
     }
     private function mapStatusToReadable($status)
     {

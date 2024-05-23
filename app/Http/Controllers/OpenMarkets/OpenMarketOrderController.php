@@ -17,100 +17,162 @@ class OpenMarketOrderController extends Controller
 {
     public function index()
     {
-        // $allPartners = $this->getAllPartners(); //모든 파트너 조회
-        // $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
-        // foreach ($allPartners as $partner) { //모든 파트너 반복문
-        //     $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
-        //     $memberId = $partnerDomewingAccount->domewing_account_id;
-        //     // $balance = $this->getBalance($memberId); // 회원의 잔액 조회
-
-        //     foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
-        //         $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
-        //         $isExistAccount = 'isExist'  . ucfirst($openMarketEngName) . 'Account';
-        //         $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
-        //         if (!$isExistOpenMarketAccount) continue;
-        //         $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi'; //오픈마켓별 주문내역조회 api 쏠려고 영어이름을 메소드명으로 지정
-        //         $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';  // 오픈마켓별 업로드된 상품인지 조회하려고 메소드명 지정
-        //         $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null); //api 결과 저장
-        //         if ($apiResults === false) continue; //api의 결과값이 비어있으면 continue 곧 아무런 결과값이 없는거지
-        //         // orderId를 기준으로 그룹화
-        //         $groupedResults = []; // wing_transaction에 주문의 총합으로 넣으려고 그룹화
-        //         foreach ($apiResults as $apiResult) {
-        //             if (!is_array($apiResult)) {
-        //                 continue;
-        //             }
-        //             if ($apiResult['productOrderStatus'] !== '결제완료') {
-        //                 continue; // 결제완료만 db에 저장하려고 검증
-        //             }
-        //             $orderId = $apiResult['orderId'];
-        //             if (!isset($groupedResults[$orderId])) {
-        //                 $groupedResults[$orderId] = [];
-        //             }
-        //             $groupedResults[$orderId][] = $apiResult;
-        //         }
-        //         try {
-        //             DB::beginTransaction(); // 트랜잭션 시작
-        //             foreach ($groupedResults as $orderId => $orders) { //orderId기준 반복문 진행
-        //                 // partner_orders 테이블에서 중복 여부 확인
-        //                 $orderNumbers = array_column($orders, 'orderId');
-        //                 $productOrderNumbers = array_column($orders, 'productOrderId');
-        //                 $exists = DB::table('partner_orders')
-        //                     ->whereIn('order_number', $orderNumbers)
-        //                     ->whereIn('product_order_number', $productOrderNumbers)
-        //                     ->exists();
-
-        //                 if ($exists) {
-        //                     continue; // 저장 로직 건너뛰기
-        //                 }
-
-        //                 $totalPrice = 0;
-        //                 $cartIds = [];
-        //                 foreach ($orders as $order) {
-        //                     $product = $this->getProduct($order['productCode']);
-        //                     print_r($order);
-        //                     if (!$product) return $order;
-        //                     $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
-        //                     $cartId = $cart['data']['cartId'];
-        //                     $cartCode = $this->getCartCode($cartId);
-        //                     $totalPrice += $this->getCartAmount($cartCode); // wing_transaction amount구하기
-        //                     $cartIds[] = $cartId;  //cartId 리스트로 보관
-        //                 }
-        //                 $wingTransaction =  $this->storeWingTransaction($memberId, 'PAYMENT', $totalPrice, $remark = ''); //윙 트랜잭션 테이블 insert
-        //                 $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
-        //                 foreach ($orders as $index => $order) {
-        //                     $product = $this->getProduct($order['productCode']);
-        //                     $priceThen = $this->getSalePrice($product->id);
-        //                     $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity);
-        //                     $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
-        //                     $uploadedProduct = call_user_func([$this, $uploadedProductMethod], $product->id); // 해당 오픈마켓 업로드테이블에서 업로드된 상품인지 확인하고 id값 가져옴
-        //                     $uploadedProductId = $uploadedProduct->id;
-        //                     $this->storePartnerOrder($orderId, $openMarket->id, $uploadedProductId, $priceThen, $product->shipping_fee, $order['orderId'], $order['productOrderId']); //partner_orders 테이블 insert
-        //                 }
-        //             }
-        //             DB::commit(); // 트랜잭션 커밋
-        //         } catch (\Exception $e) {
-        //             DB::rollBack(); // 트랜잭션 롤백
-        //             return [
-        //                 'status' => false,
-        //                 'error' => $e->getMessage(),
-        //                 'trace' => $e->getTraceAsString() // 디버깅을 위한 트레이스 추가
-        //             ];
-        //         }
-        //     }
-        // }
-
-
-
-
-
-
         $orders = $this->getPaidOrders();
         $processedOrders = $orders->map(function ($order) {
             return $this->processOrder($order);
         });
         return response()->json($processedOrders);
     }
+    public function getAllOrder()
+    {
+        $allPartners = $this->getAllPartners(); //모든 파트너 조회
+        $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
+        foreach ($allPartners as $partner) { //모든 파트너 반복문
+            $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
+            $memberId = $partnerDomewingAccount->domewing_account_id;
+            // $balance = $this->getBalance($memberId); // 회원의 잔액 조회
 
+            foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
+                // if ($openMarket->name_eng == 'smart_store') continue;
+                $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
+                $isExistAccount = 'isExist'  . ucfirst($openMarketEngName) . 'Account';
+                $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
+                if (!$isExistOpenMarketAccount) continue;
+                $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi'; //오픈마켓별 주문내역조회 api 쏠려고 영어이름을 메소드명으로 지정
+                $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';  // 오픈마켓별 업로드된 상품인지 조회하려고 메소드명 지정
+                $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null); //api 결과 저장
+                if ($apiResults === false) continue; //api의 결과값이 비어있으면 continue 곧 아무런 결과값이 없는거지
+                // orderId를 기준으로 그룹화
+                $groupedResults = []; // wing_transaction에 주문의 총합으로 넣으려고 그룹화
+                foreach ($apiResults as $apiResult) {
+                    if (!is_array($apiResult)) {
+                        continue;
+                    }
+                    if ($apiResult['productOrderStatus'] !== '결제완료') {
+                        continue; // 결제완료만 db에 저장하려고 검증
+                    }
+                    $orderId = $apiResult['orderId'];
+                    if (!isset($groupedResults[$orderId])) {
+                        $groupedResults[$orderId] = [];
+                    }
+                    $groupedResults[$orderId][] = $apiResult;
+                }
+                try {
+                    DB::beginTransaction(); // 트랜잭션 시작
+                    foreach ($groupedResults as $orderId => $orders) { //orderId기준 반복문 진행
+                        // partner_orders 테이블에서 중복 여부 확인
+                        $orderNumbers = array_column($orders, 'orderId');
+                        $productOrderNumbers = array_column($orders, 'productOrderId');
+                        $exists = DB::table('partner_orders')
+                            ->whereIn('order_number', $orderNumbers)
+                            ->whereIn('product_order_number', $productOrderNumbers)
+                            ->exists();
+
+                        if ($exists) {
+                            continue; // 저장 로직 건너뛰기
+                        }
+
+                        $totalPrice = 0;
+                        $cartIds = [];
+                        foreach ($orders as $order) {
+                            $product = $this->getProduct($order['productCode']);
+                            print_r($order);
+                            if (!$product) return $order;
+                            $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
+                            $cartId = $cart['data']['cartId'];
+                            $cartCode = $this->getCartCode($cartId);
+                            $totalPrice += $this->getCartAmount($cartCode); // wing_transaction amount구하기
+                            $cartIds[] = $cartId;  //cartId 리스트로 보관
+                        }
+                        $wingTransaction =  $this->storeWingTransaction($memberId, 'PAYMENT', $totalPrice, $remark = ''); //윙 트랜잭션 테이블 insert
+                        $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
+                        foreach ($orders as $index => $order) {
+                            $product = $this->getProduct($order['productCode']);
+                            $priceThen = $this->getSalePrice($product->id);
+                            $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity);
+                            $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
+                            $uploadedProduct = call_user_func([$this, $uploadedProductMethod], $product->id); // 해당 오픈마켓 업로드테이블에서 업로드된 상품인지 확인하고 id값 가져옴
+                            $uploadedProductId = $uploadedProduct->id;
+                            $this->storePartnerOrder($orderId, $openMarket->id, $uploadedProductId, $priceThen, $product->shipping_fee, $order['orderId'], $order['productOrderId']); //partner_orders 테이블 insert
+                        }
+                    }
+                    DB::commit(); // 트랜잭션 커밋
+
+                } catch (\Exception $e) {
+                    DB::rollBack(); // 트랜잭션 롤백
+                    return [
+                        'status' => false,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString() // 디버깅을 위한 트레이스 추가
+                    ];
+                }
+            }
+        }
+        return [
+            'status' => true,
+            'message' => '신규주문을 성공적으로 저장하였습니다.',
+            'data' => []
+        ];
+    }
+    public function indexPartner(Request $request)
+    {
+        $apiToken = $request->apiToken;
+        $currentPartnerId = DB::table('partners')
+            ->where('api_token', $apiToken)
+            ->value('id');
+        $marketIds = $request->input('openMarketIds', []);
+        $orderwingEngNameLists = $this->getOrderwingOpenMarkets($marketIds);
+        $domewingAndPartner = $this->getDomewingAndPartners($currentPartnerId);
+        if (!$domewingAndPartner) {
+            return [
+                'status' => false,
+                'message' => '도매윙 계정연동을 해야합니다.',
+                'data' => []
+            ];
+        }
+        $wc = new WingController();
+        $wing = $wc->getBalance($domewingAndPartner->domewing_account_id);
+        $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
+        $results = [];
+        $saveResults = [];
+        $totalAmountRequired = 0;
+        $partner = $this->getPartner($domewingAndPartner->partner_id);
+        $domewingUser = $this->getDomewingUser($domewingAndPartner->domewing_account_id);
+        foreach ($orderwingEngNameLists as $orderwingEngNameList) {
+            $methodName = 'call' . ucfirst($orderwingEngNameList) . 'OrderApi';
+            if (method_exists($this, $methodName)) {
+                $apiResult = call_user_func([$this, $methodName], $partner->id, $startDate, $endDate);
+                if (isset($apiResult) && is_array($apiResult)) {
+                    foreach ($apiResult as $order) {
+                        if ($order['productOrderStatus'] == "결제완료") {
+                            $totalAmountRequired += $order['totalPaymentAmount'] + $order['deliveryFeeAmount'];
+                            $saveResults[] = $order;
+                        }
+                    }
+                }
+            } else {
+                $apiResult = null;
+                Log::error("Method $methodName does not exist.");
+            }
+            $results[] = [
+                'domewing_user_name' => $domewingUser->username,
+                'api_result' => $apiResult
+            ];
+        }
+        if ($totalAmountRequired > $wing) {
+            return [
+                'status' => false,
+                'message' => 'wing 잔액이 부족합니다.',
+                'data' => $totalAmountRequired - $wing,
+            ];
+        }
+        return [
+            'status' => true,
+            'message' => '성공적으로 오더윙을 가동하였습니다.',
+            'data' => $results
+        ];
+    }
     public function cancleOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -275,65 +337,6 @@ class OpenMarketOrderController extends Controller
         $marginRate = ($margin / 100) + 1;
 
         return ceil($productPrice * $marginRate);
-    }
-    public function indexPartner(Request $request)
-    {
-        $apiToken = $request->apiToken;
-        $currentPartnerId = DB::table('partners')
-            ->where('api_token', $apiToken)
-            ->value('id');
-        $marketIds = $request->input('openMarketIds', []);
-        $orderwingEngNameLists = $this->getOrderwingOpenMarkets($marketIds);
-        $domewingAndPartner = $this->getDomewingAndPartners($currentPartnerId);
-        if (!$domewingAndPartner) {
-            return [
-                'status' => false,
-                'message' => '도매윙 계정연동을 해야합니다.',
-                'data' => []
-            ];
-        }
-        $wc = new WingController();
-        $wing = $wc->getBalance($domewingAndPartner->domewing_account_id);
-        $startDate = $request->input('startDate');
-        $endDate = $request->input('endDate');
-        $results = [];
-        $saveResults = [];
-        $totalAmountRequired = 0;
-        $partner = $this->getPartner($domewingAndPartner->partner_id);
-        $domewingUser = $this->getDomewingUser($domewingAndPartner->domewing_account_id);
-        foreach ($orderwingEngNameLists as $orderwingEngNameList) {
-            $methodName = 'call' . ucfirst($orderwingEngNameList) . 'OrderApi';
-            if (method_exists($this, $methodName)) {
-                $apiResult = call_user_func([$this, $methodName], $partner->id, $startDate, $endDate);
-                if (isset($apiResult) && is_array($apiResult)) {
-                    foreach ($apiResult as $order) {
-                        if ($order['productOrderStatus'] == "결제완료") {
-                            $totalAmountRequired += $order['totalPaymentAmount'] + $order['deliveryFeeAmount'];
-                            $saveResults[] = $order;
-                        }
-                    }
-                }
-            } else {
-                $apiResult = null;
-                Log::error("Method $methodName does not exist.");
-            }
-            $results[] = [
-                'domewing_user_name' => $domewingUser->username,
-                'api_result' => $apiResult
-            ];
-        }
-        if ($totalAmountRequired > $wing) {
-            return [
-                'status' => false,
-                'message' => 'wing 잔액이 부족합니다.',
-                'data' => $totalAmountRequired - $wing,
-            ];
-        }
-        return [
-            'status' => true,
-            'message' => '성공적으로 오더윙을 가동하였습니다.',
-            'data' => $results
-        ];
     }
     private function getPaidOrders()
     {
