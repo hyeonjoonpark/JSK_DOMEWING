@@ -20,46 +20,86 @@ class OpenMarketOrderController extends Controller
         // $allPartners = $this->getAllPartners(); //모든 파트너 조회
         // $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
         // foreach ($allPartners as $partner) { //모든 파트너 반복문
-        //     $memberId = $this->getMemberId($partner->id); // 반복분 해당 파트너 id조회
+        //     $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
+        //     $memberId = $partnerDomewingAccount->domewing_account_id;
+        //     // $balance = $this->getBalance($memberId); // 회원의 잔액 조회
+
         //     foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
         //         $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
+        //         $isExistAccount = 'isExist'  . ucfirst($openMarketEngName) . 'Account';
+        //         $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
+        //         if (!$isExistOpenMarketAccount) continue;
         //         $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi'; //오픈마켓별 주문내역조회 api 쏠려고 영어이름을 메소드명으로 지정
         //         $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';  // 오픈마켓별 업로드된 상품인지 조회하려고 메소드명 지정
         //         $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null); //api 결과 저장
-        //         if ($apiResults === false || $apiResults == []) continue; //api의 결과값이 비어있으면 continue 곧 아무런 결과값이 없는거지
+        //         if ($apiResults === false) continue; //api의 결과값이 비어있으면 continue 곧 아무런 결과값이 없는거지
         //         // orderId를 기준으로 그룹화
         //         $groupedResults = []; // wing_transaction에 주문의 총합으로 넣으려고 그룹화
         //         foreach ($apiResults as $apiResult) {
-        //             if ($apiResult->productOrderStatus !== '결제완료') continue; // 결제완료만 db에 저장하려고 검증
-        //             $orderId = $apiResult->orderId;
+        //             if (!is_array($apiResult)) {
+        //                 continue;
+        //             }
+        //             if ($apiResult['productOrderStatus'] !== '결제완료') {
+        //                 continue; // 결제완료만 db에 저장하려고 검증
+        //             }
+        //             $orderId = $apiResult['orderId'];
         //             if (!isset($groupedResults[$orderId])) {
         //                 $groupedResults[$orderId] = [];
         //             }
         //             $groupedResults[$orderId][] = $apiResult;
         //         }
+        //         try {
+        //             DB::beginTransaction(); // 트랜잭션 시작
+        //             foreach ($groupedResults as $orderId => $orders) { //orderId기준 반복문 진행
+        //                 // partner_orders 테이블에서 중복 여부 확인
+        //                 $orderNumbers = array_column($orders, 'orderId');
+        //                 $productOrderNumbers = array_column($orders, 'productOrderId');
+        //                 $exists = DB::table('partner_orders')
+        //                     ->whereIn('order_number', $orderNumbers)
+        //                     ->whereIn('product_order_number', $productOrderNumbers)
+        //                     ->exists();
 
-        //         foreach ($groupedResults as $orderId => $orders) {
-        //             $amount = array_reduce($orders, function ($carry, $order) {
-        //                 $productId = $this->getProduct($order->productCode)->id;
-        //                 $productSale = $this->getSalePrice($productId);
-        //                 return $carry + ($productSale * $order->quantity);
-        //             }, 0);
-        //             $wingTransaction = $this->storeWingTransaction($memberId, 'PAYMENT', $amount, $remark = '');
-        //             $wingTransactionId = $wingTransaction['data']['wingTransactionId'];
+        //                 if ($exists) {
+        //                     continue; // 저장 로직 건너뛰기
+        //                 }
 
-        //             foreach ($orders as $order) {
-        //                 $product = $this->getProduct($order->productCode);
-        //                 $cartResult = $this->storeCart($memberId, $product->id, $order->quantity);
-        //                 $priceThen = $this->getSalePrice($product->id);
-        //                 $cartId = $cartResult['data']['cartId'];
-        //                 $orderResult = $this->storeOrder($wingTransactionId, $cartId, $order->receiverName, $order->receiverPhone, $order->address, $order->Remark, $priceThen, $product->shipping_fee, $product->bundle_quantity);
-        //                 $orderId = $orderResult['data']['orderId'];
-        //                 $uploadedProductId = call_user_func([$this, $uploadedProductMethod], $product->id);
-        //                 $this->storePartnerOrder($orderId, $openMarket->id, $uploadedProductId, $priceThen, $product->shipping_fee, $order->orderId, $order->productOrderId);
+        //                 $totalPrice = 0;
+        //                 $cartIds = [];
+        //                 foreach ($orders as $order) {
+        //                     $product = $this->getProduct($order['productCode']);
+        //                     print_r($order);
+        //                     if (!$product) return $order;
+        //                     $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
+        //                     $cartId = $cart['data']['cartId'];
+        //                     $cartCode = $this->getCartCode($cartId);
+        //                     $totalPrice += $this->getCartAmount($cartCode); // wing_transaction amount구하기
+        //                     $cartIds[] = $cartId;  //cartId 리스트로 보관
+        //                 }
+        //                 $wingTransaction =  $this->storeWingTransaction($memberId, 'PAYMENT', $totalPrice, $remark = ''); //윙 트랜잭션 테이블 insert
+        //                 $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
+        //                 foreach ($orders as $index => $order) {
+        //                     $product = $this->getProduct($order['productCode']);
+        //                     $priceThen = $this->getSalePrice($product->id);
+        //                     $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity);
+        //                     $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
+        //                     $uploadedProduct = call_user_func([$this, $uploadedProductMethod], $product->id); // 해당 오픈마켓 업로드테이블에서 업로드된 상품인지 확인하고 id값 가져옴
+        //                     $uploadedProductId = $uploadedProduct->id;
+        //                     $this->storePartnerOrder($orderId, $openMarket->id, $uploadedProductId, $priceThen, $product->shipping_fee, $order['orderId'], $order['productOrderId']); //partner_orders 테이블 insert
+        //                 }
         //             }
+        //             DB::commit(); // 트랜잭션 커밋
+        //         } catch (\Exception $e) {
+        //             DB::rollBack(); // 트랜잭션 롤백
+        //             return [
+        //                 'status' => false,
+        //                 'error' => $e->getMessage(),
+        //                 'trace' => $e->getTraceAsString() // 디버깅을 위한 트레이스 추가
+        //             ];
         //         }
         //     }
         // }
+
+
 
 
 
@@ -129,12 +169,11 @@ class OpenMarketOrderController extends Controller
             ];
         }
     }
-    private function getMemberId($partnerId)
+    private function getPartnerDomewingAccount($partnerId)
     {
         return DB::table('partner_domewing_accounts')
             ->where('partner_id', $partnerId)
             ->where('is_active', 'Y')
-            ->select('domewing_account_id')
             ->first();
     }
     private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen)
@@ -149,7 +188,7 @@ class OpenMarketOrderController extends Controller
                     'receiver_phone' => $receiverPhone,
                     'receiver_address' => $receiverAddress,
                     'receiver_remark' => $receiverRemark,
-                    'status' => 'APPROVED',
+                    'delivery_status' => 'PENDING',
                     'type' => 'PAID',
                     'price_then' => $priceThen,
                     'shipping_fee_then' => $shippingFeeThen,
@@ -157,7 +196,9 @@ class OpenMarketOrderController extends Controller
                 ]);
             return [
                 'status' => true,
-                'data' => $orderId
+                'data' => [
+                    'orderId' => $orderId
+                ]
             ];
         } catch (\Exception $e) {
             return [
@@ -191,6 +232,12 @@ class OpenMarketOrderController extends Controller
                 'error' => $e->getMessage()
             ];
         }
+    }
+    private function getCartCode($cartId)
+    {
+        return DB::table('carts')
+            ->where('id', $cartId)
+            ->value('code');
     }
 
     // 카트 금액 계산
@@ -318,6 +365,7 @@ class OpenMarketOrderController extends Controller
                 'o.product_order_number as productOrderNumber',
                 'm.id as memberId',
                 'c.product_id as productId',
+                'o.receiver_remark as receiverRemark',
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist')
             )
             ->get();
@@ -368,7 +416,8 @@ class OpenMarketOrderController extends Controller
             'deliveryCompanies' => $deliveryCompanies,
             'productOrderNumber' => $order->productOrderNumber,
             'isPartner' => $order->isExist,
-            'isActive' => $product->isActive
+            'isActive' => $product->isActive,
+            'receiverRemark' => $order->receiverRemark
         ];
     }
     private function getAllPartners()
@@ -509,7 +558,7 @@ class OpenMarketOrderController extends Controller
         $controller = new CoupangOrderController();
         return $controller->index($id, $startDate, $endDate);
     }
-    private function getSmart_stroeUploadedProductId($productId)
+    private function getSmart_storeUploadedProductId($productId)
     {
         return DB::table('smart_store_uploaded_products')
             ->where('product_id', $productId)
@@ -524,5 +573,19 @@ class OpenMarketOrderController extends Controller
             ->where('is_active', 'Y')
             ->select('id')
             ->first();
+    }
+    private function isExistSmart_storeAccount($partnerId)
+    {
+        return DB::table('smart_store_accounts')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'ACTIVE')
+            ->exists();
+    }
+    private function isExistCoupangAccount($partnerId)
+    {
+        return DB::table('coupang_accounts')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'ACTIVE')
+            ->exists();
     }
 }
