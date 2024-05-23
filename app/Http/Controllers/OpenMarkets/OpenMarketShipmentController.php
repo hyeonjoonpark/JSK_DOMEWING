@@ -26,9 +26,7 @@ class OpenMarketShipmentController extends Controller
             'trackingNumber.min' => '운송장 번호는 최소 10자여야 합니다.',
             'trackingNumber.max' => '운송장 번호는 최대 13자여야 합니다.',
             'deliveryCompanyId' => '유효한 택배사를 선택해주세요.',
-            'productOrderNumber.required' => '제품 주문 번호는 필수 항목입니다.',
-            'productOrderNumber.string' => '제품 주문 번호는 문자열이어야 합니다.',
-            'productOrderNumber.exists' => '선택한 제품 주문 번호가 존재하지 않습니다.',
+            'productOrderNumber' => '유효한 주문이 아닙니다.',
         ]);
         if ($validator->fails()) {
             return [
