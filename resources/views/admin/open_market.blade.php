@@ -60,16 +60,16 @@
         function initOrderwing() {
             popupLoader(0, '"신규 주문 내역을 B2B 업체로부터 추출하겠습니다."');
             $.ajax({
-                url: '/admin/get-new-orders',
-                type: 'GET',
+                url: '/api/get-new-orders',
+                type: 'POST',
                 dataType: 'JSON',
                 data: {
                     rememberToken
                 },
                 success: function(response) {
+                    console.log(response);
                     updateOrderTable(response);
                     closePopup();
-                    console.log(response);
                 },
                 error: function(response) {
                     closePopup();
@@ -104,7 +104,7 @@
                 <td>
                     <div class="row">
                         <div class="col">
-                            <p><b>이름:</b><br>${order.receiverName}<br><b>연락처:</b><br>${order.receiverPhone}<br><b>주소:</b><br>${order.receiverAddress}<br>
+                            <p><b>이름:</b><br>${order.receiverName}<br><b>연락처:</b><br>${order.receiverPhone}<br><b>주소:</b><br>${order.receiverAddress}<br><b>배송요청사항:</b><br>${order.receiverRemark}<br>
                         </div>
                     </div>
                 </td>
