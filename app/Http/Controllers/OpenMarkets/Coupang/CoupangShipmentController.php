@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\SmartStore;
+namespace App\Http\Controllers\OpenMarkets\Coupang;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
@@ -33,7 +33,9 @@ class CoupangShipmentController extends Controller
             ];
         }
         try {
+            return $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
             $singleOrder = $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
+
             $setProduct = $this->setProductAsPreparing($account, $productOrder->product_order_number); //상품준비중처리
             if (!$setProduct['data']['responseList'][0]['resultCode']) {
                 return [
@@ -52,36 +54,38 @@ class CoupangShipmentController extends Controller
                 ->exists();
             //singleOrderd의 orderId와 setProductd의 shipmentBoxId를 사용해서 postApi사용
 
-            // $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany, $trackingNumber, $vendorItemId, $preSplitShipped);
-            // if ($responseApi['response'] == false) {
-            //     return [
-            //         'status' => false,
-            //         'message' => $responseApi['message'],
-            //     ];
-            // }
-
+            $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId, $preSplitShipped);
+            return $responseApi;
+            if ($responseApi['response'] == false) {
+                return [
+                    'status' => false,
+                    'message' => $responseApi['message'],
+                ];
+            }
             return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
         } catch (\Exception $e) {
-            return $this->responseError('처리 중 오류가 발생했습니다: ' . $e->getMessage());
+            return [
+                'status' => false,
+                'error' => $e->getMessage(),
+            ];
         }
     }
     private function getSingleOrder($account, $productOrderNumber) //발주서 단건 조회
     {
-        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets';
-        $baseQuery = [
-            'shipmentBoxId' => $productOrderNumber
-        ];
-        $queryString = http_build_query($baseQuery);
-        return $this->ssac->getBuilder($account->access_key, $account->secret_key, 'application/json', $path, $queryString);
+        $method = 'GET';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets' . '/' .  $productOrderNumber;
+        return $this->ssac->build($method, $path, $account->access_key, $account->secret_key, $params = "");
     }
     private function setProductAsPreparing($account, $productOrderNumber) //상품준비중처리
     {
-        $method = 'PUT';
+        $accessKey = $account->access_key;
+        $secretKey = $account->secret_key;
+        $contentType = 'application/json;charset=UTF-8';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets/acknowledgement';
-        $params = [
+        $data = [
             'shipmentBoxIds' => [$productOrderNumber] //배열처리
         ];
-        return $this->ssac->build($method, $path, $account->accessKey, $account->secretKey, $params = "");
+        return $this->ssac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
     }
     private function postApi($account, $shipmentBoxId, $orderId, $deliveryCompanyCode, $invoiceNumber, $vendorItemId, $preSplitShipped)
     {
@@ -100,7 +104,7 @@ class CoupangShipmentController extends Controller
                 'estimatedShippingDate' => ''
             ]
         ];
-        return $this->ssac->build($method, $path, $account->accessKey, $account->secretKey, $params = "");
+        return $this->ssac->build($method, $path, $account->accessKey, $account->secretKey, $params);
     }
     private function update($orderId, $deliveryCompanyId, $trackingNumber)
     {
@@ -130,7 +134,6 @@ class CoupangShipmentController extends Controller
     {
         return DB::table('delivery_companies as dc')
             ->where('dc.id', $deliveryCompanyId)
-            ->select('coupang')
             ->first();
     }
 

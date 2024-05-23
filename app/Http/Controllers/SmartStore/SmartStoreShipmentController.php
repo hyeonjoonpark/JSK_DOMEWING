@@ -42,7 +42,7 @@ class SmartStoreShipmentController extends Controller
                 'message' => $responseApi['message'],
             ];
         }
-        return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
+        $this->update($order->id, $deliveryCompanyId, $trackingNumber);
         return [
             'status' => true,
             'data' => $responseApi

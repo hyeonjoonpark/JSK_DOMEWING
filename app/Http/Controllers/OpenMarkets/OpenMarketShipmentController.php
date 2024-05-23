@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\SmartStore\CoupangShipmentController;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangShipmentController;
 use App\Http\Controllers\SmartStore\SmartStoreShipmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
