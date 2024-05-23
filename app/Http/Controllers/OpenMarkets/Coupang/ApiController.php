@@ -45,7 +45,7 @@ class ApiController extends Controller
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
         try {
-            $response = Http::timeout(0)->withHeaders([
+            $response = Http::withHeaders([
                 'Authorization' => $authorization,
                 'Content-Type' => $contentType
             ])->get($url);
@@ -79,7 +79,7 @@ class ApiController extends Controller
         $authorization  = "CEA algorithm=" . $algorithm . ", access-key=" . $accessKey . ", signed-date=" . $datetime . ", signature=" . $signature;
         $url = 'https://api-gateway.coupang.com' . $path . '?' . $query;
         try {
-            $response = Http::timeout(0)->withHeaders([
+            $response = Http::withHeaders([
                 'Authorization' => $authorization,
                 'Content-Type' => $contentType
             ])->delete($url);
@@ -152,7 +152,6 @@ class ApiController extends Controller
                 'Authorization' => $authorization,
                 'Content-Type' => $contentType,
             ])
-                ->timeout(60)
                 ->withBody($jsonData, 'application/json')
                 ->{$method}($url);
             if ($response->successful() && $response->status() === 200) {
