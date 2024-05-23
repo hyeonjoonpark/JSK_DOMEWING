@@ -125,6 +125,7 @@ class OpenMarketShipmentController extends Controller
             ];
         }
     }
+    // 딱히 외부 컨트롤러에서 참조된 메소드들이 아니라면 삭제할 것.
     // private function getVendorByProductOrderNumber($productOrderNumber)
     // {
     //     return DB::table('orders as o')
