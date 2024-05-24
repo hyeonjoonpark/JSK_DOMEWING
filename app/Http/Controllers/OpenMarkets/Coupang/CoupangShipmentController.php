@@ -16,11 +16,10 @@ class CoupangShipmentController extends Controller
     }
     public function index(Request $request)
     {
-        try {
-            $trackingNumber = $request->input('trackingNumber');
-            $deliveryCompanyId = $request->input('deliveryCompanyId');
-            $productOrderNumber = $request->input('productOrderNumber');
-
+        try { //데이터 유효값 검증을 또 하지 않음 왜냐하면 openMarketShipmentController에서 이미 검증을 한 이후에 데이터를 넘겨주기 때문.
+            $trackingNumber = $request->trackingNumber;
+            $deliveryCompanyId = $request->deliveryCompanyId;
+            $productOrderNumber = $request->productOrderNumber;
             $deliveryCompany = $this->getDeliveryCompany($deliveryCompanyId);
             $order = $this->getOrder($productOrderNumber);
             $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
