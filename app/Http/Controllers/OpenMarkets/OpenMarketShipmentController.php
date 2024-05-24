@@ -14,7 +14,7 @@ class OpenMarketShipmentController extends Controller
     public function saveShipment(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'trackingNumber' => 'required|string|min:10|max:13|unique:orders,tracking_number',
+            'trackingNumber' => 'required|string|min:10|max:13',
             'deliveryCompanyId' => 'required|integer|exists:delivery_companies,id',
             'productOrderNumber' => 'required|string|exists:orders,product_order_number'
         ], [
