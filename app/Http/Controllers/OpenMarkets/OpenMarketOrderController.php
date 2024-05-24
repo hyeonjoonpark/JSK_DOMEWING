@@ -27,11 +27,10 @@ class OpenMarketOrderController extends Controller
     {
         $allPartners = $this->getAllPartners(); //모든 파트너 조회
         $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
+        $needSeedList = [];
         foreach ($allPartners as $partner) { //모든 파트너 반복문
             $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
             $memberId = $partnerDomewingAccount->domewing_account_id;
-            // $balance = $this->getBalance($memberId); // 회원의 잔액 조회
-
             foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
                 // if ($openMarket->name_eng == 'smart_store') continue;
                 $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
@@ -67,17 +66,17 @@ class OpenMarketOrderController extends Controller
                             ->whereIn('order_number', $orderNumbers)
                             ->whereIn('product_order_number', $productOrderNumbers)
                             ->exists();
-
                         if ($exists) {
                             continue; // 저장 로직 건너뛰기
                         }
-
                         $totalPrice = 0;
                         $cartIds = [];
                         foreach ($orders as $order) {
                             $product = $this->getProduct($order['productCode']);
-                            print_r($order);
-                            if (!$product) return $order;
+                            if (!$product) return [
+                                'status' => false,
+                                'message' => '도매윙에 등록된 상품이 아닙니다. 제품코드 : ' . $order['productCode']
+                            ];
                             $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
                             $cartId = $cart['data']['cartId'];
                             $cartCode = $this->getCartCode($cartId);
@@ -97,16 +96,16 @@ class OpenMarketOrderController extends Controller
                         }
                     }
                     DB::commit(); // 트랜잭션 커밋
-
                 } catch (\Exception $e) {
                     DB::rollBack(); // 트랜잭션 롤백
                     return [
                         'status' => false,
+                        'message' => $e->getMessage(),
                         'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString() // 디버깅을 위한 트레이스 추가
                     ];
                 }
             }
+            //$needSeedList에 돈 부족한 회원들 추가
         }
         return [
             'status' => true,
@@ -547,7 +546,6 @@ class OpenMarketOrderController extends Controller
     {
         return DB::table('minewing_products')
             ->where('productCode', $productCode)
-            ->where('isActive', 'Y')
             ->first();
     }
 
