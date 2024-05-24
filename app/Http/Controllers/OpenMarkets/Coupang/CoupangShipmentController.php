@@ -27,6 +27,7 @@ class CoupangShipmentController extends Controller
             $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
             $productOrder = $this->getProductOrder($order->id);
             $account = $this->getAccount($productOrder->account_id);
+            return $account;
         } catch (\Exception $e) {
             return [
                 'status' => false,
