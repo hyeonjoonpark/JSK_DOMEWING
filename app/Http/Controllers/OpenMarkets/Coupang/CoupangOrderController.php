@@ -26,7 +26,7 @@ class CoupangOrderController extends Controller
     }
     private function getOrderList($id, $start = null, $end = null)
     {
-        $accounts = $this->getAccount($id);
+        $accounts = $this->getAccounts($id);
         if (!$accounts) {
             return false;
         }
@@ -64,7 +64,7 @@ class CoupangOrderController extends Controller
                     if (isset($response['error'])) {
                         continue; // 오류가 있으면 다음 계정으로 넘어감
                     }
-                    $transformedResponse = $this->transformOrderDetails($response);
+                    $transformedResponse = $this->transformOrderDetails($response, $account);
                     if ($transformedResponse !== false) {
                         $allOrders = array_merge($allOrders, $transformedResponse);
                     }
@@ -73,7 +73,7 @@ class CoupangOrderController extends Controller
         }
         return $allOrders;
     }
-    private function transformOrderDetails($response)
+    private function transformOrderDetails($response, $account)
     {
         if (!isset($response['data']['data'])) {
             return false;
@@ -102,6 +102,7 @@ class CoupangOrderController extends Controller
                         'addressName' => '기본배송지',
                         'productCode' => $orderItem['externalVendorSkuCode'] ?? 'N/A',
                         'remark' => $item['parcelPrintMessage'] ?? 'N/A',
+                        'accountId' => $account->id
                     ];
                 }
             }
@@ -120,7 +121,7 @@ class CoupangOrderController extends Controller
         ];
         return $statusMap[$status] ?? '상태미정';
     }
-    private function getAccount($id)
+    private function getAccounts($id)
     {
         return DB::table('coupang_accounts')
             ->where('partner_id', $id)

@@ -92,7 +92,7 @@ class OpenMarketOrderController extends Controller
                             $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
                             $uploadedProduct = call_user_func([$this, $uploadedProductMethod], $product->id); // 해당 오픈마켓 업로드테이블에서 업로드된 상품인지 확인하고 id값 가져옴
                             $uploadedProductId = $uploadedProduct->id;
-                            $this->storePartnerOrder($orderId, $openMarket->id, $uploadedProductId, $priceThen, $product->shipping_fee, $order['orderId'], $order['productOrderId']); //partner_orders 테이블 insert
+                            $this->storePartnerOrder($orderId, $openMarket->id, $order['accountId'], $uploadedProductId, $priceThen, $product->shipping_fee, $order['orderId'], $order['productOrderId'], $order['accountId']); //partner_orders 테이블 insert
                         }
                     }
                     DB::commit(); // 트랜잭션 커밋
@@ -267,13 +267,15 @@ class OpenMarketOrderController extends Controller
         }
     }
 
-    private function storePartnerOrder($orderId, $vendorId, $uploadedProductId, $price, $shippingFee, $orderNumber, $productOrderNumber)
+
+    private function storePartnerOrder($orderId, $vendorId, $accountId, $uploadedProductId, $price, $shippingFee, $orderNumber, $productOrderNumber)
     {
         try {
             DB::table('partner_orders')
                 ->insertGetId([
                     'order_id' => $orderId,
                     'vendor_id' => $vendorId,
+                    'account_id' => $accountId,
                     'uploaded_product_id' => $uploadedProductId,
                     'price_then' => $price,
                     'shipping_fee_then' => $shippingFee,

@@ -93,9 +93,9 @@ class SmartStoreOrderController extends Controller
             'CANCELED_BY_NOPAYMENT' => '미결제취소',
             'PURCHASE_DECIDED' => '구매확정',
         ];
-        $formattedResponse = array_map(function ($item) use ($statusMap) {
+        $formattedResponse = array_map(function ($item) use ($statusMap, $account) {
             $shippingAddress = isset($item['productOrder']['shippingAddress']) ? $item['productOrder']['shippingAddress'] : null;
-
+            $accountId = $account->id;
             return [
                 'market' => $item['order']['market'] ?? '스마트스토어',
                 'marketEngName' => 'smart_store',
@@ -116,6 +116,7 @@ class SmartStoreOrderController extends Controller
                 'addressName' => '기본배송지',
                 'productCode' => $item['productOrder']['sellerProductCode'] ?? 'N/A',
                 'remark' => $item['productOrder']['shippingMemo'] ?? 'N/A',
+                'accountId' => $accountId
             ];
         }, $response['data']['data']);
         return $formattedResponse;
