@@ -206,13 +206,10 @@ class OpenMarketOrderController extends Controller
             DB::table('orders')
                 ->where('product_order_number', $productOrderNumber)
                 ->where('delivery_status', 'PENDING')
-                ->update(['type' => 'CANCELLED']);
-
-            // wing_transactions 테이블 업데이트
-            DB::table('wing_transactions')
-                ->where('id', $order->wing_transaction_id)
-                ->update(['remark' => $remark]);
-
+                ->update([
+                    'type' => 'CANCELLED',
+                    'remark' => $remark
+                ]);
             // 트랜잭션 커밋
             DB::commit();
 
