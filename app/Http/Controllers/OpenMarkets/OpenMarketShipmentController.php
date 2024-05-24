@@ -60,6 +60,7 @@ class OpenMarketShipmentController extends Controller
             if ($updateApiResult['status'] === false) {
                 return $updateApiResult;
             }
+            return $updateApiResult;
         }
         return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
     }
