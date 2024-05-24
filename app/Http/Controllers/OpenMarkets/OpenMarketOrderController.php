@@ -47,7 +47,7 @@ class OpenMarketOrderController extends Controller
                     if (!is_array($apiResult)) {
                         continue;
                     }
-                    if ($apiResult['productOrderStatus'] !== '결제완료') {
+                    if ($apiResult['productOrderStatus'] !== '결제완료' && $apiResult['productOrderStatus'] !== '상품준비중') {
                         continue; // 결제완료만 db에 저장하려고 검증
                     }
                     $orderId = $apiResult['orderId'];
