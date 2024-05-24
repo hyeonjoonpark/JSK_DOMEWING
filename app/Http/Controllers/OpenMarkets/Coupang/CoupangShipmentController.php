@@ -36,7 +36,8 @@ class CoupangShipmentController extends Controller
         try {
             $singleOrder = $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
             $setProduct = $this->setProductAsPreparing($account, $productOrder->product_order_number); //상품준비중처리
-            if ($setProduct['code'] != 200) {
+            return $setProduct;
+            if ((isset($setProduct['code']) && $setProduct['code'] != 200) || (isset($setProduct['responseCode']) && $setProduct['responseCode'] == 99)) {
                 return [
                     'status' => false,
                     'message' => '상품준비중으로 처리중 오류가 발생하였습니다.',
