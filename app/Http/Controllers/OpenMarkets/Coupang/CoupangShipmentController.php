@@ -25,8 +25,8 @@ class CoupangShipmentController extends Controller
             $deliveryCompany = $this->getDeliveryCompany($deliveryCompanyId);
             $order = $this->getOrder($productOrderNumber);
             $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
-            $account = $this->getAccount($partner->id);
             $productOrder = $this->getProductOrder($order->id);
+            $account = $this->getAccount($productOrder->account_id);
         } catch (\Exception $e) {
             return [
                 'status' => false,
@@ -35,7 +35,6 @@ class CoupangShipmentController extends Controller
         }
         try {
             $singleOrder = $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
-            return $account;
             $setProduct = $this->setProductAsPreparing($account, $productOrder->product_order_number); //상품준비중처리
             if (!$setProduct['data']['data']['responseList'][0]['shipmentBoxId']) {
                 return [
@@ -164,8 +163,6 @@ class CoupangShipmentController extends Controller
             ->select('p.*')
             ->first();
     }
-
-
     private function getProductOrder($orderId)
     {
         return DB::table('partner_orders as ps')
@@ -173,10 +170,10 @@ class CoupangShipmentController extends Controller
             ->first();
     }
 
-    private function getAccount($id)
+    private function getAccount($accountId)
     {
         return DB::table('coupang_accounts')
-            ->where('partner_id', $id)
+            ->where('partner_id', $accountId)
             ->where('is_active', 'ACTIVE')
             ->first();
     }
