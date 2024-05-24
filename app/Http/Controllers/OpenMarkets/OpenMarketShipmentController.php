@@ -57,10 +57,10 @@ class OpenMarketShipmentController extends Controller
         if ($openMarket) {
             $method = 'call' . ucfirst($openMarket->name_eng) . 'ShipmentApi';
             $updateApiResult = $this->$method($request);
+            return $updateApiResult;
             if ($updateApiResult['status'] === false) {
                 return $updateApiResult;
             }
-            return $updateApiResult;
         }
         return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
     }
