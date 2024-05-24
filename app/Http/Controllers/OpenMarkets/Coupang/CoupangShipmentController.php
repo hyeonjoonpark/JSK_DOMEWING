@@ -27,7 +27,6 @@ class CoupangShipmentController extends Controller
             $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
             $productOrder = $this->getProductOrder($order->id);
             $account = $this->getAccount($productOrder->account_id);
-            return $account;
         } catch (\Exception $e) {
             return [
                 'status' => false,
@@ -116,29 +115,6 @@ class CoupangShipmentController extends Controller
         ];
         return $this->ssac->builder($account->access_key, $account->secret_key, $method, $contentType, $path, $data);
     }
-    private function update($orderId, $deliveryCompanyId, $trackingNumber)
-    {
-        try {
-            DB::table('orders')
-                ->where('id', $orderId)
-                ->update([
-                    'tracking_number' => $trackingNumber,
-                    'delivery_company_id' => $deliveryCompanyId,
-                    'delivery_status' => 'COMPLETE',
-                ]);
-            return [
-                'status' => true,
-                'message' => '송장번호 입력에 성공하였습니다',
-                'data' => []
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'message' => $e->getMessage(),
-                'data' => []
-            ];
-        }
-    }
 
     private function getDeliveryCompany($deliveryCompanyId)
     {
@@ -174,7 +150,7 @@ class CoupangShipmentController extends Controller
     private function getAccount($accountId)
     {
         return DB::table('coupang_accounts')
-            ->where('partner_id', $accountId)
+            ->where('id', $accountId)
             ->where('is_active', 'ACTIVE')
             ->first();
     }
