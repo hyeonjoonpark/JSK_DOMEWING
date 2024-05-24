@@ -160,7 +160,7 @@
                         <select class="form-select js-select2" id="deliveryCompany` + order.productOrderNumber + `">
                             ` + deliveryCompanyHtml + `
                         </select>
-                        <input type="text" class="form-control" id="trackingNumber${order.productOrderNumber}" placeholder="송장번호">
+                        <input type="number" class="form-control" id="trackingNumber${order.productOrderNumber}" placeholder="송장번호">
                         <button class="btn btn-primary" onclick="initCreateDelivery('` + order.productOrderNumber + `');">확인</button>
                         <button class="btn btn-danger" onclick="cancelDelivery('${order.productOrderNumber}');">취소</button>
                     </div>
@@ -208,6 +208,7 @@
                     productOrderNumber,
                 },
                 success: function(response) {
+                    console.log(response);
                     if (response.status === false) {
                         Swal.fire({
                             icon: 'error',
