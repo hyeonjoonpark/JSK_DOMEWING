@@ -36,8 +36,8 @@ class CoupangShipmentController extends Controller
         try {
             $singleOrder = $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
             $setProduct = $this->setProductAsPreparing($account, $productOrder->product_order_number); //상품준비중처리
-            return $setProduct;
-            if ((isset($setProduct['code']) && $setProduct['code'] != 200) || (isset($setProduct['responseCode']) && $setProduct['responseCode'] == 99)) {
+
+            if ($setProduct['data']['code'] != 200) {
                 return [
                     'status' => false,
                     'message' => '상품준비중으로 처리중 오류가 발생하였습니다.',
@@ -45,9 +45,9 @@ class CoupangShipmentController extends Controller
                 ];
             }
             // setProduct를 하면 묶음배송번호가 변경됨으로 이거를 이용해서 송장번호 입력해야함
-            $shipmentBoxId = $setProduct['data']['responseList'][0]['shipmentBoxId']; //데이터가 하나밖에 없어서 첫번째 배열임
-            $orderId = $singleOrder['data']['orderId'];
-            $vendorItemId = $singleOrder['data']['orderItems'][0]['vendorItemId'];
+            $shipmentBoxId = $setProduct['data']['data']['responseList'][0]['shipmentBoxId']; //데이터가 하나밖에 없어서 첫번째 배열임
+            $orderId = $singleOrder['data']['data']['orderId'];
+            $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
             /*
                 ● false
                 해당 주문번호에 대해 처음으로 분리배송처리 할 경우
