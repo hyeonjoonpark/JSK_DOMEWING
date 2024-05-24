@@ -55,8 +55,7 @@ class CoupangShipmentController extends Controller
             */
             //singleOrderd의 orderId와 setProductd의 shipmentBoxId를 사용해서 postApi사용
             $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId);
-            return $responseApi;
-            if (!$responseApi['data']['data']['responseList']['succeed']) {
+            if (!$responseApi['status']) {
                 return [
                     'status' => false,
                     'message' => '쿠팡 송장번호 입력 중 오류가 발생하였습니다.',
