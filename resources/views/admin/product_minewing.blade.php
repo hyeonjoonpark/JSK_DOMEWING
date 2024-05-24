@@ -159,8 +159,17 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="" class="form-label">B2B 업체 리스트</label>
-                                <div class="row">
-                                    <div class="col-6 mb-3">
+                                <div class="row g-gs">
+                                    <div class="col-12">
+                                        <div class="custom-control custom-checkbox">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" id="checkAllB2b" name="checkAllB2b"
+                                                    class="custom-control-input" checked>
+                                                <label class="custom-control-label" for="checkAllB2b">전체 선택/해제</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
                                         <div class="custom-control custom-checkbox">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" id="sellwing" name="sellwing" value="0"
@@ -170,7 +179,7 @@
                                         </div>
                                     </div>
                                     @foreach ($b2bs as $b2b)
-                                        <div class="col-6 mb-3">
+                                        <div class="col-6">
                                             <div class="custom-control custom-checkbox">
                                                 <div class="custom-control custom-checkbox">
                                                     <input type="checkbox" id="b2b{{ $b2b->vendor_id }}" name="b2bs"
@@ -203,6 +212,11 @@
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
+        });
+        $(document).on('click', '#checkAllB2b', function() {
+            const isChecked = $(this).is(':checked');
+            $('input[name="b2bs"]').prop('checked', isChecked);
+            $('input[name="sellwing"]').prop('checked', isChecked);
         });
 
         function getProductCodes() {
