@@ -27,8 +27,8 @@ class SmartStoreShipmentController extends Controller
 
             $order = $this->getOrder($productOrderNumber);
             $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
-            $account = $this->getAccount($partner->id);
             $productOrder = $this->getProductOrder($order->id);
+            $account = $this->getAccount($productOrder->account_id);
         } catch (\Exception $e) {
             return [
                 'status' => false,
@@ -36,7 +36,7 @@ class SmartStoreShipmentController extends Controller
             ];
         }
         $responseApi = $this->postApi($account, $productOrder->product_order_number, $deliveryCompany->smart_store, $trackingNumber);
-        if (!$responseApi['data']['successProductOrderIds']) {
+        if (!$responseApi['status']) {
             return [
                 'status' => false,
                 'message' => $responseApi['message'],
@@ -99,10 +99,11 @@ class SmartStoreShipmentController extends Controller
             ->first();
     }
 
-    private function getAccount($id)
+    private function getAccount($accountId)
     {
         return DB::table('smart_store_accounts')
-            ->where('partner_id', $id)
+            ->where('id', $accountId)
+            ->where('is_active', 'ACTIVE')
             ->first();
     }
 
