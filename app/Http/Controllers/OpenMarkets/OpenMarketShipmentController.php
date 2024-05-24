@@ -17,7 +17,7 @@ class OpenMarketShipmentController extends Controller
         // 그러므로 데이터 유효성 검사도 3개 모두 진행해야 한다.
         // exsits 를 활용함으로써, DB 의 해당 테이블, 해당 컬럼에 실제로 값이 존재하는지 검출한다.
         $validator = Validator::make($request->all(), [
-            'trackingNumber' => 'required|string|min:10|max:13',
+            'trackingNumber' => 'required|string|min:10|max:13|unique:shipments,tracking_number',
             'deliveryCompanyId' => 'required|integer|exists:delivery_companies,id',
             'productOrderNumber' => 'required|string|exists:orders,product_order_number'
         ], [ // 각 인자 값들의 유효성 검사들에 대한 에러 메시지 값들을 매겨줘야 한다.
