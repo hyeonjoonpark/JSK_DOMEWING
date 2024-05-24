@@ -36,7 +36,7 @@ class SmartStoreShipmentController extends Controller
             ];
         }
         $responseApi = $this->postApi($account, $productOrder->product_order_number, $deliveryCompany->smart_store, $trackingNumber);
-        if ($responseApi['response'] == false) {
+        if (!$responseApi['data']['successProductOrderIds']) {
             return [
                 'status' => false,
                 'message' => $responseApi['message'],
