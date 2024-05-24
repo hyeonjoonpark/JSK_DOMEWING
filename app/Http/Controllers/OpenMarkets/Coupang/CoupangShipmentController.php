@@ -54,9 +54,8 @@ class CoupangShipmentController extends Controller
                 해당 주문번호에 이미 분리배송을 진행한 상품이 있을 경우
             */
             //singleOrderd의 orderId와 setProductd의 shipmentBoxId를 사용해서 postApi사용
-            return $shipmentBoxId;
             $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId);
-            if (!$responseApi['data']['responseList']['succeed']) {
+            if (!$responseApi['data']['data']['responseList']['succeed']) {
                 return [
                     'status' => false,
                     'message' => '쿠팡 송장번호 입력 중 오류가 발생하였습니다.',
