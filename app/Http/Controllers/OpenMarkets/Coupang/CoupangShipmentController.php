@@ -55,7 +55,6 @@ class CoupangShipmentController extends Controller
             */
             //singleOrderd의 orderId와 setProductd의 shipmentBoxId를 사용해서 postApi사용
             $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId);
-            return $responseApi;
             if (!$responseApi['data']['data']['responseList']['succeed']) {
                 return [
                     'status' => false,
@@ -63,7 +62,11 @@ class CoupangShipmentController extends Controller
                     'data' => $responseApi,
                 ];
             }
-            return $responseApi;
+            return [
+                'status' => true,
+                'message' => '송장번호 입력에 성공하였습니다',
+                'data' => $responseApi
+            ];
         } catch (\Exception $e) {
             return [
                 'status' => false,
