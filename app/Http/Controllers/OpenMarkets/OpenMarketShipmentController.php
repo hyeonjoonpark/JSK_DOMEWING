@@ -61,6 +61,7 @@ class OpenMarketShipmentController extends Controller
                 return $updateApiResult;
             }
         }
+        return;
         return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
     }
     private function update($orderId, $deliveryCompanyId, $trackingNumber)
