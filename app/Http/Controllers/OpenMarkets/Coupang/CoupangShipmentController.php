@@ -35,6 +35,7 @@ class CoupangShipmentController extends Controller
         }
         try {
             $singleOrder = $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
+            return $account;
             $setProduct = $this->setProductAsPreparing($account, $productOrder->product_order_number); //상품준비중처리
             if (!$setProduct['data']['data']['responseList'][0]['shipmentBoxId']) {
                 return [
