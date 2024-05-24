@@ -208,6 +208,7 @@
                     productOrderNumber,
                 },
                 success: function(response) {
+                    console.log(response);
                     if (response.status === false) {
                         Swal.fire({
                             icon: 'error',

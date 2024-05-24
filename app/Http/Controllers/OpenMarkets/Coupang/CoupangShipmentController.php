@@ -4,6 +4,8 @@ namespace App\Http\Controllers\OpenMarkets\Coupang;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -32,11 +34,9 @@ class CoupangShipmentController extends Controller
             ];
         }
         try {
-            return $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
             $singleOrder = $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
-
             $setProduct = $this->setProductAsPreparing($account, $productOrder->product_order_number); //상품준비중처리
-            if (!$setProduct['data']['responseList'][0]['resultCode']) {
+            if ($setProduct['data']['code'] != 200) {
                 return [
                     'status' => false,
                     'message' => '상품준비중으로 처리중 오류가 발생하였습니다.',
@@ -44,20 +44,23 @@ class CoupangShipmentController extends Controller
                 ];
             }
             // setProduct를 하면 묶음배송번호가 변경됨으로 이거를 이용해서 송장번호 입력해야함
-            $shipmentBoxId = $setProduct['data']['responseList'][0]['shipmentBoxId']; //분리배송임으로 0, 데이터가 하나밖에 없어서
-            $orderId = $singleOrder['data']['orderId'];
-            $vendorItemId = $singleOrder['data']['orderItems']['vendorItemId'];
-            $preSplitShipped = DB::table('orders')
-                ->where('orderId', $orderId)
-                ->where('delivery_status', 'COMPLETE')
-                ->exists();
+            $shipmentBoxId = $setProduct['data']['data']['responseList'][0]['shipmentBoxId']; //데이터가 하나밖에 없어서 첫번째 배열임
+            $orderId = $singleOrder['data']['data']['orderId'];
+            $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
+            /*
+                ● false
+                해당 주문번호에 대해 처음으로 분리배송처리 할 경우
+                ● true
+                해당 주문번호에 이미 분리배송을 진행한 상품이 있을 경우
+            */
             //singleOrderd의 orderId와 setProductd의 shipmentBoxId를 사용해서 postApi사용
-
-            $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId, $preSplitShipped);
-            if ($responseApi['response'] == false) {
+            $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId);
+            return $responseApi;
+            if (!$responseApi['data']['data']['responseList']['succeed']) {
                 return [
                     'status' => false,
-                    'message' => $responseApi['message'],
+                    'message' => '쿠팡 송장번호 입력 중 오류가 발생하였습니다.',
+                    'data' => $responseApi,
                 ];
             }
             return $responseApi;
@@ -70,9 +73,9 @@ class CoupangShipmentController extends Controller
     }
     private function getSingleOrder($account, $productOrderNumber) //발주서 단건 조회
     {
-        $method = 'GET';
+        $contentType = 'application/json;charset=UTF-8';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets' . '/' .  $productOrderNumber;
-        return $this->ssac->build($method, $path, $account->access_key, $account->secret_key, $params = "");
+        return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
     }
     private function setProductAsPreparing($account, $productOrderNumber) //상품준비중처리
     {
@@ -81,28 +84,32 @@ class CoupangShipmentController extends Controller
         $contentType = 'application/json;charset=UTF-8';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets/acknowledgement';
         $data = [
+            'vendorId' => $account->code,
             'shipmentBoxIds' => [$productOrderNumber] //배열처리
         ];
         return $this->ssac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
     }
-    private function postApi($account, $shipmentBoxId, $orderId, $deliveryCompanyCode, $invoiceNumber, $vendorItemId, $preSplitShipped)
+    private function postApi($account, $shipmentBoxId, $orderId, $deliveryCompanyCode, $invoiceNumber, $vendorItemId)
     {
         $method = 'POST';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/orders/invoices';
-        $params = [
+        $contentType = 'application/json;charset=UTF-8';
+        $data = [
             'vendorId' => $account->code,
             'orderSheetInvoiceApplyDtos' => [
-                'shipmentBoxId' => $shipmentBoxId,
-                'orderId' => $orderId,
-                'deliveryCompanyCode' => $deliveryCompanyCode, //택배사
-                'invoiceNumber' => $invoiceNumber, //송장번호
-                'vendorItemId' => $vendorItemId, //data - orderItems - vendorItemId
-                'splitShipping' => true,
-                'preSplitShipped' => $preSplitShipped, //처음 orderId의 처음 분리배송이면 false, 나머지는 true
-                'estimatedShippingDate' => ''
+                [
+                    'shipmentBoxId' => $shipmentBoxId,
+                    'orderId' => $orderId,
+                    'deliveryCompanyCode' => $deliveryCompanyCode, //택배사
+                    'invoiceNumber' => $invoiceNumber, //송장번호
+                    'vendorItemId' => $vendorItemId, //data - orderItems - vendorItemId
+                    'splitShipping' => false,
+                    'preSplitShipped' => false, //처음 orderId의 처음 분리배송이면 false, 나머지는 true
+                    'estimatedShippingDate' => $this->getDispatchDate()
+                ]
             ]
         ];
-        return $this->ssac->build($method, $path, $account->accessKey, $account->secretKey, $params);
+        return $this->ssac->builder($account->access_key, $account->secret_key, $method, $contentType, $path, $data);
     }
     private function update($orderId, $deliveryCompanyId, $trackingNumber)
     {
@@ -165,6 +172,13 @@ class CoupangShipmentController extends Controller
     {
         return DB::table('coupang_accounts')
             ->where('partner_id', $id)
+            ->where('is_active', 'ACTIVE')
             ->first();
+    }
+    private function getDispatchDate()
+    {
+        $dateTime = new DateTime('now', new DateTimeZone('Asia/Seoul'));
+        $dateTime->modify('+3 days'); // 현재 날짜로부터 3일 뒤로 설정
+        return $dateTime->format('Y-m-d\TH:i:s.vP');
     }
 }
