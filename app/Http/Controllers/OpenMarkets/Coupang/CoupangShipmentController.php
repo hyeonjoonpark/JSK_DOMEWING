@@ -43,7 +43,6 @@ class CoupangShipmentController extends Controller
                     'data' => $setProduct
                 ];
             }
-            return $singleOrder;
             // setProduct를 하면 묶음배송번호가 변경됨으로 이거를 이용해서 송장번호 입력해야함
             $shipmentBoxId = $setProduct['data']['data']['responseList'][0]['shipmentBoxId']; //데이터가 하나밖에 없어서 첫번째 배열임
             $orderId = $singleOrder['data']['data']['orderId'];
