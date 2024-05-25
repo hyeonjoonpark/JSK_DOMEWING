@@ -66,7 +66,7 @@ class CoupangOrderController extends Controller
                     }
                     $shipmentBoxIds = $this->collectShipmentBoxIds($response);
                     $setProduct = $this->setProductAsPreparing($account, $shipmentBoxIds); //상품준비중처리
-                    if (!$setProduct['data']['data']['responseList'][0]['shipmentBoxId']) {
+                    if (!$setProduct['status']) {
                         return [
                             'status' => false,
                             'message' => '상품준비중으로 처리중 오류가 발생하였습니다.',
