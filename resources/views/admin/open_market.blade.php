@@ -129,7 +129,7 @@
             for (const deliveryCompany of order.deliveryCompanies) {
                 deliveryCompanyHtml += `<option value="${deliveryCompany.id}">${deliveryCompany.name}</option>`;
             }
-            let partnerStatusHtml = order.isPartner ? '<b><p>파트너 계정입니다.</p></b>' : '<b><p>일반 회원입니다.</p></b>';
+            let partnerStatusHtml = order.isPartner ? '<b><p>셀윙 발주</p></b>' : '<b><p>도매윙 발주</p></b>';
             let orderVendorHtml = order.vendorName ? `<b><p>${order.vendorName}</p></b>` : '<b><p>도매윙</p></b>';
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
 
@@ -148,7 +148,7 @@
                 <td class="text-nowrap">
                     <div class="row g-gs mb-3">
                         <div class="col-12">
-                            <p><b>닉네임:</b><br>${order.senderNickName}<br><b>이름:</b><br>${order.senderName}<br><b>연락처:</b><br>${order.senderPhone}<br><b>이메일:</b><br>${order.senderEmail}<br></p>
+                            <p><b>이름:</b><br>${order.senderName}<br><b>연락처:</b><br>${order.senderPhone}<br><b>이메일:</b><br>${order.senderEmail}<br></p>
                             ${partnerStatusHtml}
                         </div>
                     </div>
