@@ -33,8 +33,10 @@ class SmartStoreOrderController extends Controller
             if (isset($orderDetails['error'])) {
                 continue; // 오류가 있으면 다음 계정으로 넘어감
             }
+            $response = $this->confirm($account, $orderIds);
             $allOrderDetails = array_merge($allOrderDetails, $orderDetails);
         }
+
         return  $allOrderDetails;
     }
     private function getOrderList($account, $start = null, $end = null)
@@ -52,6 +54,14 @@ class SmartStoreOrderController extends Controller
             $responses[$formattedDate] = $response;
         }
         return $responses;
+    }
+    private function confirm($account, $productOrderIds)
+    {
+        $contentType = 'application/json';
+        $method = 'POST';
+        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/confirm';
+        $data = ['productOrderIds' => $productOrderIds];
+        return $this->ssac->builder($account, $contentType, $method, $url, $data);
     }
     private function convertDateFormat($inputDate)
     {

@@ -64,6 +64,15 @@ class CoupangOrderController extends Controller
                     if (isset($response['error'])) {
                         continue; // 오류가 있으면 다음 계정으로 넘어감
                     }
+                    $shipmentBoxIds = $this->collectShipmentBoxIds($response);
+                    $setProduct = $this->setProductAsPreparing($account, $shipmentBoxIds); //상품준비중처리
+                    if (!$setProduct['data']['data']['responseList'][0]['shipmentBoxId']) {
+                        return [
+                            'status' => false,
+                            'message' => '상품준비중으로 처리중 오류가 발생하였습니다.',
+                            'data' => $setProduct
+                        ];
+                    }
                     $transformedResponse = $this->transformOrderDetails($response, $account);
                     if ($transformedResponse !== false) {
                         $allOrders = array_merge($allOrders, $transformedResponse);
@@ -108,6 +117,33 @@ class CoupangOrderController extends Controller
             }
         }
         return $orderDetails;
+    }
+    private function setProductAsPreparing($account, $productOrderNumber) //상품준비중처리
+    {
+        $accessKey = $account->access_key;
+        $secretKey = $account->secret_key;
+        $contentType = 'application/json;charset=UTF-8';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets/acknowledgement';
+        $data = [
+            'vendorId' => $account->code,
+            'shipmentBoxIds' => $productOrderNumber
+        ];
+        return $this->ssac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
+    }
+    private function collectShipmentBoxIds($response)
+    {
+        if (!isset($response['data']['data'])) {
+            return [];
+        }
+        $shipmentBoxIds = [];
+        if (!empty($response['data']['data'])) {
+            foreach ($response['data']['data'] as $item) {
+                if (isset($item['shipmentBoxId'])) {
+                    $shipmentBoxIds[] = $item['shipmentBoxId'];
+                }
+            }
+        }
+        return $shipmentBoxIds;
     }
     private function mapStatusToReadable($status)
     {

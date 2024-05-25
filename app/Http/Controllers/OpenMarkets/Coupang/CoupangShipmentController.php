@@ -35,16 +35,9 @@ class CoupangShipmentController extends Controller
         }
         try {
             $singleOrder = $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
-            $setProduct = $this->setProductAsPreparing($account, $productOrder->product_order_number); //상품준비중처리
-            if (!$setProduct['data']['data']['responseList'][0]['shipmentBoxId']) {
-                return [
-                    'status' => false,
-                    'message' => '상품준비중으로 처리중 오류가 발생하였습니다.',
-                    'data' => $setProduct
-                ];
-            }
+
             // setProduct를 하면 묶음배송번호가 변경됨으로 이거를 이용해서 송장번호 입력해야함
-            $shipmentBoxId = $setProduct['data']['data']['responseList'][0]['shipmentBoxId']; //데이터가 하나밖에 없어서 첫번째 배열임
+            $shipmentBoxId = [$productOrder->product_order_number];
             $orderId = $singleOrder['data']['data']['orderId'];
             $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
             /*
@@ -80,18 +73,7 @@ class CoupangShipmentController extends Controller
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets' . '/' .  $productOrderNumber;
         return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
     }
-    private function setProductAsPreparing($account, $productOrderNumber) //상품준비중처리
-    {
-        $accessKey = $account->access_key;
-        $secretKey = $account->secret_key;
-        $contentType = 'application/json;charset=UTF-8';
-        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets/acknowledgement';
-        $data = [
-            'vendorId' => $account->code,
-            'shipmentBoxIds' => [$productOrderNumber] //배열처리
-        ];
-        return $this->ssac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
-    }
+
     private function postApi($account, $shipmentBoxId, $orderId, $deliveryCompanyCode, $invoiceNumber, $vendorItemId)
     {
         $method = 'POST';
