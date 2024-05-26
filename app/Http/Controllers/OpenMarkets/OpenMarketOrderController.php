@@ -32,7 +32,6 @@ class OpenMarketOrderController extends Controller
             $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
             $memberId = $partnerDomewingAccount->domewing_account_id;
             foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
-                // if ($openMarket->name_eng == 'smart_store') continue;
                 $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
                 $isExistAccount = 'isExist'  . ucfirst($openMarketEngName) . 'Account';
                 $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
@@ -79,8 +78,8 @@ class OpenMarketOrderController extends Controller
                             ];
                             //1개의 주문에 대한 검증
                             $exist = DB::table('partner_orders')
-                                ->whereIn('order_number', $order['orderId'])
-                                ->whereIn('product_order_number', $order['productOrderId'])
+                                ->where('order_number', $order['orderId'])
+                                ->where('product_order_number', $order['productOrderId'])
                                 ->exists();
                             if ($exist) {
                                 continue; // 저장 로직 건너뛰기
@@ -96,8 +95,8 @@ class OpenMarketOrderController extends Controller
                         foreach ($orders as $index => $order) {
                             //1개의 주문에 대한 검증
                             $exist = DB::table('partner_orders')
-                                ->whereIn('order_number', $order['orderId'])
-                                ->whereIn('product_order_number', $order['productOrderId'])
+                                ->where('order_number', $order['orderId'])
+                                ->where('product_order_number', $order['productOrderId'])
                                 ->exists();
                             if ($exist) {
                                 continue; // 저장 로직 건너뛰기
