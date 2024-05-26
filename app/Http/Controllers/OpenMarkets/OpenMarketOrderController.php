@@ -94,6 +94,14 @@ class OpenMarketOrderController extends Controller
                         $wingTransaction =  $this->storeWingTransaction($memberId, 'PAYMENT', $totalPrice, $remark = ''); //윙 트랜잭션 테이블 insert
                         $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
                         foreach ($orders as $index => $order) {
+                            //1개의 주문에 대한 검증
+                            $exist = DB::table('partner_orders')
+                                ->whereIn('order_number', $order['orderId'])
+                                ->whereIn('product_order_number', $order['productOrderId'])
+                                ->exists();
+                            if ($exist) {
+                                continue; // 저장 로직 건너뛰기
+                            }
                             $product = $this->getProduct($order['productCode']);
                             $priceThen = $this->getSalePrice($product->id);
                             $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity);
