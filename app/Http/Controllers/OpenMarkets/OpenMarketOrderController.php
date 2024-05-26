@@ -59,7 +59,7 @@ class OpenMarketOrderController extends Controller
                 try {
                     DB::beginTransaction(); // 트랜잭션 시작
                     foreach ($groupedResults as $orderId => $orders) { //orderId기준 반복문 진행
-                        // partner_orders 테이블에서 중복 여부 확인
+                        // partner_orders 테이블에서 orders값 전체 중복 여부 확인
                         $orderNumbers = array_column($orders, 'orderId');
                         $productOrderNumbers = array_column($orders, 'productOrderId');
                         $exists = DB::table('partner_orders')
@@ -77,6 +77,14 @@ class OpenMarketOrderController extends Controller
                                 'status' => false,
                                 'message' => '도매윙에 등록된 상품이 아닙니다. 제품코드 : ' . $order['productCode']
                             ];
+                            //1개의 주문에 대한 검증
+                            $exist = DB::table('partner_orders')
+                                ->whereIn('order_number', $order['orderId'])
+                                ->whereIn('product_order_number', $order['productOrderId'])
+                                ->exists();
+                            if ($exist) {
+                                continue; // 저장 로직 건너뛰기
+                            }
                             $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
                             $cartId = $cart['data']['cartId'];
                             $cartCode = $this->getCartCode($cartId);
