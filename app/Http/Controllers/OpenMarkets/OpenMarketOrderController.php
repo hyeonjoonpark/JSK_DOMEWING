@@ -25,22 +25,12 @@ class OpenMarketOrderController extends Controller
             $memberId = $partnerDomewingAccount->domewing_account_id;
             foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
                 $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
-                if ($openMarketEngName == 'smart_store') continue;
                 $isExistAccount = 'isExist'  . ucfirst($openMarketEngName) . 'Account';
                 $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
                 if (!$isExistOpenMarketAccount) continue;
                 $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi'; //오픈마켓별 주문내역조회 api 쏠려고 영어이름을 메소드명으로 지정
                 $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';  // 오픈마켓별 업로드된 상품인지 조회하려고 메소드명 지정
                 $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null); //api 결과 저장
-                foreach ($apiResults as $apiResult) {
-                    DB::table('orders as o')
-                        ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
-                        ->where('po.order_number', $apiResult['orderId'])
-                        ->where('po.product_order_number', $apiResult['productOrderId'])
-                        ->where('po.vendor_id', 40)
-                        ->update(['o.receiver_address' => $apiResult['address']]);
-                }
-                continue;
                 if ($apiResults === false) continue; //api의 결과값이 비어있으면 continue 곧 아무런 결과값이 없는거지
                 // orderId를 기준으로 그룹화
                 $groupedResults = []; // wing_transaction에 주문의 총합으로 넣으려고 그룹화
