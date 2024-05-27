@@ -33,7 +33,7 @@ class CoupangCancelController extends Controller
     public function cancelOrder($account, $vendorItemId, $quantity, $orderId)
     {
         $method = 'POST';
-        $path = '/v2/providers/openapi/apis/api/v5/vendors/' . $account->code . '/orders/{orderId}/cancel';
+        $path = '/v2/providers/openapi/apis/api/v5/vendors/' . $account->code . '/orders/' . $orderId . '/cancel';
         $contentType = 'application/json;charset=UTF-8';
         $data = [
             'orderId' => $orderId,
