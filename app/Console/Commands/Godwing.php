@@ -8,14 +8,14 @@ use Illuminate\Console\Command;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class PartnerTableWithVendor extends Command
+class Godwing extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:partner-table-with-vendor';
+    protected $signature = 'app:godwing';
 
     /**
      * The console command description.
@@ -32,7 +32,7 @@ class PartnerTableWithVendor extends Command
         set_time_limit(0);
         ini_set('memory_allow', '-1');
         $partnerId = 3;
-        $vendorIds = [37, 21];
+        $vendorIds = [30, 41, 14, 19, 20, 23, 26, 28, 47, 48, 49];
         $ptc = new PartnerTableController();
         $mc = new ManageController();
         $apiToken = DB::table('partners')
