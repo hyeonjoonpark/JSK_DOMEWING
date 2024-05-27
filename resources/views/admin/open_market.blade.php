@@ -220,6 +220,7 @@
                         },
                         success: function(response) {
                             if (response.status === false) {
+                                console.log('fail:', response);
                                 Swal.fire({
                                     icon: 'error',
                                     text: response.message,
