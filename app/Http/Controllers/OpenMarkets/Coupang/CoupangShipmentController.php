@@ -37,7 +37,7 @@ class CoupangShipmentController extends Controller
             $singleOrder = $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
 
             // setProduct를 하면 묶음배송번호가 변경됨으로 이거를 이용해서 송장번호 입력해야함
-            $shipmentBoxId = [$productOrder->product_order_number];
+            $shipmentBoxId = $productOrder->product_order_number;
             $orderId = $singleOrder['data']['data']['orderId'];
             $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
             /*
