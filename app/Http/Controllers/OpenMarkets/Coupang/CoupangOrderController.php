@@ -49,7 +49,6 @@ class CoupangOrderController extends Controller
                     $currentStart = $dt;
                     $currentEnd = clone $currentStart;
                     $currentEnd->add($interval)->sub(new DateInterval('P1D'));
-
                     if ($currentEnd > $endDate) {
                         $currentEnd = $endDate;
                     }
@@ -107,7 +106,7 @@ class CoupangOrderController extends Controller
                         'receiverName' => $item['receiver']['name'],
                         'receiverPhone' => $item['receiver']['safeNumber'],
                         'postCode' => $item['receiver']['postCode'],
-                        'address' => $item['receiver']['addr1'],
+                        'address' => $item['receiver']['addr1'] . ' ' . $item['receiver']['addr2'],
                         'addressName' => '기본배송지',
                         'productCode' => $orderItem['externalVendorSkuCode'] ?? 'N/A',
                         'remark' => $item['parcelPrintMessage'] ?? 'N/A',

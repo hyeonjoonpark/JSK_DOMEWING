@@ -17,17 +17,9 @@ class OpenMarketOrderController extends Controller
 {
     public function index()
     {
-        $orders = $this->getPaidOrders();
-        $processedOrders = $orders->map(function ($order) {
-            return $this->processOrder($order);
-        });
-        return response()->json($processedOrders);
-    }
-    public function getAllOrder()
-    {
         $allPartners = $this->getAllPartners(); //모든 파트너 조회
         $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
-        $needSeedList = [];
+        $needSeedList = []; // 보유머니 부족한 사람들 리스트 보여주기
         foreach ($allPartners as $partner) { //모든 파트너 반복문
             $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
             $memberId = $partnerDomewingAccount->domewing_account_id;
@@ -47,7 +39,7 @@ class OpenMarketOrderController extends Controller
                         continue;
                     }
                     if ($apiResult['productOrderStatus'] !== '결제완료' && $apiResult['productOrderStatus'] !== '상품준비중') {
-                        continue; // 결제완료만 db에 저장하려고 검증
+                        continue; // 결제완료, 상품준비중 db에 저장하려고 검증
                     }
                     $orderId = $apiResult['orderId'];
                     if (!isset($groupedResults[$orderId])) {
@@ -120,13 +112,12 @@ class OpenMarketOrderController extends Controller
                     ];
                 }
             }
-            //$needSeedList에 돈 부족한 회원들 추가
         }
-        return [
-            'status' => true,
-            'message' => '신규주문을 성공적으로 저장하였습니다.',
-            'data' => []
-        ];
+        $orders = $this->getPaidOrders();
+        $processedOrders = $orders->map(function ($order) {
+            return $this->processOrder($order);
+        });
+        return response()->json($processedOrders);
     }
     public function indexPartner(Request $request)
     {
