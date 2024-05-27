@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
+use App\Http\Controllers\TrackSoldOutController;
 use Illuminate\Console\Command;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class Test extends Command
@@ -27,17 +29,13 @@ class Test extends Command
      */
     public function handle()
     {
-        $metaldiyProductCodes = DB::table('minewing_products')
-            ->where('sellerID', 2)
-            ->pluck('productCode')
-            ->toArray();
-        $chunkedCodes = array_chunk($metaldiyProductCodes, 500, false);
-        foreach ($chunkedCodes as $index => $codes) {
-            $codes = join(',', $codes);
-            $i = $index + 1;
-            $tempFilePath = public_path('assets/txt/metaldiy_product_codes_' . $i . '.txt');
-            file_put_contents($tempFilePath, $codes);
-        }
-        echo "success";
+        $tsoc = new TrackSoldOutController();
+        $request = new Request([
+            'vendorId' => 39
+        ]);
+        $soldOutProducts = $tsoc->main($request);
+        $sopFile = public_path('js/track-sold-out/result.json');
+        file_put_contents($sopFile, json_encode($soldOutProducts['data']['soldOutProducts'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        $this->info('success');
     }
 }
