@@ -34,14 +34,21 @@ async function signIn(page, username, password) {
     }, username, password);
     await page.waitForNavigation({ waitUntil: 'load' });
 }
+
 async function isValidProduct(page, productHref) {
     try {
         await page.goto(productHref, { waitUntil: 'domcontentloaded' });
         return await page.evaluate(() => {
             // 품절인 상품이면 false를 return 할 것.
+            const soldOutImage = document.querySelector('img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
+            const errorImage = document.querySelector('img[src="//img.echosting.cafe24.com/ec/image_admin/img_404.png"]');
+            if (soldOutImage || errorImage) {
+                return false;
+            }
             return true;
         });
     } catch (error) {
         return false;
     }
 }
+
