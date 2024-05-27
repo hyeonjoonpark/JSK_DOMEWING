@@ -26,7 +26,6 @@
                     <h6 class="title">신규 주문</h6>
                     <p>상품 정보를 클릭하면 해당 상품의 상세 페이지로 이동합니다.</p>
                     <button class="btn btn-primary mb-5" onclick="initIndex();">조회하기</button>
-                    <button class="btn btn-primary mb-5" onclick="initOrderwing();">신규주문 저장하기</button>
                     <p>총 <span id="numOrders">0</span>개의 주문이 접수되었습니다.</p>
                     <div class="form-group">
                         <label class="form-label">금일 총 매출액</label>
@@ -75,39 +74,6 @@
                 error: function(response) {
                     closePopup();
                     console.log(response);
-                }
-            });
-        }
-
-        function initOrderwing() {
-            popupLoader(0, '"신규 주문 내역을 오픈마켓으로부터 저장하겠습니다."');
-            $.ajax({
-                url: '/api/get-new-all-orders',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    rememberToken
-                },
-                success: function(response) {
-                    if (response.status === false) {
-                        console.log(response);
-                        closePopup();
-                        Swal.fire({
-                            icon: 'error',
-                            text: response.message,
-                        });
-                    } else {
-                        console.log(response);
-                        closePopup();
-                        Swal.fire({
-                            icon: 'success',
-                            text: response.message
-                        });
-                    }
-                },
-                error: function(response) {
-                    console.error(response);
-                    closePopup();
                 }
             });
         }
