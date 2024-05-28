@@ -25,8 +25,8 @@ class CoupangShipmentController extends Controller
             $deliveryCompany = $this->getDeliveryCompany($deliveryCompanyId);
             $order = $this->getOrder($productOrderNumber);
             $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
-            $productOrder = $this->getProductOrder($order->id);
-            $account = $this->getAccount($productOrder->account_id);
+            $partnerOrder = $this->getPartnerOrder($order->id);
+            $account = $this->getAccount($partnerOrder->account_id);
         } catch (\Exception $e) {
             return [
                 'status' => false,
@@ -34,10 +34,10 @@ class CoupangShipmentController extends Controller
             ];
         }
         try {
-            $singleOrder = $this->getSingleOrder($account, $productOrder->product_order_number); //발주서 단건 조회
+            $singleOrder = $this->getSingleOrder($account, $partnerOrder->product_order_number); //발주서 단건 조회
 
             // setProduct를 하면 묶음배송번호가 변경됨으로 이거를 이용해서 송장번호 입력해야함
-            $shipmentBoxId = $productOrder->product_order_number;
+            $shipmentBoxId = $partnerOrder->product_order_number;
             $orderId = $singleOrder['data']['data']['orderId'];
             $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
             /*
@@ -121,7 +121,7 @@ class CoupangShipmentController extends Controller
             ->select('p.*')
             ->first();
     }
-    private function getProductOrder($orderId)
+    private function getPartnerOrder($orderId)
     {
         return DB::table('partner_orders as ps')
             ->where('ps.order_id', $orderId)

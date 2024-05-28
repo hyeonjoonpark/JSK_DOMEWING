@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangCancelController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
+use App\Http\Controllers\SmartStore\SmartStoreCancelController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\WingController;
 use Illuminate\Http\Request;
@@ -60,6 +62,7 @@ class OpenMarketOrderController extends Controller
                         if ($exists) {
                             continue; // 저장 로직 건너뛰기
                         }
+                        return $orders;
                         $totalPrice = 0;
                         $cartIds = [];
                         foreach ($orders as $order) {
@@ -178,7 +181,7 @@ class OpenMarketOrderController extends Controller
             'data' => $results
         ];
     }
-    public function cancleOrder(Request $request)
+    public function cancelOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'remark' => 'required',
@@ -193,9 +196,8 @@ class OpenMarketOrderController extends Controller
                 'error' => $validator->errors(),
             ];
         }
-        $productOrderNumber = $request->input('productOrderNumber');
-        $remark = $request->input('remark');
-        $order = DB::table('orders as o')
+        $productOrderNumber = $request->productOrderNumber;
+        $order = DB::table('orders as o') //주문내역가지고 작업하기전에 유효한지 확인하고 없으면 return
             ->where('product_order_number', $productOrderNumber)
             ->where('delivery_status', 'PENDING')
             ->where('type', 'PAID')
@@ -204,8 +206,22 @@ class OpenMarketOrderController extends Controller
             'status' => false,
             'message' => '이미 취소되었거나 유효한 주문이 아닙니다.',
         ];
-        DB::beginTransaction();
+        $remark = $request->remark; //취소 요청 reason
+        $partnerOrder = DB::table('partner_orders as po') //해당 주문의 partner_order 테이블 조회
+            ->where('order_id', $order->id)
+            ->first();
+        $vendor = DB::table('vendors as v') //해당 주문의 오픈마켓이 어디인지 조회
+            ->where('v.id', $partnerOrder->vendor_id)
+            ->where('is_active', 'ACTIVE')
+            ->first();
+        if ($vendor) {
+            $vendorEngName = $vendor->name_eng;
+            $method = 'call' . ucfirst($vendorEngName) . 'CancelApi'; //해당 오픈마켓의 api 호출을 위한 메소드 작성
+            $apiResult = call_user_func([$this, $method], $productOrderNumber); //api 결과 저장
+            if (!$apiResult['status']) return $apiResult;
+        }
 
+        DB::beginTransaction();
         try {
             // orders 테이블 업데이트
             DB::table('orders')
@@ -217,7 +233,6 @@ class OpenMarketOrderController extends Controller
                 ]);
             // 트랜잭션 커밋
             DB::commit();
-
             return [
                 'status' => true,
                 'message' => '주문이 성공적으로 취소되었습니다.',
@@ -225,7 +240,6 @@ class OpenMarketOrderController extends Controller
         } catch (\Exception $e) {
             // 트랜잭션 롤백
             DB::rollBack();
-
             return [
                 'status' => false,
                 'message' => '주문 취소 중 오류가 발생했습니다.',
@@ -564,6 +578,17 @@ class OpenMarketOrderController extends Controller
         $controller = new CoupangOrderController();
         return $controller->index($id, $startDate, $endDate);
     }
+    private function callSmart_storeCancelApi($productOrderNumber)
+    {
+        $controller = new SmartStoreCancelController();
+        return $controller->index($productOrderNumber);
+    }
+    private function callCoupangCancelApi($productOrderNumber)
+    {
+        $controller = new CoupangCancelController();
+        return $controller->index($productOrderNumber);
+    }
+
     private function getSmart_storeUploadedProductId($productId)
     {
         return DB::table('smart_store_uploaded_products')
