@@ -62,7 +62,6 @@ class OpenMarketOrderController extends Controller
                         if ($exists) {
                             continue; // 저장 로직 건너뛰기
                         }
-                        return $orders;
                         $totalPrice = 0;
                         $cartIds = [];
                         foreach ($orders as $order) {
