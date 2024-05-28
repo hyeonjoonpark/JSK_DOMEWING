@@ -31,8 +31,8 @@ class Godwing extends Command
     {
         set_time_limit(0);
         ini_set('memory_allow', '-1');
-        $partnerId = 3;
-        $vendorIds = [30, 41, 14, 19, 20, 23, 26, 28, 47, 48, 49];
+        $partnerId = 9;
+        $vendorIds = [23, 27];
         $ptc = new PartnerTableController();
         $mc = new ManageController();
         $apiToken = DB::table('partners')
