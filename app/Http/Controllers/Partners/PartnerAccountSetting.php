@@ -90,7 +90,7 @@ class PartnerAccountSetting extends Controller
         $accounts = DB::table($vendorEngName . '_accounts')
             ->where('partner_id', $partnerId)
             ->where('is_active', 'ACTIVE')
-            ->get(['hash', 'username']);
+            ->get();
         if ($accounts->isEmpty()) {
             return [
                 'status' => false,

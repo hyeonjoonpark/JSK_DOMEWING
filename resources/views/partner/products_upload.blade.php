@@ -98,7 +98,7 @@
     <script>
         function initUpload() {
             popupLoader(1, "상품 업로드를 위한 해당 마켓 정보들을 불러오는 중입니다.");
-            const vendorId = $('input[name="openMarkets"]:checked').val();
+            const vendorId = parseInt($('input[name="openMarkets"]:checked').val());
             $.ajax({
                 url: '/api/partner/account-setting/list',
                 type: 'POST',
@@ -117,6 +117,7 @@
                         let isFirst = true;
                         let index = 0;
                         for (const account of accounts) {
+                            const accountName = vendorId === 51 ? account.store_name : account.username;
                             html += `
                             <div class="col-6">
                                 <div class="custom-control custom-checkbox">
@@ -124,7 +125,7 @@
                                         <input type="radio" id="account${index}" name="accounts[]"
                                             value="${account.hash}" class="custom-control-input">
                                         <label class="custom-control-label"
-                                            for="account${index}">${account.username}</label>
+                                            for="account${index}">${accountName}</label>
                                     </div>
                                 </div>
                             </div>

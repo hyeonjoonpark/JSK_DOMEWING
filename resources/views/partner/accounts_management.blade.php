@@ -32,7 +32,7 @@
                         @foreach ($smartStoreAccounts as $item)
                             <div class="col-auto">
                                 <button class="btn btn-primary"
-                                    onclick="viewSsAccount('{{ $item->username }}','{{ $item->application_id }}','{{ $item->secret }}','{{ $item->store_name }}','{{ $item->hash }}');">{{ $item->username }}</button>
+                                    onclick="viewSsAccount('{{ $item->username }}','{{ $item->application_id }}','{{ $item->secret }}','{{ $item->store_name }}','{{ $item->hash }}');">{{ $item->store_name }}</button>
                             </div>
                         @endforeach
                     </div>
