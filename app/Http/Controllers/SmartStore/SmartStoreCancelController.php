@@ -32,7 +32,7 @@ class SmartStoreCancelController extends Controller
         $contentType = 'application/json';
         $method = 'POST';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderId . '/claim/cancel/request';
-        $data = ['cancelReason' => 'SOLD_OUT'];
+        $data = ['cancelReason' => 'DELAYED_DELIVERY'];
         $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
         if (!$response['status']) return [
             'status' => false,
