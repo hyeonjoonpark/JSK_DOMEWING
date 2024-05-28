@@ -17,31 +17,54 @@ class UploadedController extends Controller
 {
     public function index(Request $request)
     {
+        // 파트너 ID를 가져옵니다.
         $partnerId = Auth::guard('partner')->id();
-        // 연동된 도매윙 계정이 있는지 검사.
+
+        // 연동된 도매윙 계정이 있는지 검사합니다.
         $hasSync = DB::table('partner_domewing_accounts')
             ->where('partner_id', $partnerId)
             ->where('is_active', 'Y')
             ->exists();
-        if ($hasSync === false) {
+
+        if (!$hasSync) {
             return redirect('/partner/account-setting/dowewing-integration/');
         }
+
         set_time_limit(0);
+
+        // 활성화된 오픈마켓 목록을 가져옵니다.
         $openMarkets = DB::table('vendors')
             ->where('is_active', 'ACTIVE')
             ->where('type', 'OPEN_MARKET')
             ->get();
+
+        // 선택된 오픈마켓 ID와 해당 정보를 가져옵니다.
         $selectedOpenMarketId = $request->input('selectedOpenMarketId', 51);
         $selectedOpenMarket = DB::table('vendors')
             ->where('id', $selectedOpenMarketId)
             ->first();
+
         $vendorEngName = $selectedOpenMarket->name_eng;
+
+        // 마진율을 가져옵니다.
         $margin = DB::table('sellwing_config')
             ->where('id', 1)
             ->first(['value'])
             ->value;
+
         $marginRate = $margin / 100 + 1;
+
+        // 검색 키워드와 상품 코드를 입력받습니다.
         $searchKeyword = $request->input('searchKeyword', '');
+        $searchProductCodes = $request->input('searchProductCodes', '');
+
+        // 상품 코드 배열을 생성합니다.
+        $productCodesArr = [];
+        if (!empty($searchProductCodes)) {
+            $productCodesArr = array_map('trim', explode(',', $searchProductCodes));
+        }
+
+        // 업로드된 상품을 검색합니다.
         $uploadedProducts = DB::table($vendorEngName . '_uploaded_products AS up')
             ->join('minewing_products AS mp', 'mp.id', '=', 'up.product_id')
             ->join($vendorEngName . '_accounts AS va', 'va.id', '=', 'up.' . $vendorEngName . '_account_id')
@@ -49,14 +72,17 @@ class UploadedController extends Controller
             ->join('partners AS p', 'p.id', '=', 'va.partner_id')
             ->where('up.is_active', 'Y')
             ->where('va.partner_id', $partnerId)
-            ->where(function ($query) use ($searchKeyword) {
-                if (!empty($searchKeyword)) {
+            ->when(!empty($searchKeyword), function ($query) use ($searchKeyword) {
+                $query->where(function ($query) use ($searchKeyword) {
                     $query->where('mp.productName', 'LIKE', "%{$searchKeyword}%")
                         ->orWhere('mp.productKeywords', 'LIKE', "%{$searchKeyword}%")
                         ->orWhere('oc.name', 'LIKE', "%{$searchKeyword}%")
                         ->orWhere('mp.productCode', 'LIKE', "%{$searchKeyword}%")
                         ->orWhere('up.origin_product_no', 'LIKE', "%{$searchKeyword}%");
-                }
+                });
+            })
+            ->when(!empty($productCodesArr), function ($query) use ($productCodesArr) {
+                $query->whereIn('mp.productCode', $productCodesArr);
             })
             ->orderByDesc('up.created_at')
             ->select([
@@ -65,7 +91,7 @@ class UploadedController extends Controller
                 'mp.productName AS mpName',
                 'mp.productImage',
                 'up.price',
-                DB::raw("CEIL((mp.productPrice * $marginRate)) AS productPrice"), // 계산식 수정
+                DB::raw("CEIL((mp.productPrice * $marginRate)) AS productPrice"),
                 'mp.shipping_fee AS mp_shipping_fee',
                 'oc.name',
                 'up.shipping_fee AS up_shipping_fee',
@@ -76,11 +102,13 @@ class UploadedController extends Controller
                 'mp.createdAt AS mca'
             ])
             ->paginate(500);
+
         return view('partner.products_uploaded', [
             'openMarkets' => $openMarkets,
             'uploadedProducts' => $uploadedProducts,
             'selectedOpenMarketId' => $selectedOpenMarketId,
-            'searchKeyword' => $searchKeyword
+            'searchKeyword' => $searchKeyword,
+            'searchProductCodes' => $searchProductCodes
         ]);
     }
     public function delete(Request $request)

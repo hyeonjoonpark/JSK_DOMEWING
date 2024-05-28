@@ -96,14 +96,25 @@
                             </div>
                         @endforeach
                         <div class="col-12">
-                            <div class="form-group">
-                                <label for="" class="form-label">키워드 검색</label>
-                                <input type="text" class="form-control" name="searchKeyword"
-                                    placeholder="검색 키워드를 입력해주세요." value="{{ $searchKeyword }}">
+                            <div class="row g-gs">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="" class="form-label">키워드 검색</label>
+                                        <input type="text" class="form-control" name="searchKeyword"
+                                            placeholder="검색 키워드를 입력해주세요." value="{{ $searchKeyword }}">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label for="" class="form-label">상품 코드 대량 검색</label>
+                                        <textarea name="searchProductCodes" id="searchProductCodes" class="form-control"
+                                            placeholder="쉼표(,)로 상품 코드 단위를 구분해서 입력해주세요.">{{ $searchProductCodes }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-primary">조회하기</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-12 text-center">
-                            <button type="submit" class="btn btn-primary">조회하기</button>
                         </div>
                     </form>
                 </div>
@@ -119,6 +130,7 @@
                             'numPages' => $uploadedProducts->lastPage(),
                             'openMarket' => $openMarket,
                             'searchKeyword' => $searchKeyword,
+                            'searchProductCodes' => $searchProductCodes,
                         ])
                     </div>
                     <div class="text-center">
