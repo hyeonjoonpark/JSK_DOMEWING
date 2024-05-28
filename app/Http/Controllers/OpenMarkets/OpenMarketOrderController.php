@@ -62,6 +62,7 @@ class OpenMarketOrderController extends Controller
                         if ($exists) {
                             continue; // 저장 로직 건너뛰기
                         }
+                        return $orders;
                         $totalPrice = 0;
                         $cartIds = [];
                         foreach ($orders as $order) {
@@ -213,10 +214,13 @@ class OpenMarketOrderController extends Controller
             ->where('v.id', $partnerOrder->vendor_id)
             ->where('is_active', 'ACTIVE')
             ->first();
-        $vendorEngName = $vendor->name_eng;
-        $method = 'call' . ucfirst($vendorEngName) . 'CancelApi'; //해당 오픈마켓의 api 호출을 위한 메소드 작성
-        $apiResult = call_user_func([$this, $method], $productOrderNumber); //api 결과 저장
-        if (!$apiResult['status']) return $apiResult;
+        if ($vendor) {
+            $vendorEngName = $vendor->name_eng;
+            $method = 'call' . ucfirst($vendorEngName) . 'CancelApi'; //해당 오픈마켓의 api 호출을 위한 메소드 작성
+            $apiResult = call_user_func([$this, $method], $productOrderNumber); //api 결과 저장
+            if (!$apiResult['status']) return $apiResult;
+        }
+
         DB::beginTransaction();
         try {
             // orders 테이블 업데이트
