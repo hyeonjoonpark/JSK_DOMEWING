@@ -209,11 +209,11 @@ class OpenMarketOrderController extends Controller
         $partnerOrder = DB::table('partner_orders as po') //해당 주문의 partner_order 테이블 조회
             ->where('order_id', $order->id)
             ->first();
-        $vendor = DB::table('vendors as v') //해당 주문의 오픈마켓이 어디인지 조회
-            ->where('v.id', $partnerOrder->vendor_id)
-            ->where('is_active', 'ACTIVE')
-            ->first();
-        if ($vendor) {
+        if ($partnerOrder) {
+            $vendor = DB::table('vendors as v') //해당 주문의 오픈마켓이 어디인지 조회
+                ->where('v.id', $partnerOrder->vendor_id)
+                ->where('is_active', 'ACTIVE')
+                ->first();
             $vendorEngName = $vendor->name_eng;
             $method = 'call' . ucfirst($vendorEngName) . 'CancelApi'; //해당 오픈마켓의 api 호출을 위한 메소드 작성
             $apiResult = call_user_func([$this, $method], $productOrderNumber); //api 결과 저장
