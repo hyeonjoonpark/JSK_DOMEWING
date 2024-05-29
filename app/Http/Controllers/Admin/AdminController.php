@@ -15,25 +15,8 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $controller = new Controller();
-        $b2Bs = $controller->getActiveB2Bs();
-        $b2BHrefs = array_map(function ($b2B) {
-            return $b2B->vendor_href;
-        }, $b2Bs->toArray());
-        $vendors = DB::table('product_search AS ps')
-            ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
-            ->where('v.is_active', 'ACTIVE')
-            ->where('ps.is_active', 'Y')
-            ->get();
-        $vendorHrefs = array_map(function ($vendor) {
-            return $vendor->vendor_href;
-        }, $vendors->toArray());
-        $hrefs = array_merge($b2BHrefs, $vendorHrefs);
-        return view('admin/dashboard', [
-            'b2bs' => $b2Bs,
-            'hrefs' => $hrefs,
-            'vendors' => $vendors
-        ]);
+
+        return view('admin/dashboard');
     }
     public function productSearch()
     {
