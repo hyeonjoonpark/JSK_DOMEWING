@@ -10,13 +10,72 @@ use App\Http\Controllers\Product\ProcessController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use DateTime;
 
 class AdminController extends Controller
 {
     public function dashboard()
     {
-
-        return view('admin/dashboard');
+        $labels = [];
+        $recharges = [];
+        $sales = [];
+        $currentDate = new DateTime();
+        for ($i = 6; $i >= 0; $i--) {
+            $date = (clone $currentDate)->modify("-$i days");
+            $startDatetime = $date->format('Y-m-d 00:00:00');
+            $endDatetime = $date->format('Y-m-d 23:59:59');
+            $sale = DB::table('wing_transactions AS wt')
+                ->join('orders AS o', 'wt.id', '=', 'o.wing_transaction_id')
+                ->where('o.type', 'PAID')
+                ->where('wt.status', 'APPROVED')
+                ->whereBetween('wt.created_at', [$startDatetime, $endDatetime])
+                ->sum('wt.amount');
+            $recharge = DB::table('wing_transactions AS wt')
+                ->join('deposit_details AS dd', 'wt.id', '=', 'dd.wing_transaction_id')
+                ->where('wt.status', 'APPROVED')
+                ->whereBetween('wt.created_at', [$startDatetime, $endDatetime])
+                ->sum('wt.amount');
+            $labels[] = $date->format('d') . '일';
+            $sales[] = $sale;
+            $recharges[] = $recharge;
+        }
+        $max = ceil(max($sales) / 500000) * 500000;
+        $thisMonthStart = date('Y-m-01 00:00:00');
+        $thisMonthEnd = date('Y-m-t 23:59:59');
+        $lastMonthStart = date('Y-m-01 00:00:00', strtotime('-1 month'));
+        $lastMonthEnd = date('Y-m-t 23:59:59', strtotime('-1 month'));
+        $thisMonthSaleTotal = DB::table('wing_transactions AS wt')
+            ->join('orders AS o', 'wt.id', '=', 'o.wing_transaction_id')
+            ->where('o.type', 'PAID')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', [$thisMonthStart, $thisMonthEnd])
+            ->sum('wt.amount');
+        $lastMonthSaleTotal = DB::table('wing_transactions AS wt')
+            ->join('orders AS o', 'wt.id', '=', 'o.wing_transaction_id')
+            ->where('o.type', 'PAID')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', [$lastMonthStart, $lastMonthEnd])
+            ->sum('wt.amount');
+        $thisMonthRechargeTotal = DB::table('wing_transactions AS wt')
+            ->join('deposit_details AS dd', 'wt.id', '=', 'dd.wing_transaction_id')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', [$thisMonthStart, $thisMonthEnd])
+            ->sum('wt.amount');
+        $lastMonthRechargeTotal = DB::table('wing_transactions AS wt')
+            ->join('deposit_details AS dd', 'wt.id', '=', 'dd.wing_transaction_id')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', [$lastMonthStart, $lastMonthEnd])
+            ->sum('wt.amount');
+        return view('admin/dashboard', [
+            'labels' => $labels,
+            'sales' => $sales,
+            'recharges' => $recharges,
+            'max' => $max,
+            'thisMonthSaleTotal' => $thisMonthSaleTotal,
+            'lastMonthSaleTotal' => $lastMonthSaleTotal,
+            'thisMonthRechargeTotal' => $thisMonthRechargeTotal,
+            'lastMonthRechargeTotal' => $lastMonthRechargeTotal,
+        ]);
     }
     public function productSearch()
     {

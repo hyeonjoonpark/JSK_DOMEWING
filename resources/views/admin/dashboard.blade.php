@@ -14,7 +14,7 @@
                         <div class="card-title">
                             <h6 class="title">주간 매출표</h6>
                             <p>
-                                최근 7일 이내의 일자 별 매출표입니다.
+                                최근 7일 이내의 일자 별 윙 매출액 및 충전액 차트입니다.
                             </p>
                         </div>
                     </div><!-- .card-title-group -->
@@ -29,21 +29,39 @@
                                 <div class="row g-4">
                                     <div class="col-sm-6 col-xxl-12">
                                         <div class="nk-order-ovwg-data buy">
-                                            <div class="amount">12,954.63 <small class="currenct currency-usd">USD</small>
+                                            <div class="amount d-flex align-items-top">
+                                                {{ number_format($thisMonthSaleTotal) }}
+                                                <img src="{{ asset('assets/images/wing.svg') }}" alt="윙"
+                                                    class="ms-1" style="width: 1.5rem;">
                                             </div>
-                                            <div class="info">Last month <strong>39,485 <span
-                                                        class="currenct currency-usd">USD</span></strong></div>
-                                            <div class="title"><em class="icon ni ni-arrow-down-left"></em> Buy Orders
+                                            <div class="info d-flex align-items-top">
+                                                지난 달 <strong
+                                                    class="ms-1 me-1">{{ number_format($lastMonthSaleTotal) }}</strong><img
+                                                    src="{{ asset('assets/images/wing.svg') }}" alt="윙"
+                                                    style="width: 1rem;">
+                                            </div>
+                                            <div class="title"><em
+                                                    class="icon ni ni-arrow-{{ $thisMonthSaleTotal >= $lastMonthSaleTotal ? 'up' : 'down' }}-left"></em>
+                                                총 매출액
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-xxl-12">
                                         <div class="nk-order-ovwg-data sell">
-                                            <div class="amount">12,954.63 <small class="currenct currency-usd">USD</small>
+                                            <div class="amount d-flex align-items-top">
+                                                {{ number_format($thisMonthRechargeTotal) }}
+                                                <img src="{{ asset('assets/images/wing.svg') }}" alt="윙"
+                                                    class="ms-1" style="width: 1.5rem;">
                                             </div>
-                                            <div class="info">Last month <strong>39,485 <span
-                                                        class="currenct currency-usd">USD</span></strong></div>
-                                            <div class="title"><em class="icon ni ni-arrow-up-left"></em> Sell Orders</div>
+                                            <div class="info d-flex align-items-top">
+                                                지난 달 <strong
+                                                    class="ms-1 me-1">{{ number_format($lastMonthRechargeTotal) }}</strong><img
+                                                    src="{{ asset('assets/images/wing.svg') }}" alt="윙"
+                                                    style="width: 1rem;">
+                                            </div>
+                                            <div class="title"><em
+                                                    class="icon ni ni-arrow-{{ $thisMonthRechargeTotal >= $lastMonthRechargeTotal ? 'up' : 'down' }}-left"></em>
+                                                총 충전액</div>
                                         </div>
                                     </div>
                                 </div>
@@ -398,20 +416,22 @@
     <script src="{{ asset('assets/js/charts/gd-default.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const labels = @json($labels);
+            const sales = @json($sales);
+            const recharges = @json($recharges);
+            const max = @json($max);
             const orderOverviewData = {
-                labels: ["22 Jun", "23 Jun", "24 Jun", "25 Jun", "26 Jun", "27 Jun", "28 Jun", "29 Jun",
-                    "30 Jun", "01 Jul"
-                ],
-                dataUnit: 'USD',
+                labels,
+                dataUnit: '윙',
                 datasets: [{
-                        label: "Buy Orders",
+                        label: "매출액",
                         color: "#8feac5",
-                        data: [2000, 1200, 1600, 2500, 1820, 1200, 1700, 1820, 1400, 2100]
+                        data: sales
                     },
                     {
-                        label: "Sell Orders",
+                        label: "충전액",
                         color: "#6baafe",
-                        data: [3000, 3450, 2450, 1820, 2700, 4870, 2470, 2600, 4000, 2380]
+                        data: recharges
                     }
                 ]
             };
@@ -441,7 +461,7 @@
                         callbacks: {
                             title: (tooltipItem, data) => data.datasets[tooltipItem[0].datasetIndex].label,
                             label: (tooltipItem, data) =>
-                                `${data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]} USD`
+                                `${data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]} 윙`
                         },
                         backgroundColor: '#eff6ff',
                         titleFontSize: 13,
@@ -457,10 +477,10 @@
                         yAxes: [{
                             ticks: {
                                 beginAtZero: true,
-                                callback: value => `$ ${value}`,
-                                min: 100,
-                                max: 5000,
-                                stepSize: 1200
+                                callback: value => `윙 ${value}`,
+                                min: 0,
+                                max: max,
+                                stepSize: 500000
                             },
                             gridLines: {
                                 color: 'rgba(82, 100, 132, 0.2)',
