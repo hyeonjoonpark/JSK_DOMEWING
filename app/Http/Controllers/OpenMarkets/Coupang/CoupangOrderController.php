@@ -93,8 +93,8 @@ class CoupangOrderController extends Controller
                     $orderDetails[] = [
                         'market' => '쿠팡',
                         'marketEngName' => 'coupang',
-                        'orderId' => $item['orderId'],
-                        'productOrderId' => $item['shipmentBoxId'],
+                        'orderId' => strval($item['orderId']),
+                        'productOrderId' => strval($item['shipmentBoxId']),
                         'orderName' => $item['orderer']['name'],
                         'productName' => $orderItem['vendorItemName'],
                         'quantity' => $orderItem['shippingCount'],

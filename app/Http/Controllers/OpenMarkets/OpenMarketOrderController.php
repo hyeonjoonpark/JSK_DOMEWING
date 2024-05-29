@@ -67,14 +67,15 @@ class OpenMarketOrderController extends Controller
                             $product = $this->getProduct($order['productCode']);
                             if (!$product) return [
                                 'status' => false,
-                                'message' => '도매윙에 등록된 상품이 아닙니다. 제품코드 : ' . $order['productCode']
+                                'message' => '도매윙에 등록된 상품이 아닙니다. 제품코드 : ' . $order['productCode'],
+                                'data' => $order
                             ];
-                            //1개의 주문에 대한 검증
-                            $exist = DB::table('partner_orders')
+                            // 1개의 주문에 대한 검증
+                            $isExist = DB::table('partner_orders')
                                 ->where('order_number', $order['orderId'])
                                 ->where('product_order_number', $order['productOrderId'])
                                 ->exists();
-                            if ($exist) {
+                            if ($isExist) {
                                 continue; // 저장 로직 건너뛰기
                             }
                             $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
