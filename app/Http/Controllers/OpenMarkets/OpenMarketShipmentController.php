@@ -35,6 +35,7 @@ class OpenMarketShipmentController extends Controller
         $trackingNumber = $request->trackingNumber;
         $deliveryCompanyId = $request->deliveryCompanyId;
         $productOrderNumber = $request->productOrderNumber;
+        $isRemoteArea = $request->isRemoteArea;
         $order = DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
             ->where('delivery_status', 'PENDING')
@@ -46,7 +47,6 @@ class OpenMarketShipmentController extends Controller
                 'message' => '취소되었거나, 이미 처리된 주문입니다.'
             ];
         }
-
         $openMarket = DB::table('orders as o')
             ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
             ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
@@ -61,9 +61,9 @@ class OpenMarketShipmentController extends Controller
                 return $updateApiResult;
             }
         }
-        return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
+        return $this->update($order->id, $deliveryCompanyId, $trackingNumber, $isRemoteArea);
     }
-    private function update($orderId, $deliveryCompanyId, $trackingNumber)
+    private function update($orderId, $deliveryCompanyId, $trackingNumber, $isRemoteArea)
     {
         try {
             DB::table('orders')
@@ -73,6 +73,27 @@ class OpenMarketShipmentController extends Controller
                     'delivery_company_id' => $deliveryCompanyId,
                     'delivery_status' => 'COMPLETE',
                 ]);
+            $order = DB::table('orders')
+                ->where('id', $orderId)
+                ->first();
+            $wingTransaction = DB::table('wing_transactions')
+                ->where('id', $order->wing_transaction_id)
+                ->first();
+            if ($isRemoteArea) {
+                // Update the shipping fee by adding 5000
+                DB::table('orders')
+                    ->where('id', $orderId)
+                    ->update([
+                        'shipping_fee_then' => DB::raw('shipping_fee_then + 5000')
+                    ]);
+
+                // Update the transaction amount by adding 5000
+                DB::table('wing_transactions')
+                    ->where('id', $wingTransaction->id)
+                    ->update([
+                        'amount' => DB::raw('amount + 5000')
+                    ]);
+            }
             return [
                 'status' => true,
                 'message' => '송장번호 입력에 성공하였습니다'
