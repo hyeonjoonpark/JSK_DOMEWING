@@ -13,11 +13,9 @@
 @section('title')
     오더윙
 @endsection
-
 @section('subtitle')
     <p>오더윙을 통해 오픈마켓 업체로부터의 주문 내용을 정리하고 정산합니다. 또한, 송장 번호 자동 추출 기능이 포함되어 있어 효율적인 주문 관리가 가능합니다.</p>
 @endsection
-
 @section('content')
     <div class="row g-gs">
         <div class="col">
@@ -40,10 +38,8 @@
                                     <th scope="col">주문자 정보</th>
                                     <th scope="col">주문상태</th>
                                 </tr>
-
                             </thead>
                             <tbody id="orderwingResult">
-
                             </tbody>
                         </table>
                     </div>
@@ -98,7 +94,6 @@
             let partnerStatusHtml = order.isPartner ? '<b><p>셀윙 발주</p></b>' : '<b><p>도매윙 발주</p></b>';
             let orderVendorHtml = order.vendorName ? `<b><p>${order.vendorName}</p></b>` : '<b><p>도매윙</p></b>';
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
-
             return `
             <tr>
                 <td>
@@ -163,33 +158,52 @@
         function initCreateDelivery(productOrderNumber) {
             const trackingNumber = $('#trackingNumber' + productOrderNumber).val();
             const deliveryCompanyId = $('#deliveryCompany' + productOrderNumber).val();
-            $.ajax({
-                url: '/api/save-tracking-info',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    rememberToken,
-                    trackingNumber,
-                    deliveryCompanyId,
-                    productOrderNumber,
-                },
-                success: function(response) {
-                    console.log(response);
-                    if (response.status === false) {
-                        Swal.fire({
-                            icon: 'error',
-                            text: response.message,
-                        });
-                    } else {
-                        console.log('Tracking info saved:', response);
-                        Swal.fire({
-                            icon: 'success',
-                            text: '택배사 및 송장번호 기입에 성공하였습니다.'
-                        });
-                    }
-                },
-                error: function(response) {
-                    console.error('Error saving tracking info:', response);
+            Swal.fire({
+                title: '확인',
+                html: `
+            <div>
+                <label>
+                    <input type="checkbox" id="confirmCheckbox" />
+                    제주/도서 산간지역
+                </label>
+            </div>
+        `,
+                showCancelButton: true,
+                confirmButtonText: '확인',
+                cancelButtonText: '취소'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const isRemoteArea = document.getElementById('confirmCheckbox').checked;
+                    $.ajax({
+                        url: '/api/save-tracking-info',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            rememberToken,
+                            trackingNumber,
+                            deliveryCompanyId,
+                            productOrderNumber,
+                            isRemoteArea
+                        },
+                        success: function(response) {
+                            console.log(response);
+                            if (response.status === false) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    text: response.message,
+                                });
+                            } else {
+                                console.log('Tracking info saved:', response);
+                                Swal.fire({
+                                    icon: 'success',
+                                    text: '택배사 및 송장번호 기입에 성공하였습니다.'
+                                });
+                            }
+                        },
+                        error: function(response) {
+                            console.error('Error saving tracking info:', response);
+                        }
+                    });
                 }
             });
         }
