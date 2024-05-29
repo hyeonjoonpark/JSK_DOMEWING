@@ -7,9 +7,19 @@ const fs = require('fs');
         const [tempFilePath, username, password] = process.argv.slice(2);
         const products = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         await signIn(page, username, password);
+        const maxAttempts = 3;
         const soldOutProducts = [];
         for (const product of products) {
-            const ivp = await isValidProduct(page, product.productHref);
+            const enterResult = await enterProductPage(page, product.productHref, maxAttempts, 0);
+            if (enterResult === false) {
+                const soldOutProduct = {
+                    id: product.id,
+                    productHref: product.href
+                };
+                soldOutProducts.push(soldOutProduct);
+                continue;
+            }
+            const ivp = await isValidProduct(page);
             if (ivp === false) {
                 const soldOutProduct = {
                     id: product.id,
@@ -25,6 +35,17 @@ const fs = require('fs');
         await browser.close();
     }
 })();
+async function enterProductPage(page, productHref, maxAttempts, attempt) {
+    try {
+        page.goto(productHref, { waitUntil: 'domcontentloaded' });
+        return true;
+    } catch (error) { //attempt가 3보다 크면 false를 반환
+        if (attempt >= maxAttempts) {
+            return false;
+        }
+        return await enterProductPage(page, productHref, attempt + 1); //
+    }
+}
 async function signIn(page, username, password) {
     await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle0' });
     await page.evaluate((username, password) => {
@@ -34,21 +55,36 @@ async function signIn(page, username, password) {
     }, username, password);
     await page.waitForNavigation({ waitUntil: 'load' });
 }
-
-async function isValidProduct(page, productHref) {
+async function isValidProduct(page) {
     try {
-        await page.goto(productHref, { waitUntil: 'domcontentloaded' });
-        return await page.evaluate(() => {
-            // 품절인 상품이면 false를 return 할 것.
-            const soldOutImage = document.querySelector('img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
+        const isValid = await page.evaluate(() => {
+            const soldOutImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > span.icon img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
             const errorImage = document.querySelector('img[src="//img.echosting.cafe24.com/ec/image_admin/img_404.png"]');
             if (soldOutImage || errorImage) {
                 return false;
             }
             return true;
         });
+        return isValid;
     } catch (error) {
         return false;
     }
 }
+
+// async function isValidProduct(page, productHref) {
+//     try {
+//         await page.goto(productHref, { waitUntil: 'domcontentloaded' });
+//         return await page.evaluate(() => {
+//             // 품절인 상품이면 false를 return 할 것.
+//             const soldOutImage = document.querySelector('img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
+//             const errorImage = document.querySelector('img[src="//img.echosting.cafe24.com/ec/image_admin/img_404.png"]');
+//             if (soldOutImage || errorImage) {
+//                 return false;
+//             }
+//             return true;
+//         });
+//     } catch (error) {
+//         return false;
+//     }
+// }
 

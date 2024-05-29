@@ -38,6 +38,10 @@ async function signIn(page, username, password) {
 async function scrapeProduct(page, productHref) {
     try {
         const productImage = await getProductImage(page);
+        const skipElementExists = await page.$('#contents > div.xans-element-.xans-product.xans-product-detail.detailTop > div.detailArea > div.infoArea > div.xans-element-.xans-product.xans-product-action > div.ec-base-button > p > span');
+        if (skipElementExists) {
+            return false;
+        }
         if (productImage.includes('div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img')) {
             return false;
         }

@@ -53,15 +53,15 @@ async function scrapeProducts(page) {
         const productElements = document.querySelectorAll('div.xans-element-.xans-product.xans-product-listnormal.ec-base-product > ul.prdList.grid4 > li.xans-record-');
 
         function checkSkipProduct(promotionElement) {
-            const skipImages = ["/web/upload/icon_201909061817097000.png"];
+            const skipImageUrl = "https://cafe24.poxo.com/ec01/haven96/3JPAsJn/jGkesyYvH/tEadcPSdLJM/sODBCcZoIMNBPMyLs3Fh/UhKUCF9ppWck1AnJzNV609EfxIBkrnZmHxg==/_/web/upload/icon_201909061817097000.png";
             const promotionSrc = promotionElement.getAttribute('src');
-            return skipImages.includes(promotionSrc);
+            return promotionSrc === skipImageUrl;
         }
 
         for (const productElement of productElements) {
             const promotionElement = productElement.querySelector('div.icon > img');
             if (promotionElement && checkSkipProduct(promotionElement)) {
-                continue; // Skip if sold out, matches the custom promotion image, or is marked as wholesale
+                continue;
             }
 
             const nameElement = productElement.querySelector('div.description > p > a');
@@ -83,5 +83,6 @@ async function scrapeProducts(page) {
     });
     return products;
 }
+
 
 
