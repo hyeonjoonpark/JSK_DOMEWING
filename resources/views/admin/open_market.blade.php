@@ -24,6 +24,10 @@
                     <h6 class="title">신규 주문</h6>
                     <p>상품 정보를 클릭하면 해당 상품의 상세 페이지로 이동합니다.</p>
                     <button class="btn btn-primary mb-5" onclick="initIndex();">조회하기</button>
+                    <div class="form-group">
+                        <h6 class="title">잔액 부족 계정 리스트</h6>
+                        <ul id="lowBalanceAccountsList"></ul>
+                    </div>
                     <p>총 <span id="numOrders">0</span>개의 주문이 접수되었습니다.</p>
                     <div class="form-group">
                         <label class="form-label">금일 총 매출액</label>
@@ -64,7 +68,8 @@
                 },
                 success: function(response) {
                     console.log(response);
-                    updateOrderTable(response);
+                    updateOrderTable(response.processedOrders); // processedOrders 사용
+                    updateLowBalanceAccounts(response.lowBalanceAccounts); // lowBalanceAccounts 사용
                     closePopup();
                 },
                 error: function(response) {
@@ -73,6 +78,14 @@
                 }
             });
         }
+
+        function updateLowBalanceAccounts(accounts) {
+            let accountsHtml = accounts.length > 0 ?
+                accounts.map(account => `<li>${account}</li>`).join('') :
+                '<li>없음</li>';
+            $('#lowBalanceAccountsList').html(accountsHtml);
+        }
+
 
         function updateOrderTable(response) {
             $('#numOrders').html(response.length);

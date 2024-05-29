@@ -13,6 +13,10 @@ const puppeteer = require('puppeteer');
         await page.click('#formLogin > input.formSubmit');
         await page.waitForNavigation();
         await page.goto('https://domeggook.com/sc/order/lstInprocess', { waitUntil: 'networkidle2' });
+        const data = await page.$('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody > tr');
+        if (!data) {
+            return false;
+        }
         const elements = await page.$$('#lGrid > div > div.tui-grid-content-area > div.tui-grid-lside-area > div.tui-grid-body-area > div > div.tui-grid-table-container > table > tbody tr');
         if (elements.length < 1) {
             return false;

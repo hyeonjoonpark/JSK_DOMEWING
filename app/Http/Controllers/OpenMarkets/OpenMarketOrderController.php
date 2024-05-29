@@ -21,7 +21,6 @@ class OpenMarketOrderController extends Controller
     {
         $allPartners = $this->getAllPartners(); //모든 파트너 조회
         $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
-        $needSeedList = []; // 보유머니 부족한 사람들 리스트 보여주기
         foreach ($allPartners as $partner) { //모든 파트너 반복문
             $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
             $memberId = $partnerDomewingAccount->domewing_account_id;
@@ -119,7 +118,11 @@ class OpenMarketOrderController extends Controller
         $processedOrders = $orders->map(function ($order) {
             return $this->processOrder($order);
         });
-        return response()->json($processedOrders);
+        $lowBalanceAccounts = $this->getUsersWithLowBalance();
+        return response()->json([
+            'processedOrders' => $processedOrders,
+            'lowBalanceAccounts' => $lowBalanceAccounts,
+        ]);
     }
     public function indexPartner(Request $request)
     {
@@ -245,6 +248,54 @@ class OpenMarketOrderController extends Controller
                 'error' => $e->getMessage(),
             ];
         }
+    }
+    private function getUsersWithLowBalance()
+    {
+        $lowBalanceAccounts = [];
+        $accounts = DB::table('members')->get();
+        foreach ($accounts as $account) {
+            $balance = $this->getBalance($account->id);
+            if ($balance < 0) {
+                $name = $account->last_name . '' . $account->first_name;
+                $lowBalanceAccounts[] = $name; // 배열에 값을 추가하는 방식으로 수정
+            }
+        }
+        return $lowBalanceAccounts; // 결과를 반환
+    }
+
+    private function getBalance(int $memberId): int
+    {
+        $depositAmount = DB::table('wing_transactions')
+            ->where('member_id', $memberId)
+            ->where('type', 'DEPOSIT')
+            ->where('status', 'APPROVED')
+            ->sum('amount');
+        $withdrawalAmount = DB::table('wing_transactions AS wt')
+            ->join('withdrawal_details AS wd', 'wd.wing_transaction_id', '=', 'wt.id')
+            ->where('wt.member_id', $memberId)
+            ->where('wt.status', 'APPROVED')
+            ->sum('wt.amount');
+        $paidAmount = DB::table('wing_transactions AS wt')
+            ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
+            ->where('member_id', $memberId)
+            ->where('o.type', 'PAID')
+            ->where('wt.status', 'APPROVED')
+            ->distinct()
+            ->sum('wt.amount');
+        $refundAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
+            ->where('wt.member_id', $memberId)
+            ->where('o.type', 'REFUND')
+            ->where('wt.status', 'APPROVED')
+            ->sum('wt.amount');
+        $exchangeAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
+            ->where('wt.member_id', $memberId)
+            ->where('o.type', 'EXCHANGE')
+            ->where('wt.status', 'APPROVED')
+            ->sum('wt.amount');
+        $balance = $depositAmount - $withdrawalAmount - $paidAmount + $refundAmount - $exchangeAmount;
+        return $balance;
     }
     private function getPartnerDomewingAccount($partnerId)
     {

@@ -80,14 +80,11 @@ class OpenMarketShipmentController extends Controller
                 ->where('id', $order->wing_transaction_id)
                 ->first();
             if ($isRemoteArea) {
-                // Update the shipping fee by adding 5000
                 DB::table('orders')
                     ->where('id', $orderId)
                     ->update([
                         'shipping_fee_then' => DB::raw('shipping_fee_then + 5000')
                     ]);
-
-                // Update the transaction amount by adding 5000
                 DB::table('wing_transactions')
                     ->where('id', $wingTransaction->id)
                     ->update([
