@@ -460,8 +460,14 @@
                     tooltips: {
                         callbacks: {
                             title: (tooltipItem, data) => data.datasets[tooltipItem[0].datasetIndex].label,
-                            label: (tooltipItem, data) =>
-                                `${data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]} 윙`
+                            label: (tooltipItem, data) => {
+                                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem
+                                    .index];
+                                value = value.toString();
+                                value = value.split(/(?=(?:...)*$)/);
+                                value = value.join(',');
+                                return value + '윙';
+                            }
                         },
                         backgroundColor: '#eff6ff',
                         titleFontSize: 13,
@@ -477,10 +483,12 @@
                         yAxes: [{
                             ticks: {
                                 beginAtZero: true,
-                                callback: value => `윙 ${value}`,
                                 min: 0,
                                 max: max,
-                                stepSize: 500000
+                                stepSize: 500000,
+                                callback: function(value) {
+                                    return value.toLocaleString() + ' 윙'; // 천 단위 콤마 추가
+                                }
                             },
                             gridLines: {
                                 color: 'rgba(82, 100, 132, 0.2)',
