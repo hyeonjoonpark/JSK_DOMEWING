@@ -25,7 +25,6 @@ class OpenMarketOrderController extends Controller
             $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
             $memberId = $partnerDomewingAccount->domewing_account_id;
             foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
-                if ($openMarket->name_eng == 'smart_store') continue; //이걸로 쿠팡만 조회하고--------------------------------------------------------
                 $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
                 $isExistAccount = 'isExist'  . ucfirst($openMarketEngName) . 'Account';
                 $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
@@ -49,8 +48,6 @@ class OpenMarketOrderController extends Controller
                     }
                     $groupedResults[$orderId][] = $apiResult;
                 }
-                if (count($groupedResults) < 3) continue;
-                return $groupedResults; //어ㅗ떤 형식으로 가져오는지 확인
                 try {
                     DB::beginTransaction(); // 트랜잭션 시작
                     foreach ($groupedResults as $orderId => $orders) { //orderId기준 반복문 진행
