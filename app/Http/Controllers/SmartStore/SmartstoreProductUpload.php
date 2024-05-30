@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SmartStore;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class SmartstoreProductUpload extends Controller
 {
@@ -223,8 +224,21 @@ class SmartstoreProductUpload extends Controller
     private function createTempImage(string $imageContent, string $imageUrl): string
     {
         $extension = pathinfo($imageUrl, PATHINFO_EXTENSION);
-        $tempPath = tempnam(sys_get_temp_dir(), 'upload') . '.' . $extension;
-        return file_put_contents($tempPath, $imageContent) ? $tempPath : false;
+        $tempDir = storage_path('app/public/temp-product-images');
+
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        $uniqueName = uniqid('upload_', true) . '.' . $extension;
+        $tempPath = $tempDir . DIRECTORY_SEPARATOR . $uniqueName;
+
+        $tempFile = new \SplFileObject($tempPath, 'w');
+        if ($tempFile->fwrite($imageContent) === false) {
+            return false;
+        }
+
+        return $tempFile->getRealPath();
     }
     private function uploadToAPI(string $tempImagePath, string $imageUrl, $account): array
     {
