@@ -39,7 +39,8 @@ class AdminController extends Controller
             $sales[] = $sale;
             $recharges[] = $recharge;
         }
-        $max = ceil(max($sales) / 500000) * 500000;
+        $maxTarget = max($sales) > max($recharges) ? max($sales) : max($recharges);
+        $max = ceil($maxTarget / 500000) * 500000;
         $thisMonthStart = date('Y-m-01 00:00:00');
         $thisMonthEnd = date('Y-m-t 23:59:59');
         $lastMonthStart = date('Y-m-01 00:00:00', strtotime('-1 month'));
