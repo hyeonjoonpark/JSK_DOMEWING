@@ -33,8 +33,8 @@ class CoupangOrderController extends Controller
         $startDate = $start ? new DateTime($start) : new DateTime('now - 4 days');
         $endDate = $end ? new DateTime($end) : new DateTime('now');
         $statusMap = [
-            'ACCEPT' => '결제완료',
             'INSTRUCT' => '상품준비중',
+            'ACCEPT' => '결제완료',
             'DEPARTURE' => '배송지시',
             'DELIVERING' => '배송중',
             'FINAL_DELIVERY' => '배송완료',
