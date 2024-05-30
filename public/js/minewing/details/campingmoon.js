@@ -1,31 +1,23 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-// 비동기 함수를 시작합니다. 이 함수는 전체 스크립트의 메인 로직을 담당합니다.
 (async () => {
-    // Puppeteer로 브라우저 인스턴스를 시작합니다. headless 모드를 비활성화하여 브라우저 UI가 보이게 합니다.
     const browser = await puppeteer.launch({ headless: true });
-    // 새로운 페이지(탭)을 생성합니다.
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
         const [tempFilePath, username, password] = args;
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         await signIn(page, username, password);
-        // 스크래핑된 제품 정보를 저장할 배열을 초기화합니다.
         const products = [];
-        // 읽어들인 URL들을 순회하면서 각 제품 페이지에 접근합니다.
         for (const url of urls) {
             await page.goto(url, { waitUntil: 'domcontentloaded' });
             const product = await scrapeProduct(page, url);
             products.push(product);
         }
-        // 최종적으로 스크래핑된 모든 제품 정보를 콘솔에 출력합니다.
         console.log(JSON.stringify(products));
     } catch (error) {
-        // 에러가 발생했을 경우 에러 메시지를 콘솔에 출력합니다.
         console.error('Error occurred:', error);
     } finally {
-        // 모든 작업이 완료되면, 브라우저 인스턴스를 닫습니다.
         await browser.close();
     }
 })();
@@ -36,32 +28,23 @@ async function signIn(page, username, password) {
     await page.click('#loginarea > div > div.mlogin > fieldset > ul.logbtn > li > a > img');
     await page.waitForNavigation();
 }
-// 페이지와 제품의 링크를 받아 제품의 정보를 크롤링하는 비동기 함수입니다.
 async function scrapeProduct(page, productHref) {
     try {
-        // 제품 이미지 URL을 가져옵니다.
         const productImage = await getProductImage(page);
         if (productImage.includes('img_product_big.gif')) {
             return false;
         }
-        // 제품 상세 설명에서 필요한 이미지 URL들을 추출합니다.
         const productDetail = await getProductDetail(page);
         if (productDetail === false) {
             return false;
         }
-        // 제품 이름을 가져옵니다.
         const productName = await getProductName(page);
-        // 제품 옵션이 있는지 확인합니다.
         const hasOption = await getHasOption(page);
-        // 옵션이 있다면, 옵션 정보를 가져오고, 없다면 빈 배열을 할당합니다.
         const productOptions = hasOption ? await getProductOptions(page) : [];
-        // 제품 가격을 가져옵니다. 옵션이 있다면 0을 할당하고, 없으면 페이지에서 가격을 추출합니다.
         const productPrice = await page.evaluate(() => {
-            // 페이지에서 제품 가격을 선택하여 텍스트로 가져오고, 숫자가 아닌 문자를 제거합니다.
             const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
             return productPrice;
         });
-        // 위에서 추출한 정보들로 제품 객체를 구성합니다.
         const product = {
             productName: productName,
             productPrice: productPrice,
@@ -70,18 +53,15 @@ async function scrapeProduct(page, productHref) {
             hasOption: hasOption,
             productOptions: productOptions,
             productHref: productHref,
-            sellerID: 36 // 판매자 ID는 상수로 36를 할당합니다.
+            sellerID: 36
         };
-        // 최종적으로 구성된 제품 객체를 반환합니다.
         return product;
     } catch (error) {
-        // 오류가 발생했다면, 콘솔에 오류를 출력하고, false를 반환합니다.
         console.error('Error occurred:', error);
         return false;
     }
 }
 
-// 페이지에서 제품의 상세 설명을 크롤링하여 이미지 URL들을 배열로 반환하는 비동기 함수입니다.#prdDetail > div img
 async function getProductDetail(page) {
     return await page.evaluate(() => {
         const productDetailElements = document.querySelectorAll('#prdDetail > div img');
@@ -92,13 +72,10 @@ async function getProductDetail(page) {
     });
 }
 
-// 페이지에서 주요 제품 이미지의 URL을 추출하는 비동기 함수입니다.
 async function getProductImage(page) {
-    // 페이지의 DOM을 조사하여 주요 이미지의 src 속성값을 반환합니다.
     const productImage = await page.evaluate(() => {
         return document.querySelector('div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img').src;
     });
-    // 추출된 이미지 URL을 반환합니다.
     return productImage;
 }
 async function getProductOptions(page) {
@@ -165,30 +142,23 @@ async function getProductOptions(page) {
     return processSelectOptions(selects);
 }
 
-// 페이지에서 제품의 이름을 가져오는 비동기 함수입니다.
+
 async function getProductName(page) {
     const productName = await page.evaluate(() => {
         const productNameElement = document.querySelector('div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > h3');
         let productNameText = productNameElement.textContent.trim();
 
-        // "해외배송"을 포함하는 괄호와 내용을 제거합니다.
-        // 예: "상품명 (해외배송 가능 상품)" -> "상품명 "
         productNameText = productNameText.replace(/\(.*해외배송.*\)/g, '');
 
-        // 최종적으로 정리된 상품명에서 앞뒤 공백을 제거합니다.
         return productNameText.trim();
     });
 
     return productName;
 }
 
-// 페이지에 제품 옵션이 있는지 확인하는 비동기 함수입니다.
 async function getHasOption(page) {
-    // 페이지의 DOM을 조사하여 선택 가능한 옵션 요소가 있는지 확인합니다.
     return await page.evaluate(() => {
-        // 'select.tune' 클래스를 가진 select 요소들을 모두 선택합니다.
         const selectElements = document.querySelectorAll('select.ProductOption0');
-        // 선택 요소가 하나 이상 있다면 true를, 그렇지 않으면 false를 반환합니다.
         if (selectElements.length > 0) {
             return true;
         }
