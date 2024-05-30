@@ -36,11 +36,16 @@ class OpenMarketOrderController extends Controller
                 // orderId를 기준으로 그룹화
                 $groupedResults = []; // wing_transaction에 주문의 총합으로 넣으려고 그룹화
                 foreach ($apiResults as $apiResult) {
-                    if (!is_array($apiResult)) {
-                        continue;
-                    }
                     if ($apiResult['productOrderStatus'] !== '결제완료' && $apiResult['productOrderStatus'] !== '상품준비중') {
                         continue; // 결제완료, 상품준비중 db에 저장하려고 검증
+                    }
+                    //주문이 이미 있는지 검증
+                    $isExist = DB::table('partner_orders')
+                        ->where('order_number', $apiResult['orderId'])
+                        ->where('product_order_number', $apiResult['productOrderId'])
+                        ->exists();
+                    if ($isExist) {
+                        continue; // 저장 로직 건너뛰기
                     }
                     $orderId = $apiResult['orderId'];
                     if (!isset($groupedResults[$orderId])) {
@@ -51,16 +56,6 @@ class OpenMarketOrderController extends Controller
                 try {
                     DB::beginTransaction(); // 트랜잭션 시작
                     foreach ($groupedResults as $orderId => $orders) { //orderId기준 반복문 진행
-                        // partner_orders 테이블에서 orders값 전체 중복 여부 확인
-                        $orderNumbers = array_column($orders, 'orderId');
-                        $productOrderNumbers = array_column($orders, 'productOrderId');
-                        $exists = DB::table('partner_orders')
-                            ->whereIn('order_number', $orderNumbers)
-                            ->whereIn('product_order_number', $productOrderNumbers)
-                            ->exists();
-                        if ($exists) {
-                            continue; // 저장 로직 건너뛰기
-                        }
                         $totalPrice = 0;
                         $cartIds = [];
                         foreach ($orders as $order) {
@@ -70,14 +65,6 @@ class OpenMarketOrderController extends Controller
                                 'message' => '도매윙에 등록된 상품이 아닙니다. 제품코드 : ' . $order['productCode'],
                                 'data' => $order
                             ];
-                            // 1개의 주문에 대한 검증
-                            $isExist = DB::table('partner_orders')
-                                ->where('order_number', $order['orderId'])
-                                ->where('product_order_number', $order['productOrderId'])
-                                ->exists();
-                            if ($isExist) {
-                                continue; // 저장 로직 건너뛰기
-                            }
                             $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
                             $cartId = $cart['data']['cartId'];
                             $cartCode = $this->getCartCode($cartId);
@@ -87,14 +74,6 @@ class OpenMarketOrderController extends Controller
                         $wingTransaction =  $this->storeWingTransaction($memberId, 'PAYMENT', $totalPrice, $remark = ''); //윙 트랜잭션 테이블 insert
                         $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
                         foreach ($orders as $index => $order) {
-                            //1개의 주문에 대한 검증
-                            $exist = DB::table('partner_orders')
-                                ->where('order_number', $order['orderId'])
-                                ->where('product_order_number', $order['productOrderId'])
-                                ->exists();
-                            if ($exist) {
-                                continue; // 저장 로직 건너뛰기
-                            }
                             $product = $this->getProduct($order['productCode']);
                             $priceThen = $this->getSalePrice($product->id);
                             $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity);
