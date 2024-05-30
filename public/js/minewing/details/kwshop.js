@@ -46,9 +46,9 @@ async function scrapeProduct(page, url) {
             }
             return productDetail;
         });
-        // if (productDetail === false) {
-        //     return false;
-        // }
+        if (productDetail === false) {
+            return false;
+        }
         const productImage = await page.evaluate(() => {
             const productImageElement = document.querySelector('#goods_thumbs > ul > li:nth-child(1) > div.slides_container.hide > a:nth-child(1) > img');
             if (!productImageElement) {
