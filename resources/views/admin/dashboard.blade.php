@@ -114,7 +114,7 @@
                                     총 <strong>{{ number_format($actionCenter['numContactUs']) }}</strong>개의 문의가 답변 대기 중입니다.
                                 </p>
                             </div>
-                            <a href="#" class="btn btn-icon btn-trigger me-n2"><em
+                            <a href="/admin/contact-us" class="btn btn-icon btn-trigger me-n2"><em
                                     class="icon ni ni-forward-ios"></em></a>
                         </div>
                     </div><!-- .card-inner -->

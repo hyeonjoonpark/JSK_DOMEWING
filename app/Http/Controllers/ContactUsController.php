@@ -14,7 +14,7 @@ class ContactUsController extends Controller
     {
         $contacts = DB::table('sellwing_contact_us')
             ->orderByRaw("CASE WHEN status = 'PENDING' THEN 0 ELSE 1 END")
-            ->orderBy('created_at')
+            ->orderByDesc('created_at')
             ->get();
         return view('admin.contact_us', [
             'contacts' => $contacts

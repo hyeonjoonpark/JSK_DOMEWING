@@ -85,6 +85,7 @@
         function showContact(contactId) {
             const contact = contacts.find(c => c.id === contactId);
             const message = contact ? contact.message : '텅 빈 문희입니다.';
+            const answer = contact.answer ? contact.answer : '';
             const html = `
             <div class="form-group text-start">
                 <label class="form-label">문의 내용</label>
@@ -92,7 +93,7 @@
             </div>
             <div class="form-group text-start">
                 <label class="form-label">문의 답변</label>
-                <textarea class="form-control" id="answer" placeholder="문의 답변을 입력해주세요."></textarea>
+                <textarea class="form-control" id="answer" placeholder="문의 답변을 입력해주세요.">${answer}</textarea>
             </div>
             `;
             Swal.fire({
