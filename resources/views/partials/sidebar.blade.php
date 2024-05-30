@@ -33,14 +33,8 @@
                             </a>
                         </li>
                         <li class="nk-menu-item">
-                            <a href="/admin/product/mining" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
-                                <span class="nk-menu-text">마인윙</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item">
                             <a href="/admin/product/new-minewing" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-industry"></em></span>
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
                                 <span class="nk-menu-text">뉴 마인윙</span>
                             </a>
                         </li>
@@ -134,6 +128,12 @@
                                 </li>
                             </ul><!-- .nk-menu-sub -->
                         </li><!-- .nk-menu-item -->
+                        <li class="nk-menu-item">
+                            <a href="/admin/contact-us" class="nk-menu-link">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-headset"></em></span>
+                                <span class="nk-menu-text">문희윙</span>
+                            </a>
+                        </li>
                         <li class="nk-menu-item">
                             <a href="/auth/logout" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em

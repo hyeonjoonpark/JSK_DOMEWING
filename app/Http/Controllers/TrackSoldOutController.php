@@ -30,7 +30,9 @@ class TrackSoldOutController extends Controller
             ->limit(1000)
             ->get([
                 'id',
-                'productHref'
+                'productHref',
+                'hasOption',
+                'productDetail'
             ])
             ->toArray();
         $vendorEngName = DB::table('vendors')

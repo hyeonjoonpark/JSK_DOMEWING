@@ -47,6 +47,7 @@ use App\Http\Controllers\Productwing\RestockController;
 use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
+use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
@@ -185,6 +186,8 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('cancel-order', [OpenMarketOrderController::class, 'cancelOrder']);
     // 파트너스 주문 조회
     Route::post('get-new-orders', [OpenMarketOrderController::class, 'index']);
+
+    Route::post('contact-us/update', [ContactUsController::class, 'update']);
 });
 Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     Route::prefix('account-setting')->group(function () {
