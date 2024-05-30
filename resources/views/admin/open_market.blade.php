@@ -196,7 +196,7 @@
                             trackingNumber,
                             deliveryCompanyId,
                             productOrderNumber,
-                            isRemoteArea
+                            isRemoteArea: isRemoteArea
                         },
                         success: function(response) {
                             console.log(response);

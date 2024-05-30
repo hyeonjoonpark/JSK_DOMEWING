@@ -35,7 +35,7 @@ class OpenMarketShipmentController extends Controller
         $trackingNumber = $request->trackingNumber;
         $deliveryCompanyId = $request->deliveryCompanyId;
         $productOrderNumber = $request->productOrderNumber;
-        $isRemoteArea = $request->isRemoteArea;
+        $isRemoteArea = $request->has('isRemoteArea') && $request->isRemoteArea === 'true';
         $order = DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
             ->where('delivery_status', 'PENDING')
