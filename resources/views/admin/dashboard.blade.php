@@ -7,6 +7,16 @@
 @endsection
 @section('content')
     <div class="row g-gs">
+        <?php
+        $labels = $weeklySales['labels'];
+        $sales = $weeklySales['sales'];
+        $recharges = $weeklySales['recharges'];
+        $max = $weeklySales['max'];
+        $thisMonthSaleTotal = $weeklySales['thisMonthSaleTotal'];
+        $lastMonthSaleTotal = $weeklySales['lastMonthSaleTotal'];
+        $thisMonthRechargeTotal = $weeklySales['thisMonthRechargeTotal'];
+        $lastMonthRechargeTotal = $weeklySales['lastMonthRechargeTotal'];
+        ?>
         <div class="col-lg-8">
             <div class="card card-bordered h-100">
                 <div class="card-inner">
@@ -72,26 +82,12 @@
             </div><!-- .card -->
         </div><!-- .col -->
         <div class="col-lg-4">
-            <div class="card card-bordered h-100">
+            <div class="card card-bordered">
                 <div class="card-inner-group">
                     <div class="card-inner card-inner-md">
                         <div class="card-title-group">
                             <div class="card-title">
-                                <h6 class="title">Action Center</h6>
-                            </div>
-                            <div class="card-tools me-n1">
-                                <div class="drodown">
-                                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger"
-                                        data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <ul class="link-list-opt no-bdr">
-                                            <li><a href="#"><em class="icon ni ni-setting"></em><span>Action
-                                                        Settings</span></a></li>
-                                            <li><a href="#"><em class="icon ni ni-notify"></em><span>Push
-                                                        Notification</span></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
+                                <h6 class="title">작업 센터</h6>
                             </div>
                         </div>
                     </div><!-- .card-inner -->
@@ -99,11 +95,13 @@
                         <div class="nk-wg-action">
                             <div class="nk-wg-action-content">
                                 <em class="icon ni ni-cc-alt-fill"></em>
-                                <div class="title">Pending Buy/Sell Orders</div>
-                                <p>We have still <strong>40 buy orders</strong> and <strong>12 sell orders</strong>, thats
-                                    need to review.</p>
+                                <div class="title">발주 대기 중인 주문</div>
+                                <p>
+                                    총 <strong>{{ number_format($actionCenter['numPendingOrders']) }}</strong>개의 주문이 발주 대기
+                                    중입니다.
+                                </p>
                             </div>
-                            <a href="#" class="btn btn-icon btn-trigger me-n2"><em
+                            <a href="/admin/open-market" class="btn btn-icon btn-trigger me-n2"><em
                                     class="icon ni ni-forward-ios"></em></a>
                         </div>
                     </div><!-- .card-inner -->
@@ -111,8 +109,10 @@
                         <div class="nk-wg-action">
                             <div class="nk-wg-action-content">
                                 <em class="icon ni ni-help-fill"></em>
-                                <div class="title">Support Messages</div>
-                                <p>Here is <strong>18 new</strong> support message. </p>
+                                <div class="title">접수된 문의</div>
+                                <p>
+                                    총 <strong>{{ number_format($actionCenter['numContactUs']) }}</strong>개의 문의가 답변 대기 중입니다.
+                                </p>
                             </div>
                             <a href="#" class="btn btn-icon btn-trigger me-n2"><em
                                     class="icon ni ni-forward-ios"></em></a>
@@ -122,10 +122,13 @@
                         <div class="nk-wg-action">
                             <div class="nk-wg-action-content">
                                 <em class="icon ni ni-wallet-fill"></em>
-                                <div class="title">Upcoming Deposit</div>
-                                <p><strong>7 upcoming</strong> deposit need to review.</p>
+                                <div class="title">승인 대기 중인 입금</div>
+                                <p>
+                                    총 <strong>{{ number_format($actionCenter['numPendingDeposits']) }}</strong>개의 입금이 승인 대기
+                                    중입니다.
+                                </p>
                             </div>
-                            <a href="#" class="btn btn-icon btn-trigger me-n2"><em
+                            <a href="https://domewing.com/admin/" class="btn btn-icon btn-trigger me-n2" target="_blank"><em
                                     class="icon ni ni-forward-ios"></em></a>
                         </div>
                     </div><!-- .card-inner -->
@@ -416,10 +419,11 @@
     <script src="{{ asset('assets/js/charts/gd-default.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const labels = @json($labels);
-            const sales = @json($sales);
-            const recharges = @json($recharges);
-            const max = @json($max);
+            const weeklySales = @json($weeklySales);
+            const labels = weeklySales.labels;
+            const sales = weeklySales.sales;
+            const recharges = weeklySales.recharges;
+            const max = weeklySales.max;
             const orderOverviewData = {
                 labels,
                 dataUnit: '윙',

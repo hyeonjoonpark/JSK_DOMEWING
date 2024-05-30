@@ -8,29 +8,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
     <title></title>
-
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,600" rel="stylesheet" type="text/css">
-    <!-- Web Font / @font-face : BEGIN -->
-    <!--[if mso]>
-        <style>
-            * {
-                font-family: 'Roboto', sans-serif !important;
-            }
-        </style>
-    <![endif]-->
-
-    <!--[if !mso]>
-        <link href="https://fonts.googleapis.com/css?family=Roboto:400,600" rel="stylesheet" type="text/css">
-    <![endif]-->
-
-    <!-- Web Font / @font-face : END -->
-
-    <!-- CSS Reset : BEGIN -->
-
-
     <style>
-        /* What it does: Remove spaces around the email design added by some email clients. */
-        /* Beware: It can remove the padding / margin and add a background color to the compose a reply window. */
         html,
         body {
             margin: 0 auto !important;
@@ -77,7 +56,6 @@
             -ms-interpolation-mode: bicubic;
         }
     </style>
-
 </head>
 
 <body width="100%"
@@ -91,7 +69,7 @@
                             <tr>
                                 <td style="text-align: center; padding-bottom:25px">
                                     <a href="#"><img style="height: 40px"
-                                            src="{{ asset('assets/images/logo.png') }}" alt="이 자리에 로고가 들어갑니다"></a>
+                                            src="{{ asset('assets/images/logo.png') }}" alt="로고"></a>
                                     <p style="font-size: 14px; color: #6576ff; padding-top: 12px;">당신의 도매에 날개를 달아줄</p>
                                 </td>
                             </tr>
@@ -112,7 +90,7 @@
                                     <p style="margin-bottom: 10px;">아래 문의 내용에 대한 답변을 전해 드립니다.</p>
                                     <p style="margin-bottom: 10px;">
                                         문의 내용:<br>
-                                        {{ $message }}
+                                        {{ $question }}
                                     </p>
                                 </td>
                             </tr>

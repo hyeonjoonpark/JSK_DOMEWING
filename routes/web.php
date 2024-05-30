@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\CMSController;
 use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Admin\PartnersManagementController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\AccountManagementController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
@@ -62,9 +64,9 @@ Route::prefix('partner')->group(function () {
 });
 // 셀윙 관리자 패널.
 Route::middleware(['auth'])->prefix('admin')->group(function () {
-    Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/partners', [PartnersManagementController::class, 'index']);
-    Route::get('/dashboard', [AdminController::class, 'dashboard']); // 대시보드 페이지는 뷰로 직접 로드
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']); // 대시보드 페이지는 뷰로 직접 로드
     Route::post('submit-post', [DashboardController::class, 'createPost']);
     Route::get('product/search', [AdminController::class, 'productSearch']);
     Route::get('product/search-to-register', [AdminController::class, 'searchToRegister']);
@@ -95,6 +97,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cms_dashboard', [AdminController::class, 'cmsDashboard'])->name('admin.cms_dashboard');
     Route::get('/cms_dashboard/content_management_system/{id}', [DomainController::class, 'loadCMS']);
     Route::get('/cms/{id}', [CMSController::class, 'loadSellerCMS']);
+    Route::get('contact-us', [ContactUsController::class, 'index']);
 });
 // ?? 뭐야 씨발
 Route::get('lang/{languageId}', function ($languageId) {
