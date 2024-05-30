@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-
+const { getOptionName } = require('./extract_product_option');
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -11,6 +11,7 @@ const fs = require('fs');
         const maxAttempts = 3;
         const soldOutProducts = [];
         for (const product of products) {
+            const optionName = getOptionName(product.productDetail);
             const enterResult = await enterProductPage(page, product.productHref, maxAttempts, 0);
             if (enterResult === false) {
                 const soldOutProduct = {
@@ -65,7 +66,6 @@ async function signIn(page, username, password) {
 
 async function isValidProduct(page, productHref, maxAttempts, attempt) {
     try {
-        await page.goto(productHref, { waitUntil: 'domcontentloaded' });
         return await page.evaluate(() => {
             const soldOutSelector = '#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > span.icon > img';
             const soldOutImage = document.querySelector(soldOutSelector);
