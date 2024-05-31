@@ -27,6 +27,13 @@ class CoupangCancelController extends Controller
             ->where('id', $partnerOrder->account_id)
             ->first();
         $singleOrder = $this->getSingleOrder($account, $partnerOrder->product_order_number); //발주서 단건 조회
+        if (!$singleOrder) {
+            return [
+                'status' => false,
+                'message' => '발주서 조회에 실패하였습니다.',
+                'error' => $singleOrder
+            ];
+        }
         $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
         return $this->cancelOrder($account, $vendorItemId, $cart->quantity, $partnerOrder->order_number);
     }
