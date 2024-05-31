@@ -35,7 +35,7 @@ async function moveToPage(page, listURL) {
 }
 async function scrapeProducts(page, forbiddenWords) {
     const products = await page.evaluate((forbiddenWords) => {
-        const productElements = document.querySelectorAll('#content > div > form:nth-child(3) > table:nth-child(6) > tbody > tr:nth-child(2) > td > div.goodsDisplay.w_1100 > ul li');
+        const productElements = document.querySelectorAll('td > div.goodsDisplay.w_1100 > ul li');
         const products = [];
         for (const productElement of productElements) {
             const product = scrapeProduct(productElement, forbiddenWords);
@@ -69,7 +69,7 @@ async function scrapeProducts(page, forbiddenWords) {
                     return false; // 특정 이미지가 있는 경우 false를 반환하여 제품을 건너뜁니다.
                 }
 
-                const href = productElement.querySelector(' li > div > a.goodsDisplay_a').href;
+                const href = productElement.querySelector('li > div > a.goodsDisplay_a').href;
                 const platform = "랜마트";
                 const product = { name, price, image, href, platform };
                 return product;
