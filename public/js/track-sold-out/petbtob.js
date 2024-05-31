@@ -83,7 +83,7 @@ async function isValidProduct(page, productHref, maxAttempts, attempt) {
     }
 }
 
-// 수정된 enterProductPage 함수
+// 수정된 enterProductPage 함수 return error 부분 나중에 체크할것.
 async function enterProductPage(page, productHref, maxAttempts, attempt) {
     try {
         await page.goto(productHref, { waitUntil: 'domcontentloaded' });
