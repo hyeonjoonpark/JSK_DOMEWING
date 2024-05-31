@@ -52,29 +52,29 @@ async function scrapeProducts(page) {
         const products = [];
         const productElements = document.querySelectorAll('ul.romi_prdList.itemline4 > li.item.xans-record- div');
 
+        // 품절 상품을 체크하는 함수
         function checkSkipProduct(promotionElement) {
             const soldOut = "/web/upload/icon_201806150348451600.png";
             const promotionSrc = promotionElement.getAttribute('src');
-            if (promotionSrc == soldOut) {
-                return true;
+            if (promotionSrc.includes(soldOut)) {
+                return true; // 품절 상품인 경우 true 반환
             }
             return false;
         }
 
         for (const productElement of productElements) {
-            const promotionElement = productElement.querySelector('ul.romi_prdList.itemline4 > li.item.xans-record- > div > p.icon > img');
+            const promotionElement = productElement.querySelector('p.icon > img');
             if (promotionElement) {
                 if (checkSkipProduct(promotionElement)) {
-                    continue;
+                    continue; // 품절 상품인 경우 해당 상품을 건너뜀
                 }
             }
 
-            const nameElement = productElement.querySelector('ul.romi_prdList.itemline4 > li.item.xans-record- > div > p.name > a > span');
-            const imageElement = productElement.querySelector('ul.romi_prdList.itemline4 > li.item.xans-record- > div > a > img');
-            const priceElement = productElement.querySelector('ul.romi_prdList.itemline4 > li.item.xans-record- > div > ul > li:nth-child(1) > span:nth-child(2)');
-            const hrefElement = productElement.querySelector('ul.romi_prdList.itemline4 > li.item.xans-record- > div > a');
+            const nameElement = productElement.querySelector('p.name > a > span');
+            const imageElement = productElement.querySelector('a > img');
+            const priceElement = productElement.querySelector('ul > li:nth-child(1) > span:nth-child(2)');
+            const hrefElement = productElement.querySelector('a');
 
-            // removeSoldOutMessage 함수 호출을 제거함
             const name = nameElement ? nameElement.textContent.trim() : 'Name not found';
             const image = imageElement ? imageElement.src.trim() : 'Image URL not found';
             const href = hrefElement ? hrefElement.href.trim() : 'Detail page URL not found';
@@ -86,3 +86,4 @@ async function scrapeProducts(page) {
     });
     return products;
 }
+
