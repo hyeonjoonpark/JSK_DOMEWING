@@ -11,7 +11,7 @@ const { getOptionName } = require('./extract_product_option');
         const maxAttempts = 3;
         const soldOutProducts = [];
         for (const product of products) {
-            const optionName = getOptionName(product.productDetail);
+            const optionName = getOptionName(product.productDetail); //기존 상품 옵션 추적 메서드
             const enterResult = await enterProductPage(page, product.productHref, maxAttempts, 0);
             if (enterResult === false) {
                 const soldOutProduct = {
@@ -100,5 +100,27 @@ async function enterProductPage(page, productHref, maxAttempts, attempt) {
             return false;
         }
         return await enterProductPage(page, productHref, maxAttempts, attempt + 1);
+    }
+}
+async function getOptionProduct(page) {
+    try {
+        const content = await page.content();
+        const $ = cheerio.load(content);
+
+        const options = [];
+        $('select.ProductOption0 option:not(:disabled)').each((i, element) => {
+            const optionText = $(element).text().trim();
+            const optionValue = $(element).val();
+            if (optionValue && optionValue !== '*' && optionValue !== '**' && !optionText.includes('품절')) {
+                const optionName = optionText.replace(/\s*\([\+\-]?\d{1,3}(,\d{3})*원\)/g, "").trim();
+                const optionPriceMatch = optionText.match(/\(([\+\-]?\d{1,3}(,\d{3})*원)\)/);
+                const optionPrice = optionPriceMatch ? parseInt(optionPriceMatch[1].replace(/,|원|\+/g, ''), 10) : 0;
+                options.push({ optionName, optionPrice });
+            }
+        });
+        return options;
+    } catch (error) {
+        console.error('Error:', error);
+        return [];
     }
 }
