@@ -40,11 +40,15 @@ async function scrapeProduct(page, url) {
                 "http://www.lanmart.co.kr/shop/data/sphtml_button2.png",
                 "http://www.lanmart.co.kr/shop/product/Product_notice860.jpg",
                 "http://www.kwshop.co.kr/contents/FAQ/FAQ_top.jpg",
-                "http://www.kwshop.co.kr/ariel/USB/KW-825/KW-825_01.jpg"
+                "http://www.kwshop.co.kr/ariel/USB/KW-825/KW-825_01.jpg",
+                "http://ai.esmplus.com/ssarang0212/2020-02-02/MBF_img.gif",
             ];
-            const productDetailElements = document.querySelectorAll('#contents > center > center img');
+            const productDetailElements = document.querySelectorAll('#contents img');
             if (productDetailElements.length < 1) {
                 return false; // 상세 이미지가 없으면 false 반환
+            }
+            if (productDetailElements.length < 1) {
+                productDetailElements = document.querySelectorAll('#Table_01 img');
             }
             const productDetails = Array.from(productDetailElements).filter(el => !excludedImageUrls.includes(el.src)).map(el => el.src);
             return productDetails.length > 0 ? productDetails : false; // 제외된 이미지 후 남은 이미지가 없으면 false 반환
