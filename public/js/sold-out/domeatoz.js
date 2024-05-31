@@ -34,14 +34,16 @@ async function login(page, username, password) {
 
 async function processPageList(page, searchStr) {
     await page.goto('https://www.domeatoz.com/vendor-myGoods', { waitUntil: 'networkidle0' });
-
     await page.evaluate((searchStr) => {
         document.querySelector('#form > div > div:nth-child(6) > select').value = '8';
-        document.querySelector('#listBox > div > div:nth-child(1) > select:nth-child(3)').value = '500';
         document.querySelector('#search').value = searchStr;
-        document.querySelector('#form > div > div:nth-child(6) > button.btn.btn-primary.px-5.ms-2').click();
     }, searchStr);
-    await delay(3000);
+    await delay(2000);
+    await page.evaluate(() => {
+        document.querySelector('#listBox > div > div:nth-child(1) > select:nth-child(3)').value = '500';
+        document.querySelector('#form > div > div:nth-child(6) > button.btn.btn-primary.px-5.ms-2').click();
+    });
+    await delay(2000);
 }
 
 async function doSoldOut(page) {
@@ -84,6 +86,7 @@ async function accessPopup(page) {
         console.log(false);
         return false;
     }
+    await delay(1000);
     await page.waitForSelector('.swal2-popup.swal2-show', { visible: true });
     const response = await page.evaluate(() => {
         const resultMessage = document.querySelector('#swal2-content').textContent.trim();
