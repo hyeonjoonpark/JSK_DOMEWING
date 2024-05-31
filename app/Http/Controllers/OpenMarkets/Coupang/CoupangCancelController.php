@@ -34,6 +34,7 @@ class CoupangCancelController extends Controller
                 'error' => $singleOrder
             ];
         }
+        return $singleOrder;
         $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
         return $this->cancelOrder($account, $vendorItemId, $cart->quantity, $partnerOrder->order_number);
     }
