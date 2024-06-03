@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\OpenMarkets\Coupang;
 
 use App\Http\Controllers\Controller;
+use DateTime;
 use Illuminate\Support\Facades\DB;
 
 class CoupangExchangeController extends Controller
@@ -25,9 +26,17 @@ class CoupangExchangeController extends Controller
     }
     private function getExchangeResult($account) //교환신청 내역 불러오기
     {
+        $startDate = new DateTime('now - 4 days');
+        $endDate = new DateTime('now');
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests';
-        return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $query = '');
+        $baseQuery = [
+            'createdAtFrom' => $startDate->format('Y-m-d'),
+            'createdAtTo' => $endDate->format('Y-m-d'),
+            // 'status' => 'RECEIPT'//상태는 입력 안하는 모든 상태의 값들 넘겨짐
+        ];
+        $query = http_build_query($baseQuery);
+        return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $query);
     }
     private function checkInExchangeRequest($account, $exchangeId) //교환 신청 확인처리
     {
@@ -49,5 +58,24 @@ class CoupangExchangeController extends Controller
             'exchangeRejectCode' => 'SOLDOUT' //WITHDRAW (고객이 요청했을때는 withdraw)
         ];
         return $this->ssac->putBuilder($account->access_key, $account->secret_key, $contentType, $path, $data);
+    }
+    private function exchangeShipment($account, $exchangeId, $shipmentBoxId, $goodsDeliveryCode, $invoiceNumber) //교환상품 송장업로드 처리
+    {
+        $method = 'POST';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests/' . $exchangeId . '/invoices';
+        $contentType = 'application/json;charset=UTF-8';
+        $data = [
+            'vendorId' => $account->code,
+            'orderSheetInvoiceApplyDtos' => [
+                [
+                    'exchangeId' => $exchangeId,
+                    'vendorId' => $account->code,
+                    'shipmentBoxId' => $shipmentBoxId,
+                    'goodsDeliveryCode' => $goodsDeliveryCode, //택배사
+                    'invoiceNumber' => $invoiceNumber, //송장번호
+                ]
+            ]
+        ];
+        return $this->ssac->builder($account->access_key, $account->secret_key, $method, $contentType, $path, $data);
     }
 }
