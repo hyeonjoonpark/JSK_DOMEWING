@@ -225,6 +225,13 @@
             Swal.fire({
                 title: '주문 취소',
                 input: 'textarea',
+                inputValue: `죄송합니다.
+
+                주문해주신 제품 현재 최종 품절 확인이 되어 부득이 판매취소처리를 하게 되었습니다.
+
+                입고일정도 확인하였으나, 입고 지연이 됨으로써 예상잡혀있던 입고일정이 다시 미정으로 잡히게 되었습니다.
+
+                양해 부탁드리며, 쇼핑에 불편을 끼쳐드린점 사과의 말씀을 드립니다.`,
                 showCancelButton: true,
                 confirmButtonText: '취소하기',
                 cancelButtonText: '닫기',
