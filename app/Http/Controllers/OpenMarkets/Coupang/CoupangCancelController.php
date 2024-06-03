@@ -27,14 +27,13 @@ class CoupangCancelController extends Controller
             ->where('id', $partnerOrder->account_id)
             ->first();
         $singleOrder = $this->getSingleOrder($account, $partnerOrder->product_order_number); //발주서 단건 조회
-        if (!$singleOrder) {
-            return [
-                'status' => false,
-                'message' => '발주서 조회에 실패하였습니다.',
+        if (!$singleOrder['status']) {
+            return [ //즉 이미 쿠팡에서는 취소 또는 반품이 되어 있음으로 true를 진행하여 domewing에도 반영
+                'status' => true,
+                'message' => '쿠팡 주문의 상태가 변경되었습니다.',
                 'error' => $singleOrder
             ];
         }
-        return $singleOrder;
         $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
         return $this->cancelOrder($account, $vendorItemId, $cart->quantity, $partnerOrder->order_number);
     }
