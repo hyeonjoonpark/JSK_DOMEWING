@@ -3,10 +3,6 @@
 namespace App\Http\Controllers\OpenMarkets\Coupang;
 
 use App\Http\Controllers\Controller;
-use DateInterval;
-use DatePeriod;
-use DateTime;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CoupangExchangeController extends Controller
@@ -21,13 +17,37 @@ class CoupangExchangeController extends Controller
         $accounts = DB::table('coupang_accounts')->where('is_active', 'ACTIVE')->get();
         $apiResults = [];
         foreach ($accounts as $account) {
-            $apiResults[] = $this->getExchangeResult($account);
+            $apiResults[] = $this->getExchangeResult($account); //모든 신청내역 불러오기
+        }
+        foreach ($apiResults as $apiResult) {
+            $exchangeId = $apiResult['data']['exchangeAddressDtoV1']['exchangeId'];
         }
     }
-    private function getExchangeResult($account)
+    private function getExchangeResult($account) //교환신청 내역 불러오기
     {
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests';
-        return $this->ssac->getBuilder($account->accessKey, $account->secretKey, $contentType, $path, $query = '');
+        return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $query = '');
+    }
+    private function checkInExchangeRequest($account, $exchangeId) //교환 신청 확인처리
+    {
+        $contentType = 'application/json';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests/' . $exchangeId . '/receiveConfirmation';
+        $data = [
+            'exchangeId' => $exchangeId,
+            'vendorId' => $account->code
+        ];
+        return $this->ssac->putBuilder($account->access_key, $account->secret_key, $contentType, $path, $data);
+    }
+    private function rejectExchangeRequest($account, $exchangeId) //교환신청 거부(품절 또는 고객요청)
+    {
+        $contentType = 'application/json';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests/' . $exchangeId . '/rejection';
+        $data = [
+            'exchangeId' => $exchangeId,
+            'vendorId' => $account->code,
+            'exchangeRejectCode' => 'SOLDOUT' //WITHDRAW (고객이 요청했을때는 withdraw)
+        ];
+        return $this->ssac->putBuilder($account->access_key, $account->secret_key, $contentType, $path, $data);
     }
 }
