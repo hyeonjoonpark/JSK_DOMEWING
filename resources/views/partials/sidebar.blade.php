@@ -62,10 +62,10 @@
                                     <a href="/admin/product/legacy" class="nk-menu-link"><span class="nk-menu-text">레거시
                                             상품</span></a>
                                 </li>
-                                <li class="nk-menu-item">
+                                {{-- <li class="nk-menu-item">
                                     <a href="/admin/product-editor" class="nk-menu-link"><span class="nk-menu-text">상품
                                             대량 관리</span></a>
-                                </li>
+                                </li> --}}
                             </ul>
                         </li>
                         <li class="nk-menu-item has-sub">
