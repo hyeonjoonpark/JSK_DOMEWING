@@ -61,6 +61,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['orderStatus'] = '신규주문';
             $rowData['b2BName'] = "셀링콕";
@@ -128,6 +130,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['orderStatus'] = '배송준비';
             $rowData['b2BName'] = "오너클랜";
@@ -197,6 +201,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['b2BName'] = "도매아토즈";
             if (!empty($rowData)) {
@@ -268,6 +274,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['b2BName'] = "도매창고";
 
@@ -343,6 +351,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['b2BName'] = "도매꾹";
 
@@ -418,6 +428,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['b2BName'] = "도매꾹2";
 
@@ -487,6 +499,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['amount'] = (int)$rowData['productPrice'] * (int)$rowData['quantity'] + (int)$rowData['shippingCost'];
             $rowData['b2BName'] = "도매의신";
@@ -558,6 +572,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['orderStatus'] = '배송준비';
             $rowData['b2BName'] = "도매로";
@@ -625,6 +641,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['b2BName'] = "스페셜오퍼";
             $rowData['senderPhone'] = '';
@@ -696,6 +714,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['b2BName'] = "투비즈온";
             if (!empty($rowData)) {
@@ -762,6 +782,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $productPrice = (int)$rowData['productPrice'];
             $quantity = (int)$rowData['quantity'];
@@ -842,6 +864,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['amount'] = (int)$rowData['productPrice'] * (int)$rowData['quantity'] + (int)$rowData['shippingCost'];
             $rowData['orderStatus'] = '배송준비';
@@ -927,6 +951,8 @@ class ProcessDataController extends Controller
                 $product = $response['return'];
                 $rowData['productHref'] = $product->productHref;
                 $rowData['productImage'] = $product->productImage;
+            } else {
+                $rowData['productName'] .= ' = (품절 상품)';
             }
             $rowData['b2BName'] = "펀앤";
             if (!empty($rowData)) {
