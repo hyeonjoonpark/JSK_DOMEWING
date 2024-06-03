@@ -151,7 +151,7 @@ class CoupangUploadController extends Controller
             ];
         }
         return [
-            'status' => true,
+            'status' => false,
             'message' => '쿠팡윙에서 출고지 주소를 올바르게 설정해주세요.'
         ];
     }

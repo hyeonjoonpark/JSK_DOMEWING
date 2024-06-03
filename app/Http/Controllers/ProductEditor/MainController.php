@@ -56,11 +56,36 @@ class MainController extends Controller
                 $rowData = [
                     'productCode' => $sheet->getCell('A' . $i)->getValue(),
                     'categoryID' => $sheet->getCell('B' . $i)->getValue(),
-                    'productName' => $sheet->getCell('C' . $i)->getValue(),
-                    'productKeywords' => $sheet->getCell('D' . $i)->getValue(),
+                    'productName' => $this->nameController->index($sheet->getCell('C' . $i)->getValue()),
+                    'productKeywords' => $this->productDataValidityController->validateKeywords($sheet->getCell('D' . $i)->getValue()),
                     'productPrice' => $sheet->getCell('E' . $i)->getValue(),
-                    'productDetail' => $sheet->getCell('F' . $i)->getValue()
+                    'shipping_fee' => $sheet->getCell('F' . $i)->getValue(),
+                    'bundle_quantity' => $sheet->getCell('G' . $i)->getValue(),
                 ];
+                $validator = Validator::make($rowData, [
+                    'productCode' => ['required', 'exists:minewing_products,productCode'],
+                    'categoryID' => ['required', 'integer', 'exists:ownerclan_category,id'],
+                    'productName' => ['required'],
+                    'productKeywords' => [],
+                    'productPrice' => ['required', 'integer', 'min:10'],
+                    'shipping_fee' => ['required', 'integer', 'min:10'],
+                    'bundle_quantity' => ['required', 'integer']
+                ], [
+                    'productCode.required' => '상품 코드는 필수 항목입니다.',
+                    'productCode.exists' => '존재하지 않는 상품 코드입니다.',
+                    'categoryID.required' => '카테고리 ID는 필수 항목입니다.',
+                    'categoryID.integer' => '카테고리 ID는 정수여야 합니다.',
+                    'categoryID.exists' => '존재하지 않는 카테고리 ID입니다.',
+                    'productName.required' => '상품 이름은 필수 항목입니다.',
+                    'productPrice.required' => '상품 가격은 필수 항목입니다.',
+                    'productPrice.integer' => '상품 가격은 정수여야 합니다.',
+                    'productPrice.min' => '상품 가격은 최소 10원이어야 합니다.',
+                    'shipping_fee.required' => '배송비는 필수 항목입니다.',
+                    'shipping_fee.integer' => '배송비는 정수여야 합니다.',
+                    'shipping_fee.min' => '배송비는 최소 10원이어야 합니다.',
+                    'bundle_quantity.required' => '번들 수량은 필수 항목입니다.',
+                    'bundle_quantity.integer' => '번들 수량은 정수여야 합니다.'
+                ]);
                 $validateColumnsResult = $this->validateColumns($rowData);
                 if ($validateColumnsResult['status'] === false) {
                     $productCode = $validateColumnsResult['return']['productCode'];

@@ -37,7 +37,7 @@ class DownloadController extends Controller
         $rowIndex = 2;
         $products = DB::table('minewing_products')
             ->whereIn('productCode', $productCodes)
-            ->get(['productCode', 'categoryID', 'productName', 'productKeywords', 'productPrice', 'productDetail']);
+            ->get(['productCode', 'categoryID', 'productName', 'productKeywords', 'productPrice', 'shipping_fee', 'bundle_quantity', 'productDetail', 'productHref']);
         foreach ($products as $product) {
             $data = [
                 $product->productCode,
@@ -45,7 +45,10 @@ class DownloadController extends Controller
                 $product->productName,
                 $product->productKeywords,
                 $product->productPrice,
-                $product->productDetail
+                $product->shipping_fee,
+                $product->bundle_quantity,
+                $product->productDetail,
+                $product->productHref,
             ];
             $colIndex = 1;
             foreach ($data as $value) {
