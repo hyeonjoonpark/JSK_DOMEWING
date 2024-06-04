@@ -38,11 +38,13 @@ class OpenMarketOrderController extends Controller
                 foreach ($apiResults as $apiResult) {
                     if ($apiResult['productOrderStatus'] !== '결제완료' && $apiResult['productOrderStatus'] !== '상품준비중') {
                         continue; // 결제완료, 상품준비중 db에 저장하려고 검증
-                    }
+                    } //일부러 결제완료, 상품준비중을 먼저 검증 왜냐 db조회보다 간단한 배열 조회가 더빠르기 때문에 성능 최적화
                     //주문이 이미 있는지 검증
-                    $isExist = DB::table('partner_orders')
-                        ->where('order_number', $apiResult['orderId'])
-                        ->where('product_order_number', $apiResult['productOrderId'])
+                    $isExist = DB::table('partner_orders as po')
+                        ->join('orders as o', 'o.id', '=', 'po.order_id')
+                        ->where('po.order_number', $apiResult['orderId'])
+                        ->where('po.product_order_number', $apiResult['productOrderId'])
+                        ->whereIn('o.type', ['PAID', 'CANCELLED'])
                         ->exists();
                     if ($isExist) {
                         continue; // 저장 로직 건너뛰기
@@ -60,11 +62,7 @@ class OpenMarketOrderController extends Controller
                         $cartIds = [];
                         foreach ($orders as $order) {
                             $product = $this->getProduct($order['productCode']);
-                            if (!$product) return [
-                                'status' => false,
-                                'message' => '도매윙에 등록된 상품이 아닙니다. 제품코드 : ' . $order['productCode'],
-                                'data' => $order
-                            ];
+                            if (!$product) continue; //셀러가 우리 제품 말고 다른걸 올릴 수 있음
                             $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
                             $cartId = $cart['data']['cartId'];
                             $cartCode = $this->getCartCode($cartId);
@@ -75,6 +73,7 @@ class OpenMarketOrderController extends Controller
                         $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
                         foreach ($orders as $index => $order) {
                             $product = $this->getProduct($order['productCode']);
+                            if (!$product) continue;
                             $priceThen = $this->getSalePrice($product->id);
                             $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity);
                             $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
@@ -88,13 +87,14 @@ class OpenMarketOrderController extends Controller
                     DB::rollBack(); // 트랜잭션 롤백
                     return [
                         'status' => false,
-                        'message' => $e->getMessage(),
+                        'message' => '새로운 주문 저장과정에서 오류가 발생하였습니다.',
                         'error' => $e->getMessage(),
                     ];
                 }
             }
         }
-        $orders = $this->getPaidOrders();
+        //위에서 새로운 주문 저장이 완료 되었다면 db에서 보여줘야할 정보들 제공
+        $orders = $this->getOrders();
         $processedOrders = $orders->map(function ($order) {
             return $this->processOrder($order);
         });
@@ -386,7 +386,7 @@ class OpenMarketOrderController extends Controller
 
         return ceil($productPrice * $marginRate);
     }
-    private function getPaidOrders()
+    private function getOrders()
     {
         return DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
@@ -394,8 +394,8 @@ class OpenMarketOrderController extends Controller
             ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
             ->join('members as m', 'm.id', '=', 'wt.member_id')
             ->join('carts as c', 'c.id', '=', 'o.cart_id')
-            ->where('o.type', 'PAID')
-            ->where('wt.status', 'APPROVED')
+            ->whereNotIn('o.type', ['CANCELLED'])
+            ->whereNotIn('wt.status', ['REJECTED'])
             ->where('o.delivery_status', 'PENDING')
             ->select(
                 'm.username as member_username',
@@ -417,6 +417,7 @@ class OpenMarketOrderController extends Controller
                 'm.id as memberId',
                 'c.product_id as productId',
                 'o.receiver_remark as receiverRemark',
+                'o.type as type',
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist')
             )
             ->get();
@@ -442,7 +443,15 @@ class OpenMarketOrderController extends Controller
         }
 
         $deliveryCompanies = $this->getDeliveryCompanies();
-
+        $orderStatus = '신규주문';
+        switch ($order->type) {
+            case 'REFUND':
+                $orderStatus = '환불';
+                break;
+            case 'EXCHANGE':
+                $orderStatus = '교환';
+                break;
+        }
         return [
             'userName' => $order->member_username,
             'orderNumber' => $order->orderNumber,
@@ -459,7 +468,7 @@ class OpenMarketOrderController extends Controller
             'shippingFee' => $product ? $product->shipping_fee : null,
             'quantity' => $order->quantity,
             'amount' => $product ? $this->calcProductPrice($product->productPrice) * $order->quantity + $product->shipping_fee : null,
-            'orderStatus' => '신규주문',
+            'orderStatus' => $orderStatus,
             'senderNickName' => $order->senderNickName,
             'senderPhone' => $order->senderPhone,
             'senderEmail' => $order->senderEmail,
