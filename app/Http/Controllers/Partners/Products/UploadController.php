@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
+use App\Http\Controllers\OpenMarkets\St11\UploadController as St11UploadController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -131,5 +132,10 @@ class UploadController extends Controller
     {
         $cuc = new CoupangUploadController($products, $partner, $account);
         return $cuc->main();
+    }
+    private function st11($products, $partner, $account)
+    {
+        $st11UploadController = new St11UploadController();
+        return $st11UploadController->main($products, $partner, $account);
     }
 }

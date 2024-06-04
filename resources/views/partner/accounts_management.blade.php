@@ -295,5 +295,39 @@
                 error: AjaxErrorHandling
             });
         }
+
+        function initSt11Del() {
+            popupLoader(1, "해당 계정을 삭제 중입니다.");
+            $.ajax({
+                url: "/api/partner/account-setting/st11/delete",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    hash: hashVar
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
+        function st11Edit() {
+            popupLoader(1, '수정된 사항을 적용 중입니다.');
+            const username = $('#st11Username').val();
+            const accessKey = $('#st11AccessKey').val();
+            $.ajax({
+                url: "/api/partner/account-setting/st11/edit",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    hash: hashVar,
+                    username,
+                    accessKey
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
     </script>
 @endsection
