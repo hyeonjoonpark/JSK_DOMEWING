@@ -53,6 +53,7 @@ use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\OpenMarketOrderController;
 use App\Http\Controllers\OpenMarkets\OpenMarketShipmentController;
+use App\Http\Controllers\OpenMarkets\St11\AccountController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\Products\ManageController;
 use App\Http\Controllers\Partners\Products\PartnerTableController;
@@ -202,6 +203,11 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
             Route::post('/', [SmartStoreAccountController::class, 'add']);
             Route::post('edit', [SmartStoreAccountController::class, 'edit']);
             Route::post('delete', [SmartStoreAccountController::class, 'delete']);
+        });
+        Route::prefix('st11')->group(function () {
+            Route::post('/', [AccountController::class, 'add']);
+            Route::post('edit', [AccountController::class, 'edit']);
+            Route::post('delete', [AccountController::class, 'delete']);
         });
     });
     Route::prefix('product')->group(function () {

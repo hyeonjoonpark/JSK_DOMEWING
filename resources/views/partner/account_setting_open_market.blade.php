@@ -78,6 +78,28 @@
                 </div>
             </div>
         </div>
+        <div class="col-12 col-lg-6">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">11번가</h6>
+                    <p>
+                        11번가 서비스 등록 및 확인 페이지로부터 OPEN API KEY 정보를 입력해주세요.
+                    </p>
+                    <div class="form-group">
+                        <label for="" class="form-label">계정명(별칭)</label>
+                        <input class="form-control" type="text" id="st11Username" placeholder="계정명 혹은 별칭을 입력해주세요.">
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">OPEN API KEY</label>
+                        <input class="form-control" type="text" id="st11AccessKey"
+                            placeholder="11ST OPEN API KEY 를 입력해주세요.">
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="addSt11Account();">추가하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 @section('scripts')
@@ -122,6 +144,24 @@
                     applicationId,
                     secret,
                     storeName
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
+        function addSt11Account() {
+            const username = $('#st11Username').val();
+            const accessKey = $('#st11AccessKey').val();
+            popupLoader(0, '해당 계정 정보를 동기화 중입니다.');
+            $.ajax({
+                url: "/api/partner/account-setting/st11",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    username,
+                    accessKey
                 },
                 success: ajaxSuccessHandling,
                 error: AjaxErrorHandling

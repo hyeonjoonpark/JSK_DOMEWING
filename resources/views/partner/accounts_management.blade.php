@@ -39,6 +39,22 @@
                 </div>
             </div>
         </div>
+        <div class="col-12 col-lg-6">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">11번가</h6>
+                    <p>각 계정을 클릭하여 관리합니다.</p>
+                    <div class="row g-gs">
+                        @foreach ($st11Accounts as $item)
+                            <div class="col-auto">
+                                <button class="btn btn-primary"
+                                    onclick="viewSt11Account('{{ $item->username }}','{{ $item->access_key }}', '{{ $item->hash }}');">{{ $item->username }}</button>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog"
         id="viewCoupangAccountModal">
@@ -121,6 +137,33 @@
             </div>
         </div>
     </div>
+    <div class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog"
+        id="viewSt11Modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">스마트 스토어 계정 연동 정보</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">계정명(별칭)</label>
+                        <input type="text" class="form-control" id="st11Username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">OPEN API KEY</label>
+                        <input type="text" class="form-control" id="st11AccessKey">
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button class="btn btn-success" onclick="st11Edit();">수정하기</button>
+                    <button class="btn btn-danger" onclick="initSt11Del();">삭제하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>
@@ -143,6 +186,13 @@
             $('#ssStoreName').val(storeName);
             $('#ssUsername').val(username);
             $('#viewSsModal').modal('show');
+        }
+
+        function viewSt11Account(username, accessKey, hash) {
+            hashVar = hash;
+            $('#st11Username').val(username);
+            $('#st11AccessKey').val(accessKey);
+            $('#viewSt11Modal').modal('show');
         }
 
         function smartStoreEdit() {

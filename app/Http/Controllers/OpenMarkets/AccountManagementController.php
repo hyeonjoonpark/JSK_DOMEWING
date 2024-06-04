@@ -23,9 +23,15 @@ class AccountManagementController extends Controller
                 'is_active' => 'ACTIVE',
                 'partner_id' => $partnerId
             ])->get();
+        $st11Accounts = DB::table('st11_accounts')
+            ->where([
+                'is_active' => 'ACTIVE',
+                'partner_id' => $partnerId
+            ])->get();
         return view('partner.accounts_management', [
             'coupangAccounts' => $coupangAccounts,
-            'smartStoreAccounts' => $smartStoreAccounts
+            'smartStoreAccounts' => $smartStoreAccounts,
+            'st11Accounts' => $st11Accounts
         ]);
     }
     public function domewing()

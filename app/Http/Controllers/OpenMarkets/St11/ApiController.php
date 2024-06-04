@@ -8,18 +8,23 @@ use Illuminate\Support\Facades\Http;
 
 class ApiController extends Controller
 {
-    public function builder()
+    public function builder($apiKey, $method, $url, $data)
     {
-        $data = [
-            'key' => '88c03bfe65fa93f959564aa1caf2769a',
-            'apiCode' => 'ProductSearch',
-            'keyword' => 'test'
-        ];
-        $response = Http::get('https://openapi.11st.co.kr/openapi/OpenApiService.tmall', $data);
+        $response = Http::withHeaders([
+            'Content-Type' => 'text/xml; charset=EUC-KR',
+            'openapikey' => $apiKey
+        ])->$method($url, $data);
         if ($response->successful()) {
             $xml = simplexml_load_string($response);
+            return [
+                'status' => true,
+                'data' => $xml
+            ];
         }
-        echo "false";
-        return;
+        return [
+            'status' => false,
+            'message' => '11번가 API 요청을 보내는 과정에서 에러가 발생했습니다.',
+            'error' => $response->body()
+        ];
     }
 }

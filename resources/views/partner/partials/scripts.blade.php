@@ -112,7 +112,6 @@
         const message = response.message;
         closePopup();
         if (status === false) {
-            console.log(response);
             swalError(message);
         } else {
             swalWithReload(message, 'success');
