@@ -39,6 +39,7 @@ class CoupangReturnController extends Controller
         $baseQuery = [
             'createdAtFrom' => $startDate->format('Y-m-d\TH:i'),
             'createdAtTo' => $endDate->format('Y-m-d\TH:i'),
+            'status' => 'UC'
         ];
         $query = 'searchType=timeFrame&' . http_build_query($baseQuery);
         return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $query);
@@ -47,7 +48,44 @@ class CoupangReturnController extends Controller
     {
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests/' . $receiptId;
-        return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
+        $response =  $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
+        $transformResult = $this->transformReturnDetails($response, $account);
+    }
+    private function transformReturnDetails($response, $account)
+    {
+        if (!isset($response['data']['data'])) {
+            return false;
+        }
+        $orderDetails = [];
+        if (!empty($response['data']['data'])) {
+            foreach ($response['data']['data'] as $item) {
+                $orderDetails[] = [
+                    'market' => '쿠팡',
+                    'marketEngName' => 'coupang',
+                    'orderId' => strval($item['orderId']),
+                    'productOrderId' => strval($item['shipmentBoxId']),
+                    'orderName' => $item['orderer']['name'],
+                    'productName' => $orderItem['vendorItemName'],
+                    'quantity' => $orderItem['shippingCount'],
+                    'unitPrice' => $orderItem['salesPrice'],
+                    'totalPaymentAmount' => $orderItem['orderPrice'],
+                    'deliveryFeeAmount' => $item['shippingPrice'],
+                    'productOrderStatus' => $this->mapStatusToReadable($item['status']),
+                    'orderDate' => isset($item['paidAt']) ? (new DateTime($item['paidAt']))->format('Y-m-d H:i:s') : 'N/A',
+                    'receiverName' => $item['requesterName'],
+                    'receiverPhone' => $item['requesterPhoneNumber'],
+                    'postCode' => $item['requesterZipCode'],
+                    'address' => $item['receiver']['addr1'] . ' ' . $item['receiver']['addr2'],
+                    'addressName' => '기본배송지',
+                    'productCode' => $orderItem['externalVendorSkuCode'] ?? 'N/A',
+                    'remark' => $item['cancelReason'] ?? 'N/A',
+                    'cancelCountSum' => $item['cancelCountSum'],
+                    'returnDeliveryId' => $item['returnDeliveryId'],
+                    'accountId' => $account->id
+                ];
+            }
+        }
+        return $orderDetails;
     }
     private function extractReceiptIds($data)
     {
