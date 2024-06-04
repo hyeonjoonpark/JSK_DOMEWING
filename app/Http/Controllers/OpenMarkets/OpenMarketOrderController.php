@@ -494,6 +494,7 @@ class OpenMarketOrderController extends Controller
         return DB::table('vendors')
             ->where('is_active', 'ACTIVE')
             ->where('type', 'OPEN_MARKET')
+            ->whereIn('id', [40, 51])
             ->get();
     }
     private function calcProductPrice($productPrice)
