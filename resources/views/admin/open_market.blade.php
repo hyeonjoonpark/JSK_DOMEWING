@@ -67,10 +67,10 @@
                     rememberToken
                 },
                 success: function(response) {
+                    closePopup();
                     console.log(response);
                     updateOrderTable(response.processedOrders); // processedOrders 사용
                     updateLowBalanceAccounts(response.lowBalanceAccounts); // lowBalanceAccounts 사용
-                    closePopup();
                 },
                 error: function(response) {
                     closePopup();

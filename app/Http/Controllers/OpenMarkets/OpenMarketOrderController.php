@@ -60,11 +60,7 @@ class OpenMarketOrderController extends Controller
                         $cartIds = [];
                         foreach ($orders as $order) {
                             $product = $this->getProduct($order['productCode']);
-                            if (!$product) return [
-                                'status' => false,
-                                'message' => '도매윙에 등록된 상품이 아닙니다. 제품코드 : ' . $order['productCode'],
-                                'data' => $order
-                            ];
+                            if (!$product) continue; //셀러가 우리 제품 말고 다른걸 올릴 수 있음
                             $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
                             $cartId = $cart['data']['cartId'];
                             $cartCode = $this->getCartCode($cartId);
