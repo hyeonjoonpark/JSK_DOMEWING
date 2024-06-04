@@ -9,7 +9,7 @@ use DateTimeZone;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class SmartStoreExchangeController extends Controller
+class SmartStoreReturnController extends Controller
 {
     private $ssac;
     public function __construct()
@@ -114,16 +114,17 @@ class SmartStoreExchangeController extends Controller
                 'unitPrice' => $item['productOrder']['unitPrice'] ?? 'N/A',
                 'totalPaymentAmount' => $item['productOrder']['totalPaymentAmount'] ?? 'N/A',
                 'deliveryFeeAmount' => $item['productOrder']['deliveryFeeAmount'] ?? 'N/A',
-                'productOrderStatus' => $statusMap[$item['productOrder']['productOrderStatus']] ?? '상태 미정',
+                'productOrderStatus' => $statusMap[$item['return']['claimStatus']] ?? '상태 미정',
                 'orderDate' => isset($item['order']['orderDate']) ? (new DateTime($item['order']['orderDate']))->format('Y-m-d H:i:s') : 'N/A',
-                'receiverName' => $shippingAddress ? $shippingAddress['name'] ?? 'N/A' : 'N/A',
-                'receiverPhone' => $shippingAddress ? $shippingAddress['tel1'] ?? 'N/A' : 'N/A',
-                'postCode' => $shippingAddress ? $shippingAddress['zipCode'] ?? 'N/A' : 'N/A',
-                'address' => $shippingAddress ? ($shippingAddress['baseAddress'] . ' ' . ($shippingAddress['detailedAddress'] ?? '')) : 'N/A',
+                'receiverName' => $item['collectAddress']['name'] ?? 'N/A',
+                'receiverPhone' => $item['collectAddress']['tel1'] ?? 'N/A',
+                'postCode' => $item['collectAddress']['zipCode'] ?? 'N/A',
+                'address' => ($item['collectAddress']['baseAddress'] . ' ' . ($item['collectAddress']['detailedAddress'] ?? '')) ?? 'N/A',
                 'addressName' => '기본배송지',
                 'productCode' => $item['productOrder']['sellerProductCode'] ?? 'N/A',
                 'remark' => $item['productOrder']['shippingMemo'] ?? 'N/A',
                 'accountId' => $accountId
+
             ];
         }, $response['data']['data']);
         return $formattedResponse;
@@ -135,35 +136,24 @@ class SmartStoreExchangeController extends Controller
             ->where('is_active', 'ACTIVE')
             ->get();
     }
-
-    private function completeExchangePickup($account, $productOrderId) // 교환 수거 완료
+    private function approveReturnRequest($account, $productOrderId) //반품승인
     {
         $contentType = 'application/json';
         $method = 'POST';
-        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderId . '/claim/exchange/collect/approve';
+        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderId . '/claim/return/approve';
         $data = [];
+
         return $this->ssac->builder($account, $contentType, $method, $url, $data);
     }
-    private function reshipExchange($account, $productOrderId, $deliveryCompany, $deliveryTrackingNumber) // 교환 재배송 처리
+    private function rejectReturnRequest($account, $productOrderId, $rejectReturnReason) //반품거부
     {
         $contentType = 'application/json';
         $method = 'POST';
-        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderId . '/claim/exchange/dispatch';
+        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderId . '/claim/return/reject';
         $data = [
-            'reDeliveryMethod' => 'DELIVERY', //택배만 하기 때문
-            'reDeliveryCompany' => $deliveryCompany,
-            'reDeliveryTrackingNumber' => $deliveryTrackingNumber,
+            'rejectReturnReason' => $rejectReturnReason
         ];
-        return $this->ssac->builder($account, $contentType, $method, $url, $data);
-    }
-    private function rejectExchangeRequest($account, $productOrderId, $rejectExchangeReason) // 교환 거부(재배송) 처리
-    {
-        $contentType = 'application/json';
-        $method = 'POST';
-        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderId . '/claim/exchange/reject';
-        $data = [
-            'rejectExchangeReason' => $rejectExchangeReason
-        ];
+
         return $this->ssac->builder($account, $contentType, $method, $url, $data);
     }
 }
