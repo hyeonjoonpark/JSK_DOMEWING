@@ -89,6 +89,16 @@ class ManageController extends Controller
         }
         $productCodes = $request->productCodes;
         $partnerTableToken = $request->partnerTableToken;
+        $numInTable = DB::table('partner_products AS pp')
+            ->join('partner_tables AS pt', 'pt.id', '=', 'pp.partner_table_id')
+            ->count();
+        $totalNum = $numInTable + count($productCodes);
+        if ($totalNum > 1000) {
+            return [
+                'status' => false,
+                'message' => '테이블 당 수집 가능한 상품은 1,000개입니다.'
+            ];
+        }
         return $this->create($productCodes, $partnerTableToken);
     }
     public function create($productCodes, $partnerTableToken)
