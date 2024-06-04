@@ -40,9 +40,11 @@ class OpenMarketOrderController extends Controller
                         continue; // 결제완료, 상품준비중 db에 저장하려고 검증
                     } //일부러 결제완료, 상품준비중을 먼저 검증 왜냐 db조회보다 간단한 배열 조회가 더빠르기 때문에 성능 최적화
                     //주문이 이미 있는지 검증
-                    $isExist = DB::table('partner_orders')
-                        ->where('order_number', $apiResult['orderId'])
-                        ->where('product_order_number', $apiResult['productOrderId'])
+                    $isExist = DB::table('partner_orders as po')
+                        ->join('orders as o', 'o.id', '=', 'po.order_id')
+                        ->where('po.order_number', $apiResult['orderId'])
+                        ->where('po.product_order_number', $apiResult['productOrderId'])
+                        ->whereIn('o.type', ['PAID', 'CANCELLED'])
                         ->exists();
                     if ($isExist) {
                         continue; // 저장 로직 건너뛰기
@@ -71,6 +73,7 @@ class OpenMarketOrderController extends Controller
                         $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
                         foreach ($orders as $index => $order) {
                             $product = $this->getProduct($order['productCode']);
+                            if (!$product) continue;
                             $priceThen = $this->getSalePrice($product->id);
                             $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity);
                             $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
