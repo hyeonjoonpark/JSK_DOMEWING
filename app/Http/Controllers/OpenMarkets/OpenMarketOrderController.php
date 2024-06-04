@@ -150,13 +150,13 @@ class OpenMarketOrderController extends Controller
                 'api_result' => $apiResult
             ];
         }
-        if ($totalAmountRequired > $wing) {
-            return [
-                'status' => false,
-                'message' => 'wing 잔액이 부족합니다.',
-                'data' => $totalAmountRequired - $wing,
-            ];
-        }
+        // if ($totalAmountRequired > $wing) {
+        //     return [
+        //         'status' => false,
+        //         'message' => 'wing 잔액이 부족합니다.',
+        //         'data' => $totalAmountRequired - $wing,
+        //     ];
+        // }
         return [
             'status' => true,
             'message' => '성공적으로 오더윙을 가동하였습니다.',
