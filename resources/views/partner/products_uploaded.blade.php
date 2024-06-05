@@ -88,7 +88,7 @@
                                             name="selectedOpenMarketId" value="{{ $openMarket->id }}"
                                             class="custom-control-input"
                                             {{ $selectedOpenMarketId == $openMarket->id ? 'checked' : '' }}
-                                            {{ in_array($openMarket->id, [40, 51]) ? '' : 'disabled' }}>
+                                            {{ in_array($openMarket->id, [40, 51, 54]) ? '' : 'disabled' }}>
                                         <label class="custom-control-label"
                                             for="openMarket{{ $openMarket->id }}">{{ $openMarket->name }}</label>
                                     </div>
