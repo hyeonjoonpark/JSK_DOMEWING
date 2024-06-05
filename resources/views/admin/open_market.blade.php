@@ -160,20 +160,23 @@
             let orderVendorHtml = order.vendorName ? `<b><p>${order.vendorName}</p></b>` : '<b><p>도매윙</p></b>';
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
             let orderStatusHtml = order.orderStatus === '교환' || order.orderStatus === '환불' ?
-                `<button class="btn btn-info" onclick="showOrderInfoModal('${order.productOrderNumber}');">${order.orderStatus}</button>` :
+                `<h6 class="title">
+                    <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
+                        ${order.orderStatus}신청
+                    </a>
+                </h6>` :
                 `<h6 class="title">${order.orderStatus}</h6>`;
-
             // 교환 및 환불인 경우와 아닌 경우를 구분하여 버튼을 다르게 설정
             let actionButtonsHtml;
             if (order.orderStatus === '교환') {
                 actionButtonsHtml = `
-            <button class="btn btn-warning" onclick="initExchangeDelivery('${order.productOrderNumber}');">확인</button>
-            <button class="btn btn-secondary" onclick="cancelExchangeDelivery('${order.productOrderNumber}');">취소</button>
+            <button class="btn btn-primary" onclick="initExchangeDelivery('${order.productOrderNumber}');">확인</button>
+            <button class="btn btn-danger" onclick="cancelExchangeDelivery('${order.productOrderNumber}');">취소</button>
         `;
             } else if (order.orderStatus === '환불') {
                 actionButtonsHtml = `
-            <button class="btn btn-warning" onclick="initRefundDelivery('${order.productOrderNumber}');">확인</button>
-            <button class="btn btn-secondary" onclick="cancelRefundDelivery('${order.productOrderNumber}');">취소</button>
+            <button class="btn btn-primary" onclick="initRefundDelivery('${order.productOrderNumber}');">확인</button>
+            <button class="btn btn-danger" onclick="cancelRefundDelivery('${order.productOrderNumber}');">취소</button>
         `;
             } else {
                 actionButtonsHtml = `
@@ -255,7 +258,10 @@
                 <p><b>사유:</b> ${data.type}</p>
                 <p><b>개수:</b> ${data.quantity}</p>
                 <p><b>총 가격:</b> ${data.amount}</p>
-                <p><b>Product Image:</b> <img src="${data.productImage}" class="product-list-image" /></p>
+                <p>
+                    <b>증빙 이미지:</b><br>
+                    <img src="${data.productImage}" class="w-100" />
+                </p>
             `);
                     $('#orderInfoModal').modal('show');
                 },
