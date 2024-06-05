@@ -69,6 +69,7 @@ class OpenMarketOrderController extends Controller
                             $totalPrice += $this->getCartAmount($cartCode); // wing_transaction amount구하기
                             $cartIds[] = $cartId;  //cartId 리스트로 보관
                         }
+                        if ($totalPrice === 0) continue;
                         $wingTransaction =  $this->storeWingTransaction($memberId, 'PAYMENT', $totalPrice, $remark = ''); //윙 트랜잭션 테이블 insert
                         $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
                         foreach ($orders as $index => $order) {

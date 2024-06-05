@@ -69,6 +69,12 @@
                 success: function(response) {
                     closePopup();
                     console.log(response);
+                    if (!response.status) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: response.message,
+                        });
+                    }
                     updateOrderTable(response.processedOrders); // processedOrders 사용
                     updateLowBalanceAccounts(response.lowBalanceAccounts); // lowBalanceAccounts 사용
                 },
