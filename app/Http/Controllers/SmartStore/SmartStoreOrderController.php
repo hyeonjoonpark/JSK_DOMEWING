@@ -51,6 +51,7 @@ class SmartStoreOrderController extends Controller
             $formattedDate = $this->convertDateFormat($date->format('Y-m-d'));
             $data = ['lastChangedFrom' => $formattedDate];
             $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
+            if (!$response || isset($response['error']) || !is_array($response)) continue;
             $responses[$formattedDate] = $response;
         }
         return $responses;

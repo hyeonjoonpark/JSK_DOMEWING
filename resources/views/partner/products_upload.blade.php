@@ -189,7 +189,7 @@
                             html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Success.svg') }}"><h4 class="swal2-title mt-5">' +
                                 response.message + '</h4>'
                         }).then((result) => {
-                            window.location.replace('/partner/products/sale?openMarket=' + $(
+                            window.location.replace('/partner/products/sale?selectedOpenMarketId=' + $(
                                 'input[name="openMarkets"]:checked').val());
                         });
                     } else {

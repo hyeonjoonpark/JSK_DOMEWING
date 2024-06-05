@@ -13,10 +13,8 @@ class ApiController extends Controller
         $response = Http::withHeaders([
             'Content-type' => 'text/xml;charset=EUC-KR',
             'openapikey' => $apiKey,
-        ])->withBody(
-            iconv('UTF-8', 'EUC-KR', $data),
-            'text/xml'
-        )->$method($url);
+        ])->withBody(iconv('UTF-8', 'EUC-KR', $data), 'text/xml')
+            ->$method($url);
         if ($response->successful()) {
             $xml = simplexml_load_string($response->body());
             return [
@@ -27,7 +25,7 @@ class ApiController extends Controller
         return [
             'status' => false,
             'message' => '11번가 API 요청을 보내는 과정에서 에러가 발생했습니다.',
-            'error' => simplexml_load_string($response->body())
+            'error' => mb_convert_encoding($response->body(), 'UTF-8', 'EUC-KR')
         ];
     }
 }

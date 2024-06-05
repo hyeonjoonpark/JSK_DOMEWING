@@ -250,6 +250,9 @@
                     productOrderNumber
                 },
                 success: function(data) {
+                    let imageContent = data.image ?
+                        `<img src="${data.image}" class="w-100" />` :
+                        '이미지가 없습니다.';
                     $('#modalContent').html(`
                 <p><b>성함:</b> ${data.name}</p>
                 <p><b>전화번호:</b> ${data.phone}</p>
@@ -260,7 +263,7 @@
                 <p><b>총 가격:</b> ${data.amount}</p>
                 <p>
                     <b>증빙 이미지:</b><br>
-                    <img src="${data.productImage}" class="w-100" />
+                    ${imageContent}
                 </p>
             `);
                     $('#orderInfoModal').modal('show');
@@ -276,20 +279,11 @@
             const deliveryCompanyId = $('#deliveryCompany' + productOrderNumber).val();
             Swal.fire({
                 title: '확인',
-                html: `
-        <div>
-            <label>
-                <input type="checkbox" id="confirmCheckbox" />
-                제주/도서 산간지역
-            </label>
-        </div>
-    `,
                 showCancelButton: true,
                 confirmButtonText: '확인',
                 cancelButtonText: '취소'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const isRemoteArea = document.getElementById('confirmCheckbox').checked;
                     $.ajax({
                         url: '/api/save-exchange-tracking-info',
                         type: 'POST',
@@ -299,7 +293,6 @@
                             trackingNumber,
                             deliveryCompanyId,
                             productOrderNumber,
-                            isRemoteArea: isRemoteArea
                         },
                         success: function(response) {
                             console.log(response);
@@ -387,20 +380,11 @@
             const deliveryCompanyId = $('#deliveryCompany' + productOrderNumber).val();
             Swal.fire({
                 title: '확인',
-                html: `
-        <div>
-            <label>
-                <input type="checkbox" id="confirmCheckbox" />
-                제주/도서 산간지역
-            </label>
-        </div>
-    `,
                 showCancelButton: true,
                 confirmButtonText: '확인',
                 cancelButtonText: '취소'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const isRemoteArea = document.getElementById('confirmCheckbox').checked;
                     $.ajax({
                         url: '/api/save-refund-tracking-info',
                         type: 'POST',
@@ -410,7 +394,6 @@
                             trackingNumber,
                             deliveryCompanyId,
                             productOrderNumber,
-                            isRemoteArea: isRemoteArea
                         },
                         success: function(response) {
                             console.log(response);
@@ -540,7 +523,6 @@
                                     text: response.message,
                                 });
                             } else {
-                                console.log('Tracking info saved:', response);
                                 Swal.fire({
                                     icon: 'success',
                                     text: '택배사 및 송장번호 기입에 성공하였습니다.'
