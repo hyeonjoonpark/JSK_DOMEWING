@@ -107,7 +107,7 @@ class UploadController extends Controller
             ->where('pt.token', $partnerTableToken)
             ->where('mp.isActive', 'Y')
             ->whereNot('mp.categoryID', null)
-            ->select([DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"), 'mp.productCode', 'pp.product_name AS productName', 'mp.productImage', 'mp.productDetail', 'c.code', 'mp.shipping_fee', 'ps.additional_shipping_fee', 'mp.id', 'mp.productKeywords', 'mp.hasOption'])
+            ->select([DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"), 'mp.productCode', 'pp.product_name AS productName', 'mp.productImage', 'mp.productDetail', 'c.code', 'mp.shipping_fee', 'ps.additional_shipping_fee', 'mp.id', 'mp.productKeywords', 'mp.hasOption', 'mp.bundle_quantity'])
             ->get();
         if ($products->isEmpty()) {
             return [

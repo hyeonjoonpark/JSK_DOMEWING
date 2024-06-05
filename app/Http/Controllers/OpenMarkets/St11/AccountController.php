@@ -62,22 +62,18 @@ class AccountController extends Controller
     }
     public function requestValidateApiKey($accessKey)
     {
-        $data = [
-            'key' => $accessKey,
-            'apiCode' => 'ProductSearch',
-            'keyword' => 'test'
-        ];
         $method = 'get';
-        $url = 'https://openapi.11st.co.kr/openapi/OpenApiService.tmall';
+        $url = 'https://openapi.11st.co.kr/openapi/OpenApiService.tmall?key=' . $accessKey . '&apiCode=ProductSearch&keyword=test';
         $ac = new ApiController();
-        $builderResult = $ac->builder($accessKey, $method, $url, $data);
+        $builderResult = $ac->builder($accessKey, $method, $url);
         if ($builderResult['status'] === false) {
             return $builderResult;
         }
         if (!isset($builderResult['data']->Products->TotalCount)) {
             return [
                 'status' => false,
-                'message' => '등록되지 않은 OpenAPI Key 입니다.'
+                'message' => '등록되지 않은 OpenAPI Key 입니다.',
+                'error' => $builderResult
             ];
         }
         return [

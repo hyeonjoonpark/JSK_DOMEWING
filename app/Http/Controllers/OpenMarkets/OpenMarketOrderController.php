@@ -36,6 +36,7 @@ class OpenMarketOrderController extends Controller
                 // orderId를 기준으로 그룹화
                 $groupedResults = []; // wing_transaction에 주문의 총합으로 넣으려고 그룹화
                 foreach ($apiResults as $apiResult) {
+                    if (!$apiResult) continue;
                     if ($apiResult['productOrderStatus'] !== '결제완료' && $apiResult['productOrderStatus'] !== '상품준비중') {
                         continue; // 결제완료, 상품준비중 db에 저장하려고 검증
                     } //일부러 결제완료, 상품준비중을 먼저 검증 왜냐 db조회보다 간단한 배열 조회가 더빠르기 때문에 성능 최적화
@@ -69,6 +70,7 @@ class OpenMarketOrderController extends Controller
                             $totalPrice += $this->getCartAmount($cartCode); // wing_transaction amount구하기
                             $cartIds[] = $cartId;  //cartId 리스트로 보관
                         }
+                        if ($totalPrice === 0) continue;
                         $wingTransaction =  $this->storeWingTransaction($memberId, 'PAYMENT', $totalPrice, $remark = ''); //윙 트랜잭션 테이블 insert
                         $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
                         foreach ($orders as $index => $order) {
@@ -102,6 +104,17 @@ class OpenMarketOrderController extends Controller
         return response()->json([
             'processedOrders' => $processedOrders,
             'lowBalanceAccounts' => $lowBalanceAccounts,
+        ]);
+    }
+    public function test()
+    {
+        $orders = $this->getOrders();
+        $processedOrders = $orders->map(function ($order) {
+            return $this->processOrder($order);
+        });
+        $lowBalanceAccounts = $this->getUsersWithLowBalance();
+        return response()->json([
+            'processedOrders' => $processedOrders
         ]);
     }
     public function indexPartner(Request $request)
@@ -228,6 +241,29 @@ class OpenMarketOrderController extends Controller
                 'error' => $e->getMessage(),
             ];
         }
+    }
+    public function getOrderInfo(Request $request)
+    {
+        $productOrderNumber = $request->productOrderNumber;
+        $order = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->first();
+        $orderDetails = DB::table('order_details')
+            ->where('order_id', $order->id)
+            ->first();
+        $wingTransaction = DB::table('wing_transactions')
+            ->where('id', $order->wing_transaction_id)
+            ->first();
+        return response()->json([
+            'name' => $order->receiver_name,
+            'phone' => $order->receiver_phone,
+            'address' => $order->receiver_address,
+            'receiverRemark' => $order->receiver_remark,
+            'type' => $orderDetails->type,
+            'quantity' => $orderDetails->quantity,
+            'image' => $orderDetails->image,
+            'amount' => $wingTransaction->amount,
+        ]);
     }
     private function getUsersWithLowBalance()
     {
@@ -633,7 +669,7 @@ class OpenMarketOrderController extends Controller
     {
         return DB::table('smart_store_uploaded_products')
             ->where('product_id', $productId)
-            ->where('is_active', 'Y')
+            // ->where('is_active', 'Y')
             ->select('id')
             ->first();
     }
@@ -641,7 +677,7 @@ class OpenMarketOrderController extends Controller
     {
         return DB::table('coupang_uploaded_products')
             ->where('product_id', $productId)
-            ->where('is_active', 'Y')
+            // ->where('is_active', 'Y')
             ->select('id')
             ->first();
     }

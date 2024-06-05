@@ -60,6 +60,7 @@ class CoupangOrderController extends Controller
                     ];
                     $queryString = http_build_query($baseQuery);
                     $response = $this->ssac->getBuilder($account->access_key, $account->secret_key, 'application/json', $path, $queryString);
+                    if (!$response) continue;
                     if (isset($response['error'])) {
                         continue; // 오류가 있으면 다음 계정으로 넘어감
                     }
