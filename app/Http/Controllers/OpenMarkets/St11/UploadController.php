@@ -48,6 +48,11 @@ class UploadController extends Controller
                     $error[] = $builderResult['error'];
                     continue;
                 }
+                $resultCode = (int)$builderResult['data']->resultCode;
+                if ($resultCode === 500) {
+                    $error[] = $builderResult;
+                    continue;
+                }
                 $originProductNo = $builderResult['data']->productNo;
                 $storeResult = $this->store($account->id, $product->id, $product->productPrice, $product->shipping_fee, $originProductNo, $product->productName);
                 if ($storeResult['status'] === false) {
@@ -61,7 +66,7 @@ class UploadController extends Controller
             }
         }
         return [
-            'status' => true,
+            'status' => false,
             'message' => "총 " . count($products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
             'error' => $error
         ];
@@ -152,6 +157,7 @@ class UploadController extends Controller
             <brand>JS</brand>
             <rmaterialTypCd>05</rmaterialTypCd>
             <orgnTypCd>03</orgnTypCd>
+            <sellerPrdCd>$product->productCode</sellerPrdCd>
             <orgnNmVal>기타</orgnNmVal>
             <suplDtyfrPrdClfCd>01</suplDtyfrPrdClfCd>
             <prdStatCd>01</prdStatCd>
@@ -200,6 +206,22 @@ class UploadController extends Controller
             <dlvCst1>$product->shipping_fee</dlvCst1>
             <selTermUseYn>N</selTermUseYn>
             <prdSelQty>9999</prdSelQty>
+            <ProductCertGroup>
+                <crtfGrpTypCd>01</crtfGrpTypCd>
+                <crtfGrpObjClfCd>03</crtfGrpObjClfCd>
+            </ProductCertGroup>
+            <ProductCertGroup>
+                <crtfGrpTypCd>02</crtfGrpTypCd>
+                <crtfGrpObjClfCd>03</crtfGrpObjClfCd>
+            </ProductCertGroup>
+            <ProductCertGroup>
+                <crtfGrpTypCd>03</crtfGrpTypCd>
+                <crtfGrpObjClfCd>03</crtfGrpObjClfCd>
+            </ProductCertGroup>
+            <ProductCertGroup>
+                <crtfGrpTypCd>04</crtfGrpTypCd>
+                <crtfGrpObjClfCd>05</crtfGrpObjClfCd>
+            </ProductCertGroup>
         </Product>
         _EOT_;
     }
