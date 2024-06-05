@@ -258,6 +258,7 @@ class OpenMarketOrderController extends Controller
         $wingTransaction = DB::table('wing_transactions')
             ->where('id', $order->wing_transaction_id)
             ->first();
+        $imageUrl = $orderDetails->image ? 'https://domewing.com/storage/assets/images/exchange-refund/' . $orderDetails->image : null;
         return response()->json([
             'name' => $order->receiver_name,
             'phone' => $order->receiver_phone,
@@ -265,7 +266,7 @@ class OpenMarketOrderController extends Controller
             'receiverRemark' => $order->receiver_remark,
             'type' => $orderDetails->type,
             'quantity' => $orderDetails->quantity,
-            'image' => 'https://domewing.com/storage/assets/images/exchange-refund/' . $orderDetails->image,
+            'image' => $imageUrl,
             'amount' => $wingTransaction->amount,
         ]);
     }

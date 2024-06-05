@@ -250,6 +250,9 @@
                     productOrderNumber
                 },
                 success: function(data) {
+                    let imageContent = data.image ?
+                        `<img src="${data.image}" class="w-100" />` :
+                        '이미지가 없습니다.';
                     $('#modalContent').html(`
                 <p><b>성함:</b> ${data.name}</p>
                 <p><b>전화번호:</b> ${data.phone}</p>
@@ -260,7 +263,7 @@
                 <p><b>총 가격:</b> ${data.amount}</p>
                 <p>
                     <b>증빙 이미지:</b><br>
-                    <img src="${data.productImage}" class="w-100" />
+                    ${imageContent}
                 </p>
             `);
                     $('#orderInfoModal').modal('show');
