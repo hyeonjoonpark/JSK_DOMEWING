@@ -60,10 +60,7 @@ class CoupangOrderController extends Controller
                     ];
                     $queryString = http_build_query($baseQuery);
                     $response = $this->ssac->getBuilder($account->access_key, $account->secret_key, 'application/json', $path, $queryString);
-                    if (!$response) continue;
-                    if (isset($response['error'])) {
-                        continue; // 오류가 있으면 다음 계정으로 넘어감
-                    }
+                    if (!$response || isset($response['error']) || !is_array($response)) continue;
                     $shipmentBoxIds = $this->collectShipmentBoxIds($response);
                     $setProduct = $this->setProductAsPreparing($account, $shipmentBoxIds); //상품준비중처리
                     if (!$setProduct['status']) {
