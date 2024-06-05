@@ -213,7 +213,11 @@ class OpenMarketOrderController extends Controller
             $vendorEngName = $vendor->name_eng;
             $method = 'call' . ucfirst($vendorEngName) . 'CancelApi'; //해당 오픈마켓의 api 호출을 위한 메소드 작성
             $apiResult = call_user_func([$this, $method], $productOrderNumber); //api 결과 저장
-            if (!$apiResult['status']) return $apiResult;
+            if (!$apiResult['status']) return [
+                'status' => false,
+                'message' => '오픈마켓 주문취소 과정에서 오류가 발생하였습니다.',
+                'data' => $apiResult
+            ];
         }
 
         DB::beginTransaction();
@@ -261,7 +265,7 @@ class OpenMarketOrderController extends Controller
             'receiverRemark' => $order->receiver_remark,
             'type' => $orderDetails->type,
             'quantity' => $orderDetails->quantity,
-            'image' => $orderDetails->image,
+            'image' => 'https://domewing.com/storage/assets/images/exchange-refund/' . $orderDetails->image,
             'amount' => $wingTransaction->amount,
         ]);
     }

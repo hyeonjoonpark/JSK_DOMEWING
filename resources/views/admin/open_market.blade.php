@@ -276,20 +276,11 @@
             const deliveryCompanyId = $('#deliveryCompany' + productOrderNumber).val();
             Swal.fire({
                 title: '확인',
-                html: `
-        <div>
-            <label>
-                <input type="checkbox" id="confirmCheckbox" />
-                제주/도서 산간지역
-            </label>
-        </div>
-    `,
                 showCancelButton: true,
                 confirmButtonText: '확인',
                 cancelButtonText: '취소'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const isRemoteArea = document.getElementById('confirmCheckbox').checked;
                     $.ajax({
                         url: '/api/save-exchange-tracking-info',
                         type: 'POST',
@@ -299,7 +290,6 @@
                             trackingNumber,
                             deliveryCompanyId,
                             productOrderNumber,
-                            isRemoteArea: isRemoteArea
                         },
                         success: function(response) {
                             console.log(response);
@@ -387,20 +377,11 @@
             const deliveryCompanyId = $('#deliveryCompany' + productOrderNumber).val();
             Swal.fire({
                 title: '확인',
-                html: `
-        <div>
-            <label>
-                <input type="checkbox" id="confirmCheckbox" />
-                제주/도서 산간지역
-            </label>
-        </div>
-    `,
                 showCancelButton: true,
                 confirmButtonText: '확인',
                 cancelButtonText: '취소'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const isRemoteArea = document.getElementById('confirmCheckbox').checked;
                     $.ajax({
                         url: '/api/save-refund-tracking-info',
                         type: 'POST',
@@ -410,7 +391,6 @@
                             trackingNumber,
                             deliveryCompanyId,
                             productOrderNumber,
-                            isRemoteArea: isRemoteArea
                         },
                         success: function(response) {
                             console.log(response);
@@ -540,7 +520,6 @@
                                     text: response.message,
                                 });
                             } else {
-                                console.log('Tracking info saved:', response);
                                 Swal.fire({
                                     icon: 'success',
                                     text: '택배사 및 송장번호 기입에 성공하였습니다.'

@@ -51,7 +51,9 @@ use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
+use App\Http\Controllers\OpenMarkets\OpenMarketExchangeController;
 use App\Http\Controllers\OpenMarkets\OpenMarketOrderController;
+use App\Http\Controllers\OpenMarkets\OpenMarketRefundController;
 use App\Http\Controllers\OpenMarkets\OpenMarketShipmentController;
 use App\Http\Controllers\OpenMarkets\St11\AccountController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
@@ -189,10 +191,10 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('get-new-orders', [OpenMarketOrderController::class, 'index']);
     Route::post('test', [OpenMarketOrderController::class, 'test']);
     Route::post('getOrderInfo', [OpenMarketOrderController::class, 'getOrderInfo']);
-    Route::post('save-exchange-tracking-info', [OpenMarketOrderController::class, 'saveExchangeRefundTrackingInfo']);
-    Route::post('save-refund-tracking-info', [OpenMarketOrderController::class, 'saveExchangeRefundTrackingInfo']);
-    Route::post('save-exchange-tracking-info', [OpenMarketOrderController::class, 'saveExchangeRefundTrackingInfo']);
-    Route::post('save-exchange-tracking-info', [OpenMarketOrderController::class, 'saveExchangeRefundTrackingInfo']);
+    Route::post('save-exchange-tracking-info', [OpenMarketExchangeController::class, 'saveExchangeShipment']);
+    Route::post('cancel-exchange-order', [OpenMarketExchangeController::class, 'cancelExchange']);
+    Route::post('save-refund-tracking-info', [OpenMarketRefundController::class, 'saveRefundShipment']);
+    Route::post('cancel-refund-order', [OpenMarketRefundController::class, 'cancelRefund']);
 
     Route::post('contact-us/update', [ContactUsController::class, 'update']);
 });
