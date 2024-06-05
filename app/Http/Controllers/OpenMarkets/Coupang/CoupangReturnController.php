@@ -60,26 +60,17 @@ class CoupangReturnController extends Controller
         if (!empty($response['data']['data'])) {
             foreach ($response['data']['data'] as $item) {
                 $orderDetails[] = [
-                    'market' => '쿠팡',
-                    'marketEngName' => 'coupang',
                     'orderId' => strval($item['orderId']),
-                    'productOrderId' => strval($item['shipmentBoxId']),
+                    'productOrderId' => strval($item['returnItems']['shipmentBoxId']), //원배송번호
                     'orderName' => $item['orderer']['name'],
-                    'productName' => $orderItem['vendorItemName'],
-                    'quantity' => $orderItem['shippingCount'],
-                    'unitPrice' => $orderItem['salesPrice'],
-                    'totalPaymentAmount' => $orderItem['orderPrice'],
                     'deliveryFeeAmount' => $item['shippingPrice'],
-                    'productOrderStatus' => $this->mapStatusToReadable($item['status']),
-                    'orderDate' => isset($item['paidAt']) ? (new DateTime($item['paidAt']))->format('Y-m-d H:i:s') : 'N/A',
                     'receiverName' => $item['requesterName'],
                     'receiverPhone' => $item['requesterPhoneNumber'],
                     'postCode' => $item['requesterZipCode'],
                     'address' => $item['receiver']['addr1'] . ' ' . $item['receiver']['addr2'],
-                    'addressName' => '기본배송지',
-                    'productCode' => $orderItem['externalVendorSkuCode'] ?? 'N/A',
-                    'remark' => $item['cancelReason'] ?? 'N/A',
-                    'cancelCountSum' => $item['cancelCountSum'],
+                    'cancelReason' => $item['cancelReason'] ?? 'N/A',
+                    'reasonCodeText' => $item['reasonCodeText'] ?? 'N/A',
+                    'cancelCount' => $item['cancelCount'],
                     'returnDeliveryId' => $item['returnDeliveryId'],
                     'accountId' => $account->id
                 ];

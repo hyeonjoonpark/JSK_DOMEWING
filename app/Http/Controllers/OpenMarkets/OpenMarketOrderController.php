@@ -69,6 +69,7 @@ class OpenMarketOrderController extends Controller
                             $totalPrice += $this->getCartAmount($cartCode); // wing_transaction amount구하기
                             $cartIds[] = $cartId;  //cartId 리스트로 보관
                         }
+                        if ($totalPrice === 0) continue;
                         $wingTransaction =  $this->storeWingTransaction($memberId, 'PAYMENT', $totalPrice, $remark = ''); //윙 트랜잭션 테이블 insert
                         $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
                         foreach ($orders as $index => $order) {
@@ -102,6 +103,17 @@ class OpenMarketOrderController extends Controller
         return response()->json([
             'processedOrders' => $processedOrders,
             'lowBalanceAccounts' => $lowBalanceAccounts,
+        ]);
+    }
+    public function test()
+    {
+        $orders = $this->getOrders();
+        $processedOrders = $orders->map(function ($order) {
+            return $this->processOrder($order);
+        });
+        $lowBalanceAccounts = $this->getUsersWithLowBalance();
+        return response()->json([
+            'processedOrders' => $processedOrders
         ]);
     }
     public function indexPartner(Request $request)
@@ -228,6 +240,29 @@ class OpenMarketOrderController extends Controller
                 'error' => $e->getMessage(),
             ];
         }
+    }
+    public function getOrderInfo(Request $request)
+    {
+        $productOrderNumber = $request->productOrderNumber;
+        $order = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->first();
+        $orderDetails = DB::table('order_details')
+            ->where('order_id', $order->id)
+            ->first();
+        $wingTransaction = DB::table('wing_transactions')
+            ->where('id', $order->wing_transaction_id)
+            ->first();
+        return response()->json([
+            'name' => $order->receiver_name,
+            'phone' => $order->receiver_phone,
+            'address' => $order->receiver_address,
+            'receiverRemark' => $order->receiver_remark,
+            'type' => $orderDetails->type,
+            'quantity' => $orderDetails->quantity,
+            'image' => $orderDetails->image,
+            'amount' => $wingTransaction->amount,
+        ]);
     }
     private function getUsersWithLowBalance()
     {
@@ -633,7 +668,7 @@ class OpenMarketOrderController extends Controller
     {
         return DB::table('smart_store_uploaded_products')
             ->where('product_id', $productId)
-            ->where('is_active', 'Y')
+            // ->where('is_active', 'Y')
             ->select('id')
             ->first();
     }
@@ -641,7 +676,7 @@ class OpenMarketOrderController extends Controller
     {
         return DB::table('coupang_uploaded_products')
             ->where('product_id', $productId)
-            ->where('is_active', 'Y')
+            // ->where('is_active', 'Y')
             ->select('id')
             ->first();
     }
