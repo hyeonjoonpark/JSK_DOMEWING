@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
@@ -24,6 +25,7 @@ const fs = require('fs');
         await browser.close();
     }
 })();
+
 async function signIn(page, username, password) {
     await page.goto('https://mroutlet.cafe24.com/member/login.html', { waitUntil: 'networkidle0' });
     await page.type('#member_id', username);
@@ -36,18 +38,47 @@ async function scrapeProduct(page, productHref) {
     await scrollToDetail(page);
     try {
         const optionCount = await getOptionCount(page);
-        if (optionCount > 1) {  // 옵션이 두 개 이상인 경우
-            return false;  // 해당 제품은 스크레이핑하지 않음
+
+        // 옵션이 없는 경우
+        if (optionCount === 0) {
+            const productDetailImages = await getProductDetail(page);
+            if (productDetailImages.length === 0) {  // 상세 이미지가 하나도 없는 경우
+                return false;  // 해당 제품은 스크래핑하지 않음
+            }
+
+            const productImage = await getProductImage(page);
+            const productName = await getProductName(page);
+            const productPrice = await page.evaluate(() => {
+                const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
+                return productPrice;
+            });
+
+            const product = {
+                productName: productName,
+                productPrice: productPrice,
+                productImage: productImage,
+                productDetail: productDetailImages,
+                hasOption: false,  // 옵션이 없음
+                productOptions: [],  // 옵션 없음
+                productHref: productHref,
+                sellerID: 58
+            };
+            return product;
+        }
+
+        // 옵션이 있는 경우
+        const productOptions = await getProductOptions(page);
+        if (productOptions.length === 0) {  // 모든 옵션이 필터링되어 없으면
+            return false;  // 해당 제품은 품절이므로 스크래핑하지 않음
         }
 
         const productDetailImages = await getProductDetail(page);
         if (productDetailImages.length === 0) {  // 상세 이미지가 하나도 없는 경우
-            return false;  // 해당 제품은 스크레이핑하지 않음
+            return false;  // 해당 제품은 스크래핑하지 않음
         }
 
         const productImage = await getProductImage(page);
         const productName = await getProductName(page);
-        const productOptions = optionCount === 1 ? await getProductOptions(page) : [];
         const productPrice = await page.evaluate(() => {
             const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
             return productPrice;
@@ -58,8 +89,8 @@ async function scrapeProduct(page, productHref) {
             productPrice: productPrice,
             productImage: productImage,
             productDetail: productDetailImages,
-            hasOption: optionCount === 1,  // 옵션이 하나 있는지 여부
-            productOptions: productOptions,  // 옵션이 있다면 옵션 목록, 없다면 빈 배열
+            hasOption: true,  // 옵션이 있음
+            productOptions: productOptions,  // 필터링된 옵션 목록
             productHref: productHref,
             sellerID: 58
         };
@@ -76,6 +107,7 @@ async function getProductImage(page) {
     });
     return productImage;
 }
+
 async function getProductOptions(page) {
     async function reloadSelects() {
         const selectHandles = await page.$$('select.ProductOption0'); // 모든 select.ProductOption0 요소를 선택
@@ -91,30 +123,16 @@ async function getProductOptions(page) {
         return filteredHandles; // 필터링된 ElementHandle 배열 반환
     }
 
-    // async function resetSelects() {
-    //     const delBtn = await page.$('#totalProducts > table > tbody.option_products > tr > td:nth-child(2) > a');
-    //     if (delBtn) {
-    //         await delBtn.click();
-    //         await new Promise(resolve => setTimeout(resolve, 1000));
-    //     }
-    // }
-
-    // async function reselectOptions(selects, selectedOptions) {
-    //     for (let i = 0; i < selectedOptions.length; i++) {
-    //         await selects[i].select(selectedOptions[i].value);
-    //         await new Promise(resolve => setTimeout(resolve, 1000));
-    //         if (i < selectedOptions.length - 1) {
-    //             selects = await reloadSelects();
-    //         }
-    //     }
-    // }
-
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
                 opts.map(opt => ({ value: opt.value, text: opt.text }))
                     .filter(opt => opt.value !== '' && opt.value !== '*' && opt.value !== '**' && !opt.text.toLowerCase().includes("품절")) // 품절 텍스트를 대소문자 구분 없이 필터링
             );
+
+            if (options.length === 0) {
+                return false; // 현재 선택 가능한 옵션이 없으면 false 반환
+            }
 
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
@@ -123,7 +141,10 @@ async function getProductOptions(page) {
 
                 if (currentDepth + 1 < selects.length) {
                     const newSelects = await reloadSelects();
-                    await processSelectOptions(newSelects, currentDepth + 1, newSelectedOptions, productOptions);
+                    const result = await processSelectOptions(newSelects, currentDepth + 1, newSelectedOptions, productOptions);
+                    if (result === false) {
+                        return false; // 하위 선택에서도 모두 품절인 경우 false 반환
+                    }
                 } else {
                     let optionName = newSelectedOptions.map(opt =>
                         opt.text.replace(/\s*\([\+\-]?\d{1,3}(,\d{3})*원\)/g, "").trim() // 가격 정보 제거
@@ -133,23 +154,22 @@ async function getProductOptions(page) {
                         const matches = opt.text.match(/\(([\+\-]?\d{1,3}(,\d{3})*원)\)/);
                         return total + (matches ? parseInt(matches[1].replace(/,|원|\+/g, ''), 10) : 0); // 가격 정보 계산
                     }, 0);
-                    productOptions.push({ optionName, optionPrice });
-                }
 
-                // await resetSelects();
-                // selects = await reloadSelects();
-                // if (currentDepth > 0) {
-                //     await reselectOptions(selects, selectedOptions);
-                //     selects = await reloadSelects();
-                // }
+                    // 옵션명이 없는 경우 상품 건너뛰기
+                    if (optionName.trim() !== '') {
+                        productOptions.push({ optionName, optionPrice });
+                    }
+                }
             }
         }
         return productOptions;
     }
 
     const selects = await reloadSelects();
-    return processSelectOptions(selects);
+    const result = await processSelectOptions(selects);
+    return result === false ? [] : result; // 결과가 false이면 빈 배열 반환
 }
+
 async function getProductName(page) {
     const productName = await page.evaluate(() => {
         const productNameElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.headingArea > h2');
@@ -162,34 +182,24 @@ async function getProductName(page) {
 }
 
 async function getProductDetail(page) {
-    // 페이지 컨텍스트 내에서 이미지 URL 추출 로직 실행
     return page.evaluate(() => {
         const productDetailImageElements = document.querySelectorAll('#prdDetail > div > p img');
         const excludedPaths = ['/web/img/start', '/web/img/event'];
         const productImages = [...productDetailImageElements]
             .filter(img => img.src && !excludedPaths.some(path => img.src.includes(path)))
-            .map(img => img.src); // 이미 절대 경로이므로 바로 src를 사용
+            .map(img => img.src);
 
         return productImages;
     });
 };
 
-async function getHasOption(page) {
-    return await page.evaluate(() => {
-        const selectElements = document.querySelectorAll('select.ProductOption0');
-        const filteredSelectElements = Array.from(selectElements).filter(select => select.name !== 'addproduct_option_id_774_1');
-        if (filteredSelectElements.length > 0) {
-            return true;
-        }
-        return false;
-    });
-}
 async function getOptionCount(page) {
     return await page.evaluate(() => {
         const selectElements = document.querySelectorAll('select.ProductOption0');
         return selectElements.length;  // 옵션의 개수를 반환
     });
 }
+
 async function scrollToDetail(page) {
     await page.evaluate(async () => {
         const distance = 50;
@@ -215,4 +225,3 @@ async function scrollToDetail(page) {
         }
     });
 }
-
