@@ -105,6 +105,17 @@ class OpenMarketOrderController extends Controller
             'lowBalanceAccounts' => $lowBalanceAccounts,
         ]);
     }
+    public function test()
+    {
+        $orders = $this->getOrders();
+        $processedOrders = $orders->map(function ($order) {
+            return $this->processOrder($order);
+        });
+        $lowBalanceAccounts = $this->getUsersWithLowBalance();
+        return response()->json([
+            'processedOrders' => $processedOrders
+        ]);
+    }
     public function indexPartner(Request $request)
     {
         $apiToken = $request->apiToken;
@@ -229,6 +240,29 @@ class OpenMarketOrderController extends Controller
                 'error' => $e->getMessage(),
             ];
         }
+    }
+    public function getOrderInfo(Request $request)
+    {
+        $productOrderNumber = $request->productOrderNumber;
+        $order = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->first();
+        $orderDetails = DB::table('order_details')
+            ->where('order_id', $order->id)
+            ->first();
+        $wingTransaction = DB::table('wing_transactions')
+            ->where('id', $order->wing_transaction_id)
+            ->first();
+        return response()->json([
+            'name' => $order->receiver_name,
+            'phone' => $order->receiver_phone,
+            'address' => $order->receiver_address,
+            'receiverRemark' => $order->receiver_remark,
+            'type' => $orderDetails->type,
+            'quantity' => $orderDetails->quantity,
+            'image' => $orderDetails->image,
+            'amount' => $wingTransaction->amount,
+        ]);
     }
     private function getUsersWithLowBalance()
     {
