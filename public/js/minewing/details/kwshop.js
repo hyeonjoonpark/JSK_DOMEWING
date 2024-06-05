@@ -114,8 +114,8 @@ async function scrapeProduct(page, url) {
 }
 async function scrollToDetail(page) {
     await page.evaluate(async () => {
-        const distance = 50;
-        const scrollInterval = 5;
+        const distance = 15;
+        const scrollInterval = 3;
         while (true) {
             const scrollTop = window.scrollY;
             const prdDetailElement = document.querySelector('#goods_view > div.set_preload > div:nth-child(1) > div.goods_description.mt10');
