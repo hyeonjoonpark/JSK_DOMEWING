@@ -131,9 +131,11 @@ class UploadController extends Controller
         $account = DB::table($vendorEngName . '_accounts')
             ->where('hash', $request->accountHash)
             ->first();
-
+        $tableName = DB::table('partner_tables')
+            ->where('token', $partnerTableToken)
+            ->value('title');
         // 큐에 작업 추가
-        ProcessProductUpload::dispatch($products, $partner, $account, $vendorEngName);
+        ProcessProductUpload::dispatch($products, $partner, $account, $vendor, $tableName);
         $numJobs = DB::table('jobs')
             ->count();
         return [
