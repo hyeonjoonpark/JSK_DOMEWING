@@ -23,11 +23,6 @@ class ProcessProductUpload implements ShouldQueue
     protected $vendor;
     protected $tableName;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
     public function __construct($products, $partner, $account, $vendor, $tableName)
     {
         $this->products = $products;
@@ -37,40 +32,38 @@ class ProcessProductUpload implements ShouldQueue
         $this->tableName = $tableName;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
     public function handle()
+    {
+        $uploadResult = $this->uploadProducts();
+
+        $this->storeNotification($this->partner->id, $uploadResult['status'], $uploadResult['message']);
+    }
+
+    protected function uploadProducts()
     {
         switch ($this->vendor->name_eng) {
             case 'smart_store':
-                $spu = new SmartstoreProductUpload($this->products, $this->partner, $this->account);
-                $uploadResult = $spu->main();
+                $uploader = new SmartstoreProductUpload($this->products, $this->partner, $this->account);
                 break;
             case 'coupang':
-                $cuc = new CoupangUploadController($this->products, $this->partner, $this->account);
-                $uploadResult = $cuc->main();
+                $uploader = new CoupangUploadController($this->products, $this->partner, $this->account);
                 break;
             case 'st11':
-                $st11UploadController = new St11UploadController();
-                $uploadResult = $st11UploadController->main($this->products, $this->partner, $this->account);
+                $uploader = new St11UploadController();
                 break;
+            default:
+                throw new \Exception("Unknown vendor: {$this->vendor->name_eng}");
         }
-        $partnerId = $this->partner->id;
-        $status = $uploadResult['status'];
-        $data = $uploadResult['message'];
-        $this->storeNotification($partnerId, $status, $data);
+
+        return $uploader->main();
     }
+
     protected function storeNotification($partnerId, $status, $data)
     {
-        $nc = new NotificationController();
-        DB::table('notifications')
-            ->insert([
-                'partner_id' => $partnerId,
-                'status' => $status === true ? 'TRUE' : 'FALSE',
-                'data' => $data
-            ]);
+        DB::table('notifications')->insert([
+            'partner_id' => $partnerId,
+            'status' => $status ? 'TRUE' : 'FALSE',
+            'data' => $data
+        ]);
     }
 }

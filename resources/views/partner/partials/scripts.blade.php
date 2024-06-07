@@ -155,4 +155,17 @@
         const filteredValue = value.replace(/\D/g, '').substring(0, length);
         return filteredValue ? filteredValue : '';
     }
+
+    function readAll() {
+        $.ajax({
+            url: '/api/partner/notifications/read-all',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                apiToken
+            },
+            success: ajaxSuccessHandling,
+            error: ajaxSuccessHandling
+        });
+    }
 </script>
