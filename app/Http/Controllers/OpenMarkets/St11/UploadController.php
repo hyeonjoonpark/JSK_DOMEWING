@@ -49,7 +49,7 @@ class UploadController extends Controller
                     continue;
                 }
                 $resultCode = (int)$builderResult['data']->resultCode;
-                if ($resultCode === 500) {
+                if ($resultCode !== 200 && $resultCode !== 210) {
                     $error[] = $builderResult;
                     continue;
                 }
