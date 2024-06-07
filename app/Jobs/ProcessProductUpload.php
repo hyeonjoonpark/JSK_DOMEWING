@@ -69,7 +69,7 @@ class ProcessProductUpload implements ShouldQueue
         DB::table('notifications')
             ->insert([
                 'partner_id' => $partnerId,
-                'status' => $status,
+                'status' => $status === true ? 'TRUE' : 'FALSE',
                 'data' => $data
             ]);
     }
