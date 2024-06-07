@@ -134,10 +134,11 @@ class UploadController extends Controller
 
         // 큐에 작업 추가
         ProcessProductUpload::dispatch($products, $partner, $account, $vendorEngName);
-
+        $numJobs = DB::table('jobs')
+            ->count();
         return [
             'status' => true,
-            'message' => '상품 업로드 요청이 성공적으로 큐에 배치되었습니다.'
+            'message' => '상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>현재 ' . $numJobs . '개의 대기열이 진행 중입니다.'
         ];
     }
     private function smart_store($products, $partner, $account)
