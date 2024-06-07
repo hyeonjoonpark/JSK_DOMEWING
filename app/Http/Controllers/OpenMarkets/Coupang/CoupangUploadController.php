@@ -72,8 +72,7 @@ class CoupangUploadController extends Controller
         return [
             'status' => true,
             'message' => "총 " . count($this->products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
-            'error' => $error,
-            'data' => json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            'error' => $error
         ];
     }
     protected function store($coupangAccountId, $productId, $price, $shippingFee, $originProductNo, $productName)
