@@ -9,7 +9,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 
 class ProcessProductUpload implements ShouldQueue
@@ -55,17 +54,5 @@ class ProcessProductUpload implements ShouldQueue
                 $st11UploadController->main($this->products, $this->partner, $this->account);
                 break;
         }
-    }
-
-    /**
-     * Get the middleware the job should pass through.
-     *
-     * @return array
-     */
-    public function middleware()
-    {
-        // Using partner and account to ensure uniqueness if needed
-        $uniqueKey = $this->vendorEngName . '_' . $this->partner . '_' . $this->account;
-        return [(new WithoutOverlapping($uniqueKey))->expireAfter(600)];
     }
 }
