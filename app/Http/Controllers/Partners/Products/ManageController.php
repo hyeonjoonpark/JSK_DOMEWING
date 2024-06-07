@@ -94,10 +94,10 @@ class ManageController extends Controller
             ->where('token', $partnerTableToken)
             ->count();
         $totalNum = (int)$numInTable + (int)count($productCodes);
-        if ($totalNum > 1000) {
+        if ($totalNum > 500) {
             return [
                 'status' => false,
-                'message' => '테이블 당 수집 가능한 상품은 1,000개입니다.',
+                'message' => '테이블 당 수집 가능한 상품은 500개입니다.',
                 'error' => [
                     'totalNum' => $totalNum
                 ]
