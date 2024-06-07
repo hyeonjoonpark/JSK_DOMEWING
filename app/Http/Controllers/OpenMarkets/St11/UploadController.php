@@ -17,6 +17,12 @@ class UploadController extends Controller
      */
     public function main($products, $partner, $account): array
     {
+        if (count($products) > 500) {
+            return [
+                'status' => false,
+                'message' => '한 번에 500개 이하의 상품만 업로드 가능합니다.'
+            ];
+        }
         $ac = new ApiController();
         $apiKey = $account->access_key;
         $method = 'post';
