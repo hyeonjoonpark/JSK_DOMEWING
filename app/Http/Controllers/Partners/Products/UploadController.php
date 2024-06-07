@@ -104,23 +104,43 @@ class UploadController extends Controller
         $commissionRate = $vendorCommission / 100 + 1;
 
         // 데이터 전처리: 상품
+        $uploadedProductsTable = $vendorEngName . '_uploaded_products';
+
         $products = DB::table('partner_products AS pp')
             ->join('partner_tables AS pt', 'pt.id', '=', 'pp.partner_table_id')
             ->join('minewing_products AS mp', 'mp.id', '=', 'pp.product_id')
             ->join('category_mapping AS cm', 'cm.ownerclan', '=', 'mp.categoryID')
             ->join($vendorEngName . '_category AS c', 'c.id', '=', 'cm.' . $vendorEngName)
             ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
+            ->leftJoin($uploadedProductsTable . ' AS up', function ($join) use ($uploadedProductsTable) {
+                $join->on('up.product_id', '=', 'mp.id')
+                    ->where('up.is_active', 'Y');
+            })
             ->where('pt.is_active', 'Y')
             ->where('pt.token', $partnerTableToken)
             ->where('mp.isActive', 'Y')
-            ->whereNot('mp.categoryID', null)
-            ->select([DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"), 'mp.productCode', 'pp.product_name AS productName', 'mp.productImage', 'mp.productDetail', 'c.code', 'mp.shipping_fee', 'ps.additional_shipping_fee', 'mp.id', 'mp.productKeywords', 'mp.hasOption', 'mp.bundle_quantity'])
+            ->whereNotNull('mp.categoryID')
+            ->whereNull('up.product_id')
+            ->select([
+                DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"),
+                'mp.productCode',
+                'pp.product_name AS productName',
+                'mp.productImage',
+                'mp.productDetail',
+                'c.code',
+                'mp.shipping_fee',
+                'ps.additional_shipping_fee',
+                'mp.id',
+                'mp.productKeywords',
+                'mp.hasOption',
+                'mp.bundle_quantity'
+            ])
             ->get();
 
         if ($products->isEmpty()) {
             return [
                 'status' => false,
-                'message' => '빈 테이블입니다. 상품 수집관에서 상품 수집을 진행해주세요.'
+                'message' => '테이블이 비어 있거나 모든 상품이 이미 업로드되었습니다.'
             ];
         }
 
@@ -140,7 +160,7 @@ class UploadController extends Controller
             ->count();
         return [
             'status' => true,
-            'message' => '상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>현재 ' . $numJobs . '개의 대기열이 진행 중입니다.'
+            'message' => '중복된 상품을 제외하고 총 ' . count($products) . '개의 상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>현재 ' . $numJobs . '개의 작업이 대기열에 있습니다.'
         ];
     }
     private function smart_store($products, $partner, $account)
