@@ -30,6 +30,16 @@ class CoupangUploadController extends Controller
         $success = 0;
         $duplicated = [];
         $error = [];
+        $responseOutbound = $this->getOutbound($accessKey, $secretKey);
+        $responseReturn = $this->getReturnCenter($accessKey, $secretKey, $account->code);
+        if ($responseOutbound['status'] === false) {
+            return $responseOutbound;
+        }
+        if ($responseReturn['status'] === false) {
+            return $responseReturn;
+        }
+        $outboundCode = $responseOutbound['data'];
+        $returnCenter = $responseReturn['data'];
         foreach ($products as $product) {
             $exists = DB::table('coupang_uploaded_products')
                 ->where('is_active', 'Y')
@@ -40,16 +50,6 @@ class CoupangUploadController extends Controller
                 $duplicated[] = $product->productCode;
                 continue;
             }
-            $responseOutbound = $this->getOutbound($accessKey, $secretKey);
-            $responseReturn = $this->getReturnCenter($accessKey, $secretKey, $account->code);
-            if ($responseOutbound['status'] === false) {
-                return $responseOutbound;
-            }
-            if ($responseReturn['status'] === false) {
-                return $responseReturn;
-            }
-            $outboundCode = $responseOutbound['data'];
-            $returnCenter = $responseReturn['data'];
             // 5,000원 미만 상품들은 상품가와 배송비를 따로 구분
             $productPrice = $product->productPrice;
             $shippingFee = $product->shipping_fee;
