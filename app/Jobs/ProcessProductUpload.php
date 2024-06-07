@@ -6,12 +6,14 @@ use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
 use App\Http\Controllers\OpenMarkets\St11\UploadController as St11UploadController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 
-class ProcessProductUpload implements ShouldQueue
+class ProcessProductUpload implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -32,7 +34,15 @@ class ProcessProductUpload implements ShouldQueue
         $this->account = $account;
         $this->vendorEngName = $vendorEngName;
     }
-
+    /**
+     * Get the unique ID for the job.
+     *
+     * @return string
+     */
+    public function uniqueId()
+    {
+        return Str::uuid();
+    }
     /**
      * Execute the job.
      *
