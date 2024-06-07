@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
 use App\Http\Controllers\OpenMarkets\St11\UploadController as St11UploadController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
+use App\Jobs\ProcessProductUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,6 +52,7 @@ class UploadController extends Controller
     {
         set_time_limit(0);
         ini_set('memory_allow', '-1');
+
         // 데이터 유효성 검사.
         $validator = Validator::make($request->all(), [
             'partnerTableToken' => 'required|string',
@@ -67,12 +69,14 @@ class UploadController extends Controller
             'accountHash' => '계정을 선택해주세요.',
             'vendorCommission' => '올바른 마켓 수수료(%)를 기입해주세요.'
         ]);
+
         if ($validator->fails()) {
             return [
                 'status' => false,
                 'message' => $validator->errors()->first()
             ];
         }
+
         // 데이터 전처리: 파라미터
         $partnerTableToken = $request->partnerTableToken;
         $vendorId = $request->vendorId;
@@ -81,12 +85,14 @@ class UploadController extends Controller
             ->where('id', $vendorId)
             ->where('is_active', 'ACTIVE')
             ->first(['name_eng']);
+
         if ($vendor === null) {
             return [
                 'status' => false,
                 'message' => '비활성화된 오픈 마켓입니다. 다시 시도해주세요.'
             ];
         }
+
         $vendorEngName = $vendor->name_eng;
         $partnerMargin = $request->partnerMargin;
         $partnerMarginRate = $partnerMargin / 100 + 1;
@@ -96,6 +102,7 @@ class UploadController extends Controller
             ->value;
         $marginRate = $margin / 100 + 1;
         $commissionRate = $vendorCommission / 100 + 1;
+
         // 데이터 전처리: 상품
         $products = DB::table('partner_products AS pp')
             ->join('partner_tables AS pt', 'pt.id', '=', 'pp.partner_table_id')
@@ -109,19 +116,29 @@ class UploadController extends Controller
             ->whereNot('mp.categoryID', null)
             ->select([DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"), 'mp.productCode', 'pp.product_name AS productName', 'mp.productImage', 'mp.productDetail', 'c.code', 'mp.shipping_fee', 'ps.additional_shipping_fee', 'mp.id', 'mp.productKeywords', 'mp.hasOption', 'mp.bundle_quantity'])
             ->get();
+
         if ($products->isEmpty()) {
             return [
                 'status' => false,
                 'message' => '빈 테이블입니다. 상품 수집관에서 상품 수집을 진행해주세요.'
             ];
         }
+
         $partner = DB::table('partners')
             ->where('api_token', $request->apiToken)
             ->first();
+
         $account = DB::table($vendorEngName . '_accounts')
             ->where('hash', $request->accountHash)
             ->first();
-        return $this->$vendorEngName($products, $partner, $account);
+
+        // 큐에 작업 추가
+        ProcessProductUpload::dispatch($products, $partner, $account, $vendorEngName);
+
+        return [
+            'status' => true,
+            'message' => '상품 업로드 요청이 성공적으로 큐에 배치되었습니다.'
+        ];
     }
     private function smart_store($products, $partner, $account)
     {
