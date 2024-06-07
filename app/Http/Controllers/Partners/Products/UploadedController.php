@@ -137,7 +137,7 @@ class UploadedController extends Controller
             ->whereIn('origin_product_no', $request->originProductsNo)
             ->pluck('origin_product_no');
         $errors = [];
-        $success = 0;
+        $successedOriginProductsNo = [];
         foreach ($originProductsNo as $originProductNo) {
             $functionName = $vendorEngName . 'DeleteRequest';
             $result = $this->$functionName($originProductNo, $vendorEngName);
@@ -148,15 +148,15 @@ class UploadedController extends Controller
                     'error' => $error
                 ];
             } else {
-                $success++;
+                $successedOriginProductsNo[] = $originProductNo;
             }
         }
-        $dupResult = $this->destroyUploadedProducts($originProductsNo, $vendorEngName);
+        $dupResult = $this->destroyUploadedProducts($successedOriginProductsNo, $vendorEngName);
         return [
             'status' => true,
-            'message' => '총 ' . count($originProductsNo) . '개의 상품들 중 ' . $success . '개의 상품들을 성공적으로 삭제했습니다.',
+            'message' => '총 ' . count($originProductsNo) . '개의 상품들 중 ' . count($successedOriginProductsNo) . '개의 상품들을 성공적으로 삭제했습니다.',
             'data' => [
-                'success' => $success,
+                'success' => $successedOriginProductsNo,
                 'errors' => $errors,
                 'dupResult' => $dupResult
             ]
