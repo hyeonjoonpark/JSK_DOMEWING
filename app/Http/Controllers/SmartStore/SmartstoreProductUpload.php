@@ -81,13 +81,13 @@ class SmartstoreProductUpload extends Controller
     }
     private function generateParam($product, $productImage)
     {
-        $productKeywords = explode(',', $product->productKeywords);
-        $sellerTags = [];
-        foreach ($productKeywords as $keyword) {
-            $sellerTags[] = [
-                'text' => $keyword
-            ];
-        }
+        // $productKeywords = explode(',', $product->productKeywords);
+        // $sellerTags = [];
+        // foreach ($productKeywords as $keyword) {
+        //     $sellerTags[] = [
+        //         'text' => $keyword
+        //     ];
+        // }
         $data = [
             'originProduct' => [
                 'statusType' => 'SALE',
