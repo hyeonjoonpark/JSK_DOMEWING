@@ -112,16 +112,10 @@ class UploadController extends Controller
             ->join('category_mapping AS cm', 'cm.ownerclan', '=', 'mp.categoryID')
             ->join($vendorEngName . '_category AS c', 'c.id', '=', 'cm.' . $vendorEngName)
             ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
-            ->leftJoin($uploadedProductsTable . ' AS up', function ($join) use ($uploadedProductsTable, $partnerTableToken) {
-                $join->on('up.product_id', '=', 'mp.id')
-                    ->where('up.is_active', 'Y')
-                    ->where('up.partner_table_token', '=', $partnerTableToken); // 현재 파트너에 대한 조건 추가
-            })
             ->where('pt.is_active', 'Y')
             ->where('pt.token', $partnerTableToken)
             ->where('mp.isActive', 'Y')
             ->whereNotNull('mp.categoryID')
-            ->whereNull('up.product_id')
             ->select([
                 DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"),
                 'mp.productCode',
