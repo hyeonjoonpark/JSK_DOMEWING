@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+use function PHPSTORM_META\map;
+
 class UploadedController extends Controller
 {
     public function index(Request $request)
@@ -251,7 +253,6 @@ class UploadedController extends Controller
         // 벤더에 따라 올바른 메소드를 호출하도록 분기
         $methodName = $vendorEngName . 'EditRequest';
         $response = $this->$methodName($originProductNo, $productName, $price, $shippingFee, $partner, $product);
-        return $response;
         if ($response['status'] === false) {
             return $response;
         }
@@ -283,134 +284,51 @@ class UploadedController extends Controller
             ];
         }
     }
-
+    protected function coupangGetProduct($accessKey, $secretKey, $originProductNo)
+    {
+        $contentType = 'application/json;charset=UTF-8';
+        $path = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products/' . $originProductNo;
+        $ac = new ApiController();
+        $apiResult = $ac->getBuilder($accessKey, $secretKey, $contentType, $path);
+        return $apiResult;
+    }
     public function coupangEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
     {
         $account = DB::table('coupang_accounts AS a')
             ->join('coupang_uploaded_products AS up', 'up.coupang_account_id', '=', 'a.id')
             ->where('up.origin_product_no', $originProductNo)
-            ->select(['a.access_key', 'a.secret_key', 'a.code'])
+            ->select(['a.access_key', 'a.secret_key', 'a.code', 'a.username'])
             ->first();
         $accessKey = $account->access_key;
         $secretKey = $account->secret_key;
         $contentType = 'application/json;charset=UTF-8';
         $path = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products';
-        $cuc = new CoupangUploadController($product, $partner, $account);
-        $optionName = '단일 상품';
-        if ($product->hasOption === 'Y') {
-            $optionName = $cuc->extractOptionName($product->productDetail);
+        $coupangGetProductResult = $this->coupangGetProduct($accessKey, $secretKey, $originProductNo);
+        if ($coupangGetProductResult['status'] === false || $coupangGetProductResult['data']['code'] !== 'SUCCESS') {
+            return $coupangGetProductResult;
         }
-        $deliveryChargeType = "FREE";
-        if ($shippingFee > 0) {
-            $deliveryChargeType = "NOT_FREE";
-        }
-        $deliveryCharge = $shippingFee;
-        $responseOutbound = $cuc->getOutbound($accessKey, $secretKey);
-        $responseReturn = $cuc->getReturnCenter($accessKey, $secretKey, $account->code);
-        if ($responseOutbound['status'] === false) {
-            return $responseOutbound;
-        }
-        if ($responseReturn['status'] === false) {
-            return $responseReturn;
-        }
-        $outboundCode = $responseOutbound['data'];
-        $returnCenter = $responseReturn['data'];
-        $data = [
-            'sellerProductId' => $product->origin_product_no,
-            'sellerProductName' => $productName,
-            'vendorId' => $account->code,
-            'displayProductName' => $productName,
-            'brand' => '제이에스',
-            'generalProductName' => $productName,
-            'deliveryMethod' => 'SEQUENCIAL',
-            'deliveryCompanyCode' => 'HYUNDAI',
-            'deliveryChargeType' => $deliveryChargeType,
-            'deliveryCharge' => $deliveryCharge,
-            'freeShipOverAmount' => 0,
-            'deliveryChargeOnReturn' => $shippingFee,
-            'remoteAreaDeliverable' => 'Y',
-            'unionDeliveryType' => 'NOT_UNION_DELIVERY',
-            'returnCenterCode' => $returnCenter['returnCenterCode'],
-            'returnChargeName' => $returnCenter['shippingPlaceName'],
-            'companyContactNumber' => $returnCenter['placeAddresses'][0]['companyContactNumber'],
-            'returnZipCode' => $returnCenter['placeAddresses'][0]['returnZipCode'],
-            'returnAddress' => $returnCenter['placeAddresses'][0]['returnAddress'],
-            'returnAddressDetail' => $returnCenter['placeAddresses'][0]['returnAddressDetail'],
-            'returnCharge' => $shippingFee,
-            'outboundShippingPlaceCode' => $outboundCode,
-            'vendorUserId' => $account->username,
-            'requested' => true,
-            'items' => [
-                [
-                    'itemName' => $optionName,
-                    'originalPrice' => $price,
-                    'salePrice' => $price,
-                    'maximumBuyCount' => 9999,
-                    'maximumBuyForPerson' => 0,
-                    'maximumBuyForPersonPeriod' => 1,
-                    'outboundShippingTimeDay' => 1,
-                    'unitCount' => 0,
-                    'adultOnly' => 'EVERYONE',
-                    'taxType' => 'TAX',
-                    'parallelImported' => 'NOT_PARALLEL_IMPORTED',
-                    'overseasPurchased' => 'NOT_OVERSEAS_PURCHASED',
-                    'pccNeeded' => false,
-                    'externalVendorSku' => $product->productCode,
-                    'searchTags' => explode(',', $product->productKeywords),
-                    'images' => [
-                        [
-                            'imageOrder' => 0,
-                            'imageType' => 'REPRESENTATION',
-                            'vendorPath' => $product->productImage
-                        ]
-                    ],
-                    'notices' => [
-                        [
-                            'noticeCategoryName' => '기타 재화',
-                            'noticeCategoryDetailName' => '품명 및 모델명',
-                            'content' => '상세페이지 참조'
-                        ],
-                        [
-                            'noticeCategoryName' => '기타 재화',
-                            'noticeCategoryDetailName' => '인증/허가 사항',
-                            'content' => '상세페이지 참조'
-                        ],
-                        [
-                            'noticeCategoryName' => '기타 재화',
-                            'noticeCategoryDetailName' => '제조국(원산지)',
-                            'content' => '상세페이지 참조'
-                        ],
-                        [
-                            'noticeCategoryName' => '기타 재화',
-                            'noticeCategoryDetailName' => '제조자(수입자)',
-                            'content' => '상세페이지 참조'
-                        ],
-                        [
-                            'noticeCategoryName' => '기타 재화',
-                            'noticeCategoryDetailName' => '소비자상담 관련 전화번호',
-                            'content' => '상세페이지 참조'
-                        ],
-                    ],
-                    'contents' => [
-                        [
-                            'contentsType' => 'HTML',
-                            'contentDetails' => [
-                                [
-                                    'content' => $product->productDetail,
-                                    'detailType' => 'TEXT'
-                                ]
-                            ]
-                        ]
-                    ],
-                    'offerCondition' => 'NEW',
-                    'manufacture' => '제이에스',
-                    'attributes' => []
-                ]
-            ]
-        ];
+        $productInfo = $coupangGetProductResult['data']['data'];
+        $deliveryChargeOnReturn = (int)$shippingFee === 0 ? $product->shipping_fee : 0;
+        $returnCharge = (int)$shippingFee === 0 ? $product->shipping_fee : 0;
+        $deliveryChargeType = (int)$shippingFee === 0 ? 'FREE' : 'NOT_FREE';
+        $productInfo['items'][0]['originalPrice'] = $price;
+        $productInfo['items'][0]['salePrice'] = $price;
+        $productInfo['displayProductName'] = $productName;
+        $productInfo['generalProductName'] = $productName;
+        $productInfo['deliveryChargeType'] = $deliveryChargeType;
+        $productInfo['deliveryCharge'] = $shippingFee;
+        $productInfo['deliveryChargeOnReturn'] = $deliveryChargeOnReturn;
+        $productInfo['returnCharge'] = $returnCharge;
+        $productInfo['sellerProductName'] = $productName;
         $ac = new ApiController();
-        $apiResult = $ac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
-        return $apiResult;
+        $apiResult = $ac->putBuilder($accessKey, $secretKey, $contentType, $path, $productInfo);
+        if ($apiResult['status'] === false || $apiResult['data']['code'] !== 'SUCCESS') {
+            return $coupangGetProductResult;
+        }
+        return [
+            'status' => true,
+            'data' => $productInfo
+        ];
     }
 
     public function coupangDeleteRequest($originProductNo)
