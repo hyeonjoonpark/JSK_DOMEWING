@@ -55,7 +55,7 @@ class ProcessProductUpload implements ShouldQueue
                 throw new \Exception("Unknown vendor: {$this->vendor->name_eng}");
         }
 
-        return $uploader->main();
+        return $uploader->main($this->products, $this->partner, $this->account);
     }
 
     protected function storeNotification($partnerId, $status, $data)
