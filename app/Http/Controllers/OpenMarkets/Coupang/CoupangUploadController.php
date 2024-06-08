@@ -151,7 +151,8 @@ class CoupangUploadController extends Controller
         }
         return [
             'status' => false,
-            'message' => '쿠팡윙에서 출고지 주소를 올바르게 설정해주세요.'
+            'message' => '쿠팡윙에서 출고지 주소를 올바르게 설정해주세요.',
+            'error' => $response
         ];
     }
     protected function generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee)
@@ -261,7 +262,7 @@ class CoupangUploadController extends Controller
             ]
         ];
     }
-    protected function extractOptionName($productDetail)
+    public function extractOptionName($productDetail)
     {
         $encodedHtml = mb_convert_encoding($productDetail, 'HTML-ENTITIES', 'UTF-8');
 

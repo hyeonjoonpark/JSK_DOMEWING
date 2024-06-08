@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
 use App\Http\Controllers\OpenMarkets\St11\ApiController as St11ApiController;
+use App\Http\Controllers\OpenMarkets\St11\UploadController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use App\Http\Controllers\Product\NameController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
@@ -238,17 +239,19 @@ class UploadedController extends Controller
         $product = DB::table('minewing_products AS mp')
             ->join($vendorEngName . '_uploaded_products AS up', 'up.product_id', '=', 'mp.id')
             ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
+            ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
             ->where('up.origin_product_no', $originProductNo)
             ->first();
         if (!$product) {
             return [
                 'status' => false,
-                'message' => 'Product not found.'
+                'message' => '유효한 상품이 아닙니다.'
             ];
         }
         // 벤더에 따라 올바른 메소드를 호출하도록 분기
         $methodName = $vendorEngName . 'EditRequest';
         $response = $this->$methodName($originProductNo, $productName, $price, $shippingFee, $partner, $product);
+        return $response;
         if ($response['status'] === false) {
             return $response;
         }
@@ -283,15 +286,25 @@ class UploadedController extends Controller
 
     public function coupangEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
     {
-        $cpac = new ApiController();
         $account = DB::table('coupang_accounts AS a')
             ->join('coupang_uploaded_products AS up', 'up.coupang_account_id', '=', 'a.id')
             ->where('up.origin_product_no', $originProductNo)
-            ->select(['a.hash', 'a.secret_key', 'a.access_key', 'a.code'])
+            ->select(['a.access_key', 'a.secret_key', 'a.code'])
             ->first();
-        $cuc = new CoupangUploadController($product, $partner, $account);
         $accessKey = $account->access_key;
         $secretKey = $account->secret_key;
+        $contentType = 'application/json;charset=UTF-8';
+        $path = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products';
+        $cuc = new CoupangUploadController($product, $partner, $account);
+        $optionName = '단일 상품';
+        if ($product->hasOption === 'Y') {
+            $optionName = $cuc->extractOptionName($product->productDetail);
+        }
+        $deliveryChargeType = "FREE";
+        if ($shippingFee > 0) {
+            $deliveryChargeType = "NOT_FREE";
+        }
+        $deliveryCharge = $shippingFee;
         $responseOutbound = $cuc->getOutbound($accessKey, $secretKey);
         $responseReturn = $cuc->getReturnCenter($accessKey, $secretKey, $account->code);
         if ($responseOutbound['status'] === false) {
@@ -302,27 +315,10 @@ class UploadedController extends Controller
         }
         $outboundCode = $responseOutbound['data'];
         $returnCenter = $responseReturn['data'];
-        return [
-            'status' => true,
-            'data' => $returnCenter
-        ];
-        //ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-        $optionName = '단일 상품';
-        if ($product->hasOption === 'Y') {
-            $optionName = $this->extractOptionName($product->productDetail);
-        }
-        $deliveryChargeType = "NOT_FREE";
-        if ($price >= 5000) { //애매한부분 %salePrice
-            $deliveryChargeType = "FREE";
-        }
-        $deliveryCharge = $shippingFee;
-        //ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
         $data = [
-            'sellerProductId' => $originProductNo,
-            'displayCategoryCode' => $product->code,
+            'sellerProductId' => $product->origin_product_no,
             'sellerProductName' => $productName,
-            'saleStartedAt' => date("Y-m-d\TH:i:s"),
-            'saleEndedAt' => date("2099-12-31\TH:i:s"),
+            'vendorId' => $account->code,
             'displayProductName' => $productName,
             'brand' => '제이에스',
             'generalProductName' => $productName,
@@ -334,7 +330,7 @@ class UploadedController extends Controller
             'deliveryChargeOnReturn' => $shippingFee,
             'remoteAreaDeliverable' => 'Y',
             'unionDeliveryType' => 'NOT_UNION_DELIVERY',
-            'returnCenterCode' => "NO_RETURN_CENTERCODE",
+            'returnCenterCode' => $returnCenter['returnCenterCode'],
             'returnChargeName' => $returnCenter['shippingPlaceName'],
             'companyContactNumber' => $returnCenter['placeAddresses'][0]['companyContactNumber'],
             'returnZipCode' => $returnCenter['placeAddresses'][0]['returnZipCode'],
@@ -359,6 +355,8 @@ class UploadedController extends Controller
                     'parallelImported' => 'NOT_PARALLEL_IMPORTED',
                     'overseasPurchased' => 'NOT_OVERSEAS_PURCHASED',
                     'pccNeeded' => false,
+                    'externalVendorSku' => $product->productCode,
+                    'searchTags' => explode(',', $product->productKeywords),
                     'images' => [
                         [
                             'imageOrder' => 0,
@@ -404,13 +402,14 @@ class UploadedController extends Controller
                             ]
                         ]
                     ],
+                    'offerCondition' => 'NEW',
+                    'manufacture' => '제이에스',
                     'attributes' => []
                 ]
             ]
         ];
-        $contentType = 'application/json;charset=UTF-8';
-        $path = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products';
-        $apiResult = $cpac->putBuilder($account->access_key, $account->secret_key, $contentType, $path, $data);
+        $ac = new ApiController();
+        $apiResult = $ac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
         return $apiResult;
     }
 
@@ -583,6 +582,119 @@ class UploadedController extends Controller
                 'error' => $e->getMessage()
             ];
         }
+    }
+    public function st11EditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
+    {
+        $ac = new St11ApiController();
+        $account = DB::table('st11_accounts AS a')
+            ->join('st11_uploaded_products AS up', 'up.st11_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.hash', 'a.access_key'])
+            ->first();
+        $apiKey = $account->access_key;
+        $uc = new UploadController();
+        $getOutboundCodeResult = $uc->getOutboundCode($apiKey);
+        $getInboundCodeResult = $uc->getInboundCode($apiKey);
+        if ($getOutboundCodeResult['status'] === false) {
+            return $getOutboundCodeResult;
+        }
+        if ($getInboundCodeResult['status'] === false) {
+            return $getInboundCodeResult;
+        }
+        $outboundCode = $getOutboundCodeResult['data']['addrSeq'];
+        $inboundCode = $getInboundCodeResult['data']['addrSeq'];
+        $data = <<<_EOT_
+        <?xml version="1.0" encoding="euc-kr" ?>
+        <Product>
+            <selMthdCd>01</selMthdCd>
+            <prdTypCd>01</prdTypCd>
+            <prdNm>$productName</prdNm>
+            <brand>JS</brand>
+            <rmaterialTypCd>05</rmaterialTypCd>
+            <orgnTypCd>03</orgnTypCd>
+            <sellerPrdCd>$product->productCode</sellerPrdCd>
+            <orgnNmVal>기타</orgnNmVal>
+            <suplDtyfrPrdClfCd>01</suplDtyfrPrdClfCd>
+            <prdStatCd>01</prdStatCd>
+            <minorSelCnYn>Y</minorSelCnYn>
+            <prdImage01>$product->productImage</prdImage01>
+            <htmlDetail><![CDATA[$product->productDetail]]></htmlDetail>
+            <selPrc>$price</selPrc>
+            <dlvCnAreaCd>01</dlvCnAreaCd>
+            <dlvWyCd>01</dlvWyCd>
+            <dlvCstInstBasiCd>03</dlvCstInstBasiCd>
+            <PrdFrDlvBasiAmt>300000</PrdFrDlvBasiAmt>
+            <bndlDlvCnYn>N</bndlDlvCnYn>
+            <dlvCstPayTypCd>03</dlvCstPayTypCd>
+            <jejuDlvCst>$product->additional_shipping_fee</jejuDlvCst>
+            <islandDlvCst>$product->additional_shipping_fee</islandDlvCst>
+            <addrSeqOut>$outboundCode</addrSeqOut>
+            <addrSeqIn>$inboundCode</addrSeqIn>
+            <rtngdDlvCst>$shippingFee</rtngdDlvCst>
+            <exchDlvCst>$shippingFee</exchDlvCst>
+            <asDetail>.</asDetail>
+            <rtngExchDetail>.</rtngExchDetail>
+            <dlvClf>02</dlvClf>
+            <ProductNotification>
+                <type>891045</type>
+                <item>
+                    <code>23759100</code>
+                    <name>상세정보 참조</name>
+                </item>
+                <item>
+                    <code>23756033</code>
+                    <name>상세정보 참조</name>
+                </item>
+                <item>
+                    <code>11905</code>
+                    <name>상세정보 참조</name>
+                </item>
+                <item>
+                    <code>23760413</code>
+                    <name>상세정보 참조</name>
+                </item>
+                <item>
+                    <code>11800</code>
+                    <name>상세정보 참조</name>
+                </item>
+            </ProductNotification>
+            <dlvCst1>$shippingFee</dlvCst1>
+            <selTermUseYn>N</selTermUseYn>
+            <prdSelQty>9999</prdSelQty>
+            <ProductCertGroup>
+                <crtfGrpTypCd>01</crtfGrpTypCd>
+                <crtfGrpObjClfCd>03</crtfGrpObjClfCd>
+            </ProductCertGroup>
+            <ProductCertGroup>
+                <crtfGrpTypCd>02</crtfGrpTypCd>
+                <crtfGrpObjClfCd>03</crtfGrpObjClfCd>
+            </ProductCertGroup>
+            <ProductCertGroup>
+                <crtfGrpTypCd>03</crtfGrpTypCd>
+                <crtfGrpObjClfCd>03</crtfGrpObjClfCd>
+            </ProductCertGroup>
+            <ProductCertGroup>
+                <crtfGrpTypCd>04</crtfGrpTypCd>
+                <crtfGrpObjClfCd>05</crtfGrpObjClfCd>
+            </ProductCertGroup>
+        </Product>
+        _EOT_;
+        $url = 'http://api.11st.co.kr/rest/prodservices/product/' . $originProductNo;
+        $method = 'put';
+        $apiResult = $ac->builder($apiKey, $method, $url, $data);
+        if ($apiResult['status'] === true) {
+            $resultCode = (int)$apiResult['data']->resultCode;
+            if ($resultCode === 200) {
+                return [
+                    'status' => true
+                ];
+            }
+            return [
+                'status' => false,
+                'apiResult' => $apiResult
+            ];
+        }
+        return $apiResult;
     }
     protected function st11DeleteRequest($originProductNo)
     {
