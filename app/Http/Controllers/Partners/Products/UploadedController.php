@@ -158,7 +158,7 @@ class UploadedController extends Controller
         $dupResult = $this->destroyUploadedProducts($successedOriginProductsNo, $vendorEngName);
         return [
             'status' => true,
-            'message' => '총 ' . count($originProductsNo) . '개의 상품 중 ' . count($successedOriginProductsNo) . '개의 상품을 성공적으로 삭제했습니다.<br>실패한 상품들도 업로드된 상품 목록에서 제외했습니다.',
+            'message' => '총 ' . count($originProductsNo) . '개의 상품 중 ' . count($successedOriginProductsNo) . '개의 상품을 성공적으로 삭제했습니다.<br>주문 및 클레임 진행 중인 상품들은 삭제할 수 없습니다.',
             'data' => [
                 'success' => $successedOriginProductsNo,
                 'errors' => $errors,
