@@ -36,7 +36,7 @@ class ProcessProductUpload implements ShouldQueue
     {
         $uploadResult = $this->uploadProducts();
 
-        $this->storeNotification($this->partner->id, $uploadResult['status'], $uploadResult['message']);
+        $this->storeNotification($this->partner->id, $uploadResult['status'], $uploadResult['message'], $this->vendor->name);
     }
 
     protected function uploadProducts()
@@ -58,12 +58,12 @@ class ProcessProductUpload implements ShouldQueue
         return $uploader->main($this->products, $this->partner, $this->account);
     }
 
-    protected function storeNotification($partnerId, $status, $data)
+    protected function storeNotification($partnerId, $status, $data, $vendorName)
     {
         DB::table('notifications')->insert([
             'partner_id' => $partnerId,
             'status' => $status ? 'TRUE' : 'FALSE',
-            'data' => $data
+            'data' => '<strong>' . $vendorName . ' 상품 업로드 결과</strong><br>' . $data
         ]);
     }
 }
