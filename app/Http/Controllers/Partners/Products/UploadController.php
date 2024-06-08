@@ -102,10 +102,6 @@ class UploadController extends Controller
             ->value;
         $marginRate = $margin / 100 + 1;
         $commissionRate = $vendorCommission / 100 + 1;
-
-        // 데이터 전처리: 상품
-        $uploadedProductsTable = $vendorEngName . '_uploaded_products';
-
         $products = DB::table('partner_products AS pp')
             ->join('partner_tables AS pt', 'pt.id', '=', 'pp.partner_table_id')
             ->join('minewing_products AS mp', 'mp.id', '=', 'pp.product_id')
