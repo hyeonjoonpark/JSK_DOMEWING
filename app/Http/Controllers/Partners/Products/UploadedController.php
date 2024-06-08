@@ -582,4 +582,7 @@ class UploadedController extends Controller
             ];
         }
     }
+    protected function st11EditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
+    {
+    }
 }
