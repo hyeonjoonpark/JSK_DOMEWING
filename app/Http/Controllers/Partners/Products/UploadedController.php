@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Partners\Products;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
+use App\Http\Controllers\OpenMarkets\St11\ApiController as St11ApiController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use App\Http\Controllers\Product\NameController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
@@ -158,7 +159,8 @@ class UploadedController extends Controller
             'data' => [
                 'success' => $successedOriginProductsNo,
                 'errors' => $errors,
-                'dupResult' => $dupResult
+                'dupResult' => $dupResult,
+                'apiResult' => $result
             ]
         ];
     }
@@ -582,7 +584,30 @@ class UploadedController extends Controller
             ];
         }
     }
-    protected function st11EditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
+    protected function st11DeleteRequest($originProductNo)
     {
+        $ac = new St11ApiController();
+        $account = DB::table('st11_accounts AS a')
+            ->join('st11_uploaded_products AS up', 'up.st11_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.hash', 'a.access_key'])
+            ->first();
+        $apiKey = $account->access_key;
+        $method = 'put';
+        $url = "http://api.11st.co.kr/rest/prodstatservice/stat/stopdisplay/" . $originProductNo;
+        $apiResult = $ac->builder($apiKey, $method, $url);
+        if ($apiResult['status'] === true) {
+            $resultCode = (int)$apiResult['data']->resultCode;
+            if ($resultCode === 200) {
+                return [
+                    'status' => true
+                ];
+            }
+            return [
+                'status' => false,
+                'apiResult' => $apiResult
+            ];
+        }
+        return $apiResult;
     }
 }
