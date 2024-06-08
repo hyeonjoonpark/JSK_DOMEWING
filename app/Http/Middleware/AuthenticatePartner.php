@@ -54,8 +54,14 @@ class AuthenticatePartner
             $wc = new WingController();
             $wingBalance = $wc->getBalance($memberId);
         }
+        $notifications = DB::table('notifications')
+            ->where('partner_id', $partnerId)
+            ->where('read_at', null)
+            ->orderByDesc('created_at')
+            ->get();
         view()->share('partner', $partner);
         view()->share('wingBalance', $wingBalance);
+        view()->share('notifications', $notifications);
         return $next($request);
     }
 }

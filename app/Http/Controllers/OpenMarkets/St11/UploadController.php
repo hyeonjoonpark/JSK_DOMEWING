@@ -17,6 +17,12 @@ class UploadController extends Controller
      */
     public function main($products, $partner, $account): array
     {
+        if (count($products) > 500) {
+            return [
+                'status' => false,
+                'message' => '한 번에 500개 이하의 상품만 업로드 가능합니다.'
+            ];
+        }
         $ac = new ApiController();
         $apiKey = $account->access_key;
         $method = 'post';
@@ -25,6 +31,9 @@ class UploadController extends Controller
         $inboundCode = $this->getInboundCode($apiKey);
         if ($outboundCode['status'] === false) {
             return $outboundCode;
+        }
+        if ($inboundCode['status'] === false) {
+            return $inboundCode;
         }
         $addrSeq = $outboundCode['data']['addrSeq'];
         $inboundCode = $inboundCode['data']['addrSeq'];
@@ -49,7 +58,7 @@ class UploadController extends Controller
                     continue;
                 }
                 $resultCode = (int)$builderResult['data']->resultCode;
-                if ($resultCode === 500) {
+                if ($resultCode !== 200 && $resultCode !== 210) {
                     $error[] = $builderResult;
                     continue;
                 }
@@ -65,9 +74,13 @@ class UploadController extends Controller
                 continue;
             }
         }
+        $status = true;
+        if ($success < 1) {
+            $status = false;
+        }
         return [
-            'status' => false,
-            'message' => "총 " . count($products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
+            'status' => $status,
+            'message' => "총 " . count($products) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
             'error' => $error
         ];
     }

@@ -49,6 +49,7 @@ use App\Http\Controllers\Productwing\SoldOutController;
 use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\Namewing\NamewingController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\OpenMarketExchangeController;
@@ -230,7 +231,9 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
         Route::post('delete-uploaded', [UploadedController::class, 'delete']);
         Route::post('edit-uploaded', [UploadedController::class, 'edit']);
     });
-
+    Route::prefix('notifications')->group(function () {
+        Route::post('read-all', [NotificationController::class, 'readAll']);
+    });
     Route::post('open-market-orders', [OpenMarketOrderController::class, 'indexPartner']);
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);

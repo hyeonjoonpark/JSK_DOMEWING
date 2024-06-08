@@ -30,6 +30,16 @@ class CoupangUploadController extends Controller
         $success = 0;
         $duplicated = [];
         $error = [];
+        $responseOutbound = $this->getOutbound($accessKey, $secretKey);
+        $responseReturn = $this->getReturnCenter($accessKey, $secretKey, $account->code);
+        if ($responseOutbound['status'] === false) {
+            return $responseOutbound;
+        }
+        if ($responseReturn['status'] === false) {
+            return $responseReturn;
+        }
+        $outboundCode = $responseOutbound['data'];
+        $returnCenter = $responseReturn['data'];
         foreach ($products as $product) {
             $exists = DB::table('coupang_uploaded_products')
                 ->where('is_active', 'Y')
@@ -40,16 +50,6 @@ class CoupangUploadController extends Controller
                 $duplicated[] = $product->productCode;
                 continue;
             }
-            $responseOutbound = $this->getOutbound($accessKey, $secretKey);
-            $responseReturn = $this->getReturnCenter($accessKey, $secretKey, $account->code);
-            if ($responseOutbound['status'] === false) {
-                return $responseOutbound;
-            }
-            if ($responseReturn['status'] === false) {
-                return $responseReturn;
-            }
-            $outboundCode = $responseOutbound['data'];
-            $returnCenter = $responseReturn['data'];
             // 5,000원 미만 상품들은 상품가와 배송비를 따로 구분
             $productPrice = $product->productPrice;
             $shippingFee = $product->shipping_fee;
@@ -71,9 +71,8 @@ class CoupangUploadController extends Controller
         }
         return [
             'status' => true,
-            'message' => "총 " . count($this->products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
-            'error' => $error,
-            'data' => json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            'message' => "총 " . count($this->products) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
+            'error' => $error
         ];
     }
     protected function store($coupangAccountId, $productId, $price, $shippingFee, $originProductNo, $productName)

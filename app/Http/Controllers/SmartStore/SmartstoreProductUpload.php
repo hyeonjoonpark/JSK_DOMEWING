@@ -62,7 +62,7 @@ class SmartstoreProductUpload extends Controller
         }
         return [
             'status' => $status,
-            'message' => "총 " . $numProducts . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
+            'message' => "총 " . $numProducts . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
             'error' => $error
         ];
     }
@@ -81,13 +81,13 @@ class SmartstoreProductUpload extends Controller
     }
     private function generateParam($product, $productImage)
     {
-        $productKeywords = explode(',', $product->productKeywords);
-        $sellerTags = [];
-        foreach ($productKeywords as $keyword) {
-            $sellerTags[] = [
-                'text' => $keyword
-            ];
-        }
+        // $productKeywords = explode(',', $product->productKeywords);
+        // $sellerTags = [];
+        // foreach ($productKeywords as $keyword) {
+        //     $sellerTags[] = [
+        //         'text' => $keyword
+        //     ];
+        // }
         $data = [
             'originProduct' => [
                 'statusType' => 'SALE',

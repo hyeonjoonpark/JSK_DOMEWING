@@ -177,25 +177,7 @@
                     vendorCommission,
                     apiToken
                 },
-                success: function(response) {
-                    if (response.error !== '') {
-                        console.log(response);
-                    }
-                    closePopup();
-                    const status = response.status;
-                    if (status === true) {
-                        Swal.fire({
-                            icon: 'success',
-                            html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Success.svg') }}"><h4 class="swal2-title mt-5">' +
-                                response.message + '</h4>'
-                        }).then((result) => {
-                            window.location.replace('/partner/products/sale?selectedOpenMarketId=' + $(
-                                'input[name="openMarkets"]:checked').val());
-                        });
-                    } else {
-                        swalError(response.message);
-                    }
-                },
+                success: ajaxSuccessHandling,
                 error: AjaxErrorHandling
             });
         }

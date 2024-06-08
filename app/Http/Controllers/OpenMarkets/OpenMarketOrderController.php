@@ -19,13 +19,18 @@ class OpenMarketOrderController extends Controller
 {
     public function index()
     {
+        // Charles: allPartners 를 불러올 때, pda 로부터 member_id 를 호출할 수 있잖아?
         $allPartners = $this->getAllPartners(); //모든 파트너 조회
         $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
         foreach ($allPartners as $partner) { //모든 파트너 반복문
+            // Charles: 첫 줄에서 member_id 를 한꺼번에 불러온다면 매 반복마다 DB 조회를 안 해도 됨. DB 를 조회한다는 것은 리소스를 엄청 잡아먹는 일임.
             $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
             $memberId = $partnerDomewingAccount->domewing_account_id;
             foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
                 $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
+                // Charles: 현재 계정이 존재하는지 DB 조회 1번, 나중에 계정 정보 불러올 때 1번. 총 2번의 DB 호출이 발생하고 있음.
+                // Charles: first() 메소드를 이용한다면, 계정이 없을시 null 을 리턴함. 이 부분을 활용하면 한 번의 DB 호출로
+                // Charles: 계정이 없는지/있으면 계정 정보를 가져오는 처리를 한 번에 수행할 수 있음.
                 $isExistAccount = 'isExist'  . ucfirst($openMarketEngName) . 'Account';
                 $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
                 if (!$isExistOpenMarketAccount) continue;

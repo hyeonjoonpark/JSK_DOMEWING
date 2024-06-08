@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
 use App\Http\Controllers\OpenMarkets\St11\UploadController as St11UploadController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
+use App\Jobs\ProcessProductUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,6 +52,7 @@ class UploadController extends Controller
     {
         set_time_limit(0);
         ini_set('memory_allow', '-1');
+
         // 데이터 유효성 검사.
         $validator = Validator::make($request->all(), [
             'partnerTableToken' => 'required|string',
@@ -67,12 +69,14 @@ class UploadController extends Controller
             'accountHash' => '계정을 선택해주세요.',
             'vendorCommission' => '올바른 마켓 수수료(%)를 기입해주세요.'
         ]);
+
         if ($validator->fails()) {
             return [
                 'status' => false,
                 'message' => $validator->errors()->first()
             ];
         }
+
         // 데이터 전처리: 파라미터
         $partnerTableToken = $request->partnerTableToken;
         $vendorId = $request->vendorId;
@@ -80,13 +84,15 @@ class UploadController extends Controller
         $vendor = DB::table('vendors')
             ->where('id', $vendorId)
             ->where('is_active', 'ACTIVE')
-            ->first(['name_eng']);
+            ->first(['name_eng', 'name']);
+
         if ($vendor === null) {
             return [
                 'status' => false,
                 'message' => '비활성화된 오픈 마켓입니다. 다시 시도해주세요.'
             ];
         }
+
         $vendorEngName = $vendor->name_eng;
         $partnerMargin = $request->partnerMargin;
         $partnerMarginRate = $partnerMargin / 100 + 1;
@@ -96,32 +102,66 @@ class UploadController extends Controller
             ->value;
         $marginRate = $margin / 100 + 1;
         $commissionRate = $vendorCommission / 100 + 1;
+
         // 데이터 전처리: 상품
+        $uploadedProductsTable = $vendorEngName . '_uploaded_products';
+
         $products = DB::table('partner_products AS pp')
             ->join('partner_tables AS pt', 'pt.id', '=', 'pp.partner_table_id')
             ->join('minewing_products AS mp', 'mp.id', '=', 'pp.product_id')
             ->join('category_mapping AS cm', 'cm.ownerclan', '=', 'mp.categoryID')
             ->join($vendorEngName . '_category AS c', 'c.id', '=', 'cm.' . $vendorEngName)
             ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
+            ->leftJoin($uploadedProductsTable . ' AS up', function ($join) use ($uploadedProductsTable) {
+                $join->on('up.product_id', '=', 'mp.id')
+                    ->where('up.is_active', 'Y');
+            })
             ->where('pt.is_active', 'Y')
             ->where('pt.token', $partnerTableToken)
             ->where('mp.isActive', 'Y')
-            ->whereNot('mp.categoryID', null)
-            ->select([DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"), 'mp.productCode', 'pp.product_name AS productName', 'mp.productImage', 'mp.productDetail', 'c.code', 'mp.shipping_fee', 'ps.additional_shipping_fee', 'mp.id', 'mp.productKeywords', 'mp.hasOption', 'mp.bundle_quantity'])
+            ->whereNotNull('mp.categoryID')
+            ->whereNull('up.product_id')
+            ->select([
+                DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"),
+                'mp.productCode',
+                'pp.product_name AS productName',
+                'mp.productImage',
+                'mp.productDetail',
+                'c.code',
+                'mp.shipping_fee',
+                'ps.additional_shipping_fee',
+                'mp.id',
+                'mp.productKeywords',
+                'mp.hasOption',
+                'mp.bundle_quantity'
+            ])
             ->get();
+
         if ($products->isEmpty()) {
             return [
                 'status' => false,
-                'message' => '빈 테이블입니다. 상품 수집관에서 상품 수집을 진행해주세요.'
+                'message' => '테이블이 비어 있거나 모든 상품이 이미 업로드되었습니다.'
             ];
         }
+
         $partner = DB::table('partners')
             ->where('api_token', $request->apiToken)
             ->first();
+
         $account = DB::table($vendorEngName . '_accounts')
             ->where('hash', $request->accountHash)
             ->first();
-        return $this->$vendorEngName($products, $partner, $account);
+        $tableName = DB::table('partner_tables')
+            ->where('token', $partnerTableToken)
+            ->value('title');
+        // 큐에 작업 추가
+        ProcessProductUpload::dispatch($products, $partner, $account, $vendor, $tableName);
+        $numJobs = DB::table('jobs')
+            ->count();
+        return [
+            'status' => true,
+            'message' => '중복된 상품을 제외하고 총 ' . count($products) . '개의 상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>현재 ' . $numJobs . '개의 작업이 대기열에 있습니다.'
+        ];
     }
     private function smart_store($products, $partner, $account)
     {
