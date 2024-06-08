@@ -151,7 +151,7 @@ class UploadController extends Controller
             ->count();
         return [
             'status' => true,
-            'message' => '중복된 상품을 제외하고 총 ' . count($products) . '개의 상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>현재 ' . $numJobs . '개의 작업이 대기열에 있습니다.'
+            'message' => '총 ' . count($products) . '개의 상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>현재 ' . $numJobs . '개의 작업이 대기열에 있습니다.'
         ];
     }
     private function smart_store($products, $partner, $account)
