@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class NotificationController extends Controller
 {
-    public function handle($partnerId, $type, $data, $readAt, $createdAt, $updatedAt)
+    public function handle($partnerId, $type, $data)
     {
         try {
             DB::table('notifications')
