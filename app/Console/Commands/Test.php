@@ -35,7 +35,12 @@ class Test extends Command
         ]);
         $soldOutProducts = $tsoc->main($request);
         $sopFile = public_path('js/track-sold-out/result.json');
-        file_put_contents($sopFile, json_encode($soldOutProducts['data']['soldOutProducts'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        $this->info('success');
+
+        if (isset($soldOutProducts['data']) && isset($soldOutProducts['data']['soldOutProducts'])) {
+            file_put_contents($sopFile, json_encode($soldOutProducts['data']['soldOutProducts'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            $this->info('success');
+        } else {
+            $this->error('Data key is missing in the response.');
+        }
     }
 }

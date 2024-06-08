@@ -1,15 +1,16 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const path = require('path');
 const { getOptionName } = require('./extract_product_option');
 
 /**
  * Compare product options with existing options.
  * @param {string} optionName - Option name extracted from the product detail.
  * @param {Array} existingOptions - Array of existing options.
- * @returns {boolean} - Returns true if the option is not found (indicating sold out), otherwise false.
+ * @returns {boolean} - Returns false if the option is found (indicating not sold out), otherwise true.
  */
 function compareOptions(optionName, existingOptions) {
-    return !existingOptions.includes(optionName);
+    return existingOptions.includes(optionName);
 }
 
 /**
@@ -17,9 +18,22 @@ function compareOptions(optionName, existingOptions) {
  * @returns {Array} - Array of existing options.
  */
 function loadExistingOptions() {
-    const data = fs.readFileSync('result.json', 'utf8');
-    const soldOutProducts = JSON.parse(data);
-    return soldOutProducts.map(product => product.optionName);
+    try {
+        const filePath = path.join(__dirname, 'result.json');
+        console.log('Loading existing options from:', filePath); // 경로 디버깅
+        const data = fs.readFileSync(filePath, 'utf8');
+        console.log('File content:', data); // 파일 내용 디버깅
+        const soldOutProducts = JSON.parse(data);
+        return soldOutProducts.map(product => product.optionName);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            console.error('result.json file not found, returning empty array.');
+            return [];
+        } else {
+            console.error('Error reading result.json:', error);
+            return [];
+        }
+    }
 }
 
 (async () => {
@@ -33,6 +47,10 @@ function loadExistingOptions() {
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const products = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+
+        // 가져온 제품의 개수 로그 추가
+        console.log('Number of products:', products.length);
+
         await signIn(page, username, password);
         const maxAttempts = 3;
         const soldOutProducts = [];
@@ -68,16 +86,17 @@ function loadExistingOptions() {
                     const soldOutProduct = {
                         id: product.id,
                         optionName: option.optionName,
-                        status: found
+                        status: !found
                     };
                     soldOutProducts.push(soldOutProduct);
-                    console.log(`Product ${product.id} option ${option.optionName} found: ${!found}`);
+                    console.log(`Product ${product.id} option ${option.optionName} found: ${found}`);
                 }
             }
         }
 
         // 결과를 result.json 파일에 저장
-        fs.writeFileSync('result.json', JSON.stringify(soldOutProducts, null, 2));
+        const sopFile = path.join(__dirname, 'result.json');
+        fs.writeFileSync(sopFile, JSON.stringify(soldOutProducts, null, 2));
         console.log('Results saved to result.json');
     } catch (error) {
         console.error('Error:', error);
@@ -88,9 +107,13 @@ function loadExistingOptions() {
 
 async function enterProductPage(page, productHref, maxAttempts, attempt) {
     try {
-        await page.goto(productHref, { waitUntil: 'domcontentloaded' });
+        // 페이지 로드를 위한 대기 시간을 추가
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2초 대기
+
+        await page.goto(productHref, { waitUntil: 'networkidle2', timeout: 120000 }); // 120초로 시간 초과 설정을 증가시킴
         return true;
     } catch (error) {
+        console.error(`Error entering product page (attempt ${attempt}):`, error);
         if (attempt >= maxAttempts) {
             return false;
         }
@@ -99,13 +122,13 @@ async function enterProductPage(page, productHref, maxAttempts, attempt) {
 }
 
 async function signIn(page, username, password) {
-    await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle0' });
+    await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle2', timeout: 120000 }); // 120초로 시간 초과 설정을 증가시킴
     await page.evaluate((username, password) => {
         document.querySelector('#member_id').value = username;
         document.querySelector('#member_passwd').value = password;
         document.querySelector('#contents > form > div > div > fieldset > a').click();
     }, username, password);
-    await page.waitForNavigation({ waitUntil: 'load' });
+    await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 120000 }); // 120초로 시간 초과 설정을 증가시킴
 }
 
 async function isValidProduct(page, productHref, maxAttempts, attempt) {
@@ -120,10 +143,18 @@ async function isValidProduct(page, productHref, maxAttempts, attempt) {
             if (errorImage) {
                 return 'error';
             }
+            const productTitle = document.querySelector('title');
+            if (!productTitle) {
+                return 'error';
+            }
             return true;
         });
     } catch (error) {
-        return 'error';
+        console.error('Error in isValidProduct:', error);
+        if (attempt >= maxAttempts) {
+            return false;
+        }
+        return await isValidProduct(page, productHref, maxAttempts, attempt + 1);
     }
 }
 
@@ -157,6 +188,8 @@ async function getProductOptions(page) {
                     .filter(opt => opt.value !== '' && opt.value !== '*' && opt.value !== '**' && !opt.text.includes("품절"))
             );
 
+            console.log(`Options found at depth ${currentDepth}:`, options);
+
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
                 await new Promise(resolve => setTimeout(resolve, 1000));
@@ -174,6 +207,9 @@ async function getProductOptions(page) {
                         return total + (matches ? parseInt(matches[1].replace(/,|원|\+/g, ''), 10) : 0);
                     }, 0);
                     productOptions.push({ optionName, optionPrice });
+
+                    // 옵션명을 콘솔에 출력
+                    console.log(`Option extracted: ${optionName} with price: ${optionPrice}`);
                 }
 
                 await resetSelects();
