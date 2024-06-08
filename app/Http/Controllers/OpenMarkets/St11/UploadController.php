@@ -72,13 +72,12 @@ class UploadController extends Controller
             }
         }
         $status = true;
-        $numProducts = count($products);
         if ($success < 1) {
             $status = false;
         }
         return [
             'status' => $status,
-            'message' => "총 " . count($products) . " 개의 상품들 중 $success 개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
+            'message' => "총 " . count($products) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 <strong>11번가에</strong> 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
             'error' => $error
         ];
     }
