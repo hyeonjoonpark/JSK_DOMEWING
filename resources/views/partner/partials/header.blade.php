@@ -71,7 +71,7 @@
                     </li><!-- .dropdown -->
                     <li class="dropdown notification-dropdown me-n1">
                         <a href="#" class="dropdown-toggle nk-quick-nav-icon" data-bs-toggle="dropdown">
-                            <div class="{{ empty($notifications) ? '' : 'icon-status icon-status-info' }}">
+                            <div class="{{ count($notifications) < 1 ? '' : 'icon-status icon-status-info' }}">
                                 <em class="icon ni ni-bell"></em>
                             </div>
                         </a>

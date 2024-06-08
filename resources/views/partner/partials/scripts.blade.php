@@ -165,7 +165,7 @@
                 apiToken
             },
             success: ajaxSuccessHandling,
-            error: ajaxSuccessHandling
+            error: AjaxErrorHandling
         });
     }
 </script>
