@@ -11,37 +11,49 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        $weeklySales = $this->getWeeklySales();
-        $actionCenter = $this->getActionCenter();
-        $top6MemberSales = $this->getTop6MemberSales();
-        return view('admin.dashboard', [
-            'weeklySales' => $weeklySales,
-            'actionCenter' => $actionCenter,
-            'top6MemberSales' => $top6MemberSales
-        ]);
+        return view('admin.dashboard');
     }
-    private function getActionCenter()
+
+    public function getActionCenter()
     {
-        $numPendingOrders = DB::table('orders')
-            ->where('delivery_status', 'PENDING')
-            ->count();
-        $numContactUs = DB::table('sellwing_contact_us')
-            ->where('status', 'PENDING')
-            ->count();
-        $numPendingDeposits = DB::table('wing_transactions AS wt')
-            ->join('deposit_details AS dd', 'dd.wing_transaction_id', '=', 'wt.id')
-            ->where('dd.payment_method_id', 5)
-            ->where('wt.type', 'DEPOSIT')
-            ->where('wt.status', 'PENDING')
-            ->count();
+        set_time_limit(0);
+        $numPendingOrders = $this->countPendingOrders();
+        $numContactUs = $this->countPendingContactUs();
+        $numPendingDeposits = $this->countPendingDeposits();
         return [
             'numPendingOrders' => $numPendingOrders,
             'numContactUs' => $numContactUs,
             'numPendingDeposits' => $numPendingDeposits,
         ];
     }
-    private function getWeeklySales()
+
+    private function countPendingOrders()
     {
+        return DB::table('orders')
+            ->where('delivery_status', 'PENDING')
+            ->count();
+    }
+
+    private function countPendingContactUs()
+    {
+        return DB::table('sellwing_contact_us')
+            ->where('status', 'PENDING')
+            ->count();
+    }
+
+    private function countPendingDeposits()
+    {
+        return DB::table('wing_transactions AS wt')
+            ->join('deposit_details AS dd', 'dd.wing_transaction_id', '=', 'wt.id')
+            ->where('dd.payment_method_id', 5)
+            ->where('wt.type', 'DEPOSIT')
+            ->where('wt.status', 'PENDING')
+            ->count();
+    }
+
+    public function getWeeklySales()
+    {
+        set_time_limit(0);
         $labels = [];
         $recharges = [];
         $sales = [];
@@ -50,49 +62,22 @@ class AdminDashboardController extends Controller
             $date = (clone $currentDate)->modify("-$i days");
             $startDatetime = $date->format('Y-m-d 00:00:00');
             $endDatetime = $date->format('Y-m-d 23:59:59');
-            $sale = DB::table('wing_transactions AS wt')
-                ->join('orders AS o', 'wt.id', '=', 'o.wing_transaction_id')
-                ->where('o.type', 'PAID')
-                ->where('wt.status', 'APPROVED')
-                ->whereBetween('wt.created_at', [$startDatetime, $endDatetime])
-                ->sum('wt.amount');
-            $recharge = DB::table('wing_transactions AS wt')
-                ->join('deposit_details AS dd', 'wt.id', '=', 'dd.wing_transaction_id')
-                ->where('wt.status', 'APPROVED')
-                ->whereBetween('wt.created_at', [$startDatetime, $endDatetime])
-                ->sum('wt.amount');
+            $sales[] = $this->sumSales($startDatetime, $endDatetime);
+            $recharges[] = $this->sumRecharges($startDatetime, $endDatetime);
             $labels[] = $date->format('d') . '일';
-            $sales[] = $sale;
-            $recharges[] = $recharge;
         }
-        $maxTarget = max($sales) > max($recharges) ? max($sales) : max($recharges);
+
+        $maxTarget = max(max($sales), max($recharges));
         $max = ceil($maxTarget / 500000) * 500000;
-        $thisMonthStart = date('Y-m-01 00:00:00');
-        $thisMonthEnd = date('Y-m-t 23:59:59');
-        $lastMonthStart = date('Y-m-01 00:00:00', strtotime('-1 month'));
-        $lastMonthEnd = date('Y-m-t 23:59:59', strtotime('-1 month'));
-        $thisMonthSaleTotal = DB::table('wing_transactions AS wt')
-            ->join('orders AS o', 'wt.id', '=', 'o.wing_transaction_id')
-            ->where('o.type', 'PAID')
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', [$thisMonthStart, $thisMonthEnd])
-            ->sum('wt.amount');
-        $lastMonthSaleTotal = DB::table('wing_transactions AS wt')
-            ->join('orders AS o', 'wt.id', '=', 'o.wing_transaction_id')
-            ->where('o.type', 'PAID')
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', [$lastMonthStart, $lastMonthEnd])
-            ->sum('wt.amount');
-        $thisMonthRechargeTotal = DB::table('wing_transactions AS wt')
-            ->join('deposit_details AS dd', 'wt.id', '=', 'dd.wing_transaction_id')
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', [$thisMonthStart, $thisMonthEnd])
-            ->sum('wt.amount');
-        $lastMonthRechargeTotal = DB::table('wing_transactions AS wt')
-            ->join('deposit_details AS dd', 'wt.id', '=', 'dd.wing_transaction_id')
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', [$lastMonthStart, $lastMonthEnd])
-            ->sum('wt.amount');
+
+        $thisMonth = $this->getDateRangeForThisMonth();
+        $lastMonth = $this->getDateRangeForLastMonth();
+
+        $thisMonthSaleTotal = $this->sumSales($thisMonth['start'], $thisMonth['end']);
+        $lastMonthSaleTotal = $this->sumSales($lastMonth['start'], $lastMonth['end']);
+        $thisMonthRechargeTotal = $this->sumRecharges($thisMonth['start'], $thisMonth['end']);
+        $lastMonthRechargeTotal = $this->sumRecharges($lastMonth['start'], $lastMonth['end']);
+
         return [
             'labels' => $labels,
             'sales' => $sales,
@@ -104,8 +89,45 @@ class AdminDashboardController extends Controller
             'lastMonthRechargeTotal' => $lastMonthRechargeTotal,
         ];
     }
+
+    private function sumSales($startDatetime, $endDatetime)
+    {
+        return DB::table('wing_transactions AS wt')
+            ->join('orders AS o', 'wt.id', '=', 'o.wing_transaction_id')
+            ->where('o.type', 'PAID')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', [$startDatetime, $endDatetime])
+            ->sum('wt.amount');
+    }
+
+    private function sumRecharges($startDatetime, $endDatetime)
+    {
+        return DB::table('wing_transactions AS wt')
+            ->join('deposit_details AS dd', 'wt.id', '=', 'dd.wing_transaction_id')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', [$startDatetime, $endDatetime])
+            ->sum('wt.amount');
+    }
+
+    private function getDateRangeForThisMonth()
+    {
+        return [
+            'start' => date('Y-m-01 00:00:00'),
+            'end' => date('Y-m-t 23:59:59')
+        ];
+    }
+
+    private function getDateRangeForLastMonth()
+    {
+        return [
+            'start' => date('Y-m-01 00:00:00', strtotime('-1 month')),
+            'end' => date('Y-m-t 23:59:59', strtotime('-1 month'))
+        ];
+    }
+
     public function getTop6MemberSales()
     {
+        set_time_limit(0);
         $members = DB::table('members AS m')
             ->join('profile_picture AS pp', 'pp.id', '=', 'm.profile_picture')
             ->where('m.is_active', 'ACTIVE')
@@ -130,38 +152,31 @@ class AdminDashboardController extends Controller
                 ]
             ];
         }
+
         usort($memberSales, function ($a, $b) {
             return $b['thisMonth'] <=> $a['thisMonth'];
         });
 
-        $getTop6MemberSales = array_slice($memberSales, 0, 6);
-        return $getTop6MemberSales;
+        return array_slice($memberSales, 0, 6);
     }
-    public function getMemberSales(int $memberId, array $whereBetween): int
+
+    private function getMemberSales(int $memberId, array $dateRange): int
     {
-        $paidAmount = DB::table('wing_transactions AS wt')
+        $paidAmount = $this->sumMemberTransactions($memberId, 'PAID', $dateRange);
+        $refundAmount = $this->sumMemberTransactions($memberId, 'REFUND', $dateRange);
+        $exchangeAmount = $this->sumMemberTransactions($memberId, 'EXCHANGE', $dateRange);
+
+        return $paidAmount - $refundAmount - $exchangeAmount;
+    }
+
+    private function sumMemberTransactions(int $memberId, string $type, array $dateRange): int
+    {
+        return DB::table('wing_transactions AS wt')
             ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
-            ->where('member_id', $memberId)
-            ->where('o.type', 'PAID')
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', $whereBetween)
-            ->distinct()
-            ->sum('wt.amount');
-        $refundAmount = DB::table('orders AS o')
-            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
             ->where('wt.member_id', $memberId)
-            ->where('o.type', 'REFUND')
+            ->where('o.type', $type)
             ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', $whereBetween)
+            ->whereBetween('wt.created_at', $dateRange)
             ->sum('wt.amount');
-        $exchangeAmount = DB::table('orders AS o')
-            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
-            ->where('wt.member_id', $memberId)
-            ->where('o.type', 'EXCHANGE')
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', $whereBetween)
-            ->sum('wt.amount');
-        $sales = $paidAmount - ($refundAmount > 0 ? $refundAmount : -$refundAmount) - ($exchangeAmount > 0 ? $exchangeAmount : -$exchangeAmount);
-        return $sales;
     }
 }
