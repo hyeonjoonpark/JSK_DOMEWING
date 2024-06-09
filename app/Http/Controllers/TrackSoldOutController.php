@@ -78,7 +78,24 @@ class TrackSoldOutController extends Controller
         $command = "node {$script} {$productFilePath} {$username} $password";
         try {
             exec($command, $output, $resultCode);
-            $soldOutProducts = json_decode($output[0], true);
+
+            error_log('Track Command Output: ' . print_r($output, true));
+
+            if (isset($output[0])) {
+                $soldOutProducts = json_decode($output[0], true);
+            } else {
+                $soldOutProducts = [];
+            }
+
+            if (!is_array($soldOutProducts)) {
+                error_log('Track Command Output is not a valid JSON: ' . $output[0]);
+                return [
+                    'status' => false,
+                    'message' => 'Invalid JSON format from Node.js script.',
+                    'error' => 'Invalid JSON format'
+                ];
+            }
+
             return [
                 'status' => true,
                 'data' => [
@@ -93,6 +110,8 @@ class TrackSoldOutController extends Controller
             ];
         }
     }
+
+
     private function activeVendorAllProducts($vendorId)
     {
         try {
