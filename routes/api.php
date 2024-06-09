@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\ProductKeywordController;
 use App\Http\Controllers\Admin\ProductRegisterController;
 use App\Http\Controllers\Admin\ProductSearchController;
 use App\Http\Controllers\Admin\ShippingFeeController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\APIwing\IndexController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Http\Request;
@@ -198,6 +199,12 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('cancel-refund-order', [OpenMarketRefundController::class, 'cancelRefund']);
 
     Route::post('contact-us/update', [ContactUsController::class, 'update']);
+
+    Route::prefix('admin/dashboard')->group(function () {
+        Route::post('weeklySales', [AdminDashboardController::class, 'getWeeklySales']);
+        Route::post('action-center', [AdminDashboardController::class, 'getActionCenter']);
+        Route::post('top-6-member-sales', [AdminDashboardController::class, 'getTop6MemberSales']);
+    });
 });
 Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     Route::prefix('account-setting')->group(function () {

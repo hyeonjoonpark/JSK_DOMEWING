@@ -11,7 +11,8 @@
                         다양한 채널에 상품등록하여 매출을 극대화하세요
                     </p>
                     <a href="{{ route('partner.login') }}" type="button" class="btn btn-sellwing py-2 px-5">
-                        <p class="font-bold m-0" style="font-size:16px; color: var(--dark-blue); line-height:23px;">로그인</p>
+                        <p class="font-bold m-0" style="font-size:16px; color: var(--dark-blue); line-height:23px;">로그인
+                        </p>
                     </a>
                 </div>
                 <div class="col-lg-9 col-md-8 col-12 my-auto">

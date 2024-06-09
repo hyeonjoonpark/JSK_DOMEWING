@@ -106,7 +106,7 @@ class UploadController extends Controller
             ];
         }
     }
-    private function getOutboundCode($apiKey)
+    public function getOutboundCode($apiKey)
     {
         $ac = new ApiController();
         $method = 'get';
