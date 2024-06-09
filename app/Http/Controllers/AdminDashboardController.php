@@ -29,8 +29,9 @@ class AdminDashboardController extends Controller
 
     private function countPendingOrders()
     {
-        return DB::table('orders')
-            ->where('delivery_status', 'PENDING')
+        return DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'wt.id', '=', 'o.wing_transaction_id')
+            ->where('o.delivery_status', 'PENDING')
             ->whereNotIn('o.type', ['CANCELLED'])
             ->whereNotIn('wt.status', ['REJECTED'])
             ->count();
