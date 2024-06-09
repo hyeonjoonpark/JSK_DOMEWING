@@ -31,6 +31,8 @@ class AdminDashboardController extends Controller
     {
         return DB::table('orders')
             ->where('delivery_status', 'PENDING')
+            ->whereNotIn('o.type', ['CANCELLED'])
+            ->whereNotIn('wt.status', ['REJECTED'])
             ->count();
     }
 
