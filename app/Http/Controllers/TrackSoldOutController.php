@@ -55,7 +55,7 @@ class TrackSoldOutController extends Controller
         $soldOutProducts = [];
         foreach ($chunkedProducts as $i => $products) {
             $index = $i + 1;
-            $productFilePath = public_path('js/track-sold-out/products/' . $vendorEngName . '_' . $index . '.js');
+            $productFilePath = public_path('js/track-sold-out/products/' . $vendorEngName . '_' . $index . '.json');
             file_put_contents($productFilePath, json_encode($products));
             $trackResult = $this->track($vendorEngName, $productFilePath, $username, $password);
             if ($trackResult['status'] === false) {
@@ -76,6 +76,7 @@ class TrackSoldOutController extends Controller
             ]
         ];
     }
+
     private function track($vendorEngName, $productFilePath, $username, $password)
     {
         $script = public_path('js/track-sold-out/' . $vendorEngName . '.js');
@@ -96,7 +97,7 @@ class TrackSoldOutController extends Controller
             if (!isset($response['data'])) {
                 return [
                     'status' => false,
-                    'message' => 'Data key is missing in the response.'
+                    'message' => 'Data key is missing in the response.' // Node.js 스크립트가 JSON 형식의 응답을 반환하지 않는 경우
                 ];
             }
 
@@ -114,6 +115,7 @@ class TrackSoldOutController extends Controller
             ];
         }
     }
+
     private function updateSoldOutProducts(array $productIds)
     {
         try {
@@ -130,6 +132,7 @@ class TrackSoldOutController extends Controller
             ];
         }
     }
+
     private function activeVendorAllProducts($vendorId)
     {
         try {
