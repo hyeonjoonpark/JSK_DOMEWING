@@ -95,12 +95,19 @@ class AdminDashboardController extends Controller
 
     private function sumSales($startDatetime, $endDatetime)
     {
-        return DB::table('wing_transactions AS wt')
+        $paidAmount = DB::table('wing_transactions AS wt')
             ->join('orders AS o', 'wt.id', '=', 'o.wing_transaction_id')
             ->where('o.type', 'PAID')
             ->where('wt.status', 'APPROVED')
             ->whereBetween('wt.created_at', [$startDatetime, $endDatetime])
             ->sum('wt.amount');
+        $refundAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
+            ->where('o.type', 'REFUND')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', [$startDatetime, $endDatetime])
+            ->sum('wt.amount');
+        return $paidAmount - $refundAmount;
     }
 
     private function sumRecharges($startDatetime, $endDatetime)
@@ -180,24 +187,6 @@ class AdminDashboardController extends Controller
             ->where('wt.status', 'APPROVED')
             ->whereBetween('wt.created_at', $dateRange)
             ->sum('wt.amount');
-        $exchangeAmount = DB::table('orders AS o')
-            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
-            ->where('wt.member_id', $memberId)
-            ->where('o.type', 'EXCHANGE')
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', $dateRange)
-            ->sum('wt.amount');
-        return $paidAmount - $refundAmount - $exchangeAmount;
-    }
-
-    private function sumMemberTransactions(int $memberId, string $type, array $dateRange): int
-    {
-        return DB::table('wing_transactions AS wt')
-            ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
-            ->where('wt.member_id', $memberId)
-            ->where('o.type', $type)
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', $dateRange)
-            ->sum('wt.amount');
+        return $paidAmount - $refundAmount;
     }
 }
