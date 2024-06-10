@@ -47,7 +47,7 @@ class TrackSoldOutController extends Controller
             ->first();
         $username = $account->username;
         $password = $account->password;
-        $chunkedProducts = array_chunk($products, 500, false);
+        $chunkedProducts = array_chunk($products, 1000, false);
         $productFilePath = public_path('js/track-sold-out/products/');
         if (!is_dir($productFilePath)) {
             mkdir($productFilePath, 0755, true);
@@ -78,28 +78,28 @@ class TrackSoldOutController extends Controller
         $command = "node {$script} {$productFilePath} {$username} $password";
         try {
             exec($command, $output, $resultCode);
+            $outputString = implode("\n", $output);
+            $response = json_decode($outputString, true);
 
-            error_log('Track Command Output: ' . print_r($output, true));
-
-            if (isset($output[0])) {
-                $soldOutProducts = json_decode($output[0], true);
-            } else {
-                $soldOutProducts = [];
-            }
-
-            if (!is_array($soldOutProducts)) {
-                error_log('Track Command Output is not a valid JSON: ' . $output[0]);
+            if (json_last_error() !== JSON_ERROR_NONE) {
                 return [
                     'status' => false,
                     'message' => 'Invalid JSON format from Node.js script.',
-                    'error' => 'Invalid JSON format'
+                    'error' => json_last_error_msg()
+                ];
+            }
+
+            if (!isset($response['data'])) {
+                return [
+                    'status' => false,
+                    'message' => 'Data key is missing in the response.'
                 ];
             }
 
             return [
                 'status' => true,
                 'data' => [
-                    'soldOutProducts' => $soldOutProducts
+                    'soldOutProducts' => $response['data']['soldOutProducts']
                 ]
             ];
         } catch (\Exception $e) {
@@ -110,6 +110,7 @@ class TrackSoldOutController extends Controller
             ];
         }
     }
+
 
 
     private function activeVendorAllProducts($vendorId)
