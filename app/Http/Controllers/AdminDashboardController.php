@@ -165,10 +165,28 @@ class AdminDashboardController extends Controller
 
     private function getMemberSales(int $memberId, array $dateRange): int
     {
-        $paidAmount = $this->sumMemberTransactions($memberId, 'PAID', $dateRange);
-        $refundAmount = $this->sumMemberTransactions($memberId, 'REFUND', $dateRange);
-        $exchangeAmount = $this->sumMemberTransactions($memberId, 'EXCHANGE', $dateRange);
-
+        $paidAmount = DB::table('wing_transactions AS wt')
+            ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
+            ->where('member_id', $memberId)
+            ->where('o.type', 'PAID')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', $dateRange)
+            ->distinct()
+            ->sum('wt.amount');
+        $refundAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
+            ->where('wt.member_id', $memberId)
+            ->where('o.type', 'REFUND')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', $dateRange)
+            ->sum('wt.amount');
+        $exchangeAmount = DB::table('orders AS o')
+            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
+            ->where('wt.member_id', $memberId)
+            ->where('o.type', 'EXCHANGE')
+            ->where('wt.status', 'APPROVED')
+            ->whereBetween('wt.created_at', $dateRange)
+            ->sum('wt.amount');
         return $paidAmount - $refundAmount - $exchangeAmount;
     }
 
