@@ -63,13 +63,12 @@ class ManageController extends Controller
         return DB::table('partner_products AS pp')
             ->join('minewing_products AS mp', 'pp.product_id', '=', 'mp.id')
             ->join('ownerclan_category AS oc', 'mp.categoryID', '=', 'oc.id')
-            ->join('product_search AS ps', 'mp.sellerID', '=', 'ps.vendor_id')
             ->where('pp.partner_table_id', $partnerTableId)
             ->where('mp.productName', 'like', "%{$searchKeyword}%")
             ->where('mp.isActive', 'Y')
             ->whereNot('mp.categoryID', null)
             ->orderByDesc('pp.created_at')
-            ->select('mp.productCode', 'mp.productImage', 'pp.product_name AS productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'ps.shipping_fee', 'oc.name', 'pp.created_at')
+            ->select('mp.productCode', 'mp.productImage', 'pp.product_name AS productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'mp.shipping_fee', 'oc.name', 'pp.created_at')
             ->paginate(500);
     }
     public function add(Request $request)

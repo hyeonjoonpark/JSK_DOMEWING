@@ -790,7 +790,7 @@ class ProcessDataController extends Controller
             $productShippingFee = DB::table('minewing_products AS mp')
                 ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
                 ->where('mp.productCode', $productCode)
-                ->first(['ps.shipping_fee'])
+                ->first(['mp.shipping_fee'])
                 ->shipping_fee;
             $rowData['shippingCost'] = $productShippingFee;
             $amount = $productPrice * $quantity;
@@ -857,7 +857,7 @@ class ProcessDataController extends Controller
             $productShippingFee = DB::table('minewing_products AS mp')
                 ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
                 ->where('mp.productCode', $productCode)
-                ->first(['ps.shipping_fee'])
+                ->first(['mp.shipping_fee'])
                 ->shipping_fee;
             $rowData['shippingCost'] = $productShippingFee;
             if ($response['status'] === true) {
