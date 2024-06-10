@@ -40,10 +40,9 @@ class ExcelwingController extends Controller
     private function excelwing($b2bId, $productCodes)
     {
         $products = DB::table('minewing_products AS mp')
-            ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
             ->whereIn('mp.productCode', $productCodes)
             ->where('mp.isActive', 'Y')
-            ->get(['mp.*', 'ps.shipping_fee']);
+            ->get(['mp.*', 'mp.shipping_fee']);
         $products = $products->toArray();
         $productsChunks = array_chunk($products, 500);
         $response = $this->excelwingController->getMarginRate($b2bId);

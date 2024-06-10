@@ -20,7 +20,7 @@ class VendorListController extends Controller
             ->where('ps.is_active', 'Y')
             ->where('v.is_active', 'ACTIVE')
             ->whereNotIn('v.id', $exsitingVendorIds)
-            ->get(['ps.vendor_id', 'v.name', 'ps.shipping_fee', 'ps.additional_shipping_fee']);
+            ->get(['ps.vendor_id', 'v.name', 'mp.shipping_fee', 'mp.additional_shipping_fee']);
         return [
             'status' => true,
             'return' => $newVendors

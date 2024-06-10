@@ -128,7 +128,7 @@ class Controller extends BaseController
                 'mp.productImage',
                 DB::raw("mp.productPrice * {$marginValue} AS productPrice"),
                 'mp.productDetail',
-                'ps.shipping_fee',
+                'mp.shipping_fee',
                 'oc.name AS category'
             ])
             ->first();
