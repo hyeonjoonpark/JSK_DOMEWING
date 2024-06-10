@@ -61,8 +61,12 @@ class TrackSoldOutController extends Controller
             if ($trackResult['status'] === false) {
                 return $trackResult;
             }
-            $soldOutProducts = array_merge($soldOutProducts, $trackResult['data']['soldOutProducts']);
+            $soldOutProducts = array_merge($soldOutProducts, $trackResult['data']);
             unlink($productFilePath);
+        }
+        $updateSoldOutProductsResult = $this->updateSoldOutProducts($soldOutProducts);
+        if ($updateSoldOutProductsResult['status'] === false) {
+            return $updateSoldOutProductsResult;
         }
         return [
             'status' => true,
@@ -99,7 +103,7 @@ class TrackSoldOutController extends Controller
             return [
                 'status' => true,
                 'data' => [
-                    'soldOutProducts' => $response['data']['soldOutProducts']
+                    'soldOutProducts' => $response['data']
                 ]
             ];
         } catch (\Exception $e) {
@@ -110,9 +114,22 @@ class TrackSoldOutController extends Controller
             ];
         }
     }
-
-
-
+    private function updateSoldOutProducts(array $productIds)
+    {
+        try {
+            DB::table('minewing_products')
+                ->whereIn('id', $productIds)
+                ->update([
+                    'isActive' => 'Y'
+                ]);
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '품절 상품들을 반영하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
     private function activeVendorAllProducts($vendorId)
     {
         try {

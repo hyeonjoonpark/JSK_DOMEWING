@@ -55,25 +55,25 @@ function loadExistingOptions() {
 
             const enterResult = await enterProductPage(page, product.productHref, maxAttempts, 0);
             if (enterResult === false) {
-                soldOutProducts.push({ id: product.id, status: false });
+                soldOutProducts.push(product.id);
                 continue;
             }
 
             const ivp = await isValidProduct(page, product.productHref, maxAttempts, 0);
             if (ivp === false) {
-                soldOutProducts.push({ id: product.id, status: false });
+                soldOutProducts.push(product.id);
             } else {
                 const productOptions = await getProductOptions(page);
                 for (const option of productOptions) {
                     const found = compareOptions(option.optionName, existingOptions);
-                    soldOutProducts.push({ id: product.id, optionName: option.optionName, status: !found });
+                    soldOutProducts.push(product.id);
                 }
             }
         }
 
         const sopFile = path.join(__dirname, 'result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProducts, null, 2));
-        console.log(JSON.stringify({ status: true, data: { soldOutProducts } })); // 결과를 JSON 형식으로 출력
+        console.log(JSON.stringify({ status: true, data: soldOutProducts })); // 결과를 JSON 형식으로 출력
     } catch (error) {
         console.error('Error:', error);
         console.log(JSON.stringify({ status: false, error: error.message })); // 오류 발생 시 JSON 형식으로 출력
