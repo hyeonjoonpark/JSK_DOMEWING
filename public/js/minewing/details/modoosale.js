@@ -1,7 +1,7 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
@@ -22,6 +22,7 @@ const puppeteer = require('puppeteer');
         await browser.close();
     }
 })();
+
 async function signIn(page, username, password) {
     await page.goto('https://www.modoosale.co.kr/member/login.php?returnUrl=%2Fgoods%2Fgoods_view.php%3FgoodsNo%3D1000107036', { waitUntil: 'networkidle0' });
     await page.type('input[name="loginId"]', username);
@@ -29,6 +30,7 @@ async function signIn(page, username, password) {
     await page.click('#formLogin > div.member_login_box > div.login_input_sec > button');
     await page.waitForNavigation({ waitUntil: 'load' });
 }
+
 async function scrapeProduct(page, url) {
     try {
         await page.goto(url, { waitUntil: 'networkidle0' });
@@ -73,10 +75,12 @@ async function scrapeProduct(page, url) {
         return false;
     }
 }
+
 async function getProductOptions(page) {
     async function reloadSelects() {
         return await page.$$('#frmView > div > div > div.item_detail_list > div > dl > dd > select');
     }
+
     async function reselectOptions(selects, selectedOptions) {
         for (let i = 0; i < selectedOptions.length; i++) {
             await selects[i].select(selectedOptions[i].value);
@@ -86,13 +90,13 @@ async function getProductOptions(page) {
             }
         }
     }
+
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
                 opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value !== '' && opt.value !== '-1')
             );
-            // 첫 번째 옵션을 건너뛰기 위해 인덱스 1부터 시작
-            for (let i = 1; i < options.length; i++) { // 수정된 부분: 인덱스 1부터 시작하도록 변경
+            for (let i = 0; i < options.length; i++) {
                 const option = options[i];
                 await selects[currentDepth].select(option.value);
                 await new Promise(resolve => setTimeout(resolve, 1000));
@@ -121,6 +125,7 @@ async function getProductOptions(page) {
         }
         return productOptions;
     }
+
     let selects = await reloadSelects();
     if (selects.length < 1) {
         return {
