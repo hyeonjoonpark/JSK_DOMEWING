@@ -479,9 +479,12 @@ class AdminController extends Controller
     public function openMarket(Request $request)
     {
         $controller = new Controller();
-        $openMarkets = $controller->getActiveOpenMarkets();
+        $vendors = DB::table('vendors')
+            ->where('is_active', 'ACTIVE')
+            ->where('type', 'SELLER')
+            ->get();
         return view('admin/open_market', [
-            'openMarkets' => $openMarkets
+            'vendors' => $vendors
         ]);
     }
 

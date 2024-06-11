@@ -23,8 +23,27 @@
                 <div class="card-inner">
                     <h6 class="title">신규 주문</h6>
                     <p>상품 정보를 클릭하면 해당 상품의 상세 페이지로 이동합니다.</p>
-                    <button class="btn btn-primary mb-5" onclick="initIndex();">조회하기</button>
-                    <button class="btn btn-primary mb-5" onclick="test();">테스트 버튼</button>
+                    <div class="form-group">
+                        <label class="form-label">원청사 리스트 ({{ count($vendors) }})</label>
+                        <div>
+                            <div class="form-check">
+                                <input type="checkbox" id="checkAllvendor" class="form-check-input">
+                                <label class="form-check-label" for="checkAllvendor">전체 선택/해제</label>
+                            </div>
+                            @foreach ($vendors as $vendor)
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input vendor-checkbox" type="checkbox" name="vendor[]"
+                                        value="{{ $vendor->id }}" id="vendor-{{ $vendor->id }}">
+                                    <label class="form-check-label" for="vendor-{{ $vendor->id }}">
+                                        {{ $vendor->name }}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary mb-5" onclick="showData();">조회하기</button>
+                    <button class="btn btn-primary mb-5" onclick="initIndex();">업데이트</button>
                     <div class="form-group">
                         <h6 class="title">잔액 부족 계정 리스트</h6>
                         <ul id="lowBalanceAccountsList"></ul>
@@ -76,8 +95,20 @@
     <script>
         var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
 
+        function getSelectedVendors() {
+            let selectedVendors = [];
+            $('.vendor-checkbox:checked').each(function() {
+                selectedVendors.push($(this).val());
+            });
+            return selectedVendors;
+        }
+        $(document).on('click', '#checkAllvendor', function() {
+            const isChecked = $(this).is(':checked');
+            $('.vendor-checkbox').prop('checked', isChecked);
+        });
+
         function initIndex() {
-            popupLoader(0, '"신규 주문 내역을 데이터베이스로부터 추출하겠습니다."');
+            popupLoader(0, '"신규 주문을 데이터베이스에 저장하고 있습니다."');
             $.ajax({
                 url: '/api/get-new-orders',
                 type: 'POST',
@@ -94,8 +125,10 @@
                             text: response.message,
                         });
                     }
-                    updateOrderTable(response.processedOrders); // processedOrders 사용
-                    updateLowBalanceAccounts(response.lowBalanceAccounts); // lowBalanceAccounts 사용
+                    Swal.fire({
+                        icon: 'success',
+                        text: '신규 주문내역 저장을 완료하였습니다.'
+                    });
                 },
                 error: function(response) {
                     closePopup();
@@ -104,14 +137,15 @@
             });
         }
 
-        function test() {
-            popupLoader(0, '"테스트버튼 진행중입니다."');
+        function showData() {
+            popupLoader(0, '"주문 내역을 데이터베이스로부터 추출하겠습니다."');
             $.ajax({
-                url: '/api/test',
+                url: '/api/show-data',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    rememberToken
+                    rememberToken,
+                    vendors: getSelectedVendors()
                 },
                 success: function(response) {
                     closePopup();
@@ -122,7 +156,8 @@
                             text: response.message,
                         });
                     }
-                    updateOrderTable(response.processedOrders); // processedOrders 사용
+                    updateOrderTable(response.processedOrders);
+                    updateLowBalanceAccounts(response.lowBalanceAccounts);
                 },
                 error: function(response) {
                     closePopup();
