@@ -221,7 +221,6 @@ async function getProductOptions(page) {
                     enterResult = await enterProductPage(page, product.productHref);
                     if (!enterResult) {
                         console.log(`Failed to enter product page: ${product.productHref}`);
-                        soldOutProducts.push(product.id);
                         break;
                     }
 
@@ -246,7 +245,6 @@ async function getProductOptions(page) {
                         break;
                     } else if (ivp === 'error') {
                         console.log(`Error in product validation: ${product.productHref}`);
-                        soldOutProducts.push(product.id);
                         break;
                     }
                 } catch (error) {
@@ -254,10 +252,14 @@ async function getProductOptions(page) {
                     if (attempt < maxAttempts - 1) {
                         console.log(`Retrying for product ${product.productHref}`);
                         await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"], timeout: 120000 });
-                    } else {
-                        soldOutProducts.push(product.id);
                     }
                 }
+            }
+
+            // If product could not be processed or invalid, mark it as sold out
+            if (!enterResult || !ivp || ivp === 'error') {
+                soldOutProducts.push(product.id);
+                console.log(`Product ${product.id} is marked as sold out due to error`);
             }
         }
 

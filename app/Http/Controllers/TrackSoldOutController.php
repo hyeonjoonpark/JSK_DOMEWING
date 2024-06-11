@@ -23,7 +23,7 @@ class TrackSoldOutController extends Controller
 
         $products = DB::table('minewing_products')
             ->where('sellerID', $vendorId)
-            ->limit(30)
+            ->limit(1000)
             ->get([
                 'id',
                 'productHref',
@@ -43,7 +43,7 @@ class TrackSoldOutController extends Controller
             ->first();
         $username = $account->username;
         $password = $account->password;
-        $chunkedProducts = array_chunk($products, 10, false);
+        $chunkedProducts = array_chunk($products, 100, false);
         $productFilePath = public_path('js/track-sold-out/products/');
         if (!is_dir($productFilePath)) {
             mkdir($productFilePath, 0755, true);
@@ -76,15 +76,21 @@ class TrackSoldOutController extends Controller
     private function track($vendorEngName, $productFilePath, $username, $password)
     {
         $script = public_path('js/track-sold-out/' . $vendorEngName . '.js');
-        $command = "node {$script} {$productFilePath} {$username} $password";
+        $command = "node {$script} {$productFilePath} {$username} {$password}";
         try {
             exec($command, $output, $resultCode);
-            $soldOutProducts = json_decode($output[0], true);
+
+            // result.json 파일 읽기
+            $resultFilePath = public_path('js/track-sold-out/result.json');
+            if (file_exists($resultFilePath)) {
+                $soldOutProducts = json_decode(file_get_contents($resultFilePath), true);
+            } else {
+                $soldOutProducts = [];
+            }
+
             return [
                 'status' => true,
-                'data' => [
-                    'soldOutProducts' => $soldOutProducts
-                ]
+                'data' => $soldOutProducts // 중첩 배열을 제거하고 바로 반환
             ];
         } catch (\Exception $e) {
             return [
@@ -95,27 +101,20 @@ class TrackSoldOutController extends Controller
         }
     }
 
-
     private function updateSoldOutProducts($vendorId, array $soldOutProductIds)
     {
         try {
-            // 먼저 모든 제품의 isActive를 'Y'로 설정
+            // 모든 제품의 isActive를 'Y'로 설정
             DB::table('minewing_products')
                 ->where('sellerID', $vendorId)
-                ->update([
-                    'isActive' => 'Y'
-                ]);
+                ->update(['isActive' => 'Y']);
 
             // soldOutProductIds에 포함된 제품의 isActive를 'N'로 설정
             DB::table('minewing_products')
                 ->whereIn('id', $soldOutProductIds)
-                ->update([
-                    'isActive' => 'N'
-                ]);
+                ->update(['isActive' => 'N']);
 
-            return [
-                'status' => true
-            ];
+            return ['status' => true];
         } catch (\Exception $e) {
             return [
                 'status' => false,
@@ -125,19 +124,18 @@ class TrackSoldOutController extends Controller
         }
     }
 
+
     private function activeVendorAllProducts($vendorId)
     {
         try {
-            $productHrefs = DB::table('minewing_products')
+            DB::table('minewing_products')
                 ->where('sellerID', $vendorId)
                 ->update([
                     'isActive' => 'Y'
                 ]);
             return [
                 'status' => true,
-                'data' => [
-                    'productHrefs' => $productHrefs
-                ]
+                'message' => '원청사의 모든 상품들을 재입고 처리했습니다.'
             ];
         } catch (\Exception $e) {
             return [
