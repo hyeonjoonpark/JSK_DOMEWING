@@ -100,25 +100,30 @@ class OpenMarketOrderController extends Controller
                 }
             }
         }
-        //위에서 새로운 주문 저장이 완료 되었다면 db에서 보여줘야할 정보들 제공
-        $orders = $this->getOrders();
-        $processedOrders = $orders->map(function ($order) {
-            return $this->processOrder($order);
-        });
-        $lowBalanceAccounts = $this->getUsersWithLowBalance();
-        return response()->json([
-            'processedOrders' => $processedOrders,
-            'lowBalanceAccounts' => $lowBalanceAccounts,
-        ]);
     }
-    public function test()
+    public function showData(Request $request)
     {
-        $orders = $this->getOrders();
+        $validator = Validator::make($request->all(), [
+            'vendors' => 'required',
+        ], [
+            'vendors.required' => '하나 이상의 원청사를 선택해야합니다.'
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => '하나 이상의 원청사를 선택해야합니다.',
+                'error' => $validator->errors(),
+            ];
+        }
+        $vendors = $request->input('vendors');
+        $orders = $this->getOrders($vendors);
         $processedOrders = $orders->map(function ($order) {
             return $this->processOrder($order);
         });
         $lowBalanceAccounts = $this->getUsersWithLowBalance();
         return response()->json([
+            'lowBalanceAccounts' => $lowBalanceAccounts,
             'processedOrders' => $processedOrders
         ]);
     }
@@ -432,7 +437,7 @@ class OpenMarketOrderController extends Controller
 
         return ceil($productPrice * $marginRate);
     }
-    private function getOrders()
+    private function getOrders($vendors)
     {
         return DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
@@ -440,6 +445,8 @@ class OpenMarketOrderController extends Controller
             ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
             ->join('members as m', 'm.id', '=', 'wt.member_id')
             ->join('carts as c', 'c.id', '=', 'o.cart_id')
+            ->join('minewing_products as mp', 'mp.id', '=', 'c.product_id')
+            ->whereIn('mp.sellerID', $vendors)
             ->whereNotIn('o.type', ['CANCELLED'])
             ->whereNotIn('wt.status', ['REJECTED'])
             ->where('o.delivery_status', 'PENDING')
