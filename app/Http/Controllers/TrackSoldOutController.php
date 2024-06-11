@@ -20,14 +20,10 @@ class TrackSoldOutController extends Controller
             ], 200);
         }
         $vendorId = $request->vendorId;
-        // 테스트가 끝나고 실제로 품절 트랙윙을 반영할 때 언코멘트.
-        // $activeVendorAllProductsResult = $this->activeVendorAllProducts($vendorId);
-        // if ($activeVendorAllProductsResult['status'] === false) {
-        //     return $activeVendorAllProductsResult;
-        // }
+
         $products = DB::table('minewing_products')
             ->where('sellerID', $vendorId)
-            ->limit(1000)
+            ->limit(30)
             ->get([
                 'id',
                 'productHref',
@@ -47,7 +43,7 @@ class TrackSoldOutController extends Controller
             ->first();
         $username = $account->username;
         $password = $account->password;
-        $chunkedProducts = array_chunk($products, 1000, false);
+        $chunkedProducts = array_chunk($products, 10, false);
         $productFilePath = public_path('js/track-sold-out/products/');
         if (!is_dir($productFilePath)) {
             mkdir($productFilePath, 0755, true);
@@ -64,7 +60,7 @@ class TrackSoldOutController extends Controller
             $soldOutProducts = array_merge($soldOutProducts, $trackResult['data']);
             unlink($productFilePath);
         }
-        $updateSoldOutProductsResult = $this->updateSoldOutProducts($soldOutProducts);
+        $updateSoldOutProductsResult = $this->updateSoldOutProducts($vendorId, $soldOutProducts);
         if ($updateSoldOutProductsResult['status'] === false) {
             return $updateSoldOutProductsResult;
         }
@@ -83,28 +79,11 @@ class TrackSoldOutController extends Controller
         $command = "node {$script} {$productFilePath} {$username} $password";
         try {
             exec($command, $output, $resultCode);
-            $outputString = implode("\n", $output);
-            $response = json_decode($outputString, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return [
-                    'status' => false,
-                    'message' => 'Invalid JSON format from Node.js script.',
-                    'error' => json_last_error_msg()
-                ];
-            }
-
-            if (!isset($response['data'])) {
-                return [
-                    'status' => false,
-                    'message' => 'Data key is missing in the response.' // Node.js 스크립트가 JSON 형식의 응답을 반환하지 않는 경우
-                ];
-            }
-
+            $soldOutProducts = json_decode($output[0], true);
             return [
                 'status' => true,
                 'data' => [
-                    'soldOutProducts' => $response['data']
+                    'soldOutProducts' => $soldOutProducts
                 ]
             ];
         } catch (\Exception $e) {
@@ -116,14 +95,27 @@ class TrackSoldOutController extends Controller
         }
     }
 
-    private function updateSoldOutProducts(array $productIds)
+
+    private function updateSoldOutProducts($vendorId, array $soldOutProductIds)
     {
         try {
+            // 먼저 모든 제품의 isActive를 'Y'로 설정
             DB::table('minewing_products')
-                ->whereIn('id', $productIds)
+                ->where('sellerID', $vendorId)
                 ->update([
                     'isActive' => 'Y'
                 ]);
+
+            // soldOutProductIds에 포함된 제품의 isActive를 'N'로 설정
+            DB::table('minewing_products')
+                ->whereIn('id', $soldOutProductIds)
+                ->update([
+                    'isActive' => 'N'
+                ]);
+
+            return [
+                'status' => true
+            ];
         } catch (\Exception $e) {
             return [
                 'status' => false,
