@@ -535,7 +535,6 @@ class OpenMarketOrderController extends Controller
                 'o.receiver_address as receiver_address',
                 'v.name as vendor_name',
                 'v.name_eng as vendor_name_eng',
-                'po.uploaded_product_id as uploadedProductId',
                 'o.id as order_id',
                 'm.username as senderNickName',
                 'm.phone_number as senderPhone',
@@ -550,6 +549,8 @@ class OpenMarketOrderController extends Controller
                 'o.type as type',
                 'o.created_at as createdAt',
                 'o.updated_at as updatedAt',
+                'o.price_then as productPrice',
+                'o.shipping_fee_then as shippingFee',
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist'),
                 'o.tracking_number as trackingNumber'
             );
@@ -558,7 +559,7 @@ class OpenMarketOrderController extends Controller
             $query->where('o.updated_at', '>=', $sevenDaysAgo);
         }
         $orders = [];
-        $query->orderBy('o.id')->chunk(200, function ($chunk) use (&$orders) {
+        $query->orderBy('o.updated_at', 'asc')->chunk(200, function ($chunk) use (&$orders) {
             foreach ($chunk as $order) {
                 $orders[] = $order;
             }
@@ -581,8 +582,8 @@ class OpenMarketOrderController extends Controller
                 break;
         }
         $orderDate = ($orderStatus === 'COMPLETE') ? '발주일자 : ' . $order->updatedAt : '수집일자 : ' . $order->createdAt;
-        $productPrice = $product ? $this->calcProductPrice($product->productPrice) : null;
-        $amount = $product ? $productPrice * $order->quantity + $product->shipping_fee : null;
+        $productPrice = $order->productPrice;
+        $amount = $product ? $productPrice * $order->quantity + $order->shippingFee : null;
         return [
             'userName' => $order->member_username,
             'orderNumber' => $order->orderNumber,
@@ -596,7 +597,7 @@ class OpenMarketOrderController extends Controller
             'productHref' => $product ? $product->productHref : null,
             'productImage' => $product ? $product->productImage : null,
             'productPrice' => $productPrice,
-            'shippingFee' => $product ? $product->shipping_fee : null,
+            'shippingFee' => $order->shippingFee,
             'quantity' => $order->quantity,
             'amount' => $amount,
             'orderType' => $orderType,
