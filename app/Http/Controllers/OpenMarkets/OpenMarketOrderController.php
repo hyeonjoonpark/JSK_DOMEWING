@@ -111,17 +111,20 @@ class OpenMarketOrderController extends Controller
         set_time_limit(180);
         try {
             $validator = Validator::make($request->all(), [
-                'vendors' => 'required',
-                'orderStatus' => 'required',
+                'vendors' => 'required|array',
+                'vendors.*' => 'exists:vendors,id',
+                'orderStatus' => 'required|string',
             ], [
                 'vendors.required' => '하나 이상의 원청사를 선택해야합니다.',
+                'vendors.array' => '원청사 선택 형식이 잘못되었습니다.',
+                'vendors.*.exists' => '선택한 원청사가 존재하지 않습니다.',
                 'orderStatus.required' => '주문 상태를 선택해야합니다.',
+                'orderStatus.string' => '주문 상태 형식이 잘못되었습니다.',
             ]);
-
             if ($validator->fails()) {
                 return [
                     'status' => false,
-                    'message' => '하나 이상의 원청사를 선택해야합니다.',
+                    'message' => $validator->errors()->first(),
                     'error' => $validator->errors(),
                 ];
             }
