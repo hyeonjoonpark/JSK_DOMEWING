@@ -108,7 +108,7 @@ class OpenMarketOrderController extends Controller
     }
     public function showData(Request $request)
     {
-        set_time_limit(0);
+        set_time_limit(120);
         try {
             $validator = Validator::make($request->all(), [
                 'vendors' => 'required',
