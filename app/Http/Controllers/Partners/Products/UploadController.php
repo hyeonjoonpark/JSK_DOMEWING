@@ -147,13 +147,19 @@ class UploadController extends Controller
             ->value('title');
         // 큐에 작업 추가
         $queues = ['uploads1', 'uploads2', 'uploads3'];
-        $currentQueue = $queues[array_rand($queues)];
+
+        // 각 큐의 현재 대기열 길이 확인
+        $queueLengths = [];
+        foreach ($queues as $queue) {
+            $queueLengths[$queue] = DB::table('jobs')->where('queue', $queue)->count();
+        }
+
+        // 가장 대기열이 짧은 큐 선택
+        $currentQueue = array_keys($queueLengths, min($queueLengths))[0];
 
         ProcessProductUpload::dispatch($products, $partner, $account, $vendor, $tableName)->onQueue($currentQueue);
 
-        $numJobs = DB::table('jobs')
-            ->where('queue', $currentQueue)
-            ->count();
+        $numJobs = $queueLengths[$currentQueue];
         $queueIndex = array_search($currentQueue, $queues) + 1;
 
         return [
@@ -161,7 +167,6 @@ class UploadController extends Controller
             'message' => '총 ' . count($products) . '개의 상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>' .
                 '요청이 ' . $queueIndex . '번 채널에 배치되었습니다.<br>' .
                 '현재 ' . $numJobs . '개의 작업이 대기열에 있습니다.'
-
         ];
     }
     private function smart_store($products, $partner, $account)
