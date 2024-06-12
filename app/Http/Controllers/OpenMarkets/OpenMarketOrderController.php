@@ -9,6 +9,7 @@ use App\Http\Controllers\SmartStore\SmartStoreCancelController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\WingController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -82,7 +83,7 @@ class OpenMarketOrderController extends Controller
                             $product = $this->getProduct($order['productCode']);
                             if (!$product) continue;
                             $priceThen = $this->getSalePrice($product->id);
-                            $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity);
+                            $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity, $order['orderDate']);
                             $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
                             $uploadedProduct = call_user_func([$this, $uploadedProductMethod], $product->id); // 해당 오픈마켓 업로드테이블에서 업로드된 상품인지 확인하고 id값 가져옴
                             $uploadedProductId = $uploadedProduct->id;
@@ -100,25 +101,39 @@ class OpenMarketOrderController extends Controller
                 }
             }
         }
-        //위에서 새로운 주문 저장이 완료 되었다면 db에서 보여줘야할 정보들 제공
-        $orders = $this->getOrders();
-        $processedOrders = $orders->map(function ($order) {
-            return $this->processOrder($order);
-        });
-        $lowBalanceAccounts = $this->getUsersWithLowBalance();
-        return response()->json([
-            'processedOrders' => $processedOrders,
-            'lowBalanceAccounts' => $lowBalanceAccounts,
-        ]);
+        return [
+            'status' => true,
+            'message' => '새로운 주문 저장이 완료되었습니다.'
+        ];
     }
-    public function test()
+    public function showData(Request $request)
     {
-        $orders = $this->getOrders();
-        $processedOrders = $orders->map(function ($order) {
-            return $this->processOrder($order);
+        set_time_limit(120);
+        $validator = Validator::make($request->all(), [
+            'vendors' => 'required',
+            'orderStatus' => 'required',
+        ], [
+            'vendors.required' => '하나 이상의 원청사를 선택해야합니다.',
+            'orderStatus.required' => '주문 상태를 선택해야합니다.',
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => '하나 이상의 원청사를 선택해야합니다.',
+                'error' => $validator->errors(),
+            ];
+        }
+        $vendors = $request->input('vendors');
+        $orderStatus = $request->input('orderStatus');
+        $orders = $this->getOrders($vendors, $orderStatus);
+        $processedOrders = $orders->map(function ($order) use ($orderStatus) {
+            return $this->processOrder($order, $orderStatus);
         });
+
         $lowBalanceAccounts = $this->getUsersWithLowBalance();
         return response()->json([
+            'lowBalanceAccounts' => $lowBalanceAccounts,
             'processedOrders' => $processedOrders
         ]);
     }
@@ -330,24 +345,27 @@ class OpenMarketOrderController extends Controller
             ->where('is_active', 'Y')
             ->first();
     }
-    private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen)
+    private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen, $orderDate = null)
     {
         try {
-            $orderId = DB::table('orders')
-                ->insertGetId([
-                    'wing_transaction_id' => $wingTransactionId,
-                    'cart_id' => $cartId,
-                    'product_order_number' => (string) Str::uuid(),
-                    'receiver_name' => $receiverName,
-                    'receiver_phone' => $receiverPhone,
-                    'receiver_address' => $receiverAddress,
-                    'receiver_remark' => $receiverRemark,
-                    'delivery_status' => 'PENDING',
-                    'type' => 'PAID',
-                    'price_then' => $priceThen,
-                    'shipping_fee_then' => $shippingFeeThen,
-                    'bundle_quantity_then' => $bundleQuantityThen
-                ]);
+            $orderData = [
+                'wing_transaction_id' => $wingTransactionId,
+                'cart_id' => $cartId,
+                'product_order_number' => (string) Str::uuid(),
+                'receiver_name' => $receiverName,
+                'receiver_phone' => $receiverPhone,
+                'receiver_address' => $receiverAddress,
+                'receiver_remark' => $receiverRemark,
+                'delivery_status' => 'PENDING',
+                'type' => 'PAID',
+                'price_then' => $priceThen,
+                'shipping_fee_then' => $shippingFeeThen,
+                'bundle_quantity_then' => $bundleQuantityThen,
+            ];
+            if ($orderDate !== null) {
+                $orderData['created_at'] = $orderDate;
+            }
+            $orderId = DB::table('orders')->insertGetId($orderData);
             return [
                 'status' => true,
                 'data' => [
@@ -362,6 +380,7 @@ class OpenMarketOrderController extends Controller
             ];
         }
     }
+
 
 
     private function storePartnerOrder($orderId, $vendorId, $accountId, $uploadedProductId, $price, $shippingFee, $orderNumber, $productOrderNumber)
@@ -432,17 +451,19 @@ class OpenMarketOrderController extends Controller
 
         return ceil($productPrice * $marginRate);
     }
-    private function getOrders()
+    private function getOrders($vendors, $orderStatus)
     {
-        return DB::table('orders as o')
+        $query = DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
             ->leftJoin('vendors as v', 'v.id', '=', 'po.vendor_id')
             ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
             ->join('members as m', 'm.id', '=', 'wt.member_id')
             ->join('carts as c', 'c.id', '=', 'o.cart_id')
+            ->join('minewing_products as mp', 'mp.id', '=', 'c.product_id')
+            ->whereIn('mp.sellerID', $vendors)
             ->whereNotIn('o.type', ['CANCELLED'])
             ->whereNotIn('wt.status', ['REJECTED'])
-            ->where('o.delivery_status', 'PENDING')
+            ->where('o.delivery_status', $orderStatus)
             ->select(
                 'm.username as member_username',
                 'c.quantity as quantity',
@@ -464,11 +485,18 @@ class OpenMarketOrderController extends Controller
                 'c.product_id as productId',
                 'o.receiver_remark as receiverRemark',
                 'o.type as type',
+                'o.created_at as createdAt',
+                'o.updated_at as updatedAt',
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist')
-            )
-            ->get();
+            );
+        if ($orderStatus === 'COMPLETE') {
+            $sevenDaysAgo = Carbon::now()->subDays(7);
+            $query->where('o.updated_at', '>=', $sevenDaysAgo);
+        }
+        return $query->get();
     }
-    private function processOrder($order)
+
+    private function processOrder($order, $orderStatus)
     {
         $product = null;
         if ($order->vendor_name_eng && $order->uploadedProductId) {
@@ -489,15 +517,16 @@ class OpenMarketOrderController extends Controller
         }
 
         $deliveryCompanies = $this->getDeliveryCompanies();
-        $orderStatus = '신규주문';
+        $orderType = '신규주문';
         switch ($order->type) {
             case 'REFUND':
-                $orderStatus = '환불';
+                $orderType = '환불';
                 break;
             case 'EXCHANGE':
-                $orderStatus = '교환';
+                $orderType = '교환';
                 break;
         }
+        $orderDate = ($orderStatus === 'COMPLETE') ? '발주일자 : ' . $order->updatedAt : '수집일자 : ' . $order->createdAt;
         return [
             'userName' => $order->member_username,
             'orderNumber' => $order->orderNumber,
@@ -514,7 +543,7 @@ class OpenMarketOrderController extends Controller
             'shippingFee' => $product ? $product->shipping_fee : null,
             'quantity' => $order->quantity,
             'amount' => $product ? $this->calcProductPrice($product->productPrice) * $order->quantity + $product->shipping_fee : null,
-            'orderStatus' => $orderStatus,
+            'orderType' => $orderType,
             'senderNickName' => $order->senderNickName,
             'senderPhone' => $order->senderPhone,
             'senderEmail' => $order->senderEmail,
@@ -523,7 +552,8 @@ class OpenMarketOrderController extends Controller
             'productOrderNumber' => $order->productOrderNumber,
             'isPartner' => $order->isExist,
             'isActive' => $product->isActive,
-            'receiverRemark' => $order->receiverRemark
+            'receiverRemark' => $order->receiverRemark,
+            'orderDate' => $orderDate
         ];
     }
     private function getAllPartners()
