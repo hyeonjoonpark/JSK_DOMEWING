@@ -41,7 +41,18 @@
                             @endforeach
                         </div>
                     </div>
-
+                    <div class="form-group">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="PENDING" value="PENDING"
+                                checked>
+                            <label class="form-check-label" for="PENDING">신규주문</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="COMPLETE"
+                                value="COMPLETE">
+                            <label class="form-check-label" for="COMPLETE">발주완료</label>
+                        </div>
+                    </div>
                     <button class="btn btn-primary mb-5" onclick="showData();">조회하기</button>
                     <button class="btn btn-primary mb-5" onclick="initIndex();">업데이트</button>
                     <div class="form-group">
@@ -127,7 +138,7 @@
                     }
                     Swal.fire({
                         icon: 'success',
-                        text: '신규 주문내역 저장을 완료하였습니다.'
+                        text: response.message
                     });
                 },
                 error: function(response) {
@@ -139,13 +150,15 @@
 
         function showData() {
             popupLoader(0, '"주문 내역을 데이터베이스로부터 추출하겠습니다."');
+            const selectedOrderStatus = $('input[name="orderStatus"]:checked').val();
             $.ajax({
                 url: '/api/show-data',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
                     rememberToken,
-                    vendors: getSelectedVendors()
+                    vendors: getSelectedVendors(),
+                    orderStatus: selectedOrderStatus
                 },
                 success: function(response) {
                     closePopup();
@@ -194,21 +207,21 @@
             let partnerStatusHtml = order.isPartner ? '<b><p>셀윙 발주</p></b>' : '<b><p>도매윙 발주</p></b>';
             let orderVendorHtml = order.vendorName ? `<b><p>${order.vendorName}</p></b>` : '<b><p>도매윙</p></b>';
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
-            let orderStatusHtml = order.orderStatus === '교환' || order.orderStatus === '환불' ?
+            let orderTypeHtml = order.orderType === '교환' || order.orderType === '환불' ?
                 `<h6 class="title">
                     <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
-                        ${order.orderStatus}신청
+                        ${order.orderType}신청
                     </a>
                 </h6>` :
-                `<h6 class="title">${order.orderStatus}</h6>`;
+                `<h6 class="title">${order.orderType}</h6>`;
             // 교환 및 환불인 경우와 아닌 경우를 구분하여 버튼을 다르게 설정
             let actionButtonsHtml;
-            if (order.orderStatus === '교환') {
+            if (order.orderType === '교환') {
                 actionButtonsHtml = `
             <button class="btn btn-primary" onclick="initExchangeDelivery('${order.productOrderNumber}');">확인</button>
             <button class="btn btn-danger" onclick="cancelExchangeDelivery('${order.productOrderNumber}');">취소</button>
         `;
-            } else if (order.orderStatus === '환불') {
+            } else if (order.orderType === '환불') {
                 actionButtonsHtml = `
             <button class="btn btn-primary" onclick="initRefundDelivery('${order.productOrderNumber}');">확인</button>
             <button class="btn btn-danger" onclick="cancelRefundDelivery('${order.productOrderNumber}');">취소</button>
@@ -241,7 +254,10 @@
         </td>
         <td class="text-nowrap">
             <h6 class="title">${orderVendorHtml}</h6>
-            ${orderStatusHtml}
+            ${orderTypeHtml}
+            <div class="col-auto">
+        <p>${order.orderDate}</p>
+    </div>
             <div class="col-auto">
                 <select class="form-select js-select2" id="deliveryCompany${order.productOrderNumber}">
                     ${deliveryCompanyHtml}

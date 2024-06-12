@@ -119,7 +119,7 @@ class SmartStoreOrderController extends Controller
                 'totalPaymentAmount' => $item['productOrder']['totalPaymentAmount'] ?? 'N/A',
                 'deliveryFeeAmount' => $item['productOrder']['deliveryFeeAmount'] ?? 'N/A',
                 'productOrderStatus' => $statusMap[$item['productOrder']['productOrderStatus']] ?? '상태 미정',
-                'orderDate' => isset($item['order']['orderDate']) ? (new DateTime($item['order']['orderDate']))->format('Y-m-d H:i:s') : 'N/A',
+                'orderDate' => isset($item['order']['paymentDate']) ? (new DateTime($item['order']['paymentDate']))->format('Y-m-d H:i:s') : 'N/A',
                 'receiverName' => $shippingAddress ? $shippingAddress['name'] ?? 'N/A' : 'N/A',
                 'receiverPhone' => $shippingAddress ? $shippingAddress['tel1'] ?? 'N/A' : 'N/A',
                 'postCode' => $shippingAddress ? $shippingAddress['zipCode'] ?? 'N/A' : 'N/A',
@@ -127,7 +127,7 @@ class SmartStoreOrderController extends Controller
                 'addressName' => '기본배송지',
                 'productCode' => $item['productOrder']['sellerProductCode'] ?? 'N/A',
                 'remark' => $item['productOrder']['shippingMemo'] ?? 'N/A',
-                'accountId' => $accountId
+                'accountId' => $accountId,
             ];
         }, $response['data']['data']);
         return $formattedResponse;

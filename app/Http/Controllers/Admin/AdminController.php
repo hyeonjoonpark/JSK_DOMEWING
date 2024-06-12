@@ -476,13 +476,20 @@ class AdminController extends Controller
             'vendors' => $vendors
         ]);
     }
-    public function openMarket(Request $request)
+    public function openMarket()
     {
-        $controller = new Controller();
-        $vendors = DB::table('vendors')
-            ->where('is_active', 'ACTIVE')
-            ->where('type', 'SELLER')
+        $vendors = DB::table('vendors as v')
+            ->join('minewing_products as mp', 'mp.sellerID', '=', 'v.id')
+            ->join('carts as c', 'c.product_id', '=', 'mp.id')
+            ->join('orders as o', 'o.cart_id', '=', 'c.id')
+            ->whereNotIn('o.type', ['CANCELLED'])
+            ->where('v.is_active', 'ACTIVE')
+            ->where('v.type', 'SELLER')
+            ->select('v.id', 'v.name', 'v.is_active', 'v.type')
+            ->groupBy('v.id', 'v.name', 'v.is_active', 'v.type')
             ->get();
+        //only full groupBy가 좋다는 이야기가있음
+
         return view('admin/open_market', [
             'vendors' => $vendors
         ]);
