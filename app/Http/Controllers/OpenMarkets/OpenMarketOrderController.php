@@ -108,7 +108,7 @@ class OpenMarketOrderController extends Controller
     }
     public function showData(Request $request)
     {
-        set_time_limit(0);
+        set_time_limit(180);
         try {
             $validator = Validator::make($request->all(), [
                 'vendors' => 'required|array',
@@ -121,7 +121,6 @@ class OpenMarketOrderController extends Controller
                 'orderStatus.required' => '주문 상태를 선택해야합니다.',
                 'orderStatus.string' => '주문 상태 형식이 잘못되었습니다.',
             ]);
-
             if ($validator->fails()) {
                 return [
                     'status' => false,
@@ -132,12 +131,10 @@ class OpenMarketOrderController extends Controller
             $vendors = $request->input('vendors');
             $orderStatus = $request->input('orderStatus');
             $orders = $this->getOrders($vendors, $orderStatus);
-            $processedOrders = $orders->map(function ($orderData) use ($orderStatus) {
-                return $this->processOrder($orderData, $orderStatus);
-            });
-
-            return $processedOrders;
-
+            $deliveryCompanies = $this->getDeliveryCompanies();
+            $processedOrders = array_map(function ($order) use ($orderStatus) {
+                return $this->processOrder($order, $orderStatus);
+            }, $orders);
             $lowBalanceAccounts = $this->getUsersWithLowBalance();
         } catch (\Exception $e) {
             return [
@@ -148,7 +145,8 @@ class OpenMarketOrderController extends Controller
         }
         return response()->json([
             'lowBalanceAccounts' => $lowBalanceAccounts,
-            'processedOrders' => $processedOrders
+            'processedOrders' => $processedOrders,
+            'deliveryCompanies' => $deliveryCompanies
         ]);
     }
     public function indexPartner(Request $request)
@@ -555,59 +553,24 @@ class OpenMarketOrderController extends Controller
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist'),
                 'o.tracking_number as trackingNumber'
             );
-
         if ($orderStatus === 'COMPLETE') {
             $sevenDaysAgo = Carbon::now()->subDays(7);
             $query->where('o.updated_at', '>=', $sevenDaysAgo);
         }
-
-        $orders = $query->get();
-
-        // 미리 모든 제품 정보를 가져오기
-        $productIds = $orders->pluck('productId')->unique();
-        $products = DB::table('minewing_products')
-            ->whereIn('id', $productIds)
-            ->get()
-            ->keyBy('id');
-
-        // 미리 모든 업로드된 제품 정보를 가져오기
-        $uploadedProductIds = $orders->pluck('uploadedProductId')->filter()->unique();
-        $uploadedProducts = collect();
-        foreach ($orders as $order) {
-            if ($order->vendor_name_eng && $order->uploadedProductId) {
-                $uploadedProductsTable = $order->vendor_name_eng . '_uploaded_products';
-                $uploadedProducts = $uploadedProducts->merge(DB::table($uploadedProductsTable)
-                    ->whereIn('id', $uploadedProductIds)
-                    ->get()
-                    ->keyBy('id'));
+        $orders = [];
+        $query->orderBy('o.id')->chunk(200, function ($chunk) use (&$orders) {
+            foreach ($chunk as $order) {
+                $orders[] = $order;
             }
-        }
-
-        return $orders->map(function ($order) use ($products, $uploadedProducts) {
-            $product = $products->get($order->productId);
-
-            if ($order->vendor_name_eng && $order->uploadedProductId) {
-                $uploadedProduct = $uploadedProducts->get($order->uploadedProductId);
-                if ($uploadedProduct) {
-                    $product = DB::table('minewing_products as mp')
-                        ->where('mp.id', $uploadedProduct->product_id)
-                        ->first();
-                }
-            }
-
-            return [
-                'order' => $order,
-                'product' => $product,
-            ];
         });
+        return $orders;
     }
 
-    private function processOrder($orderData, $orderStatus)
+    private function processOrder($order, $orderStatus)
     {
-        $order = $orderData['order'];
-        $product = $orderData['product'];
-
-        $deliveryCompanies = $this->getDeliveryCompanies();
+        $product  = DB::table('minewing_products as mp')
+            ->where('mp.id', $order->productId)
+            ->first();
         $orderType = '신규주문';
         switch ($order->type) {
             case 'REFUND':
@@ -618,6 +581,8 @@ class OpenMarketOrderController extends Controller
                 break;
         }
         $orderDate = ($orderStatus === 'COMPLETE') ? '발주일자 : ' . $order->updatedAt : '수집일자 : ' . $order->createdAt;
+        $productPrice = $product ? $this->calcProductPrice($product->productPrice) : null;
+        $amount = $product ? $productPrice * $order->quantity + $product->shipping_fee : null;
         return [
             'userName' => $order->member_username,
             'orderNumber' => $order->orderNumber,
@@ -630,19 +595,18 @@ class OpenMarketOrderController extends Controller
             'orderId' => $order->order_id,
             'productHref' => $product ? $product->productHref : null,
             'productImage' => $product ? $product->productImage : null,
-            'productPrice' => $product ? $this->calcProductPrice($product->productPrice) : null,
+            'productPrice' => $productPrice,
             'shippingFee' => $product ? $product->shipping_fee : null,
             'quantity' => $order->quantity,
-            'amount' => $product ? $this->calcProductPrice($product->productPrice) * $order->quantity + $product->shipping_fee : null,
+            'amount' => $amount,
             'orderType' => $orderType,
             'senderNickName' => $order->senderNickName,
             'senderPhone' => $order->senderPhone,
             'senderEmail' => $order->senderEmail,
             'senderName' => $order->lastName . $order->firstName,
-            'deliveryCompanies' => $deliveryCompanies,
             'productOrderNumber' => $order->productOrderNumber,
             'isPartner' => $order->isExist,
-            'isActive' => $product->isActive ?? null,
+            'isActive' => $product->isActive,
             'receiverRemark' => $order->receiverRemark,
             'orderDate' => $orderDate,
             'trackingNumber' => $order->trackingNumber

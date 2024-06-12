@@ -189,6 +189,7 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('save-tracking-info', [OpenMarketShipmentController::class, 'saveShipment']);
     //주문 취소처리
     Route::post('cancel-order', [OpenMarketOrderController::class, 'cancelOrder']);
+    Route::post('accept-cancel', [OpenMarketOrderController::class, 'acceptCancel']);
     // 파트너스 주문 조회
     Route::post('get-new-orders', [OpenMarketOrderController::class, 'index']);
     Route::post('show-data', [OpenMarketOrderController::class, 'showData']);
