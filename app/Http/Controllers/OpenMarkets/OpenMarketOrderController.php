@@ -128,12 +128,10 @@ class OpenMarketOrderController extends Controller
             $vendors = $request->input('vendors');
             $orderStatus = $request->input('orderStatus');
             $orders = $this->getOrders($vendors, $orderStatus);
+            $deliveryCompanies = $this->getDeliveryCompanies();
             $processedOrders = array_map(function ($order) use ($orderStatus) {
                 return $this->processOrder($order, $orderStatus);
             }, $orders);
-
-            return $processedOrders;
-
             $lowBalanceAccounts = $this->getUsersWithLowBalance();
         } catch (\Exception $e) {
             return [
@@ -144,7 +142,8 @@ class OpenMarketOrderController extends Controller
         }
         return response()->json([
             'lowBalanceAccounts' => $lowBalanceAccounts,
-            'processedOrders' => $processedOrders
+            'processedOrders' => $processedOrders,
+            'deliveryCompanies' => $deliveryCompanies
         ]);
     }
     public function indexPartner(Request $request)
@@ -572,7 +571,6 @@ class OpenMarketOrderController extends Controller
             $uploadedProduct = DB::table($uploadedProductsTable)
                 ->where('id', $order->uploadedProductId)
                 ->first();
-
             if ($uploadedProduct) {
                 $product = DB::table('minewing_products as mp')
                     ->where('mp.id', $uploadedProduct->product_id)
@@ -583,8 +581,6 @@ class OpenMarketOrderController extends Controller
                 ->where('mp.id', $order->productId)
                 ->first();
         }
-
-        $deliveryCompanies = $this->getDeliveryCompanies();
         $orderType = '신규주문';
         switch ($order->type) {
             case 'REFUND':
@@ -616,7 +612,6 @@ class OpenMarketOrderController extends Controller
             'senderPhone' => $order->senderPhone,
             'senderEmail' => $order->senderEmail,
             'senderName' => $order->lastName . $order->firstName,
-            'deliveryCompanies' => $deliveryCompanies,
             'productOrderNumber' => $order->productOrderNumber,
             'isPartner' => $order->isExist,
             'isActive' => $product->isActive,

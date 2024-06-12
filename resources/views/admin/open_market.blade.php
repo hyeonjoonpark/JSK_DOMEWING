@@ -150,15 +150,16 @@
 
         function showData() {
             popupLoader(0, '"주문 내역을 데이터베이스로부터 추출하겠습니다."');
-            const selectedOrderStatus = $('input[name="orderStatus"]:checked').val();
+            const orderStatus = $('input[name="orderStatus"]:checked').val();
+            const vendors = getSelectedVendors();
             $.ajax({
                 url: '/api/show-data',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
                     rememberToken,
-                    vendors: getSelectedVendors(),
-                    orderStatus: selectedOrderStatus
+                    vendors,
+                    orderStatus
                 },
                 success: function(response) {
                     closePopup();
@@ -169,7 +170,7 @@
                             text: response.message,
                         });
                     }
-                    updateOrderTable(response.processedOrders);
+                    updateOrderTable(response.processedOrders, response.deliveryCompanies);
                     updateLowBalanceAccounts(response.lowBalanceAccounts);
                 },
                 error: function(response) {
@@ -187,21 +188,21 @@
         }
 
 
-        function updateOrderTable(response) {
+        function updateOrderTable(response, deliveryCompanies) {
             $('#numOrders').html(response.length);
-            $('#orderwingResult').html(generateOrdersHtml(response));
+            $('#orderwingResult').html(generateOrdersHtml(response, deliveryCompanies));
             $('#totalAmt').html(`${numberFormat(calculateTotalAmount(response))}원`);
             $('.js-select2').select2();
             closePopup();
         }
 
-        function generateOrdersHtml(orders) {
-            return orders.map(order => generateOrderRowHtml(order)).join('');
+        function generateOrdersHtml(orders, deliveryCompanies) {
+            return orders.map(order => generateOrderRowHtml(order, deliveryCompanies)).join('');
         }
 
-        function generateOrderRowHtml(order) {
+        function generateOrderRowHtml(order, deliveryCompanies) {
             let deliveryCompanyHtml = `<option value="-1">택배사 선택</option>`;
-            for (const deliveryCompany of order.deliveryCompanies) {
+            for (const deliveryCompany of deliveryCompanies) {
                 deliveryCompanyHtml += `<option value="${deliveryCompany.id}">${deliveryCompany.name}</option>`;
             }
             let partnerStatusHtml = order.isPartner ? '<b><p>셀윙 발주</p></b>' : '<b><p>도매윙 발주</p></b>';
@@ -209,29 +210,32 @@
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
             let orderTypeHtml = order.orderType === '교환' || order.orderType === '환불' ?
                 `<h6 class="title">
-                    <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
-                        ${order.orderType}신청
-                    </a>
-                </h6>` :
+            <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
+                ${order.orderType}신청
+            </a>
+        </h6>` :
                 `<h6 class="title">${order.orderType}</h6>`;
-            // 교환 및 환불인 경우와 아닌 경우를 구분하여 버튼을 다르게 설정
+
             let actionButtonsHtml;
             if (order.orderType === '교환') {
                 actionButtonsHtml = `
-            <button class="btn btn-primary" onclick="initExchangeDelivery('${order.productOrderNumber}');">확인</button>
-            <button class="btn btn-danger" onclick="cancelExchangeDelivery('${order.productOrderNumber}');">취소</button>
-        `;
+        <button class="btn btn-primary" onclick="initExchangeDelivery('${order.productOrderNumber}');">확인</button>
+        <button class="btn btn-danger" onclick="cancelExchangeDelivery('${order.productOrderNumber}');">취소</button>
+    `;
             } else if (order.orderType === '환불') {
                 actionButtonsHtml = `
-            <button class="btn btn-primary" onclick="initRefundDelivery('${order.productOrderNumber}');">확인</button>
-            <button class="btn btn-danger" onclick="cancelRefundDelivery('${order.productOrderNumber}');">취소</button>
-        `;
+        <button class="btn btn-primary" onclick="initRefundDelivery('${order.productOrderNumber}');">확인</button>
+        <button class="btn btn-danger" onclick="cancelRefundDelivery('${order.productOrderNumber}');">취소</button>
+    `;
             } else {
                 actionButtonsHtml = `
-            <button class="btn btn-primary" onclick="initCreateDelivery('${order.productOrderNumber}');">확인</button>
-            <button class="btn btn-danger" onclick="cancelDelivery('${order.productOrderNumber}');">취소</button>
-        `;
+        <button class="btn btn-primary" onclick="initCreateDelivery('${order.productOrderNumber}');">확인</button>
+        <button class="btn btn-danger" onclick="cancelDelivery('${order.productOrderNumber}');">취소</button>
+        <div>
+        <button class="btn btn-danger" onclick="acceptCancel('${order.productOrderNumber}');">취소요청수락</button></div>
+    `;
             }
+
             return `
     <tr>
         <td>
@@ -256,18 +260,17 @@
             <h6 class="title">${orderVendorHtml}</h6>
             ${orderTypeHtml}
             <div class="col-auto">
-        <p>${order.orderDate}</p>
-    </div>
-            <div class="col-auto">
+                <p>${order.orderDate}</p>
                 <select class="form-select js-select2" id="deliveryCompany${order.productOrderNumber}">
                     ${deliveryCompanyHtml}
                 </select>
-                <input type="number" class="form-control" id="trackingNumber${order.productOrderNumber}" placeholder="송장번호">
+                <input type="number" class="form-control" id="trackingNumber${order.productOrderNumber}" placeholder="${order.trackingNumber || '송장번호'}">
                 ${actionButtonsHtml}
             </div>
         </td>
     </tr>`;
         }
+
 
 
         function generateProductDetailsHtml(order, isActive) {
@@ -612,6 +615,64 @@
                     const remark = result.value;
                     $.ajax({
                         url: '/api/cancel-order',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            rememberToken,
+                            productOrderNumber,
+                            remark
+                        },
+                        success: function(response) {
+                            if (response.status === false) {
+                                console.log('fail:', response);
+                                Swal.fire({
+                                    icon: 'error',
+                                    text: response.message,
+                                });
+                            } else {
+                                console.log('Order cancelled:', response);
+                                Swal.fire({
+                                    icon: 'success',
+                                    text: '주문 취소에 성공하였습니다.'
+                                });
+                            }
+                        },
+                        error: function(response) {
+                            console.error('Error cancelling order:', response);
+                            Swal.fire({
+                                icon: 'error',
+                                text: '주문 취소 중 오류가 발생했습니다.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function acceptCancel(productOrderNumber) {
+            Swal.fire({
+                title: '취소 요청 수락',
+                input: 'textarea',
+                inputValue: `죄송합니다.
+
+                주문해주신 제품 현재 최종 품절 확인이 되어 부득이 판매취소처리를 하게 되었습니다.
+
+                입고일정도 확인하였으나, 입고 지연이 됨으로써 예상잡혀있던 입고일정이 다시 미정으로 잡히게 되었습니다.
+
+                양해 부탁드리며, 쇼핑에 불편을 끼쳐드린점 사과의 말씀을 드립니다.`,
+                showCancelButton: true,
+                confirmButtonText: '취소하기',
+                cancelButtonText: '닫기',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return '취소 사유를 입력해야 합니다!'
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const remark = result.value;
+                    $.ajax({
+                        url: '/api/accept-cancel',
                         type: 'POST',
                         dataType: 'JSON',
                         data: {

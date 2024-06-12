@@ -488,7 +488,7 @@ class AdminController extends Controller
             ->select('v.id', 'v.name', 'v.is_active', 'v.type')
             ->groupBy('v.id', 'v.name', 'v.is_active', 'v.type')
             ->get();
-        //only full groupBy가 좋다는 이야기가있음
+        //only full groupBy가 좋다는 이야기가있음 그래?
 
         return view('admin/open_market', [
             'vendors' => $vendors
