@@ -108,7 +108,7 @@ class OpenMarketOrderController extends Controller
     }
     public function showData(Request $request)
     {
-        set_time_limit(120);
+        set_time_limit(180);
         try {
             $validator = Validator::make($request->all(), [
                 'vendors' => 'required',
@@ -565,22 +565,9 @@ class OpenMarketOrderController extends Controller
 
     private function processOrder($order, $orderStatus)
     {
-        $product = null;
-        if ($order->vendor_name_eng && $order->uploadedProductId) {
-            $uploadedProductsTable = $order->vendor_name_eng . '_uploaded_products';
-            $uploadedProduct = DB::table($uploadedProductsTable)
-                ->where('id', $order->uploadedProductId)
-                ->first();
-            if ($uploadedProduct) {
-                $product = DB::table('minewing_products as mp')
-                    ->where('mp.id', $uploadedProduct->product_id)
-                    ->first();
-            }
-        } else {
-            $product = DB::table('minewing_products as mp')
-                ->where('mp.id', $order->productId)
-                ->first();
-        }
+        $product  = DB::table('minewing_products as mp')
+            ->where('mp.id', $order->productId)
+            ->first();
         $orderType = '신규주문';
         switch ($order->type) {
             case 'REFUND':
@@ -591,6 +578,8 @@ class OpenMarketOrderController extends Controller
                 break;
         }
         $orderDate = ($orderStatus === 'COMPLETE') ? '발주일자 : ' . $order->updatedAt : '수집일자 : ' . $order->createdAt;
+        $productPrice = $product ? $this->calcProductPrice($product->productPrice) : null;
+        $amount = $product ? $productPrice * $order->quantity + $product->shipping_fee : null;
         return [
             'userName' => $order->member_username,
             'orderNumber' => $order->orderNumber,
@@ -603,10 +592,10 @@ class OpenMarketOrderController extends Controller
             'orderId' => $order->order_id,
             'productHref' => $product ? $product->productHref : null,
             'productImage' => $product ? $product->productImage : null,
-            'productPrice' => $product ? $this->calcProductPrice($product->productPrice) : null,
+            'productPrice' => $productPrice,
             'shippingFee' => $product ? $product->shipping_fee : null,
             'quantity' => $order->quantity,
-            'amount' => $product ? $this->calcProductPrice($product->productPrice) * $order->quantity + $product->shipping_fee : null,
+            'amount' => $amount,
             'orderType' => $orderType,
             'senderNickName' => $order->senderNickName,
             'senderPhone' => $order->senderPhone,
