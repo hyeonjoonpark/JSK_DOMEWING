@@ -42,6 +42,27 @@ return [
             'after_commit' => false,
         ],
 
+        'uploads1' => [
+            'driver' => 'database',
+            'table' => 'jobs',
+            'queue' => 'uploads1',
+            'retry_after' => 90
+        ],
+
+        'uploads2' => [
+            'driver' => 'database',
+            'table' => 'jobs',
+            'queue' => 'uploads2',
+            'retry_after' => 90
+        ],
+
+        'uploads3' => [
+            'driver' => 'database',
+            'table' => 'jobs',
+            'queue' => 'uploads3',
+            'retry_after' => 90
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => 'localhost',

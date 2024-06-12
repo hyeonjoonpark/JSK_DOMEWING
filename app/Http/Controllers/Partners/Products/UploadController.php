@@ -146,12 +146,22 @@ class UploadController extends Controller
             ->where('token', $partnerTableToken)
             ->value('title');
         // 큐에 작업 추가
-        ProcessProductUpload::dispatch($products, $partner, $account, $vendor, $tableName);
+        $queues = ['uploads1', 'uploads2', 'uploads3'];
+        $currentQueue = $queues[array_rand($queues)];
+
+        ProcessProductUpload::dispatch($products, $partner, $account, $vendor, $tableName)->onQueue($currentQueue);
+
         $numJobs = DB::table('jobs')
+            ->where('queue', $currentQueue)
             ->count();
+        $queueIndex = array_search($currentQueue, $queues) + 1;
+
         return [
             'status' => true,
-            'message' => '총 ' . count($products) . '개의 상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>현재 ' . $numJobs . '개의 작업이 대기열에 있습니다.'
+            'message' => '총 ' . count($products) . '개의 상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>' .
+                '요청이 ' . $queueIndex . '번 채널에 배치되었습니다.<br>' .
+                '현재 ' . $numJobs . '개의 작업이 대기열에 있습니다.'
+
         ];
     }
     private function smart_store($products, $partner, $account)
