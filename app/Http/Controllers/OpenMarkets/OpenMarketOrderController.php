@@ -108,30 +108,40 @@ class OpenMarketOrderController extends Controller
     }
     public function showData(Request $request)
     {
-        set_time_limit(120);
-        $validator = Validator::make($request->all(), [
-            'vendors' => 'required',
-            'orderStatus' => 'required',
-        ], [
-            'vendors.required' => '하나 이상의 원청사를 선택해야합니다.',
-            'orderStatus.required' => '주문 상태를 선택해야합니다.',
-        ]);
+        set_time_limit(0);
+        try {
+            $validator = Validator::make($request->all(), [
+                'vendors' => 'required',
+                'orderStatus' => 'required',
+            ], [
+                'vendors.required' => '하나 이상의 원청사를 선택해야합니다.',
+                'orderStatus.required' => '주문 상태를 선택해야합니다.',
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return [
+                    'status' => false,
+                    'message' => '하나 이상의 원청사를 선택해야합니다.',
+                    'error' => $validator->errors(),
+                ];
+            }
+            $vendors = $request->input('vendors');
+            $orderStatus = $request->input('orderStatus');
+            $orders = $this->getOrders($vendors, $orderStatus);
+            $processedOrders = array_map(function ($order) use ($orderStatus) {
+                return $this->processOrder($order, $orderStatus);
+            }, $orders);
+
+            return $processedOrders;
+
+            $lowBalanceAccounts = $this->getUsersWithLowBalance();
+        } catch (\Exception $e) {
             return [
                 'status' => false,
-                'message' => '하나 이상의 원청사를 선택해야합니다.',
-                'error' => $validator->errors(),
+                'message' => '내역을 불러오는 도중 오류가 발생했습니다.',
+                'error' => $e->getMessage(),
             ];
         }
-        $vendors = $request->input('vendors');
-        $orderStatus = $request->input('orderStatus');
-        $orders = $this->getOrders($vendors, $orderStatus);
-        $processedOrders = $orders->map(function ($order) use ($orderStatus) {
-            return $this->processOrder($order, $orderStatus);
-        });
-
-        $lowBalanceAccounts = $this->getUsersWithLowBalance();
         return response()->json([
             'lowBalanceAccounts' => $lowBalanceAccounts,
             'processedOrders' => $processedOrders
@@ -240,6 +250,58 @@ class OpenMarketOrderController extends Controller
             ];
         }
 
+        DB::beginTransaction();
+        try {
+            // orders 테이블 업데이트
+            DB::table('orders')
+                ->where('product_order_number', $productOrderNumber)
+                ->where('delivery_status', 'PENDING')
+                ->update([
+                    'type' => 'CANCELLED',
+                    'remark' => $remark
+                ]);
+            // 트랜잭션 커밋
+            DB::commit();
+            return [
+                'status' => true,
+                'message' => '주문이 성공적으로 취소되었습니다.',
+            ];
+        } catch (\Exception $e) {
+            // 트랜잭션 롤백
+            DB::rollBack();
+            return [
+                'status' => false,
+                'message' => '주문 취소 중 오류가 발생했습니다.',
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+    public function acceptCancel(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'remark' => 'required',
+        ], [
+            'remark.required' => '취소 사유를 입력해야합니다.'
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => '취소 사유를 입력해야합니다.',
+                'error' => $validator->errors(),
+            ];
+        }
+        $productOrderNumber = $request->productOrderNumber;
+        $order = DB::table('orders as o') //주문내역가지고 작업하기전에 유효한지 확인하고 없으면 return
+            ->where('product_order_number', $productOrderNumber)
+            ->where('delivery_status', 'PENDING')
+            ->where('type', 'PAID')
+            ->first();
+        if (!$order) return [
+            'status' => false,
+            'message' => '이미 취소되었거나 유효한 주문이 아닙니다.',
+        ];
+        $remark = $request->remark; //취소 요청 reason
         DB::beginTransaction();
         try {
             // orders 테이블 업데이트
@@ -462,7 +524,6 @@ class OpenMarketOrderController extends Controller
             ->join('minewing_products as mp', 'mp.id', '=', 'c.product_id')
             ->whereIn('mp.sellerID', $vendors)
             ->whereNotIn('o.type', ['CANCELLED'])
-            ->whereNotIn('wt.status', ['REJECTED'])
             ->where('o.delivery_status', $orderStatus)
             ->select(
                 'm.username as member_username',
@@ -487,13 +548,20 @@ class OpenMarketOrderController extends Controller
                 'o.type as type',
                 'o.created_at as createdAt',
                 'o.updated_at as updatedAt',
-                DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist')
+                DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist'),
+                'o.tracking_number as trackingNumber'
             );
         if ($orderStatus === 'COMPLETE') {
             $sevenDaysAgo = Carbon::now()->subDays(7);
             $query->where('o.updated_at', '>=', $sevenDaysAgo);
         }
-        return $query->get();
+        $orders = [];
+        $query->orderBy('o.id')->chunk(200, function ($chunk) use (&$orders) {
+            foreach ($chunk as $order) {
+                $orders[] = $order;
+            }
+        });
+        return $orders;
     }
 
     private function processOrder($order, $orderStatus)
@@ -553,7 +621,8 @@ class OpenMarketOrderController extends Controller
             'isPartner' => $order->isExist,
             'isActive' => $product->isActive,
             'receiverRemark' => $order->receiverRemark,
-            'orderDate' => $orderDate
+            'orderDate' => $orderDate,
+            'trackingNumber' => $order->trackingNumber
         ];
     }
     private function getAllPartners()
