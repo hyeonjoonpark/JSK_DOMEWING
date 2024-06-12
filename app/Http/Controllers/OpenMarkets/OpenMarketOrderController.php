@@ -111,30 +111,26 @@ class OpenMarketOrderController extends Controller
         set_time_limit(0);
         try {
             $validator = Validator::make($request->all(), [
-                'vendors' => 'required|array',
-                'vendors.*' => 'exists:vendors,id',
-                'orderStatus' => 'required|string',
+                'vendors' => 'required',
+                'orderStatus' => 'required',
             ], [
                 'vendors.required' => '하나 이상의 원청사를 선택해야합니다.',
-                'vendors.array' => '원청사 선택 형식이 잘못되었습니다.',
-                'vendors.*.exists' => '선택한 원청사가 존재하지 않습니다.',
                 'orderStatus.required' => '주문 상태를 선택해야합니다.',
-                'orderStatus.string' => '주문 상태 형식이 잘못되었습니다.',
             ]);
 
             if ($validator->fails()) {
                 return [
                     'status' => false,
-                    'message' => $validator->errors()->first(),
+                    'message' => '하나 이상의 원청사를 선택해야합니다.',
                     'error' => $validator->errors(),
                 ];
             }
             $vendors = $request->input('vendors');
             $orderStatus = $request->input('orderStatus');
             $orders = $this->getOrders($vendors, $orderStatus);
-            $processedOrders = $orders->map(function ($orderData) use ($orderStatus) {
-                return $this->processOrder($orderData, $orderStatus);
-            });
+            $processedOrders = array_map(function ($order) use ($orderStatus) {
+                return $this->processOrder($order, $orderStatus);
+            }, $orders);
 
             return $processedOrders;
 
@@ -555,57 +551,38 @@ class OpenMarketOrderController extends Controller
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist'),
                 'o.tracking_number as trackingNumber'
             );
-
         if ($orderStatus === 'COMPLETE') {
             $sevenDaysAgo = Carbon::now()->subDays(7);
             $query->where('o.updated_at', '>=', $sevenDaysAgo);
         }
-
-        $orders = $query->get();
-
-        // 미리 모든 제품 정보를 가져오기
-        $productIds = $orders->pluck('productId')->unique();
-        $products = DB::table('minewing_products')
-            ->whereIn('id', $productIds)
-            ->get()
-            ->keyBy('id');
-
-        // 미리 모든 업로드된 제품 정보를 가져오기
-        $uploadedProductIds = $orders->pluck('uploadedProductId')->filter()->unique();
-        $uploadedProducts = collect();
-        foreach ($orders as $order) {
-            if ($order->vendor_name_eng && $order->uploadedProductId) {
-                $uploadedProductsTable = $order->vendor_name_eng . '_uploaded_products';
-                $uploadedProducts = $uploadedProducts->merge(DB::table($uploadedProductsTable)
-                    ->whereIn('id', $uploadedProductIds)
-                    ->get()
-                    ->keyBy('id'));
+        $orders = [];
+        $query->orderBy('o.id')->chunk(200, function ($chunk) use (&$orders) {
+            foreach ($chunk as $order) {
+                $orders[] = $order;
             }
-        }
-
-        return $orders->map(function ($order) use ($products, $uploadedProducts) {
-            $product = $products->get($order->productId);
-
-            if ($order->vendor_name_eng && $order->uploadedProductId) {
-                $uploadedProduct = $uploadedProducts->get($order->uploadedProductId);
-                if ($uploadedProduct) {
-                    $product = DB::table('minewing_products as mp')
-                        ->where('mp.id', $uploadedProduct->product_id)
-                        ->first();
-                }
-            }
-
-            return [
-                'order' => $order,
-                'product' => $product,
-            ];
         });
+        return $orders;
     }
 
-    private function processOrder($orderData, $orderStatus)
+    private function processOrder($order, $orderStatus)
     {
-        $order = $orderData['order'];
-        $product = $orderData['product'];
+        $product = null;
+        if ($order->vendor_name_eng && $order->uploadedProductId) {
+            $uploadedProductsTable = $order->vendor_name_eng . '_uploaded_products';
+            $uploadedProduct = DB::table($uploadedProductsTable)
+                ->where('id', $order->uploadedProductId)
+                ->first();
+
+            if ($uploadedProduct) {
+                $product = DB::table('minewing_products as mp')
+                    ->where('mp.id', $uploadedProduct->product_id)
+                    ->first();
+            }
+        } else {
+            $product = DB::table('minewing_products as mp')
+                ->where('mp.id', $order->productId)
+                ->first();
+        }
 
         $deliveryCompanies = $this->getDeliveryCompanies();
         $orderType = '신규주문';
@@ -642,7 +619,7 @@ class OpenMarketOrderController extends Controller
             'deliveryCompanies' => $deliveryCompanies,
             'productOrderNumber' => $order->productOrderNumber,
             'isPartner' => $order->isExist,
-            'isActive' => $product->isActive ?? null,
+            'isActive' => $product->isActive,
             'receiverRemark' => $order->receiverRemark,
             'orderDate' => $orderDate,
             'trackingNumber' => $order->trackingNumber
