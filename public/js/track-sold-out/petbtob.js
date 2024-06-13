@@ -194,7 +194,7 @@ async function getProductOptions(page) {
 
 (async () => {
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         args: ['--no-sandbox'],
         defaultViewport: null,
         timeout: 120000,
