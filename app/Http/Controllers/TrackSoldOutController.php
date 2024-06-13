@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Partners\Products\UploadedController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -15,10 +16,10 @@ class TrackSoldOutController extends Controller
             'vendorId' => 'required|exists:product_search,vendor_id'
         ]);
         if ($validator->fails()) {
-            return response()->json([
+            return [
                 'status' => false,
                 'message' => '유효한 원청사를 선택해주세요.'
-            ], 200);
+            ];
         }
         $vendorId = $request->vendorId;
 
@@ -64,12 +65,33 @@ class TrackSoldOutController extends Controller
         if ($updateSoldOutProductsResult['status'] === false) {
             return $updateSoldOutProductsResult;
         }
+        $openMarkets = DB::table('vendors')
+            ->where('type', 'OPEN_MARKET')
+            ->where('is_active', 'ACTIVE')
+            ->get(['name_eng', 'id']);
+        $uc = new UploadedController();
+        $errors = [];
+        foreach ($openMarkets as $openMarket) {
+            $soldOutOriginProductsNo = DB::table($openMarket->name_eng . '_uploaded_products')
+                ->whereIn('product_id', $soldOutProducts)
+                ->pluck('origin_product_no')
+                ->toArray();
+            $ucDeleteRequest = new Request([
+                'vendorId' => $openMarket->id,
+                'originProductsNo' => $soldOutOriginProductsNo
+            ]);
+            $ucDeleteResult = $uc->delete($ucDeleteRequest);
+            if ($ucDeleteResult['status'] === false) {
+                $errors[] = $ucDeleteRequest;
+            }
+        }
         return [
             'status' => true,
-            'message' => '해당 원청사의 품절 추적 프로토콜을 성공적으로 수행했습니다.',
+            'message' => '트랙윙을 성공적으로 완료했습니다.',
             'data' => [
                 'soldOutProducts' => $soldOutProducts
-            ]
+            ],
+            'error' => $errors
         ];
     }
 
@@ -119,28 +141,6 @@ class TrackSoldOutController extends Controller
             return [
                 'status' => false,
                 'message' => '품절 상품들을 반영하는 과정에서 오류가 발생했습니다.',
-                'error' => $e->getMessage()
-            ];
-        }
-    }
-
-
-    private function activeVendorAllProducts($vendorId)
-    {
-        try {
-            DB::table('minewing_products')
-                ->where('sellerID', $vendorId)
-                ->update([
-                    'isActive' => 'Y'
-                ]);
-            return [
-                'status' => true,
-                'message' => '원청사의 모든 상품들을 재입고 처리했습니다.'
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'message' => '원청사의 모든 상품들을 재입고 처리하는 과정에서 오류가 발생했습니다.',
                 'error' => $e->getMessage()
             ];
         }
