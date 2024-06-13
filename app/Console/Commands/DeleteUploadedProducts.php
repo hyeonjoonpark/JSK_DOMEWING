@@ -39,7 +39,6 @@ class DeleteUploadedProducts extends Command
         $uc = new UploadedController();
         foreach ($accountIds as $accountId) {
             $originProductsNo = DB::table($vendor->name_eng . '_uploaded_products')
-                ->where('is_active', 'Y')
                 ->where($vendor->name_eng . '_account_id', $accountId)
                 ->pluck('origin_product_no')
                 ->toArray();
