@@ -555,8 +555,8 @@ class OpenMarketOrderController extends Controller
                 'o.tracking_number as trackingNumber'
             );
         if ($orderStatus === 'COMPLETE') {
-            $sevenDaysAgo = Carbon::now()->subDays(31);
-            $query->where('o.updated_at', '>=', $sevenDaysAgo);
+            $oneMonthAgo = Carbon::now()->subMonth();
+            $query->where('o.updated_at', '>=', $oneMonthAgo);
         }
         $orders = [];
         $query->orderBy('o.created_at', 'asc')->chunk(200, function ($chunk) use (&$orders) {
