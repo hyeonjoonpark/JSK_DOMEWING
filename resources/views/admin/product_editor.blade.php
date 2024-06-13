@@ -12,6 +12,11 @@
                 <div class="card-inner">
                     <h6 class="title">상품 대량 관리 엑셀 업로드</h6>
                     <p>상품 기입이 완료된 셀윙 엑셀 양식을 업로드해주세요.</p>
+                    <p>
+                        <a href="{{ asset('assets/excel/sellwing_products_editor.xlsx') }}" target="_blank" download>
+                            빈 엑셀 양식 다운로드
+                        </a>
+                    </p>
                     <div class="d-flex text-nowrap">
                         <input type="file" class="form-control" id="products">
                         <button class="btn btn-primary" onclick="editProducts();">업로드</button>
