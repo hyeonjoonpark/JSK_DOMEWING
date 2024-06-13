@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use DateTime;
+use Illuminate\Support\Facades\Schema;
 
 class AdminController extends Controller
 {
@@ -488,8 +489,15 @@ class AdminController extends Controller
             ->select('v.id', 'v.name', 'v.is_active', 'v.type')
             ->groupBy('v.id', 'v.name', 'v.is_active', 'v.type')
             ->get();
+        $columns = Schema::getColumnListing('delivery_companies');
+        $query = DB::table('delivery_companies');
+        foreach ($columns as $column) {
+            $query->whereNotNull($column);
+        }
+        $deliveryCompanies =  $query->get();
         return view('admin/open_market', [
-            'vendors' => $vendors
+            'vendors' => $vendors,
+            'deliveryCompanies' => $deliveryCompanies
         ]);
     }
 
