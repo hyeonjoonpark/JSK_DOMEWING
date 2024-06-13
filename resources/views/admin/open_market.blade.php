@@ -264,7 +264,7 @@
                 <select class="form-select js-select2" id="deliveryCompany${order.productOrderNumber}">
                     ${deliveryCompanyHtml}
                 </select>
-                <input type="number" class="form-control" id="trackingNumber${order.productOrderNumber}" placeholder="${order.trackingNumber || '송장번호'}">
+                <input type="number" class="form-control" id="trackingNumber${order.productOrderNumber}" value="${order.trackingNumber || ''}" placeholder="송장번호">
                 ${actionButtonsHtml}
             </div>
         </td>
