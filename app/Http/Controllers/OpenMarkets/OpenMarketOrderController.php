@@ -559,7 +559,7 @@ class OpenMarketOrderController extends Controller
             $query->where('o.updated_at', '>=', $sevenDaysAgo);
         }
         $orders = [];
-        $query->orderBy('o.updated_at', 'asc')->chunk(200, function ($chunk) use (&$orders) {
+        $query->orderBy('o.created_at', 'asc')->chunk(200, function ($chunk) use (&$orders) {
             foreach ($chunk as $order) {
                 $orders[] = $order;
             }
