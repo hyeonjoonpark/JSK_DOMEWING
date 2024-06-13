@@ -42,7 +42,7 @@ class OpenMarketOrderController extends Controller
                 // orderId를 기준으로 그룹화
                 $groupedResults = []; // wing_transaction에 주문의 총합으로 넣으려고 그룹화
                 foreach ($apiResults as $apiResult) {
-                    if (!$apiResult) continue;
+                    if (!$apiResult || !$apiResult['orderId']) continue;
                     if ($apiResult['productOrderStatus'] !== '결제완료' && $apiResult['productOrderStatus'] !== '상품준비중') {
                         continue; // 결제완료, 상품준비중 db에 저장하려고 검증
                     } //일부러 결제완료, 상품준비중을 먼저 검증 왜냐 db조회보다 간단한 배열 조회가 더빠르기 때문에 성능 최적화
