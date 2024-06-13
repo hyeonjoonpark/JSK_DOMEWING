@@ -137,7 +137,6 @@ class UploadedController extends Controller
             ->where('id', $vendorId)
             ->value('name_eng');
         $originProductsNo = DB::table($vendorEngName . '_uploaded_products')
-            ->where('is_active', 'Y')
             ->whereIn('origin_product_no', $request->originProductsNo)
             ->pluck('origin_product_no');
         $errors = [];
