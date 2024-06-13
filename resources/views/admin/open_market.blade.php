@@ -212,13 +212,22 @@
         var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
         var productOrderNumber;
         $(document).ready(function() {
-            $('#orderModal').on('shown.bs.modal', function() {
+            // 모달이 열릴 때 실행되는 이벤트 핸들러
+            $('#modalProcess').on('shown.bs.modal', function() {
+                // select2 초기화
                 $("#deliveryCompanyModal").select2({
-                    dropdownParent: $('#deliveryCompanyModal')
+                    dropdownParent: $('#modalProcess')
                 });
+
+                // 모달 내부의 값을 초기화 또는 설정
+                $('#deliveryCompanyModal').val(null).trigger('change'); // select2 초기화 예시
+                $('input[name="targetStatus"]').prop('checked', false); // 체크박스 초기화 예시
+                $('#remoteAreaOption').hide(); // 숨김 초기화 예시
+                $('#trackingNumber').val(''); // 송장번호 초기화
+                $('#remark').val(''); // 사유 초기화
             });
-        });
-        $(document).ready(function() {
+
+            // targetStatus 변경 시 이벤트 핸들러
             $('input[name="targetStatus"]').change(function() {
                 const selectedStatus = $(this).attr('id');
                 if (selectedStatus === 'shipment-complete') {
@@ -227,12 +236,9 @@
                     $('#remoteAreaOption').hide();
                 }
             });
-            $('#orderModal').on('shown.bs.modal', function() {
-                $("#deliveryCompanyModal").select2({
-                    dropdownParent: $('#orderModal')
-                });
-            });
         });
+
+
 
         function processOrder() {
             const targetStatus = $('input[name="targetStatus"]:checked').attr('id');
