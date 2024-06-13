@@ -41,7 +41,7 @@ async function scrapeProduct(page, url) {
         await page.goto(url, { waitUntil: 'networkidle0' });
         const { hasOption, productOptions } = await getProductOptions(page);
         const productData = await page.evaluate(() => {
-            const productName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > div.xans-element-.xans-product.xans-product-detaildesign > table > tbody > tr:nth-child(1) > td > span')?.textContent.trim();
+            const productName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > div.xans-element-.xans-product.xans-product-detaildesign > table > tbody > tr:nth-child(1) > td > span')?.textContent.trim().replace(/^\d+\[/, '').replace(/\]|\(|\)/g, '').trim();
             const productPrice = document.querySelector('#span_product_price_text')?.textContent.trim().replace(/[^\d]/g, '');
             const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img')?.src;
             const productDetailElements = document.querySelectorAll('#prdDetail > div > img');
