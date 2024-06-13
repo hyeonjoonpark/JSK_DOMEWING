@@ -114,12 +114,15 @@ class OpenMarketOrderController extends Controller
                 'vendors' => 'required|array',
                 'vendors.*' => 'exists:vendors,id',
                 'orderStatus' => 'required|string',
+                'orderType' => 'required|string',
             ], [
                 'vendors.required' => '하나 이상의 원청사를 선택해야합니다.',
                 'vendors.array' => '원청사 선택 형식이 잘못되었습니다.',
                 'vendors.*.exists' => '선택한 원청사가 존재하지 않습니다.',
                 'orderStatus.required' => '주문 상태를 선택해야합니다.',
                 'orderStatus.string' => '주문 상태 형식이 잘못되었습니다.',
+                'orderType.required' => '주문 유형을 선택해야합니다.',
+                'orderType.string' => '주문 유형이 잘못되었습니다.',
             ]);
             if ($validator->fails()) {
                 return [
@@ -130,10 +133,10 @@ class OpenMarketOrderController extends Controller
             }
             $vendors = $request->input('vendors');
             $orderStatus = $request->input('orderStatus');
-            $orders = $this->getOrders($vendors, $orderStatus);
-            $deliveryCompanies = $this->getDeliveryCompanies();
+            $orderType = $request->input('orderType');
+            $orders = $this->getOrders($vendors, $orderStatus, $orderType);
             $processedOrders = array_map(function ($order) use ($orderStatus) {
-                return $this->processOrder($order, $orderStatus);
+                return $this->transformOrderDetails($order, $orderStatus);
             }, $orders);
             $lowBalanceAccounts = $this->getUsersWithLowBalance();
         } catch (\Exception $e) {
@@ -146,7 +149,6 @@ class OpenMarketOrderController extends Controller
         return response()->json([
             'lowBalanceAccounts' => $lowBalanceAccounts,
             'processedOrders' => $processedOrders,
-            'deliveryCompanies' => $deliveryCompanies
         ]);
     }
     public function indexPartner(Request $request)
@@ -208,22 +210,71 @@ class OpenMarketOrderController extends Controller
             'data' => $results
         ];
     }
-    public function cancelOrder(Request $request)
+    public function processOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'remark' => 'required',
+            'productOrderNumber' => 'required|string',
+            'targetStatus' => 'required|string',
+            'trackingNumber' => 'nullable|string',
+            'remark' => 'nullable|string',
         ], [
-            'remark.required' => '취소 사유를 입력해야합니다.'
+            'productOrderNumber.required' => '주문 번호는 필수 항목입니다.',
+            'productOrderNumber.string' => '주문 번호는 문자열이어야 합니다.',
+            'targetStatus.required' => '주문 상태를 선택해야 합니다.',
+            'targetStatus.string' => '주문 상태 형식이 잘못되었습니다.',
+            'trackingNumber.string' => '송장 번호는 문자열이어야 합니다.',
+            'remark.string' => '사유는 문자열이어야 합니다.',
         ]);
 
         if ($validator->fails()) {
             return [
                 'status' => false,
-                'message' => '취소 사유를 입력해야합니다.',
+                'message' => $validator->errors()->first(),
                 'error' => $validator->errors(),
             ];
         }
         $productOrderNumber = $request->productOrderNumber;
+        $orderType = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->value('type');
+        $targetStatus = $request->targetStatus;
+        $remark = $request->remark;
+        if ($targetStatus == 'shipment-complete' && $orderType == 'EXCHANGE') {
+            $exchangeController = new OpenMarketExchangeController();
+            return $exchangeController->saveExchangeShipment($request);
+        }
+        if ($targetStatus == 'order-cancel' && $orderType == 'EXCHANGE') {
+            $exchangeController = new OpenMarketExchangeController();
+            return $exchangeController->cancelExchange($request);
+        }
+        if ($targetStatus == 'shipment-complete' && $orderType == 'REFUND') {
+            $exchangeController = new OpenMarketRefundController();
+            return $exchangeController->saveRefundShipment($request);
+        }
+        if ($targetStatus == 'order-cancel' && $orderType == 'REFUND') {
+            $exchangeController = new OpenMarketRefundController();
+            return $exchangeController->cancelRefund($request);
+        }
+        if ($targetStatus == 'awaiting-shipment') {
+            return $this->setAwaitingShipmentStatus($productOrderNumber);
+        }
+        if ($targetStatus == 'shipment-complete') {
+            $shipmentController = new OpenMarketShipmentController();
+            return $shipmentController->saveShipment($request);
+        }
+        if ($targetStatus == 'order-cancel') {
+            return $this->cancelOrder($productOrderNumber, $remark);
+        }
+        if ($targetStatus == 'accept-cancel') {
+            return $this->acceptCancel($productOrderNumber, $remark);
+        }
+    }
+    public function cancelOrder($productOrderNumber, $remark)
+    {
+        if (!$remark) return [
+            'status' => false,
+            'message' => '취소사유는 필수입니다.',
+        ];
         $order = DB::table('orders as o') //주문내역가지고 작업하기전에 유효한지 확인하고 없으면 return
             ->where('product_order_number', $productOrderNumber)
             ->where('delivery_status', 'PENDING')
@@ -233,7 +284,6 @@ class OpenMarketOrderController extends Controller
             'status' => false,
             'message' => '이미 취소되었거나 유효한 주문이 아닙니다.',
         ];
-        $remark = $request->remark; //취소 요청 reason
         $partnerOrder = DB::table('partner_orders as po') //해당 주문의 partner_order 테이블 조회
             ->where('order_id', $order->id)
             ->first();
@@ -278,22 +328,12 @@ class OpenMarketOrderController extends Controller
             ];
         }
     }
-    public function acceptCancel(Request $request)
+    public function acceptCancel($productOrderNumber, $remark)
     {
-        $validator = Validator::make($request->all(), [
-            'remark' => 'required',
-        ], [
-            'remark.required' => '취소 사유를 입력해야합니다.'
-        ]);
-
-        if ($validator->fails()) {
-            return [
-                'status' => false,
-                'message' => '취소 사유를 입력해야합니다.',
-                'error' => $validator->errors(),
-            ];
-        }
-        $productOrderNumber = $request->productOrderNumber;
+        if (!$remark) return [
+            'status' => false,
+            'message' => '취소사유는 필수입니다.',
+        ];
         $order = DB::table('orders as o') //주문내역가지고 작업하기전에 유효한지 확인하고 없으면 return
             ->where('product_order_number', $productOrderNumber)
             ->where('delivery_status', 'PENDING')
@@ -303,7 +343,6 @@ class OpenMarketOrderController extends Controller
             'status' => false,
             'message' => '이미 취소되었거나 유효한 주문이 아닙니다.',
         ];
-        $remark = $request->remark; //취소 요청 reason
         DB::beginTransaction();
         try {
             // orders 테이블 업데이트
@@ -330,6 +369,39 @@ class OpenMarketOrderController extends Controller
             ];
         }
     }
+    private function setAwaitingShipmentStatus($productOrderNumber)
+    {
+        $order = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->where('requested', 'N')
+            ->where('delivery_status', 'PENDING')
+            ->whereNotIn('type', ['CANCELLED'])
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => '배송 대기 중으로 변경 가능한 주문이 아닙니다.',
+            ]);
+        }
+
+        $updated = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->update(['requested' => 'Y']);
+
+        if ($updated) {
+            return response()->json([
+                'status' => true,
+                'message' => '주문 상태가 배송 대기 중으로 변경되었습니다.',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => '주문 상태 변경에 실패했습니다.',
+            ]);
+        }
+    }
+
     public function getOrderInfo(Request $request)
     {
         $productOrderNumber = $request->productOrderNumber;
@@ -515,7 +587,7 @@ class OpenMarketOrderController extends Controller
 
         return ceil($productPrice * $marginRate);
     }
-    private function getOrders($vendors, $orderStatus)
+    private function getOrders($vendors, $orderStatus, $orderType)
     {
         $query = DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
@@ -525,8 +597,7 @@ class OpenMarketOrderController extends Controller
             ->join('carts as c', 'c.id', '=', 'o.cart_id')
             ->join('minewing_products as mp', 'mp.id', '=', 'c.product_id')
             ->whereIn('mp.sellerID', $vendors)
-            ->whereNotIn('o.type', ['CANCELLED'])
-            ->where('o.delivery_status', $orderStatus)
+            ->where('o.type', $orderType)
             ->select(
                 'm.username as member_username',
                 'c.quantity as quantity',
@@ -554,20 +625,31 @@ class OpenMarketOrderController extends Controller
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist'),
                 'o.tracking_number as trackingNumber'
             );
-        if ($orderStatus === 'COMPLETE') {
-            $sevenDaysAgo = Carbon::now()->subDays(7);
-            $query->where('o.updated_at', '>=', $sevenDaysAgo);
+
+        if ($orderStatus === 'PENDING') {
+            $query->where('o.delivery_status', 'PENDING')
+                ->where('o.requested', 'N');
+        } elseif ($orderStatus === 'AWAITING_SHIPMENT') {
+            $query->where('o.delivery_status', 'PENDING')
+                ->where('o.requested', 'Y');
+        } elseif ($orderStatus === 'COMPLETE') {
+            $oneMonthAgo = Carbon::now()->subMonth();
+            $query->where('o.delivery_status', 'COMPLETE')
+                // ->where('o.requested', 'Y')
+                ->where('o.updated_at', '>=', $oneMonthAgo);
         }
+
         $orders = [];
         $query->orderBy('o.created_at', 'asc')->chunk(200, function ($chunk) use (&$orders) {
             foreach ($chunk as $order) {
                 $orders[] = $order;
             }
         });
+
         return $orders;
     }
 
-    private function processOrder($order, $orderStatus)
+    private function transformOrderDetails($order, $orderStatus)
     {
         $product  = DB::table('minewing_products as mp')
             ->where('mp.id', $order->productId)
@@ -629,23 +711,6 @@ class OpenMarketOrderController extends Controller
             ->where('type', 'OPEN_MARKET')
             ->whereIn('id', [40, 51])
             ->get();
-    }
-    private function calcProductPrice($productPrice)
-    {
-        $config = DB::table('sellwing_config')->first();
-        $marginRate = $config->value;
-        $processMarginRate = 1 + ($marginRate) / 100;
-        return $productPrice * $processMarginRate;
-    }
-
-    private function getDeliveryCompanies()
-    {
-        $columns = Schema::getColumnListing('delivery_companies');
-        $query = DB::table('delivery_companies');
-        foreach ($columns as $column) {
-            $query->whereNotNull($column);
-        }
-        return $query->get();
     }
     private function getOrderwingOpenMarkets($marketIds)
     {

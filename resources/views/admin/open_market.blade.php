@@ -48,13 +48,33 @@
                             <label class="form-check-label" for="PENDING">신규주문</label>
                         </div>
                         <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="awaitingShipment"
+                                value="AWAITING_SHIPMENT">
+                            <label class="form-check-label" for="awaitingShipment">배송대기중</label>
+                        </div>
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="orderStatus" id="COMPLETE"
                                 value="COMPLETE">
-                            <label class="form-check-label" for="COMPLETE">발주완료</label>
+                            <label class="form-check-label" for="COMPLETE">송장완료</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderType" id="PAID" value="PAID"
+                                checked>
+                            <label class="form-check-label" for="PAID">주문</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderType" id="REFUND" value="REFUND">
+                            <label class="form-check-label" for="REFUND">환불</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderType" id="EXCHANGE" value="EXCHANGE">
+                            <label class="form-check-label" for="EXCHANGE">교환</label>
                         </div>
                     </div>
                     <button class="btn btn-primary mb-5" onclick="showData();">조회하기</button>
-                    <button class="btn btn-primary mb-5" onclick="initIndex();">업데이트</button>
+                    <button class="btn btn-primary mb-5" style="margin-left: 633px;" onclick="initIndex();">업데이트</button>
                     <div class="form-group">
                         <h6 class="title">잔액 부족 계정 리스트</h6>
                         <ul id="lowBalanceAccountsList"></ul>
@@ -82,7 +102,7 @@
             </div>
         </div>
     </div>
-    <!-- Modal -->
+    <!-- 교환, 환불 정보 Modal -->
     <div class="modal fade" id="orderInfoModal" tabindex="-1" aria-labelledby="orderInfoModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -100,11 +120,168 @@
             </div>
         </div>
     </div>
+    <!-- 주문 상태 변경 Modal -->
+    <div class="modal fade" id="modalProcess">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">주문 처리</h5>
+                    <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <em class="icon ni ni-cross"></em>
+                    </a>
+                </div>
+                <div class="modal-body">
+                    <div action="#" class="form-validate is-alter">
+                        <div class="form-group">
+                            <label class="form-label">주문 상태</label>
+                            <ul class="custom-control-group g-3 align-center">
+                                <li>
+                                    <div class="custom-control custom-control-sm custom-radio">
+                                        <input type="radio" class="custom-control-input" name="targetStatus"
+                                            id="awaiting-shipment">
+                                        <label class="custom-control-label" for="awaiting-shipment">배송 대기 중</label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="custom-control custom-control-sm custom-radio">
+                                        <input type="radio" class="custom-control-input" name="targetStatus"
+                                            id="shipment-complete">
+                                        <label class="custom-control-label" for="shipment-complete">송장 완료</label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="custom-control custom-control-sm custom-radio">
+                                        <input type="radio" class="custom-control-input" name="targetStatus"
+                                            id="order-cancel">
+                                        <label class="custom-control-label" for="order-cancel">주문 취소</label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="custom-control custom-control-sm custom-radio">
+                                        <input type="radio" class="custom-control-input" name="targetStatus"
+                                            id="accept-cancel">
+                                        <label class="custom-control-label" for="accept-cancel">취소 요청 승인</label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="form-group" id="remoteAreaOption" style="display: none;">
+                            <div>
+                                <label>
+                                    <input type="checkbox" id="confirmCheckbox" />
+                                    제주/도서 산간지역
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="full-name">택배사</label>
+                            <div class="form-control-wrap">
+                                <select class="form-select" id="deliveryCompanyModal" data-search="on">
+                                    <option value="-1">택배사를 선택해주세요.</option>
+                                    @foreach ($deliveryCompanies as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="trackingNumber">송장번호</label>
+                            <div class="form-control-wrap">
+                                <input type="text" class="form-control" id="trackingNumber" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="remark">사유</label>
+                            <div class="form-control-wrap">
+                                <input type="text" class="form-control" id="remark">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button class="btn btn-primary" onclick="processOrder();">확인</button>
+                    <button class="btn btn-danger" data-bs-dismiss="modal">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
     <script>
         var rememberToken = '{{ Auth::guard('user')->user()->remember_token }}';
+        var productOrderNumber;
+        $(document).ready(function() {
+            // 모달이 열릴 때 실행되는 이벤트 핸들러
+            $('#modalProcess').on('shown.bs.modal', function() {
+                // select2 초기화
+                $("#deliveryCompanyModal").select2({
+                    dropdownParent: $('#modalProcess')
+                });
+
+                // 모달 내부의 값을 초기화 또는 설정
+                $('#deliveryCompanyModal').val(null).trigger('change'); // select2 초기화 예시
+                $('input[name="targetStatus"]').prop('checked', false); // 체크박스 초기화 예시
+                $('#remoteAreaOption').hide(); // 숨김 초기화 예시
+                $('#trackingNumber').val(''); // 송장번호 초기화
+                $('#remark').val(''); // 사유 초기화
+            });
+
+            // targetStatus 변경 시 이벤트 핸들러
+            $('input[name="targetStatus"]').change(function() {
+                const selectedStatus = $(this).attr('id');
+                if (selectedStatus === 'shipment-complete') {
+                    $('#remoteAreaOption').show();
+                } else {
+                    $('#remoteAreaOption').hide();
+                }
+            });
+        });
+
+
+
+        function processOrder() {
+            const targetStatus = $('input[name="targetStatus"]:checked').attr('id');
+            const deliveryCompanyId = $('#deliveryCompanyModal').val();
+            const trackingNumber = $('#trackingNumber').val();
+            const remark = $('#remark').val();
+            const isRemoteArea = targetStatus === 'shipment-complete' ? $('#confirmCheckbox').prop('checked') : null;
+            $.ajax({
+                url: '/api/process-order',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    rememberToken,
+                    productOrderNumber,
+                    trackingNumber,
+                    deliveryCompanyId,
+                    remark,
+                    targetStatus,
+                    isRemoteArea
+                },
+                success: function(response) {
+                    console.log(response);
+                    if (response.status === false) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: response.message,
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(response) {
+                    console.error('Error processing order:', response);
+                    Swal.fire({
+                        icon: 'error',
+                        text: '주문 처리 중 오류가 발생했습니다.'
+                    });
+                }
+            });
+        }
 
         function getSelectedVendors() {
             let selectedVendors = [];
@@ -113,6 +290,7 @@
             });
             return selectedVendors;
         }
+
         $(document).on('click', '#checkAllvendor', function() {
             const isChecked = $(this).is(':checked');
             $('.vendor-checkbox').prop('checked', isChecked);
@@ -151,6 +329,7 @@
         function showData() {
             popupLoader(0, '"주문 내역을 데이터베이스로부터 추출하겠습니다."');
             const orderStatus = $('input[name="orderStatus"]:checked').val();
+            const orderType = $('input[name="orderType"]:checked').val();
             const vendors = getSelectedVendors();
             $.ajax({
                 url: '/api/show-data',
@@ -159,7 +338,8 @@
                 data: {
                     rememberToken,
                     vendors,
-                    orderStatus
+                    orderStatus,
+                    orderType
                 },
                 success: function(response) {
                     closePopup();
@@ -170,7 +350,7 @@
                             text: response.message,
                         });
                     }
-                    updateOrderTable(response.processedOrders, response.deliveryCompanies);
+                    updateOrderTable(response.processedOrders);
                     updateLowBalanceAccounts(response.lowBalanceAccounts);
                 },
                 error: function(response) {
@@ -187,112 +367,82 @@
             $('#lowBalanceAccountsList').html(accountsHtml);
         }
 
-
-        function updateOrderTable(response, deliveryCompanies) {
+        function updateOrderTable(response) {
             $('#numOrders').html(response.length);
-            $('#orderwingResult').html(generateOrdersHtml(response, deliveryCompanies));
+            $('#orderwingResult').html(generateOrdersHtml(response));
             $('#totalAmt').html(`${numberFormat(calculateTotalAmount(response))}원`);
             $('.js-select2').select2();
             closePopup();
         }
 
-        function generateOrdersHtml(orders, deliveryCompanies) {
-            return orders.map(order => generateOrderRowHtml(order, deliveryCompanies)).join('');
+        function generateOrdersHtml(orders) {
+            return orders.map(order => generateOrderRowHtml(order)).join('');
         }
 
-        function generateOrderRowHtml(order, deliveryCompanies) {
-            let deliveryCompanyHtml = `<option value="-1">택배사 선택</option>`;
-            for (const deliveryCompany of deliveryCompanies) {
-                deliveryCompanyHtml += `<option value="${deliveryCompany.id}">${deliveryCompany.name}</option>`;
-            }
+        function generateOrderRowHtml(order) {
             let partnerStatusHtml = order.isPartner ? '<b><p>셀윙 발주</p></b>' : '<b><p>도매윙 발주</p></b>';
             let orderVendorHtml = order.vendorName ? `<b><p>${order.vendorName}</p></b>` : '<b><p>도매윙</p></b>';
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
             let orderTypeHtml = order.orderType === '교환' || order.orderType === '환불' ?
                 `<h6 class="title">
-            <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
-                ${order.orderType}신청
-            </a>
-        </h6>` :
+                    <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
+                        ${order.orderType}신청
+                    </a>
+                </h6>` :
                 `<h6 class="title">${order.orderType}</h6>`;
 
-            let actionButtonsHtml;
-            if (order.orderType === '교환') {
-                actionButtonsHtml = `
-        <button class="btn btn-primary" onclick="initExchangeDelivery('${order.productOrderNumber}');">확인</button>
-        <button class="btn btn-danger" onclick="cancelExchangeDelivery('${order.productOrderNumber}');">취소</button>
-    `;
-            } else if (order.orderType === '환불') {
-                actionButtonsHtml = `
-        <button class="btn btn-primary" onclick="initRefundDelivery('${order.productOrderNumber}');">확인</button>
-        <button class="btn btn-danger" onclick="cancelRefundDelivery('${order.productOrderNumber}');">취소</button>
-    `;
-            } else {
-                actionButtonsHtml = `
-        <button class="btn btn-primary" onclick="initCreateDelivery('${order.productOrderNumber}');">확인</button>
-        <button class="btn btn-danger" onclick="cancelDelivery('${order.productOrderNumber}');">취소</button>
-        <div>
-        <button class="btn btn-danger" onclick="acceptCancel('${order.productOrderNumber}');">취소요청수락</button></div>
-    `;
-            }
-
             return `
-    <tr>
-        <td>
-            <div class="row">
-                <div class="col">
-                    <p><b>이름:</b><br>${order.receiverName}<br><b>연락처:</b><br>${order.receiverPhone}<br><b>주소:</b><br>${order.receiverAddress}<br><b>배송요청사항:</b><br>${order.receiverRemark}<br>
-                </div>
-            </div>
-        </td>
-        <td>
-            ${generateProductDetailsHtml(order, isActive)}
-        </td>
-        <td class="text-nowrap">
-            <div class="row g-gs mb-3">
-                <div class="col-12">
-                    <p><b>이름:</b><br>${order.senderName}<br><b>연락처:</b><br>${order.senderPhone}<br><b>이메일:</b><br>${order.senderEmail}<br></p>
-                    ${partnerStatusHtml}
-                </div>
-            </div>
-        </td>
-        <td class="text-nowrap">
-            <h6 class="title">${orderVendorHtml}</h6>
-            ${orderTypeHtml}
-            <div class="col-auto">
-                <p>${order.orderDate}</p>
-                <select class="form-select js-select2" id="deliveryCompany${order.productOrderNumber}">
-                    ${deliveryCompanyHtml}
-                </select>
-                <input type="number" class="form-control" id="trackingNumber${order.productOrderNumber}" value="${order.trackingNumber || ''}" placeholder="송장번호">
-                ${actionButtonsHtml}
-            </div>
-        </td>
-    </tr>`;
+                <tr>
+                    <td>
+                        <div class="row">
+                            <div class="col">
+                                <p><b>이름:</b><br>${order.receiverName}<br><b>연락처:</b><br>${order.receiverPhone}<br><b>주소:</b><br>${order.receiverAddress}<br><b>배송요청사항:</b><br>${order.receiverRemark}<br>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        ${generateProductDetailsHtml(order, isActive)}
+                    </td>
+                    <td class="text-nowrap">
+                        <div class="row g-gs mb-3">
+                            <div class="col-12">
+                                <p><b>이름:</b><br>${order.senderName}<br><b>연락처:</b><br>${order.senderPhone}<br><b>이메일:</b><br>${order.senderEmail}<br></p>
+                                ${partnerStatusHtml}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-nowrap">
+                        <h6 class="title">${orderVendorHtml}</h6>
+                        ${orderTypeHtml}
+                        <div class="col-auto">
+                            <p>${order.orderDate}</p>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProcess" onclick="productOrderNumber='${order.productOrderNumber}';">주문 처리</button>
+                        </div>
+                    </td>
+                </tr>
+                `;
         }
-
-
 
         function generateProductDetailsHtml(order, isActive) {
             return `
-            <div class="row mb-3">
-                <div class="col">
-                    <a href="${order.productHref}" target="_blank"><img src="${order.productImage}" class="product-list-image" /></a>
+                <div class="row mb-3">
+                    <div class="col">
+                        <a href="${order.productHref}" target="_blank"><img src="${order.productImage}" class="product-list-image" /></a>
+                    </div>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col">
-                    <h6 class='title'><a href="${order.productHref}" target="_blank">${order.productName}</a><br>${isActive}</h6>
-                    <p><a href="${order.productHref}" target="_blank">${numberFormat(order.productPrice)}원</a></p>
+                <div class="row mb-3">
+                    <div class="col">
+                        <h6 class='title'><a href="${order.productHref}" target="_blank">${order.productName}</a><br>${isActive}</h6>
+                        <p><a href="${order.productHref}" target="_blank">${numberFormat(order.productPrice)}원</a></p>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <p><b>수량:</b> ${numberFormat(order.quantity)}개<br>
-                        <b>배송비:</b> ${numberFormat(order.shippingFee)}원<br>
-                    <b>총액:</b> ${numberFormat(order.amount)}원</p>
-                </div>
-            </div>`;
+                <div class="row">
+                    <div class="col">
+                        <p><b>수량:</b> ${numberFormat(order.quantity)}개<br>
+                            <b>배송비:</b> ${numberFormat(order.shippingFee)}원<br>
+                        <b>총액:</b> ${numberFormat(order.amount)}원</p>
+                    </div>
+                </div>`;
         }
 
         function showOrderInfoModal(productOrderNumber) {
@@ -308,18 +458,18 @@
                         `<img src="${data.image}" class="w-100" />` :
                         '이미지가 없습니다.';
                     $('#modalContent').html(`
-                <p><b>성함:</b> ${data.name}</p>
-                <p><b>전화번호:</b> ${data.phone}</p>
-                <p><b>주소:</b> ${data.address}</p>
-                <p><b>요청사항:</b> ${data.receiverRemark}</p>
-                <p><b>사유:</b> ${data.type}</p>
-                <p><b>개수:</b> ${data.quantity}</p>
-                <p><b>총 가격:</b> ${data.amount}</p>
-                <p>
-                    <b>증빙 이미지:</b><br>
-                    ${imageContent}
-                </p>
-            `);
+                        <p><b>성함:</b> ${data.name}</p>
+                        <p><b>전화번호:</b> ${data.phone}</p>
+                        <p><b>주소:</b> ${data.address}</p>
+                        <p><b>요청사항:</b> ${data.receiverRemark}</p>
+                        <p><b>사유:</b> ${data.type}</p>
+                        <p><b>개수:</b> ${data.quantity}</p>
+                        <p><b>총 가격:</b> ${data.amount}</p>
+                        <p>
+                            <b>증빙 이미지:</b><br>
+                            ${imageContent}
+                        </p>
+                    `);
                     $('#orderInfoModal').modal('show');
                 },
                 error: function(error) {
@@ -328,383 +478,9 @@
             });
         }
 
-        function initExchangeDelivery(productOrderNumber) {
-            const trackingNumber = $('#trackingNumber' + productOrderNumber).val();
-            const deliveryCompanyId = $('#deliveryCompany' + productOrderNumber).val();
-            Swal.fire({
-                title: '확인',
-                showCancelButton: true,
-                confirmButtonText: '확인',
-                cancelButtonText: '취소'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/api/save-exchange-tracking-info',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: {
-                            rememberToken,
-                            trackingNumber,
-                            deliveryCompanyId,
-                            productOrderNumber,
-                        },
-                        success: function(response) {
-                            console.log(response);
-                            if (response.status === false) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    text: response.message,
-                                });
-                            } else {
-                                console.log('Tracking info saved:', response);
-                                Swal.fire({
-                                    icon: 'success',
-                                    text: '택배사 및 송장번호 기입에 성공하였습니다.'
-                                });
-                            }
-                        },
-                        error: function(response) {
-                            console.error('Error saving tracking info:', response);
-                        }
-                    });
-                }
-            });
-        }
-
-        function cancelExchangeDelivery(productOrderNumber) {
-            Swal.fire({
-                title: '주문 취소',
-                input: 'textarea',
-                inputValue: `죄송합니다.
-
-        주문해주신 제품 현재 최종 품절 확인이 되어 부득이 판매취소처리를 하게 되었습니다.
-
-        입고일정도 확인하였으나, 입고 지연이 됨으로써 예상잡혀있던 입고일정이 다시 미정으로 잡히게 되었습니다.
-
-        양해 부탁드리며, 쇼핑에 불편을 끼쳐드린점 사과의 말씀을 드립니다.`,
-                showCancelButton: true,
-                confirmButtonText: '취소하기',
-                cancelButtonText: '닫기',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return '취소 사유를 입력해야 합니다!'
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const remark = result.value;
-                    $.ajax({
-                        url: '/api/cancel-exchange-order',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: {
-                            rememberToken,
-                            productOrderNumber,
-                            remark
-                        },
-                        success: function(response) {
-                            if (response.status === false) {
-                                console.log('fail:', response);
-                                Swal.fire({
-                                    icon: 'error',
-                                    text: response.message,
-                                });
-                            } else {
-                                console.log('Order cancelled:', response);
-                                Swal.fire({
-                                    icon: 'success',
-                                    text: '주문 취소에 성공하였습니다.'
-                                });
-                            }
-                        },
-                        error: function(response) {
-                            console.error('Error cancelling order:', response);
-                            Swal.fire({
-                                icon: 'error',
-                                text: '주문 취소 중 오류가 발생했습니다.'
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
-        function initRefundDelivery(productOrderNumber) {
-            const trackingNumber = $('#trackingNumber' + productOrderNumber).val();
-            const deliveryCompanyId = $('#deliveryCompany' + productOrderNumber).val();
-            Swal.fire({
-                title: '확인',
-                showCancelButton: true,
-                confirmButtonText: '확인',
-                cancelButtonText: '취소'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/api/save-refund-tracking-info',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: {
-                            rememberToken,
-                            trackingNumber,
-                            deliveryCompanyId,
-                            productOrderNumber,
-                        },
-                        success: function(response) {
-                            console.log(response);
-                            if (response.status === false) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    text: response.message,
-                                });
-                            } else {
-                                console.log('Tracking info saved:', response);
-                                Swal.fire({
-                                    icon: 'success',
-                                    text: '택배사 및 송장번호 기입에 성공하였습니다.'
-                                });
-                            }
-                        },
-                        error: function(response) {
-                            console.error('Error saving tracking info:', response);
-                        }
-                    });
-                }
-            });
-        }
-
-        function cancelRefundDelivery(productOrderNumber) {
-            Swal.fire({
-                title: '주문 취소',
-                input: 'textarea',
-                inputValue: `죄송합니다.
-
-        주문해주신 제품 현재 최종 품절 확인이 되어 부득이 판매취소처리를 하게 되었습니다.
-
-        입고일정도 확인하였으나, 입고 지연이 됨으로써 예상잡혀있던 입고일정이 다시 미정으로 잡히게 되었습니다.
-
-        양해 부탁드리며, 쇼핑에 불편을 끼쳐드린점 사과의 말씀을 드립니다.`,
-                showCancelButton: true,
-                confirmButtonText: '취소하기',
-                cancelButtonText: '닫기',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return '취소 사유를 입력해야 합니다!'
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const remark = result.value;
-                    $.ajax({
-                        url: '/api/cancel-refund-order',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: {
-                            rememberToken,
-                            productOrderNumber,
-                            remark
-                        },
-                        success: function(response) {
-                            if (response.status === false) {
-                                console.log('fail:', response);
-                                Swal.fire({
-                                    icon: 'error',
-                                    text: response.message,
-                                });
-                            } else {
-                                console.log('Order cancelled:', response);
-                                Swal.fire({
-                                    icon: 'success',
-                                    text: '주문 취소에 성공하였습니다.'
-                                });
-                            }
-                        },
-                        error: function(response) {
-                            console.error('Error cancelling order:', response);
-                            Swal.fire({
-                                icon: 'error',
-                                text: '주문 취소 중 오류가 발생했습니다.'
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
-
-
-
-
 
         function calculateTotalAmount(orders) {
             return orders.reduce((accumulator, order) => accumulator + parseInt(order.amount || 0, 10), 0);
-        }
-
-        function initCreateDelivery(productOrderNumber) {
-            const trackingNumber = $('#trackingNumber' + productOrderNumber).val();
-            const deliveryCompanyId = $('#deliveryCompany' + productOrderNumber).val();
-            Swal.fire({
-                title: '확인',
-                html: `
-            <div>
-                <label>
-                    <input type="checkbox" id="confirmCheckbox" />
-                    제주/도서 산간지역
-                </label>
-            </div>
-        `,
-                showCancelButton: true,
-                confirmButtonText: '확인',
-                cancelButtonText: '취소'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const isRemoteArea = document.getElementById('confirmCheckbox').checked;
-                    $.ajax({
-                        url: '/api/save-tracking-info',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: {
-                            rememberToken,
-                            trackingNumber,
-                            deliveryCompanyId,
-                            productOrderNumber,
-                            isRemoteArea: isRemoteArea
-                        },
-                        success: function(response) {
-                            console.log(response);
-                            if (response.status === false) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    text: response.message,
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'success',
-                                    text: '택배사 및 송장번호 기입에 성공하였습니다.'
-                                });
-                            }
-                        },
-                        error: function(response) {
-                            console.error('Error saving tracking info:', response);
-                        }
-                    });
-                }
-            });
-        }
-
-        function cancelDelivery(productOrderNumber) {
-            Swal.fire({
-                title: '주문 취소',
-                input: 'textarea',
-                inputValue: `죄송합니다.
-
-                주문해주신 제품 현재 최종 품절 확인이 되어 부득이 판매취소처리를 하게 되었습니다.
-
-                입고일정도 확인하였으나, 입고 지연이 됨으로써 예상잡혀있던 입고일정이 다시 미정으로 잡히게 되었습니다.
-
-                양해 부탁드리며, 쇼핑에 불편을 끼쳐드린점 사과의 말씀을 드립니다.`,
-                showCancelButton: true,
-                confirmButtonText: '취소하기',
-                cancelButtonText: '닫기',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return '취소 사유를 입력해야 합니다!'
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const remark = result.value;
-                    $.ajax({
-                        url: '/api/cancel-order',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: {
-                            rememberToken,
-                            productOrderNumber,
-                            remark
-                        },
-                        success: function(response) {
-                            if (response.status === false) {
-                                console.log('fail:', response);
-                                Swal.fire({
-                                    icon: 'error',
-                                    text: response.message,
-                                });
-                            } else {
-                                console.log('Order cancelled:', response);
-                                Swal.fire({
-                                    icon: 'success',
-                                    text: '주문 취소에 성공하였습니다.'
-                                });
-                            }
-                        },
-                        error: function(response) {
-                            console.error('Error cancelling order:', response);
-                            Swal.fire({
-                                icon: 'error',
-                                text: '주문 취소 중 오류가 발생했습니다.'
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
-        function acceptCancel(productOrderNumber) {
-            Swal.fire({
-                title: '취소 요청 수락',
-                input: 'textarea',
-                inputValue: `죄송합니다.
-
-                주문해주신 제품 현재 최종 품절 확인이 되어 부득이 판매취소처리를 하게 되었습니다.
-
-                입고일정도 확인하였으나, 입고 지연이 됨으로써 예상잡혀있던 입고일정이 다시 미정으로 잡히게 되었습니다.
-
-                양해 부탁드리며, 쇼핑에 불편을 끼쳐드린점 사과의 말씀을 드립니다.`,
-                showCancelButton: true,
-                confirmButtonText: '취소하기',
-                cancelButtonText: '닫기',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return '취소 사유를 입력해야 합니다!'
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const remark = result.value;
-                    $.ajax({
-                        url: '/api/accept-cancel',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: {
-                            rememberToken,
-                            productOrderNumber,
-                            remark
-                        },
-                        success: function(response) {
-                            if (response.status === false) {
-                                console.log('fail:', response);
-                                Swal.fire({
-                                    icon: 'error',
-                                    text: response.message,
-                                });
-                            } else {
-                                console.log('Order cancelled:', response);
-                                Swal.fire({
-                                    icon: 'success',
-                                    text: '주문 취소에 성공하였습니다.'
-                                });
-                            }
-                        },
-                        error: function(response) {
-                            console.error('Error cancelling order:', response);
-                            Swal.fire({
-                                icon: 'error',
-                                text: '주문 취소 중 오류가 발생했습니다.'
-                            });
-                        }
-                    });
-                }
-            });
         }
     </script>
 @endsection

@@ -58,6 +58,7 @@ use App\Http\Controllers\OpenMarkets\OpenMarketOrderController;
 use App\Http\Controllers\OpenMarkets\OpenMarketRefundController;
 use App\Http\Controllers\OpenMarkets\OpenMarketShipmentController;
 use App\Http\Controllers\OpenMarkets\St11\AccountController;
+use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\Products\ManageController;
 use App\Http\Controllers\Partners\Products\PartnerTableController;
@@ -184,20 +185,12 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('vendor-list', [VendorListController::class, 'main']);
         Route::post('category-list', [CategoryListController::class, 'index']);
     });
-
-    //오픈마켓 발주넣기
-    Route::post('save-tracking-info', [OpenMarketShipmentController::class, 'saveShipment']);
-    //주문 취소처리
-    Route::post('cancel-order', [OpenMarketOrderController::class, 'cancelOrder']);
-    Route::post('accept-cancel', [OpenMarketOrderController::class, 'acceptCancel']);
+    //주문처리
+    Route::post('process-order', [OpenMarketOrderController::class, 'processOrder']);
     // 파트너스 주문 조회
     Route::post('get-new-orders', [OpenMarketOrderController::class, 'index']);
     Route::post('show-data', [OpenMarketOrderController::class, 'showData']);
     Route::post('getOrderInfo', [OpenMarketOrderController::class, 'getOrderInfo']);
-    Route::post('save-exchange-tracking-info', [OpenMarketExchangeController::class, 'saveExchangeShipment']);
-    Route::post('cancel-exchange-order', [OpenMarketExchangeController::class, 'cancelExchange']);
-    Route::post('save-refund-tracking-info', [OpenMarketRefundController::class, 'saveRefundShipment']);
-    Route::post('cancel-refund-order', [OpenMarketRefundController::class, 'cancelRefund']);
 
     Route::post('contact-us/update', [ContactUsController::class, 'update']);
 
@@ -207,6 +200,11 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('top-6-member-sales', [AdminDashboardController::class, 'getTop6MemberSales']);
     });
 });
+
+//테스트
+Route::post('test', [St11OrderController::class, 'index']);
+
+
 Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     Route::prefix('account-setting')->group(function () {
         Route::post('partner', [PartnerAccountSetting::class, 'validatePartner']);
