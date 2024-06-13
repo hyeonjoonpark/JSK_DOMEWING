@@ -59,6 +59,11 @@ async function scrapeProduct(page, productHref) {
         if (checkSoldout) {
             return false;
         }
+        const skipProduct = document.querySelector('#productView > div.detaile_info_wrap > div.info_wrap > div.hidden_notice');
+        if (skipProduct) {
+            const skipImage = document.querySelector('#productView > div.detaile_info_wrap > div.info_wrap > div.hidden_notice > img').src;
+            if (skipImage.includes('pd_notice01.jpg?2308')) return false;
+        }
         const productNameEl = document.querySelector('#productView > div.detaile_info_wrap > div.info_wrap > div.pdt_name.ptsans > span').textContent.trim();
         const productName = productNameEl.replace(/\[[^\]]*\]/g, "");
         const productPrice = document.querySelector('#productView > div.detaile_info_wrap > div.info_wrap > div.pdt_price_info > table > tbody > tr:nth-child(1) > td.price > strong > span').textContent.trim().replace(/[^\d]/g, '');
