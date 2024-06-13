@@ -10,6 +10,7 @@ class TrackSoldOutController extends Controller
 {
     public function main(Request $request)
     {
+        set_time_limit(0);
         $validator = Validator::make($request->all(), [
             'vendorId' => 'required|exists:product_search,vendor_id'
         ]);
@@ -23,7 +24,6 @@ class TrackSoldOutController extends Controller
 
         $products = DB::table('minewing_products')
             ->where('sellerID', $vendorId)
-            ->limit(1000)
             ->get([
                 'id',
                 'productHref',
