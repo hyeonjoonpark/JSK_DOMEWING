@@ -59,17 +59,21 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        {{-- <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="cancelRequest"
-                                value="CANCEL_REQUEST">
-                            <label class="form-check-label" for="cancelRequest">취소요청</label>
-                        </div> --}}
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="orderCancelled"
-                                value="CANCEL_COMPLETE">
-                            <label class="form-check-label" for="orderCancelled">취소완료</label>
+                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeProcess"
+                                value="EXCHANGE_REQUEST">
+                            <label class="form-check-label" for="exchangeProcess">교환요청</label>
                         </div>
-
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeComplete"
+                                value="EXCHANGE_PROCESS">
+                            <label class="form-check-label" for="exchangeComplete">교환대기중</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="returnRequest"
+                                value="EXCHANGE_COMPLETE">
+                            <label class="form-check-label" for="returnRequest">교환완료</label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <div class="form-check form-check-inline">
@@ -89,20 +93,15 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        {{-- <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="orderStatus" id="cancelRequest"
+                                                value="CANCEL_REQUEST">
+                                            <label class="form-check-label" for="cancelRequest">취소요청</label>
+                                        </div> --}}
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeProcess"
-                                value="EXCHANGE_REQUEST">
-                            <label class="form-check-label" for="exchangeProcess">교환요청</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeComplete"
-                                value="EXCHANGE_PROCESS">
-                            <label class="form-check-label" for="exchangeComplete">교환대기중</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="returnRequest"
-                                value="EXCHANGE_COMPLETE">
-                            <label class="form-check-label" for="returnRequest">교환완료</label>
+                            <input class="form-check-input" type="radio" name="orderStatus" id="orderCancelled"
+                                value="CANCEL_COMPLETE">
+                            <label class="form-check-label" for="orderCancelled">취소완료</label>
                         </div>
                     </div>
 
