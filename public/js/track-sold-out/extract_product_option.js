@@ -4,7 +4,7 @@ module.exports = {
         const $ = cheerio.load(productDetail);
         const optionText = $('h1').text().trim();
         if (!optionText) {
-            return '';
+            return false;
         }
         const optionContent = optionText.replace('옵션명 :', '').trim();
         return optionContent;

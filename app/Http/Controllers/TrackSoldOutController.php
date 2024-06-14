@@ -50,23 +50,19 @@ class TrackSoldOutController extends Controller
             mkdir($productFilePath, 0755, true);
         }
         $soldOutProducts = [];
-        $errors = [];
         foreach ($chunkedProducts as $i => $products) {
             $index = $i + 1;
             $productFilePath = public_path('js/track-sold-out/products/' . $vendorEngName . '_' . $index . '.json');
             file_put_contents($productFilePath, json_encode($products));
             $trackResult = $this->track($vendorEngName, $productFilePath, $username, $password);
             if ($trackResult['status'] === false) {
-                $errors[] = [
-                    'trackResult' => $trackResult,
-                    'products' => $products
-                ];
+                $productFilePath = public_path('js/track-sold-out/products/error_' . $vendorEngName . '_' . $index . '.json');
+                file_put_contents($productFilePath, json_encode($trackResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            } else {
+                $soldOutProducts = array_merge($soldOutProducts, $trackResult['data']);
             }
-            $soldOutProducts = array_merge($soldOutProducts, $trackResult['data']);
-            // unlink($productFilePath);
+            unlink($productFilePath);
         }
-        $productFilePath = public_path('js/track-sold-out/products/error_' . $vendorEngName . '_' . $index . '.json');
-        file_put_contents($productFilePath, json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $updateSoldOutProductsResult = $this->updateSoldOutProducts($vendorId, $soldOutProducts);
         if ($updateSoldOutProductsResult['status'] === false) {
             return $updateSoldOutProductsResult;
@@ -107,18 +103,18 @@ class TrackSoldOutController extends Controller
         $command = "node {$script} {$productFilePath} {$username} {$password}";
         try {
             exec($command, $output, $resultCode);
-
-            // result.json 파일 읽기
             $resultFilePath = public_path('js/track-sold-out/result.json');
-            if (file_exists($resultFilePath)) {
-                $soldOutProducts = json_decode(file_get_contents($resultFilePath), true);
-            } else {
-                $soldOutProducts = [];
+            if (!file_exists($resultFilePath)) {
+                return [
+                    'status' => false,
+                    'error' => json_decode($output[0])
+                ];
             }
-
+            $soldOutProducts = json_decode(file_get_contents($resultFilePath), true);
+            unlink($resultFilePath);
             return [
                 'status' => true,
-                'data' => $soldOutProducts // 중첩 배열을 제거하고 바로 반환
+                'data' => $soldOutProducts
             ];
         } catch (\Exception $e) {
             return [

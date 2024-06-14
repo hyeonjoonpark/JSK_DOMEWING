@@ -168,6 +168,7 @@ class UploadedController extends Controller
     }
     public function destroyUploadedProducts($originProductsNo, $vendorEngName)
     {
+        set_time_limit(0);
         try {
             DB::table($vendorEngName . '_uploaded_products')
                 ->whereIn('origin_product_no', $originProductsNo)

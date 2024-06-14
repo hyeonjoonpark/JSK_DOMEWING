@@ -2,134 +2,91 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 const { getOptionName } = require('./extract_product_option');
-
-/**
- * Compare product options with existing options.
- * @param {string} optionName - Option name extracted from the product detail.
- * @param {Array} existingOptions - Array of existing options.
- * @returns {boolean} - Returns true if the option is found, otherwise false.
- */
-function compareOptions(optionName, existingOptions) {
-    return existingOptions.includes(optionName);
-}
-
-/**
- * Load existing options from result.json file.
- * @returns {Array} - Array of existing options.
- */
-function loadExistingOptions() {
+(async () => {
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
     try {
-        const filePath = path.join(__dirname, 'result.json');
-        const data = fs.readFileSync(filePath, 'utf8');
-        if (data.trim().length === 0) {
-            return [];
+        const [tempFilePath, username, password] = process.argv.slice(2);
+        const products = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        const signInResult = await signIn(page, username, password);
+        if (signInResult === false) {
+            console.log(JSON.stringify('로그인 과정에서 오류가 발생했습니다.'));
+            return;
         }
-        const options = JSON.parse(data);
-        return options;
+        const soldOutProductIds = [];
+        for (const product of products) {
+            const goToAttemptsResult = await goToAttempts(page, product.productHref, 'domcontentloaded');
+            if (goToAttemptsResult === false) {
+                soldOutProductIds.push(product.id);
+                continue;
+            }
+            const isValid = await validateProduct(page);
+            if (isValid === false) {
+                soldOutProductIds.push(product.id);
+            }
+            const thisOptionName = getOptionName(product.productDetail);
+            const optionNames = await getProductOptions(page);
+            if (!optionNames.includes(thisOptionName)) {
+                soldOutProductIds.push(product.id);
+            }
+        }
+        console.log(soldOutProductIds);
+        const sopFile = path.join(__dirname, 'result.json');
+        fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8');
     } catch (error) {
-        if (error.code === 'ENOENT') {
-            return [];
-        } else {
-            return [];
-        }
+        console.error(error);
+    } finally {
+        await browser.close();
     }
+})();
+async function validateProduct(page) {
+    return await page.evaluate(() => {
+        const txtDescElement = document.querySelector('p.txtDesc');
+        if (txtDescElement && txtDescElement.textContent.trim().includes('사라졌거나')) {
+            return false;
+        }
+        const soldOutImage = document.querySelector('div.infoArea img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
+        if (soldOutImage) {
+            return false;
+        }
+        const buyButton = document.querySelector('a.first');
+        if (buyButton && buyButton.classList.contains('displaynone') && buyButton.textContent.trim().includes('구매하기')) {
+            return false;
+        }
+    });
 }
-
-/**
- * Sign in to the website.
- * @param {object} page - Puppeteer page object.
- * @param {string} username - Username for login.
- * @param {string} password - Password for login.
- */
 async function signIn(page, username, password) {
+    const goToAttemptsResult = await goToAttempts(page, 'https://petbtob.co.kr/member/login.html', 'networkidle0');
+    if (goToAttemptsResult === false) {
+        return false;
+    }
     try {
-        await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle2' });
         await page.evaluate((username, password) => {
             document.querySelector('#member_id').value = username;
             document.querySelector('#member_passwd').value = password;
             document.querySelector('#contents > form > div > div > fieldset > a').click();
         }, username, password);
-        await page.waitForNavigation({ waitUntil: 'networkidle2' });
-    } catch (error) {
-        throw new Error('Sign in failed');
-    }
-}
-
-/**
- * Check if the product page is valid.
- * @param {object} page - Puppeteer page object.
- * @param {string} productHref - Product URL.
- * @returns {string|boolean} - Returns 'error' for error, false for sold out, true for valid product.
- */
-async function isValidProduct(page, productHref) {
-    try {
-        // Check for sold out image
-        const soldOutImageExists = await page.evaluate(() => {
-            const soldOutImage = document.querySelector('img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
-            return !!soldOutImage;
-        });
-
-        if (soldOutImageExists) {
-            return false;
-        }
-
-        // Check for error image
-        const errorImageExists = await page.evaluate(() => {
-            const errorImage = document.querySelector('img[src="//img.echosting.cafe24.com/ec/image_admin/img_404.png"]');
-            return !!errorImage;
-        });
-
-        if (errorImageExists) {
-            return 'error';
-        }
-
-        // Check if product title exists
-        const productTitleExists = await page.evaluate(() => {
-            const productTitle = document.querySelector('title');
-            return !!productTitle;
-        });
-
-        if (!productTitleExists) {
-            return 'error';
-        }
-
+        await page.waitForNavigation({ waitUntil: 'load' });
         return true;
     } catch (error) {
         return false;
     }
 }
-
-
-/**
- * Enter the product page.
- * @param {object} page - Puppeteer page object.
- * @param {string} productHref - Product URL.
- * @returns {boolean} - Returns true if successfully entered the product page.
- */
-async function enterProductPage(page, productHref) {
-    try {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        try {
-            await page.goto(productHref, { waitUntil: 'domcontentloaded' });
-        } catch (error) {
-            return false;
-        }
-        return true;
-    } catch (error) {
+async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) {
+    if (attempt >= maxAttempts) {
         return false;
     }
+    try {
+        await page.goto(url, { waitUntil });
+        return true;
+    } catch (error) {
+        return await goToAttempts(page, url, waitUntil, attempt++, maxAttempts);
+    }
 }
-
-/**
- * Get product options from the page.
- * @param {object} page - Puppeteer page object.
- * @returns {Array} - Array of product options.
- */
 async function getProductOptions(page) {
     async function reloadSelects() {
         return page.$$('select.ProductOption0');
     }
-
     async function resetSelects() {
         const delBtn = await page.$('#option_box1_del');
         if (delBtn) {
@@ -137,7 +94,6 @@ async function getProductOptions(page) {
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
-
     async function reselectOptions(selects, selectedOptions) {
         for (let i = 0; i < selectedOptions.length; i++) {
             await selects[i].select(selectedOptions[i].value);
@@ -147,19 +103,16 @@ async function getProductOptions(page) {
             }
         }
     }
-
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
                 opts.map(opt => ({ value: opt.value, text: opt.text }))
-                    .filter(opt => opt.value !== '' && opt.value !== '*' && opt.value !== '**')
+                    .filter(opt => opt.value !== '' && opt.value !== '*' && opt.value !== '**' && !opt.text.includes("품절"))
             );
-
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 const newSelectedOptions = [...selectedOptions, { text: option.text, value: option.value }];
-
                 if (currentDepth + 1 < selects.length) {
                     const newSelects = await reloadSelects();
                     await processSelectOptions(newSelects, currentDepth + 1, newSelectedOptions, productOptions);
@@ -171,9 +124,8 @@ async function getProductOptions(page) {
                         const matches = opt.text.match(/\(([\+\-]?\d{1,3}(,\d{3})*원)\)/);
                         return total + (matches ? parseInt(matches[1].replace(/,|원|\+/g, ''), 10) : 0);
                     }, 0);
-                    productOptions.push({ optionName, optionPrice });
+                    productOptions.push(optionName);
                 }
-
                 await resetSelects();
                 selects = await reloadSelects();
                 if (currentDepth > 0) {
@@ -184,88 +136,6 @@ async function getProductOptions(page) {
         }
         return productOptions;
     }
-
     const selects = await reloadSelects();
     return processSelectOptions(selects);
 }
-
-(async () => {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox'],
-        defaultViewport: null,
-        protocolTimeout: 300000
-    });
-    const page = await browser.newPage();
-    try {
-        const [tempFilePath, username, password] = process.argv.slice(2);
-        const products = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-
-        await signIn(page, username, password);
-        const maxAttempts = 3;
-        const soldOutProducts = [];
-        const existingOptions = loadExistingOptions();
-
-        for (const product of products) {
-            const optionName = getOptionName(product.productDetail);
-
-            let enterResult = false;
-            let ivp = false;
-
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                try {
-                    enterResult = await enterProductPage(page, product.productHref);
-                    if (!enterResult) {
-                        break;
-                    }
-
-                    ivp = await isValidProduct(page, product.productHref);
-                    if (ivp === true) {
-                        let foundMatch = false;
-                        if (product.hasOption) {
-                            const productOptions = await getProductOptions(page);
-                            for (const option of productOptions) {
-                                const found = compareOptions(option.optionName, existingOptions);
-                                if (found) {
-                                    foundMatch = true;
-                                } else {
-                                    soldOutProducts.push(product.id);
-                                }
-                            }
-                        } else {
-                            const found = compareOptions(optionName, existingOptions);
-                            if (found) {
-                                foundMatch = true;
-                            } else {
-                                soldOutProducts.push(product.id);
-                            }
-                        }
-
-                        if (!foundMatch) {
-                            soldOutProducts.push(product.id);
-                        }
-
-                        break;
-                    } else if (ivp === 'error') {
-                        break;
-                    }
-                } catch (error) {
-                    if (attempt < maxAttempts - 1) {
-                        await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
-                    }
-                }
-            }
-
-            if (!enterResult || !ivp || ivp === 'error') {
-                soldOutProducts.push(product.id);
-            }
-        }
-
-        const sopFile = path.join(__dirname, 'result.json');
-        fs.writeFileSync(sopFile, JSON.stringify(soldOutProducts), 'utf8');
-    } catch (error) {
-        return false;
-    } finally {
-        await browser.close();
-    }
-})();
