@@ -452,11 +452,50 @@
                             <p>${order.orderDate}</p>
                             ${trackingNumber}
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProcess" onclick="productOrderNumber='${order.productOrderNumber}';">주문 처리</button>
+                            <div class="d-flex mt-3">
+                                <input class="form-control" type="text" id="adminRemarkInput${order.productOrderNumber}" />
+                                <button class="btn btn-success" onclick="setAdminRemark('${order.productOrderNumber}');">메모</button>
+                            </div>
+                            <p id="adminRemark${order.productOrderNumber}">${order.adminRemark}</p>
                         </div>
                     </td>
                 </tr>
                 `;
         }
+
+        function setAdminRemark(productOrderNumber) {
+            const adminRemark = $('#adminRemarkInput' + productOrderNumber).val();
+            $('#adminRemark' + productOrderNumber).html(adminRemark);
+            $.ajax({
+                url: '/api/set-memo',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    rememberToken,
+                    productOrderNumber,
+                    adminRemark
+                },
+                success: function(response) {
+                    closePopup();
+                    if (!response.status) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: response.message,
+                        });
+                    }
+                    console.log(response);
+                },
+                error: function(response) {
+                    closePopup();
+                    Swal.fire({
+                        icon: 'error',
+                        text: response.message,
+                    });
+                    console.log(response);
+                }
+            });
+        }
+
 
         function generateProductDetailsHtml(order, isActive) {
             return `
@@ -492,6 +531,7 @@
                     rememberToken
                 },
                 success: function(response) {
+                    console.log(response);
                     closePopup();
                     const {
                         status,
@@ -524,6 +564,7 @@
                     }
                 },
                 error: function(error) {
+                    console.log(error);
                     closePopup();
                     swalWithReload('API 통신 중 에러가 발생했습니다.', 'error');
                 }
