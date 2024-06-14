@@ -30,7 +30,6 @@ function loadExistingOptions() {
         if (error.code === 'ENOENT') {
             return [];
         } else {
-            console.error('Error reading result.json:', error);
             return [];
         }
     }
@@ -44,16 +43,14 @@ function loadExistingOptions() {
  */
 async function signIn(page, username, password) {
     try {
-        await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle2', timeout: 120000 });
+        await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle2' });
         await page.evaluate((username, password) => {
             document.querySelector('#member_id').value = username;
             document.querySelector('#member_passwd').value = password;
             document.querySelector('#contents > form > div > div > fieldset > a').click();
         }, username, password);
-        await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 120000 });
-        console.log('Successfully signed in');
+        await page.waitForNavigation({ waitUntil: 'networkidle2' });
     } catch (error) {
-        console.error(`Failed to sign in: ${error.message}`);
         throw new Error('Sign in failed');
     }
 }
@@ -73,7 +70,6 @@ async function isValidProduct(page, productHref) {
         });
 
         if (soldOutImageSrc && soldOutImageSrc.includes("img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif")) {
-            console.log(`Product ${productHref} is sold out`);
             return false;
         }
 
@@ -83,7 +79,6 @@ async function isValidProduct(page, productHref) {
         });
 
         if (errorImageExists) {
-            console.log(`Product ${productHref} has an error image`);
             return 'error';
         }
 
@@ -93,13 +88,11 @@ async function isValidProduct(page, productHref) {
         });
 
         if (!productTitleExists) {
-            console.log(`Product ${productHref} has no title`);
             return 'error';
         }
 
         return true;
     } catch (error) {
-        console.error(`Timeout or error checking product ${productHref}: ${error.message}`);
         return false;
     }
 }
@@ -113,11 +106,14 @@ async function isValidProduct(page, productHref) {
 async function enterProductPage(page, productHref) {
     try {
         await new Promise(resolve => setTimeout(resolve, 2000));
-        await page.goto(productHref, { waitUntil: 'networkidle2', timeout: 120000 });
-        console.log(`Entered product page: ${productHref}`);
+        // try-catch로 감싸서 에러 발생 시 return false 처리
+        try {
+            await page.goto(productHref, { waitUntil: 'domcontentloaded' }); // 수정된 부분
+        } catch (error) {
+            return false; // 수정된 부분
+        }
         return true;
     } catch (error) {
-        console.error(`Failed to enter product page ${productHref}: ${error.message}`);
         return false;
     }
 }
@@ -174,7 +170,6 @@ async function getProductOptions(page) {
                         return total + (matches ? parseInt(matches[1].replace(/,|원|\+/g, ''), 10) : 0);
                     }, 0);
                     productOptions.push({ optionName, optionPrice });
-                    console.log(`Processed option: ${optionName}, Price: ${optionPrice}`);
                 }
 
                 await resetSelects();
@@ -197,7 +192,6 @@ async function getProductOptions(page) {
         headless: true,
         args: ['--no-sandbox'],
         defaultViewport: null,
-        timeout: 120000,
         protocolTimeout: 300000
     });
     const page = await browser.newPage();
@@ -220,7 +214,6 @@ async function getProductOptions(page) {
                 try {
                     enterResult = await enterProductPage(page, product.productHref);
                     if (!enterResult) {
-                        console.log(`Failed to enter product page: ${product.productHref}`);
                         break;
                     }
 
@@ -232,26 +225,21 @@ async function getProductOptions(page) {
                                 const found = compareOptions(option.optionName, existingOptions);
                                 if (found) {
                                     soldOutProducts.push(product.id);
-                                    console.log(`Product ${product.id} with option ${option.optionName} is sold out`);
                                 }
                             }
                         } else {
                             const found = compareOptions(optionName, existingOptions);
                             if (found) {
                                 soldOutProducts.push(product.id);
-                                console.log(`Product ${product.id} without options is sold out`);
                             }
                         }
                         break;
                     } else if (ivp === 'error') {
-                        console.log(`Error in product validation: ${product.productHref}`);
                         break;
                     }
                 } catch (error) {
-                    console.error(`Error on attempt ${attempt + 1} for product ${product.productHref}: ${error.message}`);
                     if (attempt < maxAttempts - 1) {
-                        console.log(`Retrying for product ${product.productHref}`);
-                        await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"], timeout: 120000 });
+                        await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
                     }
                 }
             }
@@ -259,16 +247,13 @@ async function getProductOptions(page) {
             // If product could not be processed or invalid, mark it as sold out
             if (!enterResult || !ivp || ivp === 'error') {
                 soldOutProducts.push(product.id);
-                console.log(`Product ${product.id} is marked as sold out due to error`);
             }
         }
 
         const sopFile = path.join(__dirname, 'result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProducts), 'utf8');
-        console.log({ status: true, data: soldOutProducts });
     } catch (error) {
-        console.error('Error:', error);
-        console.log({ status: false, error: error.message });
+        return false;
     } finally {
         await browser.close();
     }
