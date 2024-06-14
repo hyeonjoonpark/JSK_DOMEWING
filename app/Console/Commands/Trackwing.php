@@ -46,7 +46,7 @@ class Trackwing extends Command
             $index = $i + 1;
             $vendorId = $vendor->id;
             $vendorName = $vendor->name_eng;
-            $this->info('#' . $index . ': Queuing Trackwing for vendor ' . $vendorName . ' (ID: ' . $vendorId . ') ----------' . now());
+            $this->info('#' . $index . ': Queuing Trackwing for vendor ' . $vendorName . ' (ID: ' . $vendorId . ') ----------' . date('Y-m-d H:i:s'));
 
             $pool[] = async(function () use ($tsoc, $vendorId, $index, $vendorName) {
                 $request = new Request([
