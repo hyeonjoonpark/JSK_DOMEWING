@@ -469,6 +469,7 @@
                     <div class="col">
                         <h6 class='title'><a href="${order.productHref}" target="_blank">${order.productName}</a><br>${isActive}</h6>
                         <p><a href="${order.productHref}" target="_blank">${numberFormat(order.productPrice)}원</a></p>
+                        <p><a href="javascript:view('${order.productCode}');">상세보기</a></p>
                     </div>
                 </div>
                 <div class="row">
@@ -478,6 +479,55 @@
                         <b>총액:</b> ${numberFormat(order.amount)}원</p>
                     </div>
                 </div>`;
+        }
+
+        function view(productCode) {
+            popupLoader(1, "상품 정보를 불러오는 중입니다.");
+            $.ajax({
+                url: "/api/product/view",
+                type: 'POST',
+                dataType: "JSON",
+                data: {
+                    productCode,
+                    rememberToken
+                },
+                success: function(response) {
+                    closePopup();
+                    const {
+                        status,
+                        data,
+                        message
+                    } = response;
+                    if (status === true) {
+                        const {
+                            productName,
+                            productPrice,
+                            productImage,
+                            productDetail,
+                            shipping_fee,
+                            category
+                        } = data;
+                        $('#viewCategory').html(category);
+                        $('#viewProductName').html(productName);
+                        $("#viewProductCode").html(productCode);
+                        $('#viewProductPrice').html(
+                            `${numberFormat(productPrice)} <img class="wing" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />`
+                        );
+                        $('#viewProductImage').attr('src', productImage);
+                        $('#viewProductDetail').html(productDetail);
+                        $("#viewShippingFee").html(
+                            `${numberFormat(shipping_fee)} <img class="wing" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />`
+                        );
+                        $("#viewProduct").modal('show');
+                    } else {
+                        swalWithReload(message, 'error');
+                    }
+                },
+                error: function(error) {
+                    closePopup();
+                    swalWithReload('API 통신 중 에러가 발생했습니다.', 'error');
+                }
+            });
         }
 
         function showOrderInfoModal(productOrderNumber) {

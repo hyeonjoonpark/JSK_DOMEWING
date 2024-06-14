@@ -252,7 +252,8 @@ class OpenMarketOrderController extends Controller
             return $exchangeController->cancelRefund($request);
         }
         if ($targetStatus == 'awaiting-shipment') {
-            return $this->setAwaitingShipmentStatus($productOrderNumber);
+            $setAwaitingController = new OpenMarketSetAwaitingController();
+            return $setAwaitingController->setAwaitingShipmentStatus($request->productOrderNumber);
         }
         if ($targetStatus == 'shipment-complete') {
             $shipmentController = new OpenMarketShipmentController();
@@ -365,38 +366,7 @@ class OpenMarketOrderController extends Controller
             ];
         }
     }
-    private function setAwaitingShipmentStatus($productOrderNumber)
-    {
-        $order = DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->where('requested', 'N')
-            ->where('delivery_status', 'PENDING')
-            ->whereNotIn('type', ['CANCELLED'])
-            ->first();
 
-        if (!$order) {
-            return response()->json([
-                'status' => false,
-                'message' => '배송 대기 중으로 변경 가능한 주문이 아닙니다.',
-            ]);
-        }
-
-        $updated = DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->update(['requested' => 'Y']);
-
-        if ($updated) {
-            return response()->json([
-                'status' => true,
-                'message' => '주문 상태가 배송 대기 중으로 변경되었습니다.',
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => '주문 상태 변경에 실패했습니다.',
-            ]);
-        }
-    }
 
     public function getOrderInfo(Request $request)
     {
@@ -618,7 +588,8 @@ class OpenMarketOrderController extends Controller
                 'o.price_then as productPrice',
                 'o.shipping_fee_then as shippingFee',
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist'),
-                'o.tracking_number as trackingNumber'
+                'o.tracking_number as trackingNumber',
+                'mp.productCode as productCode'
             );
 
         if ($orderStatus === 'PAID_REQUEST') {
@@ -728,7 +699,8 @@ class OpenMarketOrderController extends Controller
             'isActive' => $product->isActive,
             'receiverRemark' => $order->receiverRemark,
             'orderDate' => $orderDate,
-            'trackingNumber' => $order->trackingNumber
+            'trackingNumber' => $order->trackingNumber,
+            'productCode' => $order->productCode
         ];
     }
     private function getAllPartners()
