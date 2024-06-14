@@ -119,6 +119,7 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::post('/product/download', [DownloadController::class, 'main']);
     Route::post('/product/edit', [MainController::class, 'main']);
     Route::post('/product/edit/excelwing', [ProductEditorExcelwingController::class, 'index']);
+    Route::post('/product/view', [ViewController::class, 'main']);
     Route::post('/namewing/power-namewing', [NamewingController::class, 'power']);
     Route::post('/namewing/multi-edit', [NamewingController::class, 'multiEdit']);
     // account-setting
@@ -187,6 +188,8 @@ Route::middleware(['auth.custom'])->group(function () {
     });
     //주문처리
     Route::post('process-order', [OpenMarketOrderController::class, 'processOrder']);
+    //메모작성
+    Route::post('set-memo', [OpenMarketOrderController::class, 'setMemo']);
     // 파트너스 주문 조회
     Route::post('get-new-orders', [OpenMarketOrderController::class, 'index']);
     Route::post('show-data', [OpenMarketOrderController::class, 'showData']);

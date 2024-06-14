@@ -93,11 +93,6 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        {{-- <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="orderStatus" id="cancelRequest"
-                                                value="CANCEL_REQUEST">
-                                            <label class="form-check-label" for="cancelRequest">취소요청</label>
-                                        </div> --}}
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="orderStatus" id="orderCancelled"
                                 value="CANCEL_COMPLETE">
@@ -257,7 +252,9 @@
                 $('input[name="targetStatus"]').prop('checked', false); // 체크박스 초기화 예시
                 $('#remoteAreaOption').hide(); // 숨김 초기화 예시
                 $('#trackingNumber').val(''); // 송장번호 초기화
-                $('#remark').val(''); // 사유 초기화
+                $('#remark').val(
+                    '죄송합니다.\n\n주문해주신 제품 현재 최종 품절 확인이 되어 부득이 판매취소처리를 하게 되었습니다.\n\n입고일정도 확인하였으나, 입고 지연이 됨으로써 예상잡혀있던 입고일정이 다시 미정으로 잡히게 되었습니다.\n\n양해 부탁드리며, 쇼핑에 불편을 끼쳐드린점 사과의 말씀을 드립니다.'
+                ); // 사유 초기화
             });
 
             // targetStatus 변경 시 이벤트 핸들러
@@ -452,11 +449,50 @@
                             <p>${order.orderDate}</p>
                             ${trackingNumber}
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProcess" onclick="productOrderNumber='${order.productOrderNumber}';">주문 처리</button>
+                            <div class="d-flex mt-3">
+                                <input class="form-control" type="text" id="adminRemarkInput${order.productOrderNumber}" />
+                                <button class="btn btn-success" onclick="setAdminRemark('${order.productOrderNumber}');">메모</button>
+                            </div>
+                            <p id="adminRemark${order.productOrderNumber}">${order.adminRemark ? order.adminRemark : ''}</p>
                         </div>
                     </td>
                 </tr>
                 `;
         }
+
+        function setAdminRemark(productOrderNumber) {
+            const adminRemark = $('#adminRemarkInput' + productOrderNumber).val();
+            $('#adminRemark' + productOrderNumber).html(adminRemark);
+            $.ajax({
+                url: '/api/set-memo',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    rememberToken,
+                    productOrderNumber,
+                    adminRemark
+                },
+                success: function(response) {
+                    closePopup();
+                    if (!response.status) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: response.message,
+                        });
+                    }
+                    console.log(response);
+                },
+                error: function(response) {
+                    closePopup();
+                    Swal.fire({
+                        icon: 'error',
+                        text: response.message,
+                    });
+                    console.log(response);
+                }
+            });
+        }
+
 
         function generateProductDetailsHtml(order, isActive) {
             return `
@@ -469,6 +505,7 @@
                     <div class="col">
                         <h6 class='title'><a href="${order.productHref}" target="_blank">${order.productName}</a><br>${isActive}</h6>
                         <p><a href="${order.productHref}" target="_blank">${numberFormat(order.productPrice)}원</a></p>
+                        <p><a href="javascript:view('${order.productCode}');">상세보기</a></p>
                     </div>
                 </div>
                 <div class="row">
@@ -478,6 +515,57 @@
                         <b>총액:</b> ${numberFormat(order.amount)}원</p>
                     </div>
                 </div>`;
+        }
+
+        function view(productCode) {
+            popupLoader(1, "상품 정보를 불러오는 중입니다.");
+            $.ajax({
+                url: "/api/product/view",
+                type: 'POST',
+                dataType: "JSON",
+                data: {
+                    productCode,
+                    rememberToken
+                },
+                success: function(response) {
+                    console.log(response);
+                    closePopup();
+                    const {
+                        status,
+                        data,
+                        message
+                    } = response;
+                    if (status === true) {
+                        const {
+                            productName,
+                            productPrice,
+                            productImage,
+                            productDetail,
+                            shipping_fee,
+                            category
+                        } = data;
+                        $('#viewCategory').html(category);
+                        $('#viewProductName').html(productName);
+                        $("#viewProductCode").html(productCode);
+                        $('#viewProductPrice').html(
+                            `${numberFormat(productPrice)} <img class="wing" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />`
+                        );
+                        $('#viewProductImage').attr('src', productImage);
+                        $('#viewProductDetail').html(productDetail);
+                        $("#viewShippingFee").html(
+                            `${numberFormat(shipping_fee)} <img class="wing" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />`
+                        );
+                        $("#viewProduct").modal('show');
+                    } else {
+                        swalWithReload(message, 'error');
+                    }
+                },
+                error: function(error) {
+                    console.log(error);
+                    closePopup();
+                    swalWithReload('API 통신 중 에러가 발생했습니다.', 'error');
+                }
+            });
         }
 
         function showOrderInfoModal(productOrderNumber) {

@@ -252,7 +252,8 @@ class OpenMarketOrderController extends Controller
             return $exchangeController->cancelRefund($request);
         }
         if ($targetStatus == 'awaiting-shipment') {
-            return $this->setAwaitingShipmentStatus($productOrderNumber);
+            $setAwaitingController = new OpenMarketSetAwaitingController();
+            return $setAwaitingController->setAwaitingShipmentStatus($request->productOrderNumber);
         }
         if ($targetStatus == 'shipment-complete') {
             $shipmentController = new OpenMarketShipmentController();
@@ -365,39 +366,35 @@ class OpenMarketOrderController extends Controller
             ];
         }
     }
-    private function setAwaitingShipmentStatus($productOrderNumber)
+    public function setMemo(Request $request)
     {
-        $order = DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->where('requested', 'N')
-            ->where('delivery_status', 'PENDING')
-            ->whereNotIn('type', ['CANCELLED'])
-            ->first();
-
-        if (!$order) {
-            return response()->json([
+        $validator = Validator::make($request->all(), [
+            'adminRemark' => 'required|string'
+        ], [
+            'adminRemark.required' => '메모를 입력해야합니다.',
+            'adminRemark.string' => '메모는 문자열입니다.',
+        ]);
+        if ($validator->fails()) {
+            return [
                 'status' => false,
-                'message' => '배송 대기 중으로 변경 가능한 주문이 아닙니다.',
-            ]);
+                'message' => $validator->errors()->first(),
+                'error' => $validator->errors(),
+            ];
         }
-
-        $updated = DB::table('orders')
+        $productOrderNumber = $request->productOrderNumber;
+        $adminRemark = $request->adminRemark;
+        $update = DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
-            ->update(['requested' => 'Y']);
-
-        if ($updated) {
-            return response()->json([
-                'status' => true,
-                'message' => '주문 상태가 배송 대기 중으로 변경되었습니다.',
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => '주문 상태 변경에 실패했습니다.',
-            ]);
-        }
+            ->update(['admin_remark' => $adminRemark]);
+        if (!$update) return [
+            'status' => false,
+            'message' => '해당 주문을 찾을 수 없습니다'
+        ];
+        return [
+            'status' => true,
+            'message' => '메모가 성공적으로 저장되었습니다.',
+        ];
     }
-
     public function getOrderInfo(Request $request)
     {
         $productOrderNumber = $request->productOrderNumber;
@@ -618,61 +615,63 @@ class OpenMarketOrderController extends Controller
                 'o.price_then as productPrice',
                 'o.shipping_fee_then as shippingFee',
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist'),
-                'o.tracking_number as trackingNumber'
+                'o.tracking_number as trackingNumber',
+                'mp.productCode as productCode',
+                'o.admin_remark as adminRemark',
             );
 
-        if ($orderStatus === 'PAID_REQUEST') {
-            $query->where('o.delivery_status', 'PENDING')
-                ->where('o.type', 'PAID')
-                ->where('o.requested', 'N');
-        } elseif ($orderStatus === 'PAID_PROCESS') {
-            $query->where('o.delivery_status', 'PENDING')
-                ->where('o.type', 'PAID')
-                ->where('o.requested', 'Y');
-        } elseif ($orderStatus === 'PAID_COMPLETE') {
-            $oneMonthAgo = Carbon::now()->subMonth();
-            $query->where('o.delivery_status', 'COMPLETE')
-                ->where('o.type', 'PAID')
-                // ->where('o.requested', 'Y')
-                ->where('o.updated_at', '>=', $oneMonthAgo);
-        }
-        // elseif ($orderStatus === 'CANCEL_REQUEST') { 취소 요청들 대기중
-        //     $query->where('o.delivery_status', 'PENDING')
-        //         ->where('o.type', 'CANCELLED')
-        //         ->where('o.requested', 'N');
-        // }
-        elseif ($orderStatus === 'CANCEL_COMPLETE') {
-            $oneMonthAgo = Carbon::now()->subMonth();
-            $query->where('o.type', 'CANCELLED')
-                ->where('o.updated_at', '>=', $oneMonthAgo);
-        } elseif ($orderStatus === 'RETURN_REQUEST') {
-            $query->where('o.delivery_status', 'PENDING')
-                ->where('o.type', 'REFUND')
-                ->where('o.requested', 'N');
-        } elseif ($orderStatus === 'RETURN_PROCESS') {
-            $query->where('o.delivery_status', 'PENDING')
-                ->where('o.type', 'REFUND')
-                ->where('o.requested', 'Y');
-        } elseif ($orderStatus === 'RETURN_COMPLETE') {
-            $oneMonthAgo = Carbon::now()->subMonth();
-            $query->where('o.delivery_status', 'COMPLETE')
-                ->where('o.type', 'REFUND')
-                // ->where('o.requested', 'Y')
-                ->where('o.updated_at', '>=', $oneMonthAgo);
-        } elseif ($orderStatus === 'EXCHANGE_REQUEST') {
-            $query->where('o.delivery_status', 'PENDING')
-                ->where('o.type', 'EXCHANGE')
-                ->where('o.requested', 'N');
-        } elseif ($orderStatus === 'EXCHANGE_PROCESS') {
-            $query->where('o.delivery_status', 'PENDING')
-                ->where('o.type', 'EXCHANGE')
-                ->where('o.requested', 'Y');
-        } elseif ($orderStatus === 'EXCHANGE_COMPLETE') {
-            $oneMonthAgo = Carbon::now()->subMonth();
-            $query->where('o.delivery_status', 'COMPLETE')
-                ->where('o.type', 'EXCHANGE')
-                // ->where('o.requested', 'Y')
-                ->where('o.updated_at', '>=', $oneMonthAgo);
+        $oneMonthAgo = Carbon::now()->subMonth();
+
+        switch ($orderStatus) {
+            case 'PAID_REQUEST':
+                $query->where('o.delivery_status', 'PENDING')
+                    ->where('o.type', 'PAID')
+                    ->where('o.requested', 'N');
+                break;
+            case 'PAID_PROCESS':
+                $query->where('o.delivery_status', 'PENDING')
+                    ->where('o.type', 'PAID')
+                    ->where('o.requested', 'Y');
+                break;
+            case 'PAID_COMPLETE':
+                $query->where('o.delivery_status', 'COMPLETE')
+                    ->where('o.type', 'PAID')
+                    ->where('o.updated_at', '>=', $oneMonthAgo);
+                break;
+            case 'CANCEL_COMPLETE':
+                $query->where('o.type', 'CANCELLED')
+                    ->where('o.updated_at', '>=', $oneMonthAgo);
+                break;
+            case 'RETURN_REQUEST':
+                $query->where('o.delivery_status', 'PENDING')
+                    ->where('o.type', 'REFUND')
+                    ->where('o.requested', 'N');
+                break;
+            case 'RETURN_PROCESS':
+                $query->where('o.delivery_status', 'PENDING')
+                    ->where('o.type', 'REFUND')
+                    ->where('o.requested', 'Y');
+                break;
+            case 'RETURN_COMPLETE':
+                $query->where('o.delivery_status', 'COMPLETE')
+                    ->where('o.type', 'REFUND')
+                    ->where('o.updated_at', '>=', $oneMonthAgo);
+                break;
+            case 'EXCHANGE_REQUEST':
+                $query->where('o.delivery_status', 'PENDING')
+                    ->where('o.type', 'EXCHANGE')
+                    ->where('o.requested', 'N');
+                break;
+            case 'EXCHANGE_PROCESS':
+                $query->where('o.delivery_status', 'PENDING')
+                    ->where('o.type', 'EXCHANGE')
+                    ->where('o.requested', 'Y');
+                break;
+            case 'EXCHANGE_COMPLETE':
+                $query->where('o.delivery_status', 'COMPLETE')
+                    ->where('o.type', 'EXCHANGE')
+                    ->where('o.updated_at', '>=', $oneMonthAgo);
+                break;
         }
 
         $orders = [];
@@ -684,6 +683,7 @@ class OpenMarketOrderController extends Controller
 
         return $orders;
     }
+
 
     private function transformOrderDetails($order, $orderStatus)
     {
@@ -728,7 +728,9 @@ class OpenMarketOrderController extends Controller
             'isActive' => $product->isActive,
             'receiverRemark' => $order->receiverRemark,
             'orderDate' => $orderDate,
-            'trackingNumber' => $order->trackingNumber
+            'trackingNumber' => $order->trackingNumber,
+            'productCode' => $order->productCode,
+            'adminRemark' => $order->adminRemark ? $order->adminRemark : null,
         ];
     }
     private function getAllPartners()
