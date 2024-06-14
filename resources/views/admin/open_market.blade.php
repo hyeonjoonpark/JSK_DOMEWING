@@ -456,7 +456,7 @@
                                 <input class="form-control" type="text" id="adminRemarkInput${order.productOrderNumber}" />
                                 <button class="btn btn-success" onclick="setAdminRemark('${order.productOrderNumber}');">메모</button>
                             </div>
-                            <p id="adminRemark${order.productOrderNumber}">${order.adminRemark}</p>
+                            <p id="adminRemark${order.productOrderNumber}">${order.adminRemark ? order.adminRemark : ''}</p>
                         </div>
                     </td>
                 </tr>
