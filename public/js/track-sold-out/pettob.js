@@ -3,20 +3,12 @@ const fs = require('fs');
 const path = require('path');
 const { getOptionName } = require('./extract_product_option');
 
-/**
- * Compare product options with existing options.
- * @param {string} optionName - Option name extracted from the product detail.
- * @param {Array} existingOptions - Array of existing options.
- * @returns {boolean} - Returns true if the option is found (indicating sold out), otherwise false.
- */
+//옵션 비교
 function compareOptions(optionName, existingOptions) {
     return existingOptions.includes(optionName);
 }
 
-/**
- * Load existing options from result.json file.
- * @returns {Array} - Array of existing options.
- */
+//옵션 배열
 function loadExistingOptions() {
     try {
         const filePath = path.join(__dirname, 'result.json');
@@ -30,7 +22,6 @@ function loadExistingOptions() {
         if (error.code === 'ENOENT') {
             return [];
         } else {
-            console.error('Error reading result.json:', error);
             return [];
         }
     }
@@ -44,16 +35,14 @@ function loadExistingOptions() {
  */
 async function signIn(page, username, password) {
     try {
-        await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle2', timeout: 120000 });
+        await page.goto('https://petbtob.co.kr/member/login.html', { waitUntil: 'networkidle2' });
         await page.evaluate((username, password) => {
             document.querySelector('#member_id').value = username;
             document.querySelector('#member_passwd').value = password;
             document.querySelector('#contents > form > div > div > fieldset > a').click();
         }, username, password);
-        await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 120000 });
-        console.log('Successfully signed in');
+        await page.waitForNavigation({ waitUntil: 'networkidle2' });
     } catch (error) {
-        console.error(`Failed to sign in: ${error.message}`);
         throw new Error('Sign in failed');
     }
 }
@@ -73,7 +62,6 @@ async function isValidProduct(page, productHref) {
         });
 
         if (soldOutImageSrc && soldOutImageSrc.includes("img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif")) {
-            console.log(`Product ${productHref} is sold out`);
             return false;
         }
 
@@ -83,7 +71,6 @@ async function isValidProduct(page, productHref) {
         });
 
         if (errorImageExists) {
-            console.log(`Product ${productHref} has an error image`);
             return 'error';
         }
 
@@ -93,13 +80,11 @@ async function isValidProduct(page, productHref) {
         });
 
         if (!productTitleExists) {
-            console.log(`Product ${productHref} has no title`);
             return 'error';
         }
 
         return true;
     } catch (error) {
-        console.error(`Timeout or error checking product ${productHref}: ${error.message}`);
         return false;
     }
 }
@@ -113,11 +98,9 @@ async function isValidProduct(page, productHref) {
 async function enterProductPage(page, productHref) {
     try {
         await new Promise(resolve => setTimeout(resolve, 2000));
-        await page.goto(productHref, { waitUntil: 'networkidle2', timeout: 120000 });
-        console.log(`Entered product page: ${productHref}`);
+        await page.goto(productHref, { waitUntil: 'networkidle2' });
         return true;
     } catch (error) {
-        console.error(`Failed to enter product page ${productHref}: ${error.message}`);
         return false;
     }
 }
@@ -127,77 +110,50 @@ async function enterProductPage(page, productHref) {
  * @param {object} page - Puppeteer page object.
  * @returns {Array} - Array of product options.
  */
-async function getProductOptions(page) {
-    async function reloadSelects() {
-        return page.$$('select.ProductOption0');
-    }
+async function scrapeProductOptions(page, productHref) {
+    await page.goto(productHref);
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    async function resetSelects() {
-        const delBtn = await page.$('#option_box1_del');
-        if (delBtn) {
-            await delBtn.click();
-            await new Promise(resolve => setTimeout(resolve, 1000));
+    const productOptions = await page.evaluate(() => {
+        const optionElement = document.querySelector('#el-sOption');
+        if (!optionElement) {
+            return [];
         }
-    }
 
-    async function reselectOptions(selects, selectedOptions) {
-        for (let i = 0; i < selectedOptions.length; i++) {
-            await selects[i].select(selectedOptions[i].value);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            if (i < selectedOptions.length - 1) {
-                selects = await reloadSelects();
+        const optionElements = document.querySelectorAll('#el-sOption option');
+        const options = [];
+
+        for (let i = 1; i < optionElements.length; i++) {
+            const optionElement = optionElements[i];
+            const optionText = optionElement.textContent.trim();
+            let optionName, optionPrice;
+
+            if (optionText.includes('0원')) {
+                const optionFull = optionText.split(':');
+                optionName = optionFull[0].trim();
+                optionPrice = optionFull[1].replace(/[^\d-+]/g, '').trim();
+                optionPrice = parseInt(optionPrice, 10);
+            } else {
+                optionName = optionText.trim();
+                optionPrice = 0;
             }
+
+            options.push({ optionName, optionPrice });
         }
-    }
 
-    async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
-        if (currentDepth < selects.length) {
-            const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
-                opts.map(opt => ({ value: opt.value, text: opt.text }))
-                    .filter(opt => opt.value !== '' && opt.value !== '*' && opt.value !== '**')
-            );
+        return options;
+    });
 
-            for (const option of options) {
-                await selects[currentDepth].select(option.value);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                const newSelectedOptions = [...selectedOptions, { text: option.text, value: option.value }];
-
-                if (currentDepth + 1 < selects.length) {
-                    const newSelects = await reloadSelects();
-                    await processSelectOptions(newSelects, currentDepth + 1, newSelectedOptions, productOptions);
-                } else {
-                    let optionName = newSelectedOptions.map(opt =>
-                        opt.text.replace(/\s*\([\+\-]?\d{1,3}(,\d{3})*원\)/g, "").trim()
-                    ).join(", ");
-                    const optionPrice = newSelectedOptions.reduce((total, opt) => {
-                        const matches = opt.text.match(/\(([\+\-]?\d{1,3}(,\d{3})*원)\)/);
-                        return total + (matches ? parseInt(matches[1].replace(/,|원|\+/g, ''), 10) : 0);
-                    }, 0);
-                    productOptions.push({ optionName, optionPrice });
-                    console.log(`Processed option: ${optionName}, Price: ${optionPrice}`);
-                }
-
-                await resetSelects();
-                selects = await reloadSelects();
-                if (currentDepth > 0) {
-                    await reselectOptions(selects, selectedOptions);
-                    selects = await reloadSelects();
-                }
-            }
-        }
-        return productOptions;
-    }
-
-    const selects = await reloadSelects();
-    return processSelectOptions(selects);
+    return productOptions;
 }
+
+
 
 (async () => {
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox'],
         defaultViewport: null,
-        timeout: 120000,
         protocolTimeout: 300000
     });
     const page = await browser.newPage();
@@ -220,7 +176,6 @@ async function getProductOptions(page) {
                 try {
                     enterResult = await enterProductPage(page, product.productHref);
                     if (!enterResult) {
-                        console.log(`Failed to enter product page: ${product.productHref}`);
                         break;
                     }
 
@@ -232,26 +187,21 @@ async function getProductOptions(page) {
                                 const found = compareOptions(option.optionName, existingOptions);
                                 if (found) {
                                     soldOutProducts.push(product.id);
-                                    console.log(`Product ${product.id} with option ${option.optionName} is sold out`);
                                 }
                             }
                         } else {
                             const found = compareOptions(optionName, existingOptions);
                             if (found) {
                                 soldOutProducts.push(product.id);
-                                console.log(`Product ${product.id} without options is sold out`);
                             }
                         }
                         break;
                     } else if (ivp === 'error') {
-                        console.log(`Error in product validation: ${product.productHref}`);
                         break;
                     }
                 } catch (error) {
-                    console.error(`Error on attempt ${attempt + 1} for product ${product.productHref}: ${error.message}`);
                     if (attempt < maxAttempts - 1) {
-                        console.log(`Retrying for product ${product.productHref}`);
-                        await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"], timeout: 120000 });
+                        await page.reload({ waitUntil: ["domcontentloaded"] });
                     }
                 }
             }
@@ -259,16 +209,13 @@ async function getProductOptions(page) {
             // If product could not be processed or invalid, mark it as sold out
             if (!enterResult || !ivp || ivp === 'error') {
                 soldOutProducts.push(product.id);
-                console.log(`Product ${product.id} is marked as sold out due to error`);
             }
         }
 
         const sopFile = path.join(__dirname, 'result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProducts), 'utf8');
-        console.log({ status: true, data: soldOutProducts });
     } catch (error) {
-        console.error('Error:', error);
-        console.log({ status: false, error: error.message });
+        return false;
     } finally {
         await browser.close();
     }
