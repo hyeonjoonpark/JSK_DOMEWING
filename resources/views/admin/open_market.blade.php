@@ -43,36 +43,68 @@
                     </div>
                     <div class="form-group">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="PENDING" value="PENDING"
-                                checked>
-                            <label class="form-check-label" for="PENDING">신규주문</label>
+                            <input class="form-check-input" type="radio" name="orderStatus" id="newOrder"
+                                value="PAID_REQUEST" checked>
+                            <label class="form-check-label" for="newOrder">신규주문</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="orderStatus" id="awaitingShipment"
-                                value="AWAITING_SHIPMENT">
+                                value="PAID_PROCESS">
                             <label class="form-check-label" for="awaitingShipment">배송대기중</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="COMPLETE"
-                                value="COMPLETE">
-                            <label class="form-check-label" for="COMPLETE">송장완료</label>
+                            <input class="form-check-input" type="radio" name="orderStatus" id="shipmentComplete"
+                                value="PAID_COMPLETE">
+                            <label class="form-check-label" for="shipmentComplete">송장완료</label>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderType" id="PAID" value="PAID"
-                                checked>
-                            <label class="form-check-label" for="PAID">주문</label>
+                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeProcess"
+                                value="EXCHANGE_REQUEST">
+                            <label class="form-check-label" for="exchangeProcess">교환요청</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderType" id="REFUND" value="REFUND">
-                            <label class="form-check-label" for="REFUND">환불</label>
+                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeComplete"
+                                value="EXCHANGE_PROCESS">
+                            <label class="form-check-label" for="exchangeComplete">교환대기중</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderType" id="EXCHANGE" value="EXCHANGE">
-                            <label class="form-check-label" for="EXCHANGE">교환</label>
+                            <input class="form-check-input" type="radio" name="orderStatus" id="returnRequest"
+                                value="EXCHANGE_COMPLETE">
+                            <label class="form-check-label" for="returnRequest">교환완료</label>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="returnProcess"
+                                value="RETURN_REQUEST">
+                            <label class="form-check-label" for="returnProcess">반품요청</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="returnComplete"
+                                value="RETURN_PROCESS">
+                            <label class="form-check-label" for="returnComplete">반품대기중</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeRequest"
+                                value="RETURN_COMPLETE">
+                            <label class="form-check-label" for="exchangeRequest">반품완료</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{-- <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="orderStatus" id="cancelRequest"
+                                                value="CANCEL_REQUEST">
+                                            <label class="form-check-label" for="cancelRequest">취소요청</label>
+                                        </div> --}}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="orderCancelled"
+                                value="CANCEL_COMPLETE">
+                            <label class="form-check-label" for="orderCancelled">취소완료</label>
+                        </div>
+                    </div>
+
                     <button class="btn btn-primary mb-5" onclick="showData();">조회하기</button>
                     <button class="btn btn-primary mb-5" style="margin-left: 633px;" onclick="initIndex();">업데이트</button>
                     <div class="form-group">
@@ -103,7 +135,8 @@
         </div>
     </div>
     <!-- 교환, 환불 정보 Modal -->
-    <div class="modal fade" id="orderInfoModal" tabindex="-1" aria-labelledby="orderInfoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="orderInfoModal" tabindex="-1" aria-labelledby="orderInfoModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -153,14 +186,14 @@
                                     <div class="custom-control custom-control-sm custom-radio">
                                         <input type="radio" class="custom-control-input" name="targetStatus"
                                             id="order-cancel">
-                                        <label class="custom-control-label" for="order-cancel">주문 취소</label>
+                                        <label class="custom-control-label" for="order-cancel">오픈마켓 취소</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="custom-control custom-control-sm custom-radio">
                                         <input type="radio" class="custom-control-input" name="targetStatus"
                                             id="accept-cancel">
-                                        <label class="custom-control-label" for="accept-cancel">취소 요청 승인</label>
+                                        <label class="custom-control-label" for="accept-cancel">도매윙 취소</label>
                                     </div>
                                 </li>
                             </ul>
@@ -270,6 +303,8 @@
                         Swal.fire({
                             icon: 'success',
                             text: response.message
+                        }).then(() => {
+                            $('#modalProcess').modal('hide');
                         });
                     }
                 },
@@ -329,7 +364,6 @@
         function showData() {
             popupLoader(0, '"주문 내역을 데이터베이스로부터 추출하겠습니다."');
             const orderStatus = $('input[name="orderStatus"]:checked').val();
-            const orderType = $('input[name="orderType"]:checked').val();
             const vendors = getSelectedVendors();
             $.ajax({
                 url: '/api/show-data',
@@ -338,8 +372,7 @@
                 data: {
                     rememberToken,
                     vendors,
-                    orderStatus,
-                    orderType
+                    orderStatus
                 },
                 success: function(response) {
                     closePopup();
@@ -383,6 +416,7 @@
             let partnerStatusHtml = order.isPartner ? '<b><p>셀윙 발주</p></b>' : '<b><p>도매윙 발주</p></b>';
             let orderVendorHtml = order.vendorName ? `<b><p>${order.vendorName}</p></b>` : '<b><p>도매윙</p></b>';
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
+            let trackingNumber = order.trackingNumber ? `<p>송장 번호 : ${order.trackingNumber}</p>` : '';
             let orderTypeHtml = order.orderType === '교환' || order.orderType === '환불' ?
                 `<h6 class="title">
                     <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
@@ -396,7 +430,7 @@
                     <td>
                         <div class="row">
                             <div class="col">
-                                <p><b>이름:</b><br>${order.receiverName}<br><b>연락처:</b><br>${order.receiverPhone}<br><b>주소:</b><br>${order.receiverAddress}<br><b>배송요청사항:</b><br>${order.receiverRemark}<br>
+                                <p><b>주문번호:</b><br>${order.productOrderNumber}<br><b>이름:</b><br>${order.receiverName}<br><b>연락처:</b><br>${order.receiverPhone}<br><b>주소:</b><br>${order.receiverAddress}<br><b>배송요청사항:</b><br>${order.receiverRemark}<br>
                             </div>
                         </div>
                     </td>
@@ -416,6 +450,7 @@
                         ${orderTypeHtml}
                         <div class="col-auto">
                             <p>${order.orderDate}</p>
+                            ${trackingNumber}
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProcess" onclick="productOrderNumber='${order.productOrderNumber}';">주문 처리</button>
                         </div>
                     </td>
