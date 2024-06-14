@@ -7,7 +7,7 @@ const { getOptionName } = require('./extract_product_option');
  * Compare product options with existing options.
  * @param {string} optionName - Option name extracted from the product detail.
  * @param {Array} existingOptions - Array of existing options.
- * @returns {boolean} - Returns true if the option is found (indicating sold out), otherwise false.
+ * @returns {boolean} - Returns true if the option is found, otherwise false.
  */
 function compareOptions(optionName, existingOptions) {
     return existingOptions.includes(optionName);
@@ -24,8 +24,8 @@ function loadExistingOptions() {
         if (data.trim().length === 0) {
             return [];
         }
-        const soldOutProductIds = JSON.parse(data);
-        return soldOutProductIds;
+        const options = JSON.parse(data);
+        return options;
     } catch (error) {
         if (error.code === 'ENOENT') {
             return [];
@@ -63,16 +63,17 @@ async function signIn(page, username, password) {
  */
 async function isValidProduct(page, productHref) {
     try {
-        const soldOutImageSrc = await page.evaluate(() => {
-            const soldOutSelector = '#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > span.icon > img';
-            const soldOutImage = document.querySelector(soldOutSelector);
-            return soldOutImage ? soldOutImage.src : null;
+        // Check for sold out image
+        const soldOutImageExists = await page.evaluate(() => {
+            const soldOutImage = document.querySelector('img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
+            return !!soldOutImage;
         });
 
-        if (soldOutImageSrc && soldOutImageSrc.includes("img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif")) {
+        if (soldOutImageExists) {
             return false;
         }
 
+        // Check for error image
         const errorImageExists = await page.evaluate(() => {
             const errorImage = document.querySelector('img[src="//img.echosting.cafe24.com/ec/image_admin/img_404.png"]');
             return !!errorImage;
@@ -82,6 +83,7 @@ async function isValidProduct(page, productHref) {
             return 'error';
         }
 
+        // Check if product title exists
         const productTitleExists = await page.evaluate(() => {
             const productTitle = document.querySelector('title');
             return !!productTitle;
@@ -97,6 +99,7 @@ async function isValidProduct(page, productHref) {
     }
 }
 
+
 /**
  * Enter the product page.
  * @param {object} page - Puppeteer page object.
@@ -106,11 +109,10 @@ async function isValidProduct(page, productHref) {
 async function enterProductPage(page, productHref) {
     try {
         await new Promise(resolve => setTimeout(resolve, 2000));
-        // try-catch로 감싸서 에러 발생 시 return false 처리
         try {
-            await page.goto(productHref, { waitUntil: 'domcontentloaded' }); // 수정된 부분
+            await page.goto(productHref, { waitUntil: 'domcontentloaded' });
         } catch (error) {
-            return false; // 수정된 부분
+            return false;
         }
         return true;
     } catch (error) {
@@ -219,20 +221,30 @@ async function getProductOptions(page) {
 
                     ivp = await isValidProduct(page, product.productHref);
                     if (ivp === true) {
+                        let foundMatch = false;
                         if (product.hasOption) {
                             const productOptions = await getProductOptions(page);
                             for (const option of productOptions) {
                                 const found = compareOptions(option.optionName, existingOptions);
                                 if (found) {
+                                    foundMatch = true;
+                                } else {
                                     soldOutProducts.push(product.id);
                                 }
                             }
                         } else {
                             const found = compareOptions(optionName, existingOptions);
                             if (found) {
+                                foundMatch = true;
+                            } else {
                                 soldOutProducts.push(product.id);
                             }
                         }
+
+                        if (!foundMatch) {
+                            soldOutProducts.push(product.id);
+                        }
+
                         break;
                     } else if (ivp === 'error') {
                         break;
