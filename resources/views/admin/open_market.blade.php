@@ -186,14 +186,14 @@
                                     <div class="custom-control custom-control-sm custom-radio">
                                         <input type="radio" class="custom-control-input" name="targetStatus"
                                             id="order-cancel">
-                                        <label class="custom-control-label" for="order-cancel">주문 취소</label>
+                                        <label class="custom-control-label" for="order-cancel">오픈마켓 취소</label>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="custom-control custom-control-sm custom-radio">
                                         <input type="radio" class="custom-control-input" name="targetStatus"
                                             id="accept-cancel">
-                                        <label class="custom-control-label" for="accept-cancel">취소 요청 승인</label>
+                                        <label class="custom-control-label" for="accept-cancel">도매윙 취소</label>
                                     </div>
                                 </li>
                             </ul>
@@ -430,7 +430,7 @@
                     <td>
                         <div class="row">
                             <div class="col">
-                                <p><b>이름:</b><br>${order.receiverName}<br><b>연락처:</b><br>${order.receiverPhone}<br><b>주소:</b><br>${order.receiverAddress}<br><b>배송요청사항:</b><br>${order.receiverRemark}<br>
+                                <p><b>주문번호:</b><br>${order.productOrderNumber}<br><b>이름:</b><br>${order.receiverName}<br><b>연락처:</b><br>${order.receiverPhone}<br><b>주소:</b><br>${order.receiverAddress}<br><b>배송요청사항:</b><br>${order.receiverRemark}<br>
                             </div>
                         </div>
                     </td>
