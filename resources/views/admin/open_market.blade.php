@@ -416,6 +416,7 @@
             let partnerStatusHtml = order.isPartner ? '<b><p>셀윙 발주</p></b>' : '<b><p>도매윙 발주</p></b>';
             let orderVendorHtml = order.vendorName ? `<b><p>${order.vendorName}</p></b>` : '<b><p>도매윙</p></b>';
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
+            let trackingNumber = order.trackingNumber ? `<p>송장 번호 : ${order.trackingNumber}</p>` : '';
             let orderTypeHtml = order.orderType === '교환' || order.orderType === '환불' ?
                 `<h6 class="title">
                     <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
@@ -449,6 +450,7 @@
                         ${orderTypeHtml}
                         <div class="col-auto">
                             <p>${order.orderDate}</p>
+                            ${trackingNumber}
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProcess" onclick="productOrderNumber='${order.productOrderNumber}';">주문 처리</button>
                         </div>
                     </td>
