@@ -374,7 +374,7 @@
                                         beginAtZero: true,
                                         min: 0,
                                         max: max,
-                                        stepSize: 500000,
+                                        stepSize: 1000000,
                                         callback: function(value) {
                                             return value.toLocaleString() +
                                                 ' 윙'; // 천 단위 콤마 추가
