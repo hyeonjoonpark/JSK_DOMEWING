@@ -93,11 +93,6 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        {{-- <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="orderStatus" id="cancelRequest"
-                                                value="CANCEL_REQUEST">
-                                            <label class="form-check-label" for="cancelRequest">취소요청</label>
-                                        </div> --}}
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="orderStatus" id="orderCancelled"
                                 value="CANCEL_COMPLETE">
