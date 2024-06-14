@@ -86,12 +86,12 @@ class MainController extends Controller
                 $this->updateProduct($product);
                 $productCodes[] = $product['productCode'];
             }
-            $productCodes = join(',', $productCodes);
+            $productCodesStr = join(',', $productCodes);
             return [
                 'status' => true,
                 'return' => '상품셋 정보를 성공적으로 업데이트했습니다.',
                 'errors' => $errors,
-                'productCodes' => $productCodes,
+                'productCodes' => $productCodesStr,
             ];
         } catch (\Exception $e) {
             return [

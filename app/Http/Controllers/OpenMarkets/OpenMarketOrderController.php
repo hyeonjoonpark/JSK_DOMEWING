@@ -113,16 +113,13 @@ class OpenMarketOrderController extends Controller
             $validator = Validator::make($request->all(), [
                 'vendors' => 'required|array',
                 'vendors.*' => 'exists:vendors,id',
-                'orderStatus' => 'required|string',
-                'orderType' => 'required|string',
+                'orderStatus' => 'required|string'
             ], [
                 'vendors.required' => '하나 이상의 원청사를 선택해야합니다.',
                 'vendors.array' => '원청사 선택 형식이 잘못되었습니다.',
                 'vendors.*.exists' => '선택한 원청사가 존재하지 않습니다.',
                 'orderStatus.required' => '주문 상태를 선택해야합니다.',
-                'orderStatus.string' => '주문 상태 형식이 잘못되었습니다.',
-                'orderType.required' => '주문 유형을 선택해야합니다.',
-                'orderType.string' => '주문 유형이 잘못되었습니다.',
+                'orderStatus.string' => '주문 상태 형식이 잘못되었습니다.'
             ]);
             if ($validator->fails()) {
                 return [
@@ -133,8 +130,7 @@ class OpenMarketOrderController extends Controller
             }
             $vendors = $request->input('vendors');
             $orderStatus = $request->input('orderStatus');
-            $orderType = $request->input('orderType');
-            $orders = $this->getOrders($vendors, $orderStatus, $orderType);
+            $orders = $this->getOrders($vendors, $orderStatus);
             $processedOrders = array_map(function ($order) use ($orderStatus) {
                 return $this->transformOrderDetails($order, $orderStatus);
             }, $orders);
@@ -587,7 +583,7 @@ class OpenMarketOrderController extends Controller
 
         return ceil($productPrice * $marginRate);
     }
-    private function getOrders($vendors, $orderStatus, $orderType)
+    private function getOrders($vendors, $orderStatus)
     {
         $query = DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
@@ -597,7 +593,6 @@ class OpenMarketOrderController extends Controller
             ->join('carts as c', 'c.id', '=', 'o.cart_id')
             ->join('minewing_products as mp', 'mp.id', '=', 'c.product_id')
             ->whereIn('mp.sellerID', $vendors)
-            ->where('o.type', $orderType)
             ->select(
                 'm.username as member_username',
                 'c.quantity as quantity',
@@ -626,15 +621,56 @@ class OpenMarketOrderController extends Controller
                 'o.tracking_number as trackingNumber'
             );
 
-        if ($orderStatus === 'PENDING') {
+        if ($orderStatus === 'PAID_REQUEST') {
             $query->where('o.delivery_status', 'PENDING')
+                ->where('o.type', 'PAID')
                 ->where('o.requested', 'N');
-        } elseif ($orderStatus === 'AWAITING_SHIPMENT') {
+        } elseif ($orderStatus === 'PAID_PROCESS') {
             $query->where('o.delivery_status', 'PENDING')
+                ->where('o.type', 'PAID')
                 ->where('o.requested', 'Y');
-        } elseif ($orderStatus === 'COMPLETE') {
+        } elseif ($orderStatus === 'PAID_COMPLETE') {
             $oneMonthAgo = Carbon::now()->subMonth();
             $query->where('o.delivery_status', 'COMPLETE')
+                ->where('o.type', 'PAID')
+                // ->where('o.requested', 'Y')
+                ->where('o.updated_at', '>=', $oneMonthAgo);
+        }
+        // elseif ($orderStatus === 'CANCEL_REQUEST') { 취소 요청들 대기중
+        //     $query->where('o.delivery_status', 'PENDING')
+        //         ->where('o.type', 'CANCELLED')
+        //         ->where('o.requested', 'N');
+        // }
+        elseif ($orderStatus === 'CANCEL_COMPLETE') {
+            $oneMonthAgo = Carbon::now()->subMonth();
+            $query->where('o.type', 'CANCELLED')
+                ->where('o.updated_at', '>=', $oneMonthAgo);
+        } elseif ($orderStatus === 'RETURN_REQUEST') {
+            $query->where('o.delivery_status', 'PENDING')
+                ->where('o.type', 'REFUND')
+                ->where('o.requested', 'N');
+        } elseif ($orderStatus === 'RETURN_PROCESS') {
+            $query->where('o.delivery_status', 'PENDING')
+                ->where('o.type', 'REFUND')
+                ->where('o.requested', 'Y');
+        } elseif ($orderStatus === 'RETURN_COMPLETE') {
+            $oneMonthAgo = Carbon::now()->subMonth();
+            $query->where('o.delivery_status', 'COMPLETE')
+                ->where('o.type', 'REFUND')
+                // ->where('o.requested', 'Y')
+                ->where('o.updated_at', '>=', $oneMonthAgo);
+        } elseif ($orderStatus === 'EXCHANGE_REQUEST') {
+            $query->where('o.delivery_status', 'PENDING')
+                ->where('o.type', 'EXCHANGE')
+                ->where('o.requested', 'N');
+        } elseif ($orderStatus === 'EXCHANGE_PROCESS') {
+            $query->where('o.delivery_status', 'PENDING')
+                ->where('o.type', 'EXCHANGE')
+                ->where('o.requested', 'Y');
+        } elseif ($orderStatus === 'EXCHANGE_COMPLETE') {
+            $oneMonthAgo = Carbon::now()->subMonth();
+            $query->where('o.delivery_status', 'COMPLETE')
+                ->where('o.type', 'EXCHANGE')
                 // ->where('o.requested', 'Y')
                 ->where('o.updated_at', '>=', $oneMonthAgo);
         }
