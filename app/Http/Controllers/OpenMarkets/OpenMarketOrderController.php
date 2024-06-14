@@ -366,8 +366,35 @@ class OpenMarketOrderController extends Controller
             ];
         }
     }
-
-
+    public function setMemo(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'adminRemark' => 'required|string'
+        ], [
+            'adminRemark.required' => '메모를 입력해야합니다.',
+            'adminRemark.string' => '메모는 문자열입니다.',
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first(),
+                'error' => $validator->errors(),
+            ];
+        }
+        $productOrderNumber = $request->productOrderNumber;
+        $adminRemark = $request->adminRemark;
+        $update = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->update(['admin_remark' => $adminRemark]);
+        if (!$update) return [
+            'status' => false,
+            'message' => '해당 주문을 찾을 수 없습니다'
+        ];
+        return [
+            'status' => true,
+            'message' => '메모가 성공적으로 저장되었습니다.',
+        ];
+    }
     public function getOrderInfo(Request $request)
     {
         $productOrderNumber = $request->productOrderNumber;
@@ -589,7 +616,8 @@ class OpenMarketOrderController extends Controller
                 'o.shipping_fee_then as shippingFee',
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist'),
                 'o.tracking_number as trackingNumber',
-                'mp.productCode as productCode'
+                'mp.productCode as productCode',
+                'o.admin_remark as adminRemark',
             );
 
         if ($orderStatus === 'PAID_REQUEST') {
@@ -700,7 +728,8 @@ class OpenMarketOrderController extends Controller
             'receiverRemark' => $order->receiverRemark,
             'orderDate' => $orderDate,
             'trackingNumber' => $order->trackingNumber,
-            'productCode' => $order->productCode
+            'productCode' => $order->productCode,
+            'adminRemark' => $order->adminRemark ? $order->adminRemark : null,
         ];
     }
     private function getAllPartners()
