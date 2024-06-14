@@ -188,6 +188,8 @@ Route::middleware(['auth.custom'])->group(function () {
     });
     //주문처리
     Route::post('process-order', [OpenMarketOrderController::class, 'processOrder']);
+    //메모작성
+    Route::post('set-memo', [OpenMarketOrderController::class, 'setMemo']);
     // 파트너스 주문 조회
     Route::post('get-new-orders', [OpenMarketOrderController::class, 'index']);
     Route::post('show-data', [OpenMarketOrderController::class, 'showData']);
