@@ -270,6 +270,8 @@
                         Swal.fire({
                             icon: 'success',
                             text: response.message
+                        }).then(() => {
+                            $('#modalProcess').modal('hide');
                         });
                     }
                 },
