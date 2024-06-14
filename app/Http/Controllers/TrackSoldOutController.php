@@ -50,17 +50,23 @@ class TrackSoldOutController extends Controller
             mkdir($productFilePath, 0755, true);
         }
         $soldOutProducts = [];
+        $errors = [];
         foreach ($chunkedProducts as $i => $products) {
             $index = $i + 1;
             $productFilePath = public_path('js/track-sold-out/products/' . $vendorEngName . '_' . $index . '.json');
             file_put_contents($productFilePath, json_encode($products));
             $trackResult = $this->track($vendorEngName, $productFilePath, $username, $password);
             if ($trackResult['status'] === false) {
-                return $trackResult;
+                $errors[] = [
+                    'trackResult' => $trackResult,
+                    'products' => $products
+                ];
             }
             $soldOutProducts = array_merge($soldOutProducts, $trackResult['data']);
-            unlink($productFilePath);
+            // unlink($productFilePath);
         }
+        $productFilePath = public_path('js/track-sold-out/products/error_' . $vendorEngName . '_' . $index . '.json');
+        file_put_contents($productFilePath, json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $updateSoldOutProductsResult = $this->updateSoldOutProducts($vendorId, $soldOutProducts);
         if ($updateSoldOutProductsResult['status'] === false) {
             return $updateSoldOutProductsResult;
