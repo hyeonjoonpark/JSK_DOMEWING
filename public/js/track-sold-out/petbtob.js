@@ -256,7 +256,6 @@ async function getProductOptions(page) {
                 }
             }
 
-            // If product could not be processed or invalid, mark it as sold out
             if (!enterResult || !ivp || ivp === 'error') {
                 soldOutProducts.push(product.id);
             }
