@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { getOptionName } = require('./extract_product_option');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
