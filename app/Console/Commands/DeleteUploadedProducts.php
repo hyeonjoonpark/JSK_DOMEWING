@@ -52,6 +52,8 @@ class DeleteUploadedProducts extends Command
     }
     protected function destroy($originProductsNo, $table)
     {
+        ini_set('memory_allow', '-1');
+        set_time_limit(0);
         try {
             DB::table($table)
                 ->whereIn('origin_product_no', $originProductsNo)
