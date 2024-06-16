@@ -24,14 +24,13 @@ const { getOptionName } = require('./extract_product_option');
             if (isValid === false) {
                 soldOutProductIds.push(product.id);
             }
-            const thisOptionName = getOptionName(product.productDetail);
-            const optionNames = await getProductOptions(page);
-            if (!optionNames.includes(thisOptionName)) {
-                soldOutProductIds.push(product.id);
-            }
+            // const thisOptionName = getOptionName(product.productDetail);
+            // const optionNames = await getProductOptions(page);
+            // if (!optionNames.includes(thisOptionName)) {
+            //     soldOutProductIds.push(product.id);
+            // }
         }
-        console.log(soldOutProductIds);
-        const sopFile = path.join(__dirname, 'result.json');
+        const sopFile = path.join(__dirname, 'petbtob_result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8');
     } catch (error) {
         console.error(error);

@@ -103,7 +103,7 @@ class TrackSoldOutController extends Controller
         $command = "node {$script} {$productFilePath} {$username} {$password}";
         try {
             exec($command, $output, $resultCode);
-            $resultFilePath = public_path('js/track-sold-out/result.json');
+            $resultFilePath = public_path('js/track-sold-out/' . $vendorEngName . '_result.json');
             if (!file_exists($resultFilePath)) {
                 return [
                     'status' => false,
