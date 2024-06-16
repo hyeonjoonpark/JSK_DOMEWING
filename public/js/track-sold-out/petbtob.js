@@ -1,9 +1,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
-const { getOptionName } = require('./extract_product_option');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
@@ -24,12 +23,8 @@ const { getOptionName } = require('./extract_product_option');
             if (isValid === false) {
                 soldOutProductIds.push(product.id);
             }
-            // const thisOptionName = getOptionName(product.productDetail);
-            // const optionNames = await getProductOptions(page);
-            // if (!optionNames.includes(thisOptionName)) {
-            //     soldOutProductIds.push(product.id);
-            // }
         }
+        console.log(JSON.stringify(soldOutProductIds));
         const sopFile = path.join(__dirname, 'petbtob_result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8');
     } catch (error) {
@@ -39,20 +34,25 @@ const { getOptionName } = require('./extract_product_option');
     }
 })();
 async function validateProduct(page) {
-    return await page.evaluate(() => {
-        const txtDescElement = document.querySelector('p.txtDesc');
-        if (txtDescElement && txtDescElement.textContent.trim().includes('사라졌거나')) {
-            return false;
-        }
-        const soldOutImage = document.querySelector('div.infoArea img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
-        if (soldOutImage) {
-            return false;
-        }
-        const buyButton = document.querySelector('a.first');
-        if (buyButton && buyButton.classList.contains('displaynone') && buyButton.textContent.trim().includes('구매하기')) {
-            return false;
-        }
-    });
+    try {
+        return await page.evaluate(() => {
+            const txtDescElement = document.querySelector('p.txtDesc');
+            if (txtDescElement && txtDescElement.textContent.trim().includes('사라졌거나')) {
+                return false;
+            }
+            const soldOutImage = document.querySelector('div.infoArea img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
+            if (soldOutImage) {
+                return false;
+            }
+            const buyButton = document.querySelector('a.first');
+            if (buyButton && buyButton.classList.contains('displaynone') && buyButton.textContent.trim().includes('구매하기')) {
+                return false;
+            }
+            return true;
+        });
+    } catch (error) {
+        return false;
+    }
 }
 async function signIn(page, username, password) {
     const goToAttemptsResult = await goToAttempts(page, 'https://petbtob.co.kr/member/login.html', 'networkidle0');
@@ -65,10 +65,15 @@ async function signIn(page, username, password) {
             document.querySelector('#member_passwd').value = password;
             document.querySelector('#contents > form > div > div > fieldset > a').click();
         }, username, password);
-        await page.waitForNavigation({ waitUntil: 'load' });
-        return true;
     } catch (error) {
         return false;
+    }
+    try {
+        await page.waitForNavigation({ waitUntil: 'load', timeout: 1000 });
+    } catch (error) {
+
+    } finally {
+        return true;
     }
 }
 async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) {
@@ -77,6 +82,9 @@ async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) 
     }
     try {
         await page.goto(url, { waitUntil });
+        page.once('dialog', async dialog => {
+            await dialog.accept();
+        });
         return true;
     } catch (error) {
         return await goToAttempts(page, url, waitUntil, attempt++, maxAttempts);
