@@ -31,8 +31,8 @@ class DeleteUploadedProducts extends Command
         ini_set('memory_allow', '-1');
         set_time_limit(0);
         // 쿠팡: 40, 스마트 스토어: 51
-        $vendorId = 40;
-        $accountIds = [11, 29, 12, 13, 14, 49, 51];
+        $vendorId = 51;
+        $accountIds = [7, 10, 8, 9, 11, 44, 46];
         $vendor = DB::table('vendors')
             ->where('id', $vendorId)
             ->first();
