@@ -44,7 +44,7 @@ class TrackSoldOutController extends Controller
             ->first();
         $username = $account->username;
         $password = $account->password;
-        $chunkedProducts = array_chunk($products, 100, false);
+        $chunkedProducts = array_chunk($products, 500, false);
         $productFilePath = public_path('js/track-sold-out/products/');
         if (!is_dir($productFilePath)) {
             mkdir($productFilePath, 0755, true);
