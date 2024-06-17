@@ -109,8 +109,10 @@ class DeleteQueueController extends Controller
 
         // 각 오픈 마켓에 대해
         foreach ($openMarkets as $openMarket) {
+            $table = $openMarket->name_eng . '_uploaded_products';
+
             // 해당 마켓의 업로드된 제품 테이블에서 원본 제품 번호를 가져옴
-            $originProductsNo = DB::table($openMarket->name_eng . '_uploaded_products')
+            $originProductsNo = DB::table($table)
                 ->whereIn('product_id', $deleteQueues)
                 ->pluck('origin_product_no')
                 ->toArray();
@@ -124,8 +126,14 @@ class DeleteQueueController extends Controller
             // 삭제 요청 실행 및 결과 저장
             $ucDeleteResult = $uc->delete($ucDeleteRequest);
             if (!$ucDeleteResult['status']) {
+                file_put_contents($deleteQueueResultsPath . $openMarket->name_eng . '_' . date('YmdHis') . '.json', json_encode($ucDeleteResult));
             }
-            file_put_contents($deleteQueueResultsPath . $openMarket->name_eng . '_' . date('YmdHis') . '.json', json_encode($ucDeleteResult));
+
+            DB::table($table)
+                ->whereIn('product_id', $deleteQueues)
+                ->update([
+                    'is_active' => 'N'
+                ]);
         }
 
         // 데이터베이스 트랜잭션 시작
@@ -139,7 +147,7 @@ class DeleteQueueController extends Controller
                 ]);
 
             // 삭제 대기열에서 해당 제품 ID를 삭제
-            // DeleteQueue::whereIn('product_id', $deleteQueues)->delete();
+            DeleteQueue::whereIn('product_id', $deleteQueues)->delete();
 
             // 트랜잭션 커밋
             DB::commit();
