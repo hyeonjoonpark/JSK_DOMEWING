@@ -271,6 +271,7 @@
 
 
         function processOrder() {
+            popupLoader(0, '"요청사항 반영중입니다."');
             const targetStatus = $('input[name="targetStatus"]:checked').attr('id');
             const deliveryCompanyId = $('#deliveryCompanyModal').val();
             const trackingNumber = $('#trackingNumber').val();
@@ -290,6 +291,7 @@
                     isRemoteArea
                 },
                 success: function(response) {
+                    closePopup();
                     console.log(response);
                     if (response.status === false) {
                         Swal.fire({
@@ -306,6 +308,7 @@
                     }
                 },
                 error: function(response) {
+                    closePopup();
                     console.error('Error processing order:', response);
                     Swal.fire({
                         icon: 'error',

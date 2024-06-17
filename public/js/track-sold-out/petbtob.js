@@ -70,8 +70,6 @@ async function signIn(page, username, password) {
     try {
         await page.waitForNavigation({ waitUntil: 'load', timeout: 1000 });
     } catch (error) {
-
-    } finally {
         return true;
     }
 }
