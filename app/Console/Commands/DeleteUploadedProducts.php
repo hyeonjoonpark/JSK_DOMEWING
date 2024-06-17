@@ -46,9 +46,14 @@ class DeleteUploadedProducts extends Command
                 'vendorId' => $vendorId,
                 'originProductsNo' => $originProductsNo
             ]);
-            print_r($uc->delete($request));
+            $ucDeleteResultFilePath = public_path('/assets/json/delete-uploaded-products-results/');
+            if (!is_dir($ucDeleteResultFilePath)) {
+                mkdir($ucDeleteResultFilePath);
+            }
+            file_put_contents($ucDeleteResultFilePath . $vendor->name_eng . '_' . date("YmdHis") . '.json', json_encode($uc->delete($request), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
             $this->destroy($originProductsNo, $vendor->name_eng . '_uploaded_products');
         }
+        $this->info('COMPLETED!');
     }
     protected function destroy($originProductsNo, $table)
     {
@@ -60,7 +65,6 @@ class DeleteUploadedProducts extends Command
                 ->update([
                     'is_active' => 'N'
                 ]);
-            $this->info('Success');
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
