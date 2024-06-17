@@ -123,14 +123,14 @@ class OpenMarketSetAwaitingController extends Controller
         $controller = new ApiController();
         $orderId = $partnerOrder->order_number;
         $shipmentBoxId = $partnerOrder->product_order_number;
-        $receiptId = $this->getReceiptId($account, $orderId, $shipmentBoxId); //orderId로 반품건 조회 조회 결과에
-        if ($receiptId['status']) {
-            $response = $this->coupangCancelApi($controller, $account, $contentType, $receiptId['receiptId'], $receiptId['cancelCount']); //취소 승인 api
+        $receiptDetails = $this->fetchReceiptDetails($account, $orderId, $shipmentBoxId); //orderId로 반품건 조회 조회 결과에
+        if ($receiptDetails['status']) {
+            $response = $this->coupangCancelApi($controller, $account, $contentType, $receiptDetails['receiptId'], $receiptDetails['cancelCount']); //취소 승인 api
             if (!$response['status']) return [
                 'status' => false,
                 'message' => '취소 승인에 실패하였습니다.',
                 'data' => $response
-            ]; //여기서 쿠팡은 기존 주문들 전부 환불시키고 취소 반영해서 새로운 주문 만들기로.
+            ];
             $updated = $this->updateCancel($order);
             if (!$updated['status']) return [
                 'status' => false,
@@ -150,7 +150,7 @@ class OpenMarketSetAwaitingController extends Controller
             'cancelled' => false
         ];
     }
-    private function getReceiptId($account, $orderId, $shipmentBoxId)
+    private function fetchReceiptDetails($account, $orderId, $shipmentBoxId)
     {
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests';
@@ -166,21 +166,24 @@ class OpenMarketSetAwaitingController extends Controller
         $response =  $controller->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $queryString); //발주서 단건조회
         $receiptId = 0;
         $cancelCount = 0;
-        if (!$response['status']) return [
-            'status' => false,
-            'message' => '쿠팡 취소 주문이 아닙니다.'
-        ];
+        $purchaseCount = 0;
         foreach ($response['data']['data'] as $orderItem) {
             if ($orderItem['returnItems'][0]['shipmentBoxId'] == $shipmentBoxId) {
                 $receiptId = $orderItem['receiptId'];
-                $cancelCount = $orderItem['cancelCountSum'];
+                $cancelCount = $orderItem['returnItems'][0]['cancelCount'];
+                $purchaseCount = $orderItem['returnItems'][0]['purchaseCount'];
                 break;
             }
         }
+        if ($cancelCount === 0) return [
+            'status' => false,
+            'message' => '주문 취소 건이 아닙니다.'
+        ];
         return [
             'status' => true,
             'receiptId' => $receiptId,
-            'cancelCount' => $cancelCount
+            'cancelCount' => $cancelCount,
+            'purchaseCount' => $purchaseCount
         ];
     }
     private function coupangCancelApi($controller, $account, $contentType, $receiptId, $cancelCount)
