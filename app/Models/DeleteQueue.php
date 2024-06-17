@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class DeleteQueue extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'product_id'
+    ];
 }

@@ -24,7 +24,6 @@ const path = require('path');
                 soldOutProductIds.push(product.id);
             }
         }
-        console.log(JSON.stringify(soldOutProductIds));
         const sopFile = path.join(__dirname, 'petbtob_result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8');
     } catch (error) {

@@ -29,10 +29,10 @@ class CollectOrderController extends Controller
             $username = $account->username;
             $password = $account->password;
             $this->deleteLegacy($b2BEngName);
-            if ($result == false && $b2BEngName == 'domeggook') {
+            if ($result === false && $b2BEngName == 'domeggook') {
                 continue;
             }
-            if ($result2 == false && $b2BEngName == 'domeggook2') {
+            if ($result2 === false && $b2BEngName == 'domeggook2') {
                 continue;
             }
             $this->getOrderExcelFile($b2BEngName, $b2BVendorID, $username, $password);

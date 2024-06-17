@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('delete_queues', function (Blueprint $table) {
             $table->id();
-            $table->foreign('product_id')->constrained('minewing_products')->onDelete('cascade');
-            $table->timestamps();
+            $table->foreignId('product_id')->constrained('minewing_products')->onDelete('cascade');
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 
