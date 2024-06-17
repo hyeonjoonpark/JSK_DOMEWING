@@ -154,10 +154,10 @@ class UploadedController extends Controller
                 $successedOriginProductsNo[] = $originProductNo;
             }
         }
-        $dupResult = $this->destroyUploadedProducts($successedOriginProductsNo, $vendorEngName);
+        $dupResult = $this->destroyUploadedProducts($originProductsNo, $vendorEngName);
         return [
             'status' => true,
-            'message' => '총 ' . count($originProductsNo) . '개의 상품 중 ' . count($successedOriginProductsNo) . '개의 상품을 성공적으로 삭제했습니다.<br>주문 및 클레임 진행 중인 상품들은 삭제할 수 없습니다.',
+            'message' => '총 ' . count($originProductsNo) . '개의 상품 중 ' . count($successedOriginProductsNo) . '개의 상품을 성공적으로 삭제했습니다.<br>주문 및 클레임 진행 중인 상품들은 삭제할 수 없습니다. 해당 상품들은 주문 및 클레임이 완료된 후, 판매자 센터에서 수동으로 삭제해주시기 바랍니다.',
             'data' => [
                 'success' => $successedOriginProductsNo,
                 'errors' => $errors,
