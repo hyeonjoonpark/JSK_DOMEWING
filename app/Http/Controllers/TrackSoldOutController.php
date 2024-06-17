@@ -22,7 +22,6 @@ class TrackSoldOutController extends Controller
             ];
         }
         $vendorId = $request->vendorId;
-
         $products = DB::table('minewing_products')
             ->where('sellerID', $vendorId)
             ->get([
@@ -67,25 +66,10 @@ class TrackSoldOutController extends Controller
         if ($updateSoldOutProductsResult['status'] === false) {
             return $updateSoldOutProductsResult;
         }
-        $openMarkets = DB::table('vendors')
-            ->where('type', 'OPEN_MARKET')
-            ->where('is_active', 'ACTIVE')
-            ->get(['name_eng', 'id']);
-        $uc = new UploadedController();
-        $errors = [];
-        foreach ($openMarkets as $openMarket) {
-            $soldOutOriginProductsNo = DB::table($openMarket->name_eng . '_uploaded_products')
-                ->whereIn('product_id', $soldOutProducts)
-                ->pluck('origin_product_no')
-                ->toArray();
-            $ucDeleteRequest = new Request([
-                'vendorId' => $openMarket->id,
-                'originProductsNo' => $soldOutOriginProductsNo
-            ]);
-            $ucDeleteResult = $uc->delete($ucDeleteRequest);
-            if ($ucDeleteResult['status'] === false) {
-                $errors[] = $ucDeleteRequest;
-            }
+        $dqc = new DeleteQueueController();
+        $dqcStoreResult = $dqc->store($soldOutProducts);
+        if (!$dqcStoreResult['status']) {
+            $errors['dqcStoreResult'] = $dqcStoreResult;
         }
         return [
             'status' => true,
