@@ -97,6 +97,7 @@ class DeleteQueueController extends Controller
 
         // 활성 상태인 모든 벤더(오픈 마켓)를 가져옴
         $openMarkets = DB::table('vendors')
+            ->where('type', 'OPEN_MARKET')
             ->where('is_active', 'ACTIVE')
             ->get(['id', 'name_eng']);
 
