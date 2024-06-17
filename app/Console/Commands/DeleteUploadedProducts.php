@@ -32,7 +32,7 @@ class DeleteUploadedProducts extends Command
         set_time_limit(0);
         // 쿠팡: 40, 스마트 스토어: 51
         $vendorId = 51;
-        $accountIds = [44, 46];
+        $accountIds = [46];
         $vendor = DB::table('vendors')
             ->where('id', $vendorId)
             ->first();
