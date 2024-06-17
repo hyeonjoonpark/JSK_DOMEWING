@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Productwing;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\DeleteQueueController;
 use App\Http\Controllers\ProductEditor\IndexController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -58,7 +59,14 @@ class SoldOutController extends Controller
             if ($status === false) {
                 return $inactiveProducts;
             }
+            $productIds = DB::table('minewing_products')
+                ->whereIn('productCode', $productCodes)
+                ->pluck('id')
+                ->toArray();
+            $dqc = new DeleteQueueController();
+            $dqcStoreResult = $dqc->store($productIds);
         }
+
         return response()->json([
             'status' => true,
             'return' => $html
