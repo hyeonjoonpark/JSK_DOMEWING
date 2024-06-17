@@ -27,6 +27,6 @@ class DeleteQueue extends Command
     public function handle()
     {
         $dqc = new DeleteQueueController();
-        return $dqc->destroy();
+        print_r($dqc->destroy());
     }
 }
