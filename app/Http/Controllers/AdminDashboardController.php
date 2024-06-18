@@ -95,12 +95,23 @@ class AdminDashboardController extends Controller
 
     private function sumSales($startDatetime, $endDatetime)
     {
-        $paidAmount = DB::table('wing_transactions AS wt')
-            ->join('orders AS o', 'wt.id', '=', 'o.wing_transaction_id')
+        $paidAmount = DB::table('orders AS o')
+            ->join('carts AS c', 'c.id', '=', 'o.cart_id')
             ->where('o.type', 'PAID')
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', [$startDatetime, $endDatetime])
-            ->sum('wt.amount');
+            ->whereBetween('o.created_at', [$startDatetime, $endDatetime])
+            ->selectRaw('
+                SUM(
+                    o.price_then * c.quantity +
+                    o.shipping_fee_then * CEIL(
+                        CASE
+                            WHEN o.bundle_quantity_then = 0
+                            THEN 1
+                            ELSE c.quantity / o.bundle_quantity_then
+                        END
+                    )
+                ) AS total
+            ')
+            ->value('total');
         $refundAmount = DB::table('orders AS o')
             ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
             ->where('o.type', 'REFUND')
@@ -172,14 +183,24 @@ class AdminDashboardController extends Controller
 
     private function getMemberSales(int $memberId, array $dateRange): int
     {
-        $paidAmount = DB::table('wing_transactions AS wt')
-            ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
-            ->where('member_id', $memberId)
+        $paidAmount = DB::table('orders AS o')
+            ->join('carts AS c', 'c.id', '=', 'o.cart_id')
             ->where('o.type', 'PAID')
-            ->where('wt.status', 'APPROVED')
-            ->whereBetween('wt.created_at', $dateRange)
-            ->distinct()
-            ->sum('wt.amount');
+            ->where('c.member_id', $memberId)
+            ->whereBetween('o.created_at', $dateRange)
+            ->selectRaw('
+                SUM(
+                    o.price_then * c.quantity +
+                    o.shipping_fee_then * CEIL(
+                        CASE
+                            WHEN o.bundle_quantity_then = 0
+                            THEN 1
+                            ELSE c.quantity / o.bundle_quantity_then
+                        END
+                    )
+                ) AS total
+            ')
+            ->value('total');
         $refundAmount = DB::table('orders AS o')
             ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
             ->where('wt.member_id', $memberId)
