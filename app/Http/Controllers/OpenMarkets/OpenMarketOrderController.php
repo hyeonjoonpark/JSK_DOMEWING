@@ -649,11 +649,11 @@ class OpenMarketOrderController extends Controller
                     ->where('o.type', 'REFUND')
                     ->where('o.requested', 'N');
                 break;
-            case 'RETURN_PROCESS':
-                $query->where('o.delivery_status', 'PENDING')
-                    ->where('o.type', 'REFUND')
-                    ->where('o.requested', 'Y');
-                break;
+                // case 'RETURN_PROCESS':
+                //     $query->where('o.delivery_status', 'PENDING')
+                //         ->where('o.type', 'REFUND')
+                //         ->where('o.requested', 'Y');
+                //     break;
             case 'RETURN_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
                     ->where('o.type', 'REFUND')

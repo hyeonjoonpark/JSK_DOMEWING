@@ -33,6 +33,15 @@ class SmartStoreCancelController extends Controller
         $method = 'POST';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderId . '/claim/cancel/request';
         $data = ['cancelReason' => 'DELAYED_DELIVERY'];
+        /*
+        INTENT_CHANGED	구매 의사 취소
+        COLOR_AND_SIZE	색상 및 사이즈 변경
+        WRONG_ORDER	다른 상품 잘못 주문
+        PRODUCT_UNSATISFIED	서비스 불만족
+        DELAYED_DELIVERY	배송 지연
+        SOLD_OUT	상품 품절
+        INCORRECT_INFO	상품 정보 상이
+        */
         $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
         if (!$response['status']) return [
             'status' => false,

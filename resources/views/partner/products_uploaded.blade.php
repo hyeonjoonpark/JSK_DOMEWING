@@ -32,38 +32,6 @@
         .pagination:hover {
             background-color: #f8f9fa;
         }
-
-        #topBtn {
-            position: fixed;
-            /* 고정된 위치 */
-            bottom: 20px;
-            /* 하단에서 20px 떨어진 위치 */
-            right: 30px;
-            /* 우측에서 30px 떨어진 위치 */
-            z-index: 99;
-            /* 다른 요소 위에 표시 */
-            font-size: 18px;
-            /* 글자 크기 */
-            border: none;
-            /* 테두리 없음 */
-            outline: none;
-            /* 외곽선 없음 */
-            background-color: #555;
-            /* 배경색 */
-            color: white;
-            /* 글자색 */
-            cursor: pointer;
-            /* 마우스 커서를 포인터로 변경 */
-            padding: 15px;
-            /* 패딩 */
-            border-radius: 10px;
-            /* 모서리 둥글게 */
-        }
-
-        #topBtn:hover {
-            background-color: #333;
-            /* 호버 시 배경색 변경 */
-        }
     </style>
 @endsection
 @section('title')
@@ -95,6 +63,30 @@
                                 </div>
                             </div>
                         @endforeach
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">계정 목록</label>
+                                <ul class="custom-control-group g-3 align-center">
+                                    <li>
+                                        <div class="custom-control custom-control-sm custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="checkAllAccounts">
+                                            <label class="custom-control-label" for="checkAllAccounts">전체 선택/해제</label>
+                                        </div>
+                                    </li>
+                                    @foreach ($accounts as $item)
+                                        <li>
+                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" name="accountHashes[]"
+                                                    id="{{ $item->hash }}" value="{{ $item->hash }}"
+                                                    {{ in_array($item->hash, $accountHashes) ? 'checked' : '' }}>
+                                                <label class="custom-control-label"
+                                                    for="{{ $item->hash }}">{{ $item->username }}</label>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
                         <div class="col-12">
                             <div class="row g-gs">
                                 <div class="col-12 col-md-6">
@@ -131,6 +123,7 @@
                             'openMarket' => $openMarket,
                             'searchKeyword' => $searchKeyword,
                             'searchProductCodes' => $searchProductCodes,
+                            'accountHashes' => $accountHashes,
                         ])
                     </div>
                     <div class="text-center">
@@ -220,6 +213,10 @@
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
+        });
+        $(document).on('click', '#checkAllAccounts', function() {
+            const isChecked = $(this).is(':checked');
+            $('input[name="accountHashes[]"]').prop('checked', isChecked);
         });
 
         function initEdit(productCode, originProductNo, productName, price, shippingFee) {
