@@ -37,7 +37,7 @@ class St11OrderController extends Controller
         $formattedStartDate = $startDate->format('YmdHi');
         $formattedEndDate = $endDate->format('YmdHi');
         $method = 'GET';
-        $url = 'https://api.11st.co.kr/rest/ordservices/delvplacestandby/' . $formattedStartDate . '/' . $formattedEndDate;
+        $url = 'https://api.11st.co.kr/rest/ordservices/complete/' . $formattedStartDate . '/' . $formattedEndDate;
         foreach ($accounts as $account) {
             $apiKey = $account->access_key;
             $builderResult = $this->ssac->builder($apiKey, $method, $url); //날짜별 주문내역 조회
