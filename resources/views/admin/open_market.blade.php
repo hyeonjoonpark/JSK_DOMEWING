@@ -101,7 +101,7 @@
                     </div>
 
                     <button class="btn btn-primary mb-5" onclick="showData();">조회하기</button>
-                    <button class="btn btn-primary mb-5" style="margin-left: 633px;" onclick="initIndex();">업데이트</button>
+                    <button class="btn btn-danger mb-5" style="margin-left: 633px;" onclick="initIndex();">업데이트</button>
                     <div class="form-group">
                         <h6 class="title">잔액 부족 계정 리스트</h6>
                         <ul id="lowBalanceAccountsList"></ul>
