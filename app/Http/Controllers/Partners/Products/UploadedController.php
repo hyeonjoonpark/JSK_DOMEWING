@@ -68,12 +68,19 @@ class UploadedController extends Controller
             $productCodesArr = array_map('trim', explode(',', $searchProductCodes));
         }
 
+        $accounts = DB::table($vendorEngName . '_accounts')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'ACTIVE')
+            ->get(['hash', 'username']);
+        $accountHashes = $request->input('accountHashes', []);
+
         // 업로드된 상품을 검색합니다.
         $uploadedProducts = DB::table($vendorEngName . '_uploaded_products AS up')
             ->join('minewing_products AS mp', 'mp.id', '=', 'up.product_id')
             ->join($vendorEngName . '_accounts AS va', 'va.id', '=', 'up.' . $vendorEngName . '_account_id')
             ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
             ->join('partners AS p', 'p.id', '=', 'va.partner_id')
+            ->join($vendorEngName . '_accounts AS a', 'a.id', '=', 'up.' . $vendorEngName . '_account_id')
             ->where('up.is_active', 'Y')
             ->where('va.partner_id', $partnerId)
             ->when(!empty($searchKeyword), function ($query) use ($searchKeyword) {
@@ -87,6 +94,9 @@ class UploadedController extends Controller
             })
             ->when(!empty($productCodesArr), function ($query) use ($productCodesArr) {
                 $query->whereIn('mp.productCode', $productCodesArr);
+            })
+            ->when(!empty($accountHashes), function ($query) use ($accountHashes) {
+                $query->whereIn('a.hash', $accountHashes);
             })
             ->orderByDesc('up.created_at')
             ->select([
@@ -112,7 +122,9 @@ class UploadedController extends Controller
             'uploadedProducts' => $uploadedProducts,
             'selectedOpenMarketId' => $selectedOpenMarketId,
             'searchKeyword' => $searchKeyword,
-            'searchProductCodes' => $searchProductCodes
+            'searchProductCodes' => $searchProductCodes,
+            'accounts' => $accounts,
+            'accountHashes' => $accountHashes
         ]);
     }
     public function delete(Request $request)

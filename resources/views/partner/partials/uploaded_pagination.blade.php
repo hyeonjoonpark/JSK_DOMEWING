@@ -1,7 +1,7 @@
 <div class="d-flex justify-content-center align-items-center flex-wrap">
     @if ($page > 1)
         <a class="pagination"
-            href="{{ route('partner.products.uploaded', ['page' => $page - 1, 'selectedOpenMarketId' => $selectedOpenMarketId, 'searchKeyword' => $searchKeyword, 'searchProductCodes' => $searchProductCodes]) }}">
+            href="{{ route('partner.products.uploaded', ['page' => $page - 1, 'selectedOpenMarketId' => $selectedOpenMarketId, 'searchKeyword' => $searchKeyword, 'searchProductCodes' => $searchProductCodes, 'accountHashes' => $accountHashes]) }}">
             &lt; 이전
         </a>
     @endif
@@ -13,14 +13,14 @@
 
     @for ($i = $startPage; $i <= $endPage; $i++)
         <a class="pagination {{ $page == $i ? 'active' : '' }}"
-            href="{{ route('partner.products.uploaded', ['page' => $i, 'selectedOpenMarketId' => $selectedOpenMarketId, 'searchKeyword' => $searchKeyword, 'searchProductCodes' => $searchProductCodes]) }}">
+            href="{{ route('partner.products.uploaded', ['page' => $i, 'selectedOpenMarketId' => $selectedOpenMarketId, 'searchKeyword' => $searchKeyword, 'searchProductCodes' => $searchProductCodes, 'accountHashes' => $accountHashes]) }}">
             {{ $i }}
         </a>
     @endfor
 
     @if ($page < $numPages)
         <a class="pagination"
-            href="{{ route('partner.products.uploaded', ['page' => $page + 1, 'selectedOpenMarketId' => $selectedOpenMarketId, 'searchKeyword' => $searchKeyword, 'searchProductCodes' => $searchProductCodes]) }}">
+            href="{{ route('partner.products.uploaded', ['page' => $page + 1, 'selectedOpenMarketId' => $selectedOpenMarketId, 'searchKeyword' => $searchKeyword, 'searchProductCodes' => $searchProductCodes, 'accountHashes' => $accountHashes]) }}">
             다음 &gt;
         </a>
     @endif

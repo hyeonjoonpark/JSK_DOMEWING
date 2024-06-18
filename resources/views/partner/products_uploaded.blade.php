@@ -64,6 +64,30 @@
                             </div>
                         @endforeach
                         <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">계정 목록</label>
+                                <ul class="custom-control-group g-3 align-center">
+                                    <li>
+                                        <div class="custom-control custom-control-sm custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="checkAllAccounts">
+                                            <label class="custom-control-label" for="checkAllAccounts">전체 선택/해제</label>
+                                        </div>
+                                    </li>
+                                    @foreach ($accounts as $item)
+                                        <li>
+                                            <div class="custom-control custom-control-sm custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" name="accountHashes[]"
+                                                    id="{{ $item->hash }}" value="{{ $item->hash }}"
+                                                    {{ in_array($item->hash, $accountHashes) ? 'checked' : '' }}>
+                                                <label class="custom-control-label"
+                                                    for="{{ $item->hash }}">{{ $item->username }}</label>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-12">
                             <div class="row g-gs">
                                 <div class="col-12 col-md-6">
                                     <div class="form-group">
@@ -99,6 +123,7 @@
                             'openMarket' => $openMarket,
                             'searchKeyword' => $searchKeyword,
                             'searchProductCodes' => $searchProductCodes,
+                            'accountHashes' => $accountHashes,
                         ])
                     </div>
                     <div class="text-center">
@@ -188,6 +213,10 @@
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
+        });
+        $(document).on('click', '#checkAllAccounts', function() {
+            const isChecked = $(this).is(':checked');
+            $('input[name="accountHashes[]"]').prop('checked', isChecked);
         });
 
         function initEdit(productCode, originProductNo, productName, price, shippingFee) {
