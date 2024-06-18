@@ -32,19 +32,18 @@ class St11OrderController extends Controller
             return false;
         }
         $response = [];
-        $startDate = new DateTime('now - 4 days');
-        $endDate = new DateTime('now');
-        $formattedStartDate = $startDate->format('YmdHi');
-        $formattedEndDate = $endDate->format('YmdHi');
+        $startDate = (new DateTime('now - 4 days'))->format('YmdHi');
+        $endDate = (new DateTime('now'))->format('YmdHi');
+
         $method = 'GET';
-        $url = 'https://api.11st.co.kr/rest/ordservices/complete/' . $formattedStartDate . '/' . $formattedEndDate;
+        $url = 'https://api.11st.co.kr/rest/ordservices/complete/' . $startDate . '/' . $endDate;
+        // $url = 'https://api.11st.co.kr/rest/ordservices/complete/20240618837686159'; //실제 주문번호로 조회
         foreach ($accounts as $account) {
             $apiKey = $account->access_key;
             $builderResult = $this->ssac->builder($apiKey, $method, $url); //날짜별 주문내역 조회
-            if ($builderResult['status'] === false) continue; //오류는 그냥 넘겨
+            // if ($builderResult['status'] === false) continue; //오류는 그냥 넘겨
 
             // $addrSeq = $builderResult['data']->xpath('//ns2:order')[0]->addrSeq;
-
             // $confirmResult = $this->confirmOrder($apiKey, $builderResult['ordNo'], $builderResult['ordPrdSeq'], $builderResult['dlvNo']); //상품준비중처리
             // if ($confirmResult['status'] === false) {
             //     return $confirmResult;
