@@ -12,17 +12,17 @@ class OpenMarketRefundController extends Controller
     public function saveRefundShipment(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'trackingNumber' => 'required|string|min:10|max:13',
-            'deliveryCompanyId' => 'required|integer|exists:delivery_companies,id',
+            'trackingNumber' => 'nullable|string|min:10|max:13',
+            'deliveryCompanyId' => 'nullable|integer|exists:delivery_companies,id',
             'productOrderNumber' => 'required|string|exists:orders,product_order_number'
         ], [
-            'trackingNumber.required' => '운송장 번호는 필수 항목입니다.',
             'trackingNumber.string' => '운송장 번호는 문자열이어야 합니다.',
             'trackingNumber.min' => '운송장 번호는 최소 10자여야 합니다.',
             'trackingNumber.max' => '운송장 번호는 최대 13자여야 합니다.',
-            'deliveryCompanyId' => '유효한 택배사를 선택해주세요.',
-            'productOrderNumber' => '유효한 주문이 아닙니다.',
+            'deliveryCompanyId.exists' => '유효한 택배사를 선택해주세요.',
+            'productOrderNumber.exists' => '유효한 주문이 아닙니다.',
         ]);
+
         if ($validator->fails()) {
             return [
                 'status' => false,
@@ -30,8 +30,6 @@ class OpenMarketRefundController extends Controller
                 'error' => $validator->errors(),
             ];
         }
-        $trackingNumber = $request->trackingNumber;
-        $deliveryCompanyId = $request->deliveryCompanyId;
         $productOrderNumber = $request->productOrderNumber;
         $order = DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
@@ -43,6 +41,13 @@ class OpenMarketRefundController extends Controller
                 'status' => false,
                 'message' => '취소되었거나, 이미 처리된 주문입니다.'
             ];
+        }
+        $deliveryCompanyId = $request->deliveryCompanyId;
+        $trackingNumber = $request->trackingNumber;
+        if ($trackingNumber && $deliveryCompanyId) {
+            return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
+        } else {
+            return $this->updateWithoutTracking($order->id);
         }
         // $openMarket = DB::table('orders as o')
         //     ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
@@ -131,6 +136,27 @@ class OpenMarketRefundController extends Controller
             return [
                 'status' => false,
                 'message' => '송장번호를 업데이트하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    private function updateWithoutTracking($orderId)
+    {
+        try {
+            DB::table('orders')
+                ->where('id', $orderId)
+                ->update([
+                    'delivery_status' => 'COMPLETE',
+                ]);
+
+            return [
+                'status' => true,
+                'message' => '송장번호, 택배사 없이 성공하였습니다'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '오류가 발생했습니다.',
                 'error' => $e->getMessage()
             ];
         }
