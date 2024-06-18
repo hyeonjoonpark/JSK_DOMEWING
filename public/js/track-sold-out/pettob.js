@@ -24,7 +24,6 @@ const path = require('path');
                 soldOutProductIds.push(product.id); // 품절상품 배열에 상품id값을 감아버림
             }
         }
-        console.log(JSON.stringify(soldOutProductIds));
         const sopFile = path.join(__dirname, 'pettob_result.json'); // 파일 경로 설정
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8'); // 파일에 문자열로 저장
     } catch (error) {
@@ -35,10 +34,6 @@ const path = require('path');
 })();
 async function validateProduct(page) { // 상품 품절 검증
     try {
-        const soldOutPopupProduct = await checkPopupProduct(page);
-        if (soldOutPopupProduct) {
-            return false;
-        }
         return await page.evaluate(() => {
             const soldOutElement = document.querySelector('#goods_spec > form > div.view_btn > span > button');
             if (soldOutElement) {
@@ -54,16 +49,6 @@ async function validateProduct(page) { // 상품 품절 검증
         return false;
     }
 }
-async function checkPopupProduct(page) { // 팝업 창 검증
-    let popupPage = false;
-
-    page.on('dialog', async dialog => {
-        if (dialog.type() === 'alert') {
-            popupPage = true;
-            await dialog.dismiss();
-        }
-    });
-};
 async function signIn(page, username, password) { //로그인 처리
     const goToAttemptsResult = await goToAttempts(page, 'https://pettob.co.kr/shop/main/intro_member.php?returnUrl=%2Fshop%2Fmain%2Findex.php', 'networkidle0');
     if (goToAttemptsResult === false) {
