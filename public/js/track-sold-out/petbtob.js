@@ -80,7 +80,11 @@ async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) 
     try {
         await page.goto(url, { waitUntil });
         page.once('dialog', async dialog => {
-            await dialog.accept();
+            try {
+                await dialog.accept();
+            } catch (error) {
+                return false;
+            }
         });
         return true;
     } catch (error) {
