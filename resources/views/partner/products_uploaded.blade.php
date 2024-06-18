@@ -32,38 +32,6 @@
         .pagination:hover {
             background-color: #f8f9fa;
         }
-
-        #topBtn {
-            position: fixed;
-            /* 고정된 위치 */
-            bottom: 20px;
-            /* 하단에서 20px 떨어진 위치 */
-            right: 30px;
-            /* 우측에서 30px 떨어진 위치 */
-            z-index: 99;
-            /* 다른 요소 위에 표시 */
-            font-size: 18px;
-            /* 글자 크기 */
-            border: none;
-            /* 테두리 없음 */
-            outline: none;
-            /* 외곽선 없음 */
-            background-color: #555;
-            /* 배경색 */
-            color: white;
-            /* 글자색 */
-            cursor: pointer;
-            /* 마우스 커서를 포인터로 변경 */
-            padding: 15px;
-            /* 패딩 */
-            border-radius: 10px;
-            /* 모서리 둥글게 */
-        }
-
-        #topBtn:hover {
-            background-color: #333;
-            /* 호버 시 배경색 변경 */
-        }
     </style>
 @endsection
 @section('title')
