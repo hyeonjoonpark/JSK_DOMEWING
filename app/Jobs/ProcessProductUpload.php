@@ -63,7 +63,7 @@ class ProcessProductUpload implements ShouldQueue
         DB::table('notifications')->insert([
             'partner_id' => $partnerId,
             'status' => $status ? 'TRUE' : 'FALSE',
-            'data' => '<strong>' . $vendorName . ' 상품 업로드 결과</strong><br>' . $data
+            'data' => "<b>$vendorName: $this->tableName 테이블 업로드 결과</b><br>$data"
         ]);
     }
 }
