@@ -251,6 +251,7 @@
                 $('#deliveryCompanyModal').val(null).trigger('change'); // select2 초기화 예시
                 $('input[name="targetStatus"]').prop('checked', false); // 체크박스 초기화 예시
                 $('#remoteAreaOption').hide(); // 숨김 초기화 예시
+                $('#confirmCheckbox').prop('checked', false);
                 $('#trackingNumber').val(''); // 송장번호 초기화
                 $('#remark').val(
                     '죄송합니다.\n\n주문해주신 제품 현재 최종 품절 확인이 되어 부득이 판매취소처리를 하게 되었습니다.\n\n입고일정도 확인하였으나, 입고 지연이 됨으로써 예상잡혀있던 입고일정이 다시 미정으로 잡히게 되었습니다.\n\n양해 부탁드리며, 쇼핑에 불편을 끼쳐드린점 사과의 말씀을 드립니다.'
