@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage(); //페이지 열고
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
@@ -39,8 +39,8 @@ async function validateProduct(page) { // 상품 품절 검증
             if (soldOutElement) {
                 return false;
             }
-            const soldOutImage = document.querySelector('div.infoArea img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
-            if (soldOutImage) {
+            const expirationDateElement = document.querySelector('div.info_name.bootstrap');
+            if (expirationDateElement && expirationDateElement.textContent.includes('유통기한')) {
                 return false;
             }
             return true;
@@ -77,11 +77,9 @@ async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) 
     }
     try { //정상적 로그임처리
         await page.goto(url, { waitUntil });
-        page.once('dialog', async dialog => {
-            await dialog.accept();
-        });
         return true;
     } catch (error) {
         return await goToAttempts(page, url, waitUntil, attempt++, maxAttempts);
     }
 }
+
