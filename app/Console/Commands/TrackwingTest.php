@@ -35,8 +35,12 @@ class TrackwingTest extends Command
             'vendorId' => $vendorId
         ]);
         $this->info('Operating Trackwing main engine...');
-        $soldOutProducts = $tsoc->main($request);
+        $soldOutProductIds = $tsoc->test($request);
+        $soldOutProductIdsFilePath = public_path('/assets/json/trackwing-results/test/');
+        if (!is_dir($soldOutProductIdsFilePath)) {
+            mkdir($soldOutProductIdsFilePath);
+        }
+        file_put_contents($soldOutProductIdsFilePath, json_encode($soldOutProductIds, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $this->info('Trackwing - TEST MODE has completed');
-        print_r($soldOutProducts);
     }
 }

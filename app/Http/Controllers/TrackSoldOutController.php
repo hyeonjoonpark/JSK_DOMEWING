@@ -131,4 +131,60 @@ class TrackSoldOutController extends Controller
             ];
         }
     }
+
+    public function test(Request $request)
+    {
+        set_time_limit(0);
+        $validator = Validator::make($request->all(), [
+            'vendorId' => 'required|exists:product_search,vendor_id'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => '유효한 원청사를 선택해주세요.'
+            ];
+        }
+        $vendorId = $request->vendorId;
+        $products = DB::table('minewing_products')
+            ->where('sellerID', $vendorId)
+            ->get([
+                'id',
+                'productHref',
+                'hasOption',
+                'productDetail'
+            ])
+            ->toArray();
+        $vendorEngName = DB::table('vendors')
+            ->where('id', $vendorId)
+            ->value('name_eng');
+        $account = DB::table('accounts')
+            ->where('vendor_id', $vendorId)
+            ->select([
+                'username',
+                'password'
+            ])
+            ->first();
+        $username = $account->username;
+        $password = $account->password;
+        $chunkedProducts = array_chunk($products, 500, false);
+        $productFilePath = public_path('js/track-sold-out/products/');
+        if (!is_dir($productFilePath)) {
+            mkdir($productFilePath, 0755, true);
+        }
+        $soldOutProductIds = [];
+        foreach ($chunkedProducts as $i => $products) {
+            $index = $i + 1;
+            $productFilePath = public_path('js/track-sold-out/products/' . $vendorEngName . '_' . $index . '.json');
+            file_put_contents($productFilePath, json_encode($products));
+            $trackResult = $this->track($vendorEngName, $productFilePath, $username, $password);
+            if ($trackResult['status'] === false) {
+                $productFilePath = public_path('js/track-sold-out/products/error_' . $vendorEngName . '_' . $index . '.json');
+                file_put_contents($productFilePath, json_encode($trackResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            } else {
+                $soldOutProductIds = array_merge($soldOutProductIds, $trackResult['data']);
+            }
+            unlink($productFilePath);
+        }
+        return $soldOutProductIds;
+    }
 }
