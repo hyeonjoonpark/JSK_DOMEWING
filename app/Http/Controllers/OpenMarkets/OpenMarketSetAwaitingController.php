@@ -154,11 +154,9 @@ class OpenMarketSetAwaitingController extends Controller
         $apiKey = $account->access_key;
         $controller = new St11ApiController();
         $method = 'GET';
-        $startDate = new DateTime('now - 4 days');
-        $endDate = new DateTime('now');
-        $formattedStartDate = $startDate->format('YmdHi');
-        $formattedEndDate = $endDate->format('YmdHi');
-        $url = 'http://api.11st.co.kr/rest/claimservice/cancelorders/' . $formattedStartDate . '/' . $formattedEndDate;
+        $startDate = (new DateTime('now - 4 days'))->format('YmdHi');
+        $endDate = (new DateTime('now'))->format('YmdHi');
+        $url = 'http://api.11st.co.kr/rest/claimservice/cancelorders/' . $startDate . '/' . $endDate;
         $builderResult = $controller->builder($apiKey, $method, $url); //날짜별 취소내역 조회
 
 

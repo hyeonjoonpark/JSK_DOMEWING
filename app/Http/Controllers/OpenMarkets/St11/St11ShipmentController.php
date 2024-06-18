@@ -110,6 +110,6 @@ class St11ShipmentController extends Controller
     {
         $dateTime = new DateTime('now', new DateTimeZone('Asia/Seoul'));
         $dateTime->modify('+3 days'); // 현재 날짜로부터 3일 뒤로 설정
-        return $dateTime->format('Y-m-d\TH:i:s.vP');
+        return $dateTime->format('YmdHi');
     }
 }

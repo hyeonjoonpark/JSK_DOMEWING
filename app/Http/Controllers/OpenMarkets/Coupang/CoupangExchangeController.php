@@ -27,14 +27,14 @@ class CoupangExchangeController extends Controller
     }
     private function getExchangeResult($account) //교환신청 내역 불러오기 - 테스트 완료
     {
-        $startDate = new DateTime('now - 4 days');
-        $endDate = new DateTime('now');
+        $startDate = (new DateTime('now - 4 days'))->format('YmdHi');
+        $endDate = (new DateTime('now'))->format('YmdHi');
 
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests';
         $baseQuery = [
-            'createdAtFrom' => $startDate->format('Y-m-d\TH:i:s'),
-            'createdAtTo' => $endDate->format('Y-m-d\TH:i:s'),
+            'createdAtFrom' => $startDate,
+            'createdAtTo' => $endDate,
             // 'status' => 'RECEIPT'//상태 - 입력 안하는 모든 상태의 값들 넘겨짐
         ];
         $query = http_build_query($baseQuery);
