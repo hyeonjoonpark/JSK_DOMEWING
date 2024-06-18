@@ -24,7 +24,6 @@ class CoupangShipmentController extends Controller
             $productOrderNumber = $request->productOrderNumber;
             $deliveryCompany = $this->getDeliveryCompany($deliveryCompanyId);
             $order = $this->getOrder($productOrderNumber);
-            $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
             $partnerOrder = $this->getPartnerOrder($order->id);
             $account = $this->getAccount($partnerOrder->account_id);
         } catch (\Exception $e) {
@@ -108,17 +107,6 @@ class CoupangShipmentController extends Controller
     {
         return DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
-            ->first();
-    }
-
-    private function getPartnerByWingTransactionId($wingTransactionId)
-    {
-        return DB::table('wing_transactions as wt')
-            ->join('partner_domewing_accounts as pda', 'wt.member_id', '=', 'pda.domewing_account_id')
-            ->join('partners as p', 'pda.partner_id', '=', 'p.id')
-            ->where('wt.id', $wingTransactionId)
-            ->where('pda.is_active', 'Y')
-            ->select('p.*')
             ->first();
     }
     private function getPartnerOrder($orderId)
