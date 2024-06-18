@@ -66,20 +66,24 @@ async function signIn(page, username, password) { //로그인 처리
     try {
         await page.waitForNavigation({ waitUntil: 'load', timeout: 1000 });
     } catch (error) {
-
-    } finally {
         return true;
     }
 }
-async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) { //로그인 시도 3회
-    if (attempt >= maxAttempts) { //3번이 넘어가면 false처리
+async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) {
+    if (attempt >= maxAttempts) {
         return false;
     }
-    try { //정상적 로그임처리
+    try {
         await page.goto(url, { waitUntil });
+        page.once('dialog', async dialog => {
+            try {
+                await dialog.accept();
+            } catch (error) {
+                return false;
+            }
+        });
         return true;
     } catch (error) {
         return await goToAttempts(page, url, waitUntil, attempt++, maxAttempts);
     }
 }
-
