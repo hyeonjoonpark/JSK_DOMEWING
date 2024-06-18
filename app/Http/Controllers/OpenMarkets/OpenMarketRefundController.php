@@ -143,10 +143,18 @@ class OpenMarketRefundController extends Controller
     private function updateWithoutTracking($orderId)
     {
         try {
+            $order = DB::table('orders')
+                ->where('id', $orderId)
+                ->first();
             DB::table('orders')
                 ->where('id', $orderId)
                 ->update([
                     'delivery_status' => 'COMPLETE',
+                ]);
+            DB::table('wing_transactions')
+                ->where('id', $order->wing_transaction_id)
+                ->update([
+                    'status' => 'APPROVED'
                 ]);
 
             return [
