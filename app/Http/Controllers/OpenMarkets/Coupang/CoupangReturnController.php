@@ -32,13 +32,13 @@ class CoupangReturnController extends Controller
     }
     private function getReturnList($account)  //반품내역 불러오기 - 테스트 완료
     {
-        $startDate = new DateTime('now - 4 days');
-        $endDate = new DateTime('now');
+        $startDate = (new DateTime('now - 4 days'))->format('YmdHi');
+        $endDate = (new DateTime('now'))->format('YmdHi');
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests';
         $baseQuery = [
-            'createdAtFrom' => $startDate->format('Y-m-d\TH:i'),
-            'createdAtTo' => $endDate->format('Y-m-d\TH:i'),
+            'createdAtFrom' => $startDate,
+            'createdAtTo' => $endDate,
             'status' => 'UC'
         ];
         $query = 'searchType=timeFrame&' . http_build_query($baseQuery);

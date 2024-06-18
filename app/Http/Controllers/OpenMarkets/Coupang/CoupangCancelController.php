@@ -48,6 +48,11 @@ class CoupangCancelController extends Controller
             'receiptCounts' => [$quantity],
             'bigCancelCode' => 'CANERR',
             'middleCancelCode' => 'CCPNER',
+            /*
+            CCTTER // 재고 연동 오류 : 재고 문제로 취소가 발생하는 경우
+            CCPNER // 제휴사이트 오류 : 주소 문제로 고객 배송지 생성 불가시 취소 되는 오류
+            CCPRER // 가격등재오류 : 양사간 상품 가격오류 발생시 취소 되는 오류
+            */
             'userId' => $account->username,
             'vendorId' => $account->code
         ];

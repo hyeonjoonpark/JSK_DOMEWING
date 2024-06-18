@@ -11,21 +11,21 @@ class St11OrderController extends Controller
     {
         $this->ssac = new ApiController();
     }
-    public function cancelOrder($account, $vendorItemId, $quantity, $orderId)
+    public function cancelOrder($account, $ordNo, $ordPrdSeq)
     {
-        $method = 'POST';
-        $path = '/v2/providers/openapi/apis/api/v5/vendors/' . $account->code . '/orders/' . $orderId . '/cancel';
-        $contentType = 'application/json;charset=UTF-8';
-        $data = [
-            'orderId' => $orderId,
-            'vendorItemIds' => [$vendorItemId],
-            'receiptCounts' => [$quantity],
-            'bigCancelCode' => 'CANERR',
-            'middleCancelCode' => 'CCPNER',
-            'userId' => $account->username,
-            'vendorId' => $account->code
-        ];
-        $response =  $this->ssac->builder($account->access_key, $account->secret_key, $method, $contentType, $path, $data);
+        $method = 'GET';
+        $url = 'https://api.11st.co.kr/rest/claimservice/reqrejectorder/' . $ordNo . '/' . $ordPrdSeq . '/06/[ordCnDtlsRsn]';
+        /*
+        배송업체
+→ 06 : 배송 지연 예상
+→ 07 : 상품/가격 정보 잘못 입력
+→ 08 : 상품 품절(전체옵션)
+→ 09 : 옵션 품절(해당옵션)
+→ 10 : 고객변심
+→ 99 : 기타
+        */
+        $apiKey = $account->access_key;
+        $response = $this->ssac->builder($apiKey, $method, $url);
         if (!$response['status']) return [
             'status' => false,
             'message' => '주문취소에 실패하였습니다.',

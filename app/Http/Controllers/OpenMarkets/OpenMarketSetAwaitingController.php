@@ -4,6 +4,7 @@ namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
+use App\Http\Controllers\OpenMarkets\St11\ApiController as St11ApiController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
 use App\Http\Controllers\WingController;
 use DateTime;
@@ -103,14 +104,6 @@ class OpenMarketSetAwaitingController extends Controller
             'cancelled' => false
         ];
     }
-    private function smartStoreCancelApi($controller, $account, $contentType, $method, $productOrderNumber)
-    {
-        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderNumber . '/claim/cancel/approve';
-        $data = [
-            'productOrderId' => $productOrderNumber
-        ];
-        return $controller->builder($account, $contentType, $method, $url, $data);
-    }
     private function callCoupangCheckApi($order)
     {
         $partnerOrder = DB::table('partner_orders')
@@ -149,6 +142,41 @@ class OpenMarketSetAwaitingController extends Controller
             'message' => '쿠팡 취소 요청건이 아닙니다.',
             'cancelled' => false
         ];
+    }
+    private function callSt11CheckApi($order)
+    {
+        $partnerOrder = DB::table('partner_orders')
+            ->where('order_id', $order->id)
+            ->first();
+        $account = DB::table('coupang_accounts as ca')
+            ->where('ca.id', $partnerOrder->account_id)
+            ->first();
+        $apiKey = $account->access_key;
+        $controller = new St11ApiController();
+        $method = 'GET';
+        $startDate = (new DateTime('now - 4 days'))->format('YmdHi');
+        $endDate = (new DateTime('now'))->format('YmdHi');
+        $url = 'http://api.11st.co.kr/rest/claimservice/cancelorders/' . $startDate . '/' . $endDate;
+        $builderResult = $controller->builder($apiKey, $method, $url); //날짜별 취소내역 조회
+
+
+        // $this->st11CancelApi($apiKey);
+    }
+    private function st11CancelApi($apiKey, $ordPrdCnSeq, $ordNo, $ordPrdSeq)
+    {
+        $controller = new St11ApiController();
+        $method = 'GET';
+        $url = 'http: //api.11st.co.kr/rest/claimservice/cancelreqconf/[ordPrdCnSeq]/[ordNo]/[ordPrdSeq]';
+
+        $builderResult = $controller->builder($apiKey, $method, $url); //주문취소승인
+    }
+    private function smartStoreCancelApi($controller, $account, $contentType, $method, $productOrderNumber)
+    {
+        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderNumber . '/claim/cancel/approve';
+        $data = [
+            'productOrderId' => $productOrderNumber
+        ];
+        return $controller->builder($account, $contentType, $method, $url, $data);
     }
     private function fetchReceiptDetails($account, $orderId, $shipmentBoxId)
     {

@@ -147,6 +147,7 @@ class TrackSoldOutController extends Controller
         $vendorId = $request->vendorId;
         $products = DB::table('minewing_products')
             ->where('sellerID', $vendorId)
+            ->limit(100)
             ->get([
                 'id',
                 'productHref',
@@ -166,7 +167,7 @@ class TrackSoldOutController extends Controller
             ->first();
         $username = $account->username;
         $password = $account->password;
-        $chunkedProducts = array_chunk($products, 500, false);
+        $chunkedProducts = array_chunk($products, 100, false);
         $productFilePath = public_path('js/track-sold-out/products/');
         if (!is_dir($productFilePath)) {
             mkdir($productFilePath, 0755, true);
