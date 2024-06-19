@@ -35,16 +35,16 @@ const path = require('path');
 async function validateProduct(page) {
     try {
         return await page.evaluate(() => {
-            const txtDescElement = document.querySelector('p.txtDesc');
-            if (txtDescElement && txtDescElement.textContent.trim().includes('사라졌거나')) {
+            const soldOutTextElement = document.querySelector('#container > div.container.wrapper_fix > div > div.goods_title > h2 > span:nth-child(2)');
+            if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('품절')) {
                 return false;
             }
-            const soldOutImage = document.querySelector('div.infoArea img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
-            if (soldOutImage) {
+            const soldOutButton = document.querySelector('#container > div.container.wrapper_fix > div > div.goods_title > h2 > span.goods_restock > a > img');
+            if (soldOutButton && soldOutButton.scr.includes('/images/shop/option_btn_msg.gif')) {
                 return false;
             }
-            const buyButton = document.querySelector('a.first');
-            if (buyButton && buyButton.classList.contains('displaynone') && buyButton.textContent.trim().includes('구매하기')) {
+            const buyButton = document.querySelector('#container > div.container.wrapper_fix > div > div.goods_info > div.right > div > a:nth-child(2) > img');
+            if (buyButton && buyButton.src.includes('/images/shop/goods_btn_big_buy.gif') && buyButton.alt.trim().includes('바로구매')) {
                 return false;
             }
             return true;

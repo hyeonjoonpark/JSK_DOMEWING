@@ -38,6 +38,7 @@ class OpenMarketSetAwaitingController extends Controller
         if ($openMarket) {
             $method = 'call' . ucfirst($openMarket->name_eng) . 'CheckApi';
             $updateApiResult = $this->$method($order);
+            return $updateApiResult;
             if ($updateApiResult['status'] === false) {
                 return $updateApiResult;
             }
@@ -117,6 +118,7 @@ class OpenMarketSetAwaitingController extends Controller
         $orderId = $partnerOrder->order_number;
         $shipmentBoxId = $partnerOrder->product_order_number;
         $receiptDetails = $this->fetchReceiptDetails($account, $orderId, $shipmentBoxId); //orderId로 반품건 조회 조회 결과에
+        return $receiptDetails;
         if ($receiptDetails['status']) {
             $response = $this->coupangCancelApi($controller, $account, $contentType, $receiptDetails['receiptId'], $receiptDetails['cancelCount']); //취소 승인 api
             if (!$response['status']) return [
@@ -192,9 +194,14 @@ class OpenMarketSetAwaitingController extends Controller
         $queryString = http_build_query($baseQuery);
         $controller = new ApiController();
         $response =  $controller->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $queryString); //발주서 단건조회
+        return $response;
         $receiptId = 0;
         $cancelCount = 0;
         $purchaseCount = 0;
+        if (isset($response['data']['data'])) return [
+            'status' => false,
+            'message' => '쿠팡 주문 조회가 되지 않습니다.'
+        ];
         foreach ($response['data']['data'] as $orderItem) {
             if ($orderItem['returnItems'][0]['shipmentBoxId'] == $shipmentBoxId) {
                 $receiptId = $orderItem['receiptId'];
