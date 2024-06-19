@@ -81,6 +81,9 @@ class MainController extends Controller
                     'errors' => $errors
                 ];
             }
+            // 파트너스 업로드된 상품들에 반영.
+
+            // END.
             $productCodes = [];
             foreach ($products as $product) {
                 $this->updateProduct($product);

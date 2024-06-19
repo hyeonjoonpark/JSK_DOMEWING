@@ -652,24 +652,25 @@ class UploadedController extends Controller
         }
         return $apiResult;
     }
-    public function sync(Request $request)
+    public function fetchEdittedProducts(array $products)
     {
-        $this->syncValidator($request);
-    }
-    protected function syncValidator(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'vendorId' => ['required', 'exists:vendors,id'],
-            'hash' => ['required']
-        ], [
-            'vendorId' => '유효한 오픈 마켓을 선택해주세요.',
-            'hash' => '유효한 계정을 선택해주세요.'
-        ]);
-        if ($validator->fails()) {
-            return [
-                'status' => false,
-                'message' => $validator->errors()->first()
-            ];
+        $openMarkets = DB::table('vendors')
+            ->where('is_active', 'ACTIVE')
+            ->where('type', 'OPEN_MARKET')
+            ->get(['name_eng', 'id']);
+        foreach ($products as $product) {
+            $oldProduct = DB::table('minewing_products')
+                ->where('productCode', $product['productCode'])
+                ->first(['id', 'productPrice']);
+            foreach ($openMarkets as $openMarket) {
+                $uploadedProducts = DB::table($openMarket->name_eng . '_uploaded_products')
+                    ->whereIn('product_id', $oldProduct->id)
+                    ->get(['origin_product_no', 'price']);
+                foreach ($uploadedProducts as $uploadedProduct) {
+                    $marginRate = ceil($uploadedProduct->price / $oldProduct->$oldProduct->productPrice * 100) / 100;
+                    $newPrice = ceil($product['productPrice'] * $marginRate * 10) / 10;
+                }
+            }
         }
     }
 }
