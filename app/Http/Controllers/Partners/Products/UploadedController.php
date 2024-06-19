@@ -654,23 +654,58 @@ class UploadedController extends Controller
     }
     public function fetchEdittedProducts(array $products)
     {
+        // 활성화된 'OPEN_MARKET' 타입의 모든 벤더를 조회하여 $openMarkets에 저장
         $openMarkets = DB::table('vendors')
             ->where('is_active', 'ACTIVE')
             ->where('type', 'OPEN_MARKET')
             ->get(['name_eng', 'id']);
+
+        // 에러를 저장할 배열 초기화
+        $errors = [];
+
+        // 입력받은 제품 목록을 하나씩 처리
         foreach ($products as $product) {
+            // 입력받은 제품의 제품 코드를 기준으로 기존 제품 정보 조회
             $oldProduct = DB::table('minewing_products')
                 ->where('productCode', $product['productCode'])
                 ->first(['id', 'productPrice']);
+
+            // 모든 오픈 마켓 벤더를 순회
             foreach ($openMarkets as $openMarket) {
+                // 각 벤더의 업로드된 제품 중 해당 제품의 ID와 일치하는 제품 목록 조회
                 $uploadedProducts = DB::table($openMarket->name_eng . '_uploaded_products')
                     ->whereIn('product_id', $oldProduct->id)
                     ->get(['origin_product_no', 'price']);
+
+                // 조회된 업로드된 제품 목록을 순회
                 foreach ($uploadedProducts as $uploadedProduct) {
-                    $marginRate = ceil($uploadedProduct->price / $oldProduct->$oldProduct->productPrice * 100) / 100;
+                    // 마진율 계산
+                    $marginRate = ceil($uploadedProduct->price / $$oldProduct->productPrice * 100) / 100;
+                    // 새로운 가격 계산
                     $newPrice = ceil($product['productPrice'] * $marginRate * 10) / 10;
+                    // 쿠팡인 경우, 5,000원 이상인 상품들은 배송비를 0원 -> 상품가에 덤핑.
+                    $shippingFee = $openMarket->id === 40 ? 0 : $product['shipping_fee'];
+                    $newPrice = $openMarket->id === 40 ? $newPrice + $shippingFee : $newPrice;
+
+                    // 제품 수정 요청을 위한 데이터 생성
+                    $editRequest = new Request([
+                        'originProductNo' => $uploadedProduct->origin_product_no,
+                        'productName' => $product['productName'],
+                        'price' => $newPrice,
+                        'shippingFee' => $shippingFee,
+                        'vendorId' => $openMarket->id
+                    ]);
+
+                    // 제품 수정 요청 실행
+                    $editResult = $this->edit($editRequest);
+
+                    // 수정 요청이 실패하면 에러 배열에 추가
+                    if (!$editResult['status']) {
+                        $errors[] = $editResult;
+                    }
                 }
             }
         }
+        return $errors;
     }
 }

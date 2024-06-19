@@ -446,19 +446,17 @@
                             </div>
                         </div>
                     </td>
-                    <td class="text-nowrap">
+                    <td>
                         <h6 class="title">${orderVendorHtml}</h6>
                         ${orderTypeHtml}
-                        <div class="col-auto">
-                            <p>${order.orderDate}</p>
-                            ${trackingNumber}
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProcess" onclick="productOrderNumber='${order.productOrderNumber}';">주문 처리</button>
-                            <div class="d-flex mt-3">
-                                <input class="form-control" type="text" id="adminRemarkInput${order.productOrderNumber}" />
-                                <button class="btn btn-success" onclick="setAdminRemark('${order.productOrderNumber}');">메모</button>
-                            </div>
-                            <p id="adminRemark${order.productOrderNumber}">${order.adminRemark ? order.adminRemark : ''}</p>
+                        <p>${order.orderDate}</p>
+                        ${trackingNumber}
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProcess" onclick="productOrderNumber='${order.productOrderNumber}';">주문 처리</button>
+                        <div class="d-flex mt-3">
+                            <input class="form-control" type="text" id="adminRemarkInput${order.productOrderNumber}" />
+                            <button class="btn btn-success text-nowrap" onclick="setAdminRemark('${order.productOrderNumber}');">메모</button>
                         </div>
+                        <p id="adminRemark${order.productOrderNumber}">${order.adminRemark ? order.adminRemark : ''}</p>
                     </td>
                 </tr>
                 `;

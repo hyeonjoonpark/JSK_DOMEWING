@@ -59,7 +59,7 @@ class CoupangUploadController extends Controller
                 $salePrice = (int)($product->productPrice + $product->shipping_fee);
                 $shippingFee = 0;
             }
-            $data = $this->generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee);
+            $data = $this->generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee, $productPrice);
             $uploadResult = $ac->builder($accessKey, $secretKey, $method, $contentType, $path, $data);
             if ($uploadResult['status'] === true && $uploadResult['data']['code'] === 'SUCCESS') {
                 $originProductNo = $uploadResult['data']['data'];
@@ -155,14 +155,14 @@ class CoupangUploadController extends Controller
             'error' => $response
         ];
     }
-    protected function generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee)
+    protected function generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee, $productPrice)
     {
         $optionName = '단일 상품';
         if ($product->hasOption === 'Y') {
             $optionName = $this->extractOptionName($product->productDetail);
         }
         $deliveryChargeType = "NOT_FREE";
-        if ($salePrice >= 5000) {
+        if ($productPrice >= 5000) {
             $deliveryChargeType = "FREE";
         }
         $deliveryCharge = $shippingFee;
