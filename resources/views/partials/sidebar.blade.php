@@ -3,7 +3,7 @@
         <div class="nk-sidebar-brand">
             <a href="/" class="logo-link nk-sidebar-logo">
                 <h3 class="font-bold fw-bold m-0" style="color: var(--dark-blue); line-height:44px; font-size:30px;">
-                    SELLWING
+                    SELLWING 관리자
                 </h3>
             </a>
         </div>

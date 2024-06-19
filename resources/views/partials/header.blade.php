@@ -9,7 +9,7 @@
                 <a href="/" class="logo-link">
                     <h3 class="font-bold fw-bold m-0"
                         style="color: var(--dark-blue); line-height:44px; font-size:30px;">
-                        SELLWING
+                        SELLWING 관리자
                     </h3>
                 </a>
             </div><!-- .nk-header-brand -->

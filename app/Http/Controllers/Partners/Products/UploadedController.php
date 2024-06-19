@@ -652,4 +652,24 @@ class UploadedController extends Controller
         }
         return $apiResult;
     }
+    public function sync(Request $request)
+    {
+        $this->syncValidator($request);
+    }
+    protected function syncValidator(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'vendorId' => ['required', 'exists:vendors,id'],
+            'hash' => ['required']
+        ], [
+            'vendorId' => '유효한 오픈 마켓을 선택해주세요.',
+            'hash' => '유효한 계정을 선택해주세요.'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first()
+            ];
+        }
+    }
 }
