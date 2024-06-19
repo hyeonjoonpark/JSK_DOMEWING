@@ -8,9 +8,6 @@ const fs = require('fs');
     try {
         const [username, password, tempFilePath] = process.argv.slice(2);
         const productCodes = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const username = 'jskorea2024';
-        // const password = 'tjddlf88!@';
-        // const productCodes = ['Q6PEA'];
         const searchStr = productCodes.join(',');
 
         await login(page, username, password);
