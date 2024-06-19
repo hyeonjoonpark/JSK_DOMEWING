@@ -1,14 +1,14 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
-const { goToAttempts } = require('./trackwing-common');
+const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage(); //페이지 열고
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const products = JSON.parse(fs.readFileSync(tempFilePath, 'utf8')); //products 변수 선언
-        const signInResult = await signIn(page, username, password); // 로그인 시도
+        const signInResult = await signIn(page, username, password, 'https://pettob.co.kr/shop/main/intro_member.php?returnUrl=%2Fshop%2Fmain%2Findex.php', '#login_frm > div:nth-child(3) > input', '#login_frm > div:nth-child(4) > input', '#login_frm > div:nth-child(5) > a.btn.btn-default.btn-lg.submit.btn_login');
         if (signInResult === false) { //로그인 실패 처리
             console.log(JSON.stringify('로그인 과정에서 오류가 발생했습니다.'));
             return;
@@ -40,8 +40,8 @@ async function validateProduct(page) { // 상품 품절 검증
             if (soldOutElement) {
                 return false;
             }
-            const expirationDateElement = document.querySelector('div.info_name.bootstrap');
-            if (expirationDateElement && expirationDateElement.textContent.includes('유통기한')) {
+            const expirationDateElement = document.querySelector('strong.label.label-success');
+            if (expirationDateElement) {
                 return false;
             }
             return true;
@@ -50,47 +50,7 @@ async function validateProduct(page) { // 상품 품절 검증
         return false;
     }
 }
-async function signIn(page, username, password) { //로그인 처리
-    const goToAttemptsResult = await goToAttempts(page, 'https://pettob.co.kr/shop/main/intro_member.php?returnUrl=%2Fshop%2Fmain%2Findex.php', 'networkidle0');
-    if (goToAttemptsResult === false) {
-        return false;
-    }
-    try {
-        await page.evaluate((username, password) => {
-            document.querySelector('#login_frm > div:nth-child(3) > input').value = username;
-            document.querySelector('#login_frm > div:nth-child(4) > input').value = password;
-            document.querySelector('#login_frm > div:nth-child(5) > a.btn.btn-default.btn-lg.submit.btn_login').click();
-        }, username, password);
-    } catch (error) {
-        return false;
-    }
-    try {
-        await page.waitForNavigation({ waitUntil: 'load', timeout: 1000 });
-    } catch (error) {
-        return true;
-    }
-}
-async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) {
-    if (attempt >= maxAttempts) {
-        return false;
-    }
-    let dialogAppeared = false;
-    page.once('dialog', async dialog => {
-        try {
-            await dialog.accept();
-        } catch (error) {
-
-        } finally {
-            dialogAppeared = true;
-        }
-    });
-    try {
-        await page.goto(url, { waitUntil });
-        if (dialogAppeared) {
-            return false;
-        }
-        return true;
-    } catch (error) {
-        return await goToAttempts(page, url, waitUntil, attempt++, maxAttempts);
-    }
-}
+// const buyButton = document.querySelector('a.first');
+// if (buyButton && buyButton.classList.contains('displaynone') && buyButton.textContent.trim().includes('구매하기')) {
+//     return false;
+// }
