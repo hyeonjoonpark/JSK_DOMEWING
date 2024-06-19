@@ -684,8 +684,11 @@ class UploadedController extends Controller
                     // 새로운 가격 계산
                     $newPrice = ceil($product['productPrice'] * $marginRate * 10) / 10;
                     // 쿠팡인 경우, 5,000원 이상인 상품들은 배송비를 0원 -> 상품가에 덤핑.
-                    $shippingFee = $openMarket->id === 40 ? 0 : $product['shipping_fee'];
-                    $newPrice = $openMarket->id === 40 ? $newPrice + $shippingFee : $newPrice;
+                    $shippingFee = $product['shipping_fee'];
+                    if ($newPrice >= 5000) {
+                        $newPrice += $product['shipping_fee'];
+                        $shippingFee = 0;
+                    }
 
                     // 제품 수정 요청을 위한 데이터 생성
                     $editRequest = new Request([
