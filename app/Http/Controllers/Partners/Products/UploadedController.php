@@ -652,4 +652,25 @@ class UploadedController extends Controller
         }
         return $apiResult;
     }
+    public function fetchEdittedProducts(array $products)
+    {
+        $openMarkets = DB::table('vendors')
+            ->where('is_active', 'ACTIVE')
+            ->where('type', 'OPEN_MARKET')
+            ->get(['name_eng', 'id']);
+        foreach ($products as $product) {
+            $oldProduct = DB::table('minewing_products')
+                ->where('productCode', $product['productCode'])
+                ->first(['id', 'productPrice']);
+            foreach ($openMarkets as $openMarket) {
+                $uploadedProducts = DB::table($openMarket->name_eng . '_uploaded_products')
+                    ->whereIn('product_id', $oldProduct->id)
+                    ->get(['origin_product_no', 'price']);
+                foreach ($uploadedProducts as $uploadedProduct) {
+                    $marginRate = ceil($uploadedProduct->price / $oldProduct->$oldProduct->productPrice * 100) / 100;
+                    $newPrice = ceil($product['productPrice'] * $marginRate * 10) / 10;
+                }
+            }
+        }
+    }
 }

@@ -3,7 +3,7 @@
         <div class="nk-sidebar-brand">
             <a href="/" class="logo-link nk-sidebar-logo">
                 <h3 class="font-bold fw-bold m-0" style="color: var(--dark-blue); line-height:44px; font-size:30px;">
-                    SELLWING
+                    SELLWING 관리자
                 </h3>
             </a>
         </div>
@@ -36,12 +36,6 @@
                             <a href="/admin/product/new-minewing" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-person-digging"></em></span>
                                 <span class="nk-menu-text">뉴 마인윙</span>
-                            </a>
-                        </li>
-                        <li class="nk-menu-item">
-                            <a href="/admin/apiwing" class="nk-menu-link">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-code-pull-request"></em></span>
-                                <span class="nk-menu-text">API윙</span>
                             </a>
                         </li>
                         <li class="nk-menu-item has-sub">

@@ -182,8 +182,8 @@ class OpenMarketSetAwaitingController extends Controller
     {
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests';
-        $startDate = (new DateTime('now - 4 days'))->format('YmdHi');
-        $endDate = (new DateTime('now'))->format('YmdHi');
+        $startDate = (new DateTime('now - 4 days'))->format('Y-m-d');
+        $endDate = (new DateTime('now'))->format('Y-m-d');
         $baseQuery = [
             'createdAtFrom' => $startDate,
             'createdAtTo' => $endDate,
@@ -195,6 +195,10 @@ class OpenMarketSetAwaitingController extends Controller
         $receiptId = 0;
         $cancelCount = 0;
         $purchaseCount = 0;
+        if (isset($response['data']['data'])) return [
+            'status' => false,
+            'message' => '쿠팡 주문 조회가 되지 않습니다.'
+        ];
         foreach ($response['data']['data'] as $orderItem) {
             if ($orderItem['returnItems'][0]['shipmentBoxId'] == $shipmentBoxId) {
                 $receiptId = $orderItem['receiptId'];
