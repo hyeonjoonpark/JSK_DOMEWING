@@ -147,6 +147,7 @@ class TrackSoldOutController extends Controller
         $vendorId = $request->vendorId;
         $products = DB::table('minewing_products')
             ->where('sellerID', $vendorId)
+            ->limit(100)
             ->get([
                 'id',
                 'productHref',
