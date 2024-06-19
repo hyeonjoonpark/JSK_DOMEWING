@@ -279,7 +279,7 @@ class SmartstoreProductUpload extends Controller
             return [
                 'status' => false,
                 'message' => '유효한 API 계정 정보가 아닙니다.',
-                'error' => $getAccessTokenResult['message']
+                'error' => $getAccessTokenResult['error']
             ];
         }
 
