@@ -425,49 +425,15 @@ class OpenMarketOrderController extends Controller
     {
         $lowBalanceAccounts = [];
         $accounts = DB::table('members')->get();
+        $wc = new WingController();
         foreach ($accounts as $account) {
-            $balance = $this->getBalance($account->id);
+            $balance = $wc->getBalance($account->id);
             if ($balance < 0) {
                 $name = $account->last_name . '' . $account->first_name;
                 $lowBalanceAccounts[] = $name; // 배열에 값을 추가하는 방식으로 수정
             }
         }
         return $lowBalanceAccounts; // 결과를 반환
-    }
-
-    private function getBalance(int $memberId): int
-    {
-        $depositAmount = DB::table('wing_transactions')
-            ->where('member_id', $memberId)
-            ->where('type', 'DEPOSIT')
-            ->where('status', 'APPROVED')
-            ->sum('amount');
-        $withdrawalAmount = DB::table('wing_transactions AS wt')
-            ->join('withdrawal_details AS wd', 'wd.wing_transaction_id', '=', 'wt.id')
-            ->where('wt.member_id', $memberId)
-            ->where('wt.status', 'APPROVED')
-            ->sum('wt.amount');
-        $paidAmount = DB::table('wing_transactions AS wt')
-            ->join('orders AS o', 'o.wing_transaction_id', '=', 'wt.id')
-            ->where('member_id', $memberId)
-            ->where('o.type', 'PAID')
-            ->where('wt.status', 'APPROVED')
-            ->distinct()
-            ->sum('wt.amount');
-        $refundAmount = DB::table('orders AS o')
-            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
-            ->where('wt.member_id', $memberId)
-            ->where('o.type', 'REFUND')
-            ->where('wt.status', 'APPROVED')
-            ->sum('wt.amount');
-        $exchangeAmount = DB::table('orders AS o')
-            ->join('wing_transactions AS wt', 'o.wing_transaction_id', '=', 'wt.id')
-            ->where('wt.member_id', $memberId)
-            ->where('o.type', 'EXCHANGE')
-            ->where('wt.status', 'APPROVED')
-            ->sum('wt.amount');
-        $balance = $depositAmount - $withdrawalAmount - $paidAmount + $refundAmount - $exchangeAmount;
-        return $balance;
     }
     private function getPartnerDomewingAccount($partnerId)
     {
