@@ -27,8 +27,8 @@ class St11OrderController extends Controller
     }
     private function getOrderList($id)
     {
-        $accounts = $this->getAccounts($id);
-        if (!$accounts) {
+        $account = $this->getAccounts($id);
+        if (!$account) {
             return false;
         }
         $response = [];
@@ -38,19 +38,19 @@ class St11OrderController extends Controller
         $method = 'GET';
         $url = 'https://api.11st.co.kr/rest/ordservices/complete/' . $startDate . '/' . $endDate;
         // $url = 'https://api.11st.co.kr/rest/ordservices/complete/20240618837686159'; //실제 주문번호로 조회
-        foreach ($accounts as $account) {
-            $apiKey = $account->access_key;
-            $builderResult = $this->ssac->builder($apiKey, $method, $url); //날짜별 주문내역 조회
-            // if ($builderResult['status'] === false) continue; //오류는 그냥 넘겨
+        // foreach ($accounts as $account) {
+        $apiKey = $account->access_key;
+        $builderResult = $this->ssac->orderBuilder($apiKey, $method, $url); //날짜별 주문내역 조회
+        // if ($builderResult['status'] === false) continue; //오류는 그냥 넘겨
 
-            // $addrSeq = $builderResult['data']->xpath('//ns2:order')[0]->addrSeq;
-            // $confirmResult = $this->confirmOrder($apiKey, $builderResult['ordNo'], $builderResult['ordPrdSeq'], $builderResult['dlvNo']); //상품준비중처리
-            // if ($confirmResult['status'] === false) {
-            //     return $confirmResult;
-            // }
-            //상품 준비중 처리까지하면 builderResult를 한쪽에 잘 정렬해서 넣고 return
-            $response[] = $builderResult;
-        }
+        // $addrSeq = $builderResult['data']->xpath('//ns2:order')[0]->addrSeq;
+        // $confirmResult = $this->confirmOrder($apiKey, $builderResult['ordNo'], $builderResult['ordPrdSeq'], $builderResult['dlvNo']); //상품준비중처리
+        // if ($confirmResult['status'] === false) {
+        //     return $confirmResult;
+        // }
+        //상품 준비중 처리까지하면 builderResult를 한쪽에 잘 정렬해서 넣고 return
+        $response[] = $builderResult;
+        // }
         return [
             'status' => true,
             'message' => '성공하였습니다.',
@@ -93,6 +93,6 @@ class St11OrderController extends Controller
         return DB::table('st11_accounts')
             ->where('partner_id', $id)
             ->where('is_active', 'ACTIVE')
-            ->get();
+            ->first();
     }
 }
