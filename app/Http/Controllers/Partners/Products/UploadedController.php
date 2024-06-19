@@ -658,19 +658,52 @@ class UploadedController extends Controller
             ->where('is_active', 'ACTIVE')
             ->where('type', 'OPEN_MARKET')
             ->get(['name_eng', 'id']);
+
+        $errors = [];
+
         foreach ($products as $product) {
             $oldProduct = DB::table('minewing_products')
                 ->where('productCode', $product['productCode'])
                 ->first(['id', 'productPrice']);
-            foreach ($openMarkets as $openMarket) {
-                $uploadedProducts = DB::table($openMarket->name_eng . '_uploaded_products')
-                    ->whereIn('product_id', $oldProduct->id)
-                    ->get(['origin_product_no', 'price']);
-                foreach ($uploadedProducts as $uploadedProduct) {
-                    $marginRate = ceil($uploadedProduct->price / $oldProduct->$oldProduct->productPrice * 100) / 100;
-                    $newPrice = ceil($product['productPrice'] * $marginRate * 10) / 10;
-                }
+
+            if ($oldProduct) {
+                $this->processProductForMarkets($product, $oldProduct, $openMarkets, $errors);
             }
+        }
+
+        return $errors;
+    }
+
+    private function processProductForMarkets($product, $oldProduct, $openMarkets, &$errors)
+    {
+        foreach ($openMarkets as $openMarket) {
+            $uploadedProducts = DB::table($openMarket->name_eng . '_uploaded_products')
+                ->where('product_id', $oldProduct->id)
+                ->get(['origin_product_no', 'price']);
+
+            foreach ($uploadedProducts as $uploadedProduct) {
+                $this->processUploadedProduct($product, $oldProduct, $openMarket, $uploadedProduct, $errors);
+            }
+        }
+    }
+
+    private function processUploadedProduct($product, $oldProduct, $openMarket, $uploadedProduct, &$errors)
+    {
+        $marginRate = ceil($uploadedProduct->price / $oldProduct->productPrice * 100) / 100;
+        $newPrice = ceil($product['productPrice'] * $marginRate * 10) / 10;
+
+        $editRequest = new Request([
+            'originProductNo' => $uploadedProduct->origin_product_no,
+            'productName' => $product['productName'],
+            'price' => $newPrice,
+            'shippingFee' => $product['shipping_fee'],
+            'vendorId' => $openMarket->id
+        ]);
+
+        $editResult = $this->edit($editRequest);
+
+        if (!$editResult['status']) {
+            $errors[] = $editResult;
         }
     }
 }
