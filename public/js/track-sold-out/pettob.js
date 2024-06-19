@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
+const { goToAttempts } = require('./trackwing-common');
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage(); //페이지 열고
@@ -73,15 +74,21 @@ async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) 
     if (attempt >= maxAttempts) {
         return false;
     }
+    let dialogAppeared = false;
+    page.once('dialog', async dialog => {
+        try {
+            await dialog.accept();
+        } catch (error) {
+
+        } finally {
+            dialogAppeared = true;
+        }
+    });
     try {
         await page.goto(url, { waitUntil });
-        page.once('dialog', async dialog => {
-            try {
-                await dialog.accept();
-            } catch (error) {
-                return false;
-            }
-        });
+        if (dialogAppeared) {
+            return false;
+        }
         return true;
     } catch (error) {
         return await goToAttempts(page, url, waitUntil, attempt++, maxAttempts);

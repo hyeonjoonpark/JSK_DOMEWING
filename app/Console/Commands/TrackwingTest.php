@@ -40,7 +40,7 @@ class TrackwingTest extends Command
         if (!is_dir($soldOutProductIdsFilePath)) {
             mkdir($soldOutProductIdsFilePath);
         }
-        file_put_contents($soldOutProductIdsFilePath, json_encode($soldOutProductIds, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        file_put_contents($soldOutProductIdsFilePath . 'result.json', json_encode($soldOutProductIds, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $this->info('Trackwing - TEST MODE has completed');
     }
 }

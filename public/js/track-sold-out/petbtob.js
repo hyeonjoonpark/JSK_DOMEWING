@@ -1,13 +1,14 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
+const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const products = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const signInResult = await signIn(page, username, password);
+        const signInResult = await signIn(page, username, password, 'https://petbtob.co.kr/member/login.html', '#member_id', '#member_passwd', '#contents > form > div > div > fieldset > a');
         if (signInResult === false) {
             console.log(JSON.stringify('로그인 과정에서 오류가 발생했습니다.'));
             return;
@@ -51,43 +52,5 @@ async function validateProduct(page) {
         });
     } catch (error) {
         return false;
-    }
-}
-async function signIn(page, username, password) {
-    const goToAttemptsResult = await goToAttempts(page, 'https://petbtob.co.kr/member/login.html', 'networkidle0');
-    if (goToAttemptsResult === false) {
-        return false;
-    }
-    try {
-        await page.evaluate((username, password) => {
-            document.querySelector('#member_id').value = username;
-            document.querySelector('#member_passwd').value = password;
-            document.querySelector('#contents > form > div > div > fieldset > a').click();
-        }, username, password);
-    } catch (error) {
-        return false;
-    }
-    try {
-        await page.waitForNavigation({ waitUntil: 'load', timeout: 1000 });
-    } catch (error) {
-        return true;
-    }
-}
-async function goToAttempts(page, url, waitUntil, attempt = 0, maxAttempts = 3) {
-    if (attempt >= maxAttempts) {
-        return false;
-    }
-    try {
-        await page.goto(url, { waitUntil });
-        page.once('dialog', async dialog => {
-            try {
-                await dialog.accept();
-            } catch (error) {
-                return false;
-            }
-        });
-        return true;
-    } catch (error) {
-        return await goToAttempts(page, url, waitUntil, attempt++, maxAttempts);
     }
 }
