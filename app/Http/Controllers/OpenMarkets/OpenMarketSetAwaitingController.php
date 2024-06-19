@@ -182,8 +182,8 @@ class OpenMarketSetAwaitingController extends Controller
     {
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests';
-        $startDate = (new DateTime('now - 4 days'))->format('Y-m-d\TH:i:s');
-        $endDate = (new DateTime('now'))->format('Y-m-d\TH:i:s');
+        $startDate = (new DateTime('now - 4 days'))->format('Y-m-d');
+        $endDate = (new DateTime('now'))->format('Y-m-d');
         $baseQuery = [
             'createdAtFrom' => $startDate,
             'createdAtTo' => $endDate,
