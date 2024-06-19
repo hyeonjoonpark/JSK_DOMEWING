@@ -673,30 +673,32 @@ class UploadedController extends Controller
             // 모든 오픈 마켓 벤더를 순회
             foreach ($openMarkets as $openMarket) {
                 // 각 벤더의 업로드된 제품 중 해당 제품의 ID와 일치하는 제품 목록 조회
-                $uploadedProducts = DB::table($openMarket->name_eng . '_uploaded_products')
-                    ->whereIn('product_id', $oldProduct->id)
-                    ->get(['origin_product_no', 'price']);
+                $uploadedProducts = DB::table($openMarket->name_eng . '_uploaded_products AS up')
+                    ->join($openMarket->name_eng . '_accounts AS a', 'a.id', '=', 'up.' . $openMarket->name_eng . '_account_id')
+                    ->join('partners AS p', 'p.id', '=', 'a.partner_id')
+                    ->where('up.product_id', $oldProduct->id)
+                    ->get(['up.origin_product_no', 'up.price', 'p.api_token']);
 
                 // 조회된 업로드된 제품 목록을 순회
                 foreach ($uploadedProducts as $uploadedProduct) {
                     // 마진율 계산
-                    $marginRate = ceil($uploadedProduct->price / $$oldProduct->productPrice * 100) / 100;
+                    $marginRate = $uploadedProduct->price / $oldProduct->productPrice;
                     // 새로운 가격 계산
-                    $newPrice = ceil($product['productPrice'] * $marginRate * 10) / 10;
+                    $newPrice = round($product['productPrice'] * $marginRate, -1);
                     // 쿠팡인 경우, 5,000원 이상인 상품들은 배송비를 0원 -> 상품가에 덤핑.
                     $shippingFee = $product['shipping_fee'];
-                    if ($newPrice >= 5000) {
+                    if ($openMarket->id === 40 && $newPrice >= 5000) {
                         $newPrice += $product['shipping_fee'];
                         $shippingFee = 0;
                     }
-
                     // 제품 수정 요청을 위한 데이터 생성
                     $editRequest = new Request([
                         'originProductNo' => $uploadedProduct->origin_product_no,
                         'productName' => $product['productName'],
                         'price' => $newPrice,
                         'shippingFee' => $shippingFee,
-                        'vendorId' => $openMarket->id
+                        'vendorId' => $openMarket->id,
+                        'apiToken' => $uploadedProduct->api_token
                     ]);
 
                     // 제품 수정 요청 실행

@@ -103,8 +103,7 @@ class MainController extends Controller
             return [
                 'status' => false,
                 'return' => '엑셀 파일로부터 상품 정보들을 추출하는 과정에서 에러가 발생했습니다.',
-                'error' => $e->getMessage(),
-                'partnerErrors' => $partnerErrors
+                'error' => $e->getMessage()
             ];
         }
     }
