@@ -50,7 +50,3 @@ async function validateProduct(page) { // 상품 품절 검증
         return false;
     }
 }
-// const buyButton = document.querySelector('a.first');
-// if (buyButton && buyButton.classList.contains('displaynone') && buyButton.textContent.trim().includes('구매하기')) {
-//     return false;
-// }
