@@ -1,5 +1,6 @@
 const getForbiddenWords = require('../forbidden_words');
 const puppeteer = require('puppeteer');
+
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -22,6 +23,7 @@ const puppeteer = require('puppeteer');
         await browser.close();
     }
 })();
+
 async function signIn(page, username, password) {
     await page.goto('https://sapakorea.co.kr/member/login.html', { waitUntil: 'networkidle0' });
     await page.type('#member_id', username);
@@ -29,6 +31,7 @@ async function signIn(page, username, password) {
     await page.click('div > div > fieldset > a');
     await page.waitForNavigation({ waitUntil: 'load' });
 }
+
 async function getNumPage(page, listUrl) {
     await page.goto(listUrl, { waitUntil: 'domcontentloaded' });
     const numPage = await page.evaluate(() => {
@@ -49,9 +52,9 @@ async function getNumPage(page, listUrl) {
 async function moveToPage(page, listUrl, curPage) {
     const url = new URL(listUrl);
     url.searchParams.set('page', curPage);
-
     await page.goto(url.toString(), { waitUntil: 'domcontentloaded' });
 }
+
 async function scrapeProducts(page, forbiddenWords) {
     const products = await page.evaluate((forbiddenWords) => {
         const productElements = document.querySelectorAll('li.item.xans-record-');
@@ -64,9 +67,10 @@ async function scrapeProducts(page, forbiddenWords) {
             products.push(product);
         }
         return products;
+
         function scrapeProduct(productElement, forbiddenWords) {
             try {
-                const soldOutImageElement = productElement.querySelector('img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
+                const soldOutImageElement = productElement.querySelector('img[src*="ico_product_soldout.gif"]');
                 if (soldOutImageElement) {
                     return false; // 판매 완료된 상품 건너뛰기
                 }
@@ -89,8 +93,8 @@ async function scrapeProducts(page, forbiddenWords) {
                     return false; // 가격이 0원 이하인 상품 건너뛰기
                 }
                 const image = productElement.querySelector('div > a > img.thumb').src;
-                const href = productElement.querySelector(' div.box > a').href;
-                const platform = "";
+                const href = productElement.querySelector('div.box > a').href;
+                const platform = "싸파코리아";
                 const product = { name, price, image, href, platform };
                 return product;
             } catch (error) {

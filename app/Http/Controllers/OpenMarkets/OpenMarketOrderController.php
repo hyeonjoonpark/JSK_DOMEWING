@@ -588,11 +588,8 @@ class OpenMarketOrderController extends Controller
                 'dc.name as deliveryCompany',
                 'mp.productCode as productCode',
                 'o.admin_remark as adminRemark',
-
             );
-
         $oneMonthAgo = Carbon::now()->subMonth();
-
         switch ($orderStatus) {
             case 'PAID_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
