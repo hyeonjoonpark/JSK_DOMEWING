@@ -1,7 +1,7 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
@@ -23,10 +23,10 @@ const puppeteer = require('puppeteer');
     }
 })();
 async function signIn(page, username, password) {
-    await page.goto('https://www.mongtang.co.kr/shop/member/login.php', { waitUntil: 'networkidle0' });
-    await page.type('input[name="m_id"]', username);
-    await page.type('input[name="password"]', password);
-    await page.click('#form > table > tbody > tr:nth-child(2) > td.noline > input[type=image]');
+    await page.goto('https://sapakorea.co.kr/member/login.html', { waitUntil: 'networkidle0' });
+    await page.type('#member_id', username);
+    await page.type('#member_passwd', password);
+    await page.click('div > div > fieldset > a');
     await page.waitForNavigation({ waitUntil: 'load' });
 }
 async function scrapeProduct(page, url) {
@@ -36,17 +36,18 @@ async function scrapeProduct(page, url) {
         const hasOption = productOptionData.hasOption;
         const productOptions = productOptionData.productOptions;
         const productData = await page.evaluate(() => {
-            const productName = document.querySelector('#goods_spec > form > div:nth-child(4) > b').textContent.trim();
-            const productPrice = document.querySelector('#price').textContent.trim().replace(/[^\d]/g, '');
-            const productImage = document.querySelector('#objImg').src;
-            const productDetailElements = document.querySelectorAll('#contents img');
+            const productName = document.querySelector('div.xans-element-.xans-product.xans-product-detaildesign > table > tbody > tr:nth-child(1) > td > span').textContent.trim();
+            const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
+            const productImage = document.querySelector('div.keyImg > div > a > img').src;
+            const shippingFee = document.querySelector('table > tbody > tr > td > span > span > strong').textContent.trim().replace(/[^\d]/g, '');
+            const productDetailElements = document.querySelectorAll('#prdDetail > div > center img');
             if (productDetailElements.length < 1) {
                 return false;
             }
             const productDetail = [];
             for (const productDetailElement of productDetailElements) {
                 const tempProductDetailSrc = productDetailElement.src;
-                if (tempProductDetailSrc === 'http://buzz71.godohosting.com/start/common/open_end.jpg' || tempProductDetailSrc === 'http://buzz71.godohosting.com/start/common/open_notice.jpg') {
+                if (tempProductDetailSrc === '//www.mteshop.co.kr/sapa_photo/tw/notice/intro_with.jpg' || tempProductDetailSrc === '//www.mteshop.co.kr/sapa_photo/tw/notice/delivery.jpg' || tempProductDetailSrc === '//www.mteshop.co.kr/sapa_photo/tw/notice/SAPA_notice02.jpg' || tempProductDetailSrc === '//www.mteshop.co.kr/sapa_photo/tw/notice/SAPA_notice01.jpg') {
                     continue;
                 }
                 productDetail.push(productDetailElement.src);
@@ -55,20 +56,22 @@ async function scrapeProduct(page, url) {
                 productName,
                 productPrice,
                 productImage,
-                productDetail
+                shippingFee,
+                productDetail,
             };
             return productData;
         });
-        const { productName, productPrice, productImage, productDetail } = productData;
+        const { productName, productPrice, productImage, productDetail, shippingFee } = productData;
         const product = {
             productName,
             productPrice,
             productImage,
+            shippingFee,
             productDetail,
             hasOption,
             productOptions,
             productHref: url,
-            sellerID: 43
+            sellerID: 71
         };
         return product;
     } catch (error) {
@@ -78,7 +81,7 @@ async function scrapeProduct(page, url) {
 }
 async function getProductOptions(page) {
     async function reloadSelects() {
-        return await page.$$('table select');
+        return await page.$$('table select'); // a.delete
     }
     async function reselectOptions(selects, selectedOptions) {
         for (let i = 0; i < selectedOptions.length; i++) {
@@ -92,7 +95,7 @@ async function getProductOptions(page) {
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
-                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value !== '' && opt.value !== '-1')
+                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value !== '*' && opt.value !== '**')
             );
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
