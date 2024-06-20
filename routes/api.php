@@ -73,8 +73,10 @@ use App\Http\Controllers\SellwingApis\AuthController;
 use App\Http\Controllers\SellwingApis\CategoryListController;
 use App\Http\Controllers\SellwingApis\VendorListController;
 use App\Http\Controllers\SmartStore\SmartStoreAccountController;
+use App\Http\Controllers\SmartStore\SmartStoreExchangeController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
+use App\Http\Controllers\SmartStore\SmartStoreReturnController;
 use App\Http\Controllers\SmartStore\SmartStoreShipmentController;
 use App\Http\Controllers\Testmonial\TestmonialController;
 
@@ -206,6 +208,9 @@ Route::middleware(['auth.custom'])->group(function () {
 
 //테스트
 Route::post('test', [St11OrderController::class, 'index']);
+Route::post('smart-store-return-test', [SmartStoreReturnController::class, 'index']);
+Route::post('smart-store-exchange-test', [SmartStoreExchangeController::class, 'index']);
+
 
 
 Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
