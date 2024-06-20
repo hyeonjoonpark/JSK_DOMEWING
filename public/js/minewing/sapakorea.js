@@ -1,14 +1,20 @@
 const getForbiddenWords = require('../forbidden_words');
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const [listURL, username, password] = process.argv.slice(2);
     try {
         await signIn(page, username, password);
         await moveToPage(page, listURL);
+        const numPage = await getNumPage(page, listURL);
         const forbiddenWords = getForbiddenWords();
-        const products = await scrapeProducts(page, forbiddenWords);
+        const products = [];
+        for (let i = numPage; i > 0; i--) {
+            await moveToPage(page, listURL, i);
+            let list = await scrapeProducts(page, forbiddenWords);
+            products.push(...list);
+        }
         console.log(JSON.stringify(products));
     } catch (error) {
         console.error(error);
@@ -17,24 +23,38 @@ const puppeteer = require('puppeteer');
     }
 })();
 async function signIn(page, username, password) {
-    await page.goto('https://www.mongtang.co.kr/shop/member/login.php', { waitUntil: 'networkidle0' });
-    await page.type('input[name="m_id"]', username);
-    await page.type('input[name="password"]', password);
-    await page.click('#form > table > tbody > tr:nth-child(2) > td.noline > input[type=image]');
-    await page.waitForNavigation({ waitUntil: 'load' }); // a.last
+    await page.goto('https://sapakorea.co.kr/member/login.html', { waitUntil: 'networkidle0' });
+    await page.type('#member_id', username);
+    await page.type('#member_passwd', password);
+    await page.click('div > div > fieldset > a');
+    await page.waitForNavigation({ waitUntil: 'load' });
 }
-async function moveToPage(page, listURL) {
-    await page.goto(listURL, { waitUntil: 'load' });
-    const url = await page.evaluate((listURL) => {
-        const numTotal = parseInt(document.querySelector("#b_white > font > b").textContent.trim().replace(/[^\d]/g, ''));
-        listURL += '&page_num=' + numTotal;
-        return listURL;
-    }, listURL);
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+async function getNumPage(page, listUrl) {
+    await page.goto(listUrl, { waitUntil: 'domcontentloaded' });
+    const numPage = await page.evaluate(() => {
+        const lastPageLink = document.querySelector('a.last');
+        if (!lastPageLink) {
+            return false;
+        }
+        const hrefValue = lastPageLink.getAttribute('href');
+        const pageNumberMatch = hrefValue.match(/page=(\d+)/);
+        if (!pageNumberMatch) {
+            return false;
+        }
+        return parseInt(pageNumberMatch[1], 10);
+    });
+    return numPage;
+}
+
+async function moveToPage(page, listUrl, curPage) {
+    const url = new URL(listUrl);
+    url.searchParams.set('page', curPage);
+
+    await page.goto(url.toString(), { waitUntil: 'domcontentloaded' });
 }
 async function scrapeProducts(page, forbiddenWords) {
     const products = await page.evaluate((forbiddenWords) => {
-        const productElements = document.querySelectorAll('td[align="center"][valign="top"]');
+        const productElements = document.querySelectorAll('li.item.xans-record-');
         const products = [];
         for (const productElement of productElements) {
             const product = scrapeProduct(productElement, forbiddenWords);
@@ -46,27 +66,35 @@ async function scrapeProducts(page, forbiddenWords) {
         return products;
         function scrapeProduct(productElement, forbiddenWords) {
             try {
-                const soldOutImageElement = productElement.querySelector('img[src="/shop/data/skin/everybag/img/icon/good_icon_soldout.gif"]');
+                const soldOutImageElement = productElement.querySelector('img[src="/web/upload/custom_4.gif"]');
                 if (soldOutImageElement) {
-                    return false;
+                    return false; // 판매 완료된 상품 건너뛰기
                 }
-                const name = productElement.querySelector('div:nth-child(2) > div:nth-child(1) > a').textContent.trim();
+                const name = productElement.querySelector('div > p > strong > a > span:nth-child(2)').textContent.trim();
                 for (const forbiddenWord of forbiddenWords) {
                     if (name.includes(forbiddenWord)) {
-                        return false;
+                        return false; // 금지된 단어가 포함된 상품 건너뛰기
                     }
                 }
-                const price = parseInt(productElement.querySelector('div[style="padding-bottom:3px; font-family:Tahoma, Geneva, sans-serif; font-size:12px; font-weight:bold; color:#ed5d55;"] > b').textContent.trim().replace(/[^\d]/g, ''));
-                if (price < 1) {
-                    return false;
+                const priceElement = productElement.querySelector('div > ul > li:nth-child(2) > span:nth-child(2)');
+                if (!priceElement) {
+                    return false; // 가격 정보가 없는 상품 건너뛰기
                 }
-                const image = productElement.querySelector('div:nth-child(1) > a > img').src;
-                const href = productElement.querySelector('div:nth-child(1) > a').href;
-                const platform = "블랙라이거";
+                const priceText = priceElement.textContent.trim().replace(/[^\d]/g, '');
+                if (priceText === '') {
+                    return false; // 가격 정보가 비어있는 경우
+                }
+                const price = parseInt(priceText);
+                if (price < 1) {
+                    return false; // 가격이 0원 이하인 상품 건너뛰기
+                }
+                const image = productElement.querySelector('div > a > img.thumb').src;
+                const href = productElement.querySelector(' div.box > a').href;
+                const platform = "";
                 const product = { name, price, image, href, platform };
                 return product;
             } catch (error) {
-                return false;
+                return false; // 에러 발생 시 상품 건너뛰기
             }
         }
     }, forbiddenWords);
