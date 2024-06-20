@@ -31,6 +31,7 @@ async function signIn(page, username, password) {
 }
 async function scrapeProduct(page, url) {
     try {
+        await scrollToDetail(page)
         await page.goto(url, { waitUntil: 'networkidle0' });
         const productOptionData = await getProductOptions(page);
         const hasOption = productOptionData.hasOption;
@@ -137,4 +138,29 @@ async function getProductOptions(page) {
         hasOption: true,
         productOptions: productOptions
     };
+}
+async function scrollToDetail(page) {
+    await page.evaluate(async () => {
+        const distance = 50;
+        const scrollInterval = 5;
+        while (true) {
+            const scrollTop = window.scrollY;
+            const prdDetailElement = document.getElementById('#prdDetail > ul');
+            const prdInfoElement = document.getElementById('#prdReview > div > p.ec-base-button.typeBorder');
+            if (prdDetailElement) {
+                const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
+                if (scrollTop < targetScrollBottom) {
+                    window.scrollBy(0, distance);
+                } else {
+                    break;
+                }
+            } else if (prdInfoElement) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                break;
+            } else {
+                window.scrollBy(0, distance);
+            }
+            await new Promise(resolve => setTimeout(resolve, scrollInterval));
+        }
+    });
 }
