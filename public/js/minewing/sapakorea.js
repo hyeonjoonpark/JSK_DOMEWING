@@ -66,7 +66,7 @@ async function scrapeProducts(page, forbiddenWords) {
         return products;
         function scrapeProduct(productElement, forbiddenWords) {
             try {
-                const soldOutImageElement = productElement.querySelector('img[src="/web/upload/custom_4.gif"]');
+                const soldOutImageElement = productElement.querySelector('img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
                 if (soldOutImageElement) {
                     return false; // 판매 완료된 상품 건너뛰기
                 }
