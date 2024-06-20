@@ -34,7 +34,7 @@ async function moveToPage(page, listURL) {
 }
 async function scrapeProducts(page, forbiddenWords) {
     const products = await page.evaluate((forbiddenWords) => {
-        const productElements = document.querySelectorAll('#contents > div.sub_content > div > div.goods_list_item > div.goods_list > div > div.item_basket_type > ul > li');
+        const productElements = document.querySelectorAll('#contents > div.sub_content > div > div.goods_list_item > div.goods_list > div > div.item_basket_type > ul li');
         const products = [];
         for (const productElement of productElements) {
             const product = scrapeProduct(productElement, forbiddenWords);
