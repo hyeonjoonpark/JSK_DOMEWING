@@ -38,6 +38,9 @@ class SaveController extends Controller
         $nameController = new NameController();
         $productImageController = new ProductImageController();
         $controller = new Controller();
+        $shippingFee = DB::table('product_search')
+            ->where('vendor_id', $products[0]['sellerID'])
+            ->value('shipping_fee');
         foreach ($products as $product) {
             $hasOption = $product['hasOption'];
             $sellerID = $product['sellerID'];
@@ -69,6 +72,9 @@ class SaveController extends Controller
             }
             $productPrice = (int)$product['productPrice'];
             $productHref = $product['productHref'];
+            if (isset($product['shippingFee'])) {
+                $shippingFee = $product['shippingFee'];
+            }
             if ($hasOption === 'true' && isset($product['productOptions'])) {
                 $productOptions = $product['productOptions'];
                 $optionPriceType = $this->getOptionPriceType($sellerID);
@@ -85,7 +91,7 @@ class SaveController extends Controller
                     } else {
                         $productPrice = (int)$productOption['optionPrice'];
                     }
-                    $response = $this->insertProducts($sellerID, $userID, $categoryID, $newProductName, $productKeywords, $productPrice, $productImage, $newProductDetail, $hasOption, $productHref);
+                    $response = $this->insertProducts($sellerID, $userID, $categoryID, $newProductName, $productKeywords, $productPrice, $productImage, $newProductDetail, $hasOption, $productHref, $shippingFee);
                     if (!$response['status']) {
                         return $response;
                     }
@@ -93,7 +99,7 @@ class SaveController extends Controller
                 }
             } else {
                 $productName = $nameController->index($productName);
-                $response = $this->insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref);
+                $response = $this->insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref, $shippingFee);
                 if (!$response['status']) {
                     return $response;
                 }
@@ -189,7 +195,7 @@ class SaveController extends Controller
             return $e->getMessage();
         }
     }
-    public function insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref)
+    public function insertProducts($sellerID, $userID, $categoryID, $productName, $productKeywords, $productPrice, $productImage, $productDetail, $hasOption, $productHref, $shippingFee)
     {
         try {
             $isVAT = $this->getIsVAT($sellerID);
@@ -208,9 +214,6 @@ class SaveController extends Controller
             } else {
                 $hasOption = 'N';
             }
-            $shippingFee = DB::table('product_search')
-                ->where('vendor_id', $sellerID)
-                ->value('shipping_fee');
             DB::table('minewing_products')->insert([
                 'sellerID' => $sellerID,
                 'userID' => $userID,
