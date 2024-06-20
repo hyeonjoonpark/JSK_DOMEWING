@@ -553,6 +553,7 @@ class OpenMarketOrderController extends Controller
         $query = DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
             ->leftJoin('vendors as v', 'v.id', '=', 'po.vendor_id')
+            ->leftJoin('delivery_companies as dc', 'o.delivery_company_id', '=', 'dc.id')
             ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
             ->join('members as m', 'm.id', '=', 'wt.member_id')
             ->join('carts as c', 'c.id', '=', 'o.cart_id')
@@ -584,8 +585,10 @@ class OpenMarketOrderController extends Controller
                 'o.shipping_fee_then as shippingFee',
                 DB::raw('IF(po.order_id IS NOT NULL, true, false) as isExist'),
                 'o.tracking_number as trackingNumber',
+                'dc.name as deliveryCompany',
                 'mp.productCode as productCode',
                 'o.admin_remark as adminRemark',
+
             );
 
         $oneMonthAgo = Carbon::now()->subMonth();
@@ -697,6 +700,7 @@ class OpenMarketOrderController extends Controller
             'receiverRemark' => $order->receiverRemark,
             'orderDate' => $orderDate,
             'trackingNumber' => $order->trackingNumber,
+            'deliveryCompany' => $order->deliveryCompany,
             'productCode' => $order->productCode,
             'adminRemark' => $order->adminRemark ? $order->adminRemark : null,
         ];
