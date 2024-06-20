@@ -77,6 +77,7 @@ use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
 use App\Http\Controllers\SmartStore\SmartStoreShipmentController;
 use App\Http\Controllers\Testmonial\TestmonialController;
+use App\Http\Controllers\TrackSoldOutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -202,6 +203,8 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('action-center', [AdminDashboardController::class, 'getActionCenter']);
         Route::post('top-6-member-sales', [AdminDashboardController::class, 'getTop6MemberSales']);
     });
+
+    Route::post('trackwing', [TrackSoldOutController::class, 'main'])->name('trackwing');
 });
 
 //테스트
