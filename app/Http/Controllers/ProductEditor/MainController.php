@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ProductEditor;
 use App\Http\Controllers\Admin\ProductDataValidityController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Minewing\SaveController;
+use App\Http\Controllers\Partners\Products\UploadedController;
 use App\Http\Controllers\Product\NameController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -82,7 +83,8 @@ class MainController extends Controller
                 ];
             }
             // 파트너스 업로드된 상품들에 반영.
-
+            $uc = new UploadedController();
+            $partnerErrors = $uc->fetchEdittedProducts($products);
             // END.
             $productCodes = [];
             foreach ($products as $product) {
@@ -95,6 +97,7 @@ class MainController extends Controller
                 'return' => '상품셋 정보를 성공적으로 업데이트했습니다.',
                 'errors' => $errors,
                 'productCodes' => $productCodesStr,
+                'partnerErrors' => $partnerErrors
             ];
         } catch (\Exception $e) {
             return [
