@@ -56,6 +56,12 @@ async function extractProductData(page) {
         'bmwa007.godohosting.com/detail_nt.jpg'
     ];
     return page.evaluate((filterUrls) => {
+        const skipProductsEl = document.querySelectorAll('.ProductDetail_tag-list__UBBPk span');
+        for (const element of skipProductsEl) {
+            if (element.textContent.trim() === '폐쇄몰') {
+                return false;
+            }
+        }
         const productName = document.querySelector('.ProductDetail_title-button__ZBnqo > .ProductDetail_title__JikYt')?.textContent.trim();
         const productPrice = document.querySelector('.Price_price-wrapper__jTdRi')?.textContent.trim().replace(/[^\d]/g, '');
         const productImageEl = document.querySelector('.ProductDetail_thumbnail__KX26C > img')?.src;
