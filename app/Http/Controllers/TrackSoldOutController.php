@@ -68,8 +68,9 @@ class TrackSoldOutController extends Controller
         }
         $dqc = new DeleteQueueController();
         $dqcStoreResult = $dqc->store($soldOutProducts);
+        $errors = [];
         if (!$dqcStoreResult['status']) {
-            $errors['dqcStoreResult'] = $dqcStoreResult;
+            $errors = $dqcStoreResult;
         }
         return [
             'status' => true,
