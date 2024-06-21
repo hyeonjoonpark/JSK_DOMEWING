@@ -52,7 +52,10 @@ async function scrapeProduct(page, url) {
     }
 }
 async function extractProductData(page) {
-    return page.evaluate(() => {
+    const filterUrls = [
+        'bmwa007.godohosting.com/detail_nt.jpg'
+    ];
+    return page.evaluate((filterUrls) => {
         const productName = document.querySelector('.ProductDetail_title-button__ZBnqo > .ProductDetail_title__JikYt')?.textContent.trim();
         const productPrice = document.querySelector('.Price_price-wrapper__jTdRi')?.textContent.trim().replace(/[^\d]/g, '');
         const productImageEl = document.querySelector('.ProductDetail_thumbnail__KX26C > img')?.src;
@@ -62,9 +65,12 @@ async function extractProductData(page) {
         const productImage = match ? decodeURIComponent(match[1]) : productImageEl;
         const productDetailElements = document.querySelectorAll('.ProductDetail_gap__KbFAP > .ProductDetail_content__wenPZ img');
         if (productDetailElements.length < 1) return false;
-        const productDetail = Array.from(productDetailElements).map(el => el.src);
+        const productDetail = Array.from(productDetailElements)
+            .map(el => el.src)
+            .filter(src => !filterUrls.some(filterUrl => src.includes(filterUrl)));
+        if (productDetail.length < 1) return false;
         return { productName, productPrice, productImage, productDetail };
-    });
+    }, filterUrls);
 }
 async function getProductOptions(page) {
     const optionElements = await reloadSelects(page);
