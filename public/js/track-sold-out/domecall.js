@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -29,7 +29,7 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                 soldOutProductIds.push(product.id);
             }
         }
-        const sopFile = path.join(__dirname, 'metaldiy_result.json');
+        const sopFile = path.join(__dirname, 'domecall_result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8');
     } catch (error) {
         console.error(error);
@@ -43,7 +43,7 @@ async function validateProduct(page) {
     page.once('dialog', async dialog => {
         try {
             const message = dialog.message();
-            if (message.includes('온라인')) {
+            if (message.includes('인터넷')) {
                 dialogContainsOnline = true;
             }
             await dialog.accept();
