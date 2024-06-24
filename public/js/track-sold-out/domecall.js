@@ -19,13 +19,21 @@ const { goToAttempts, signIn } = require('./trackwing-common');
         }
         const soldOutProductIds = [];
         for (const product of products) {
+            let dialogAppeared = false;
+            page.once('dialog', async dialog => {
+                try {
+                    await dialog.accept();
+                } catch (error) { } finally {
+                    dialogAppeared = true;
+                }
+            });
             const goToAttemptsResult = await goToAttempts(page, product.productHref, 'domcontentloaded');
             if (goToAttemptsResult === false) {
                 soldOutProductIds.push(product.id);
                 continue;
             }
             const isValid = await validateProduct(page);
-            if (isValid === false) {
+            if (isValid === false || dialogAppeared === true) {
                 soldOutProductIds.push(product.id);
             }
         }
