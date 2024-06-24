@@ -56,6 +56,14 @@ async function validateProduct(page) {
             if (buyButton && buyButton.classList.contains('displaynone') && buyButton.textContent.trim().includes('구매하기')) {
                 return false;
             }
+            const minimumOrderElement = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > div.buy_wrap.top > div.buy_box > div > div:nth-child(2) > div > div.scrollbar_box.op_list_h > div > p');
+            if (minimumOrderElement) {
+                const minimumOrderText = minimumOrderElement.textContent.trim();
+                const number = parseInt(minimumOrderText, 10);
+                if (number > 1) {
+                    return false;
+                }
+            }
             return true;
         });
     } catch (error) {
