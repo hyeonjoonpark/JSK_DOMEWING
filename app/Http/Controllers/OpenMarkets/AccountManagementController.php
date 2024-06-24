@@ -28,10 +28,16 @@ class AccountManagementController extends Controller
                 'is_active' => 'ACTIVE',
                 'partner_id' => $partnerId
             ])->get();
+        $lotteOnAccounts = DB::table('lotte_on_accounts')
+            ->where([
+                'is_active' => 'ACTIVE',
+                'partner_id' => $partnerId
+            ])->get();
         return view('partner.accounts_management', [
             'coupangAccounts' => $coupangAccounts,
             'smartStoreAccounts' => $smartStoreAccounts,
-            'st11Accounts' => $st11Accounts
+            'st11Accounts' => $st11Accounts,
+            'lotteOnAccounts' => $lotteOnAccounts
         ]);
     }
     public function domewing()

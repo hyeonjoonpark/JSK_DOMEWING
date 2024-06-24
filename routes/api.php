@@ -53,6 +53,8 @@ use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
+use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnAccountController;
+use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnApiController;
 use App\Http\Controllers\OpenMarkets\OpenMarketExchangeController;
 use App\Http\Controllers\OpenMarkets\OpenMarketOrderController;
 use App\Http\Controllers\OpenMarkets\OpenMarketRefundController;
@@ -211,6 +213,7 @@ Route::middleware(['auth.custom'])->group(function () {
 
 //테스트
 Route::post('test', [St11OrderController::class, 'index']);
+// Route::post('test', [LotteOnApiController::class, 'index']);
 Route::post('smart-store-return-test', [SmartStoreReturnController::class, 'index']);
 Route::post('smart-store-exchange-test', [SmartStoreExchangeController::class, 'index']);
 
@@ -234,6 +237,11 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
             Route::post('/', [AccountController::class, 'add']);
             Route::post('edit', [AccountController::class, 'edit']);
             Route::post('delete', [AccountController::class, 'delete']);
+        });
+        Route::prefix('lotte-on')->group(function () {
+            Route::post('/', [LotteOnAccountController::class, 'add']);
+            Route::post('edit', [LotteOnAccountController::class, 'edit']);
+            Route::post('delete', [LotteOnAccountController::class, 'delete']);
         });
     });
     Route::prefix('product')->group(function () {
