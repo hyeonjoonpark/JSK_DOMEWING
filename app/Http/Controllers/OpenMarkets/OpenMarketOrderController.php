@@ -588,7 +588,8 @@ class OpenMarketOrderController extends Controller
                 'dc.name as deliveryCompany',
                 'mp.productCode as productCode',
                 'o.admin_remark as adminRemark',
-                'o.bundle_quantity_then as bundleQuantity'
+                'o.bundle_quantity_then as bundleQuantity',
+                'o.delivery_status as deliveryStatus'
             );
         $oneMonthAgo = Carbon::now()->subMonth();
         switch ($orderStatus) {
@@ -668,7 +669,7 @@ class OpenMarketOrderController extends Controller
                 $orderType = '교환';
                 break;
         }
-        $orderDate = ($orderStatus === 'COMPLETE') ? '발주일자 : ' . $order->updatedAt : '수집일자 : ' . $order->createdAt;
+        $orderDate = ($order->deliveryStatus === 'COMPLETE') ? '발주일자 : ' . $order->updatedAt : '수집일자 : ' . $order->createdAt;
         $productPrice = $order->productPrice;
         $shippingRate = $order->bundleQuantity < 1 ? 1 : ceil($order->quantity / $order->bundleQuantity);
         $shippingAmount = $order->shippingFee * $shippingRate;
