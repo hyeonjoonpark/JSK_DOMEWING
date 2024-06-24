@@ -118,9 +118,9 @@ class OpenMarketSetAwaitingController extends Controller
         $orderId = $partnerOrder->order_number;
         $shipmentBoxId = $partnerOrder->product_order_number;
         $receiptDetails = $this->fetchReceiptDetails($account, $orderId, $shipmentBoxId); //orderId로 반품건 조회 조회 결과에
-        return $receiptDetails;
         if ($receiptDetails['status']) {
             $response = $this->coupangCancelApi($controller, $account, $contentType, $receiptDetails['receiptId'], $receiptDetails['cancelCount']); //취소 승인 api
+            return $response;
             if (!$response['status']) return [
                 'status' => false,
                 'message' => '취소 승인에 실패하였습니다.',
@@ -194,7 +194,6 @@ class OpenMarketSetAwaitingController extends Controller
         $queryString = http_build_query($baseQuery);
         $controller = new ApiController();
         $response =  $controller->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $queryString); //발주서 단건조회
-        return $response;
         $receiptId = 0;
         $cancelCount = 0;
         $purchaseCount = 0;
