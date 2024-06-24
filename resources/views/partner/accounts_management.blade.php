@@ -55,6 +55,22 @@
                 </div>
             </div>
         </div>
+        <div class="col-12 col-lg-6">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">롯데온</h6>
+                    <p>각 계정을 클릭하여 관리합니다.</p>
+                    <div class="row g-gs">
+                        @foreach ($lotteOnAccounts as $item)
+                            <div class="col-auto">
+                                <button class="btn btn-primary"
+                                    onclick="viewLotteOnAccount('{{ $item->username }}','{{ $item->access_key }}', '{{ $item->hash }}');">{{ $item->username }}</button>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog"
         id="viewCoupangAccountModal">
@@ -164,6 +180,33 @@
             </div>
         </div>
     </div>
+    <div class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog"
+        id="viewLotteOnModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">롯데온 계정 연동 정보</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">스토어명</label>
+                        <input type="text" class="form-control" id="lotteOnUsername">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">OPEN API KEY</label>
+                        <input type="text" class="form-control" id="lotteOnAccessKey">
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button class="btn btn-success" onclick="lotteOnEdit();">수정하기</button>
+                    <button class="btn btn-danger" onclick="initLotteOnDel();">삭제하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>
@@ -194,6 +237,14 @@
             $('#st11AccessKey').val(accessKey);
             $('#viewSt11Modal').modal('show');
         }
+
+        function viewLotteOnAccount(username, accessKey, hash) {
+            hashVar = hash;
+            $('#lotteOnUsername').val(username);
+            $('#lotteOnAccessKey').val(accessKey);
+            $('#viewLotteOnModal').modal('show');
+        }
+
 
         function smartStoreEdit() {
             popupLoader(1, "계정 정보를 수정 중입니다.");
@@ -317,6 +368,56 @@
             const accessKey = $('#st11AccessKey').val();
             $.ajax({
                 url: "/api/partner/account-setting/st11/edit",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    hash: hashVar,
+                    username,
+                    accessKey
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
+        function initLotteOnDel() {
+            Swal.fire({
+                icon: "warning",
+                title: "계정 삭제",
+                text: "해당 계정에 속한 모든 상품 정보 또한 삭제됩니다. 그래도 진행하시겠습니까?",
+                showConfirmButton: true,
+                showCancelButton: true,
+                cancelButtonText: "취소",
+                confirmButtonText: "확인"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteLotteOnAccount();
+                }
+            });
+        }
+
+        function deleteLotteOnAccount() {
+            popupLoader(1, "해당 계정을 삭제 중입니다.");
+            $.ajax({
+                url: "/api/partner/account-setting/lotte-on/delete",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    hash: hashVar
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
+        function lotteOnEdit() {
+            popupLoader(1, '수정된 사항을 적용 중입니다.');
+            const username = $('#lotteOnUsername').val();
+            const accessKey = $('#lotteOnAccessKey').val();
+            $.ajax({
+                url: "/api/partner/account-setting/lotte-on/edit",
                 type: "POST",
                 dataType: "JSON",
                 data: {

@@ -100,6 +100,29 @@
                 </div>
             </div>
         </div>
+        <div class="col-12 col-lg-6">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">롯데온</h6>
+                    <p>
+                        롯데온 스토어센터의 OpenAPI관리에서 연동방법 - 직접입력 누르시고 서버 IP등록에 43.200.252.11를 반드시 입력 후 인증키를 발급해주세요. OPEN API KEY
+                        정보를 입력해주세요.
+                    </p>
+                    <div class="form-group">
+                        <label for="" class="form-label">스토어명</label>
+                        <input class="form-control" type="text" id="lotteOnUsername"
+                            placeholder="계정명 혹은 별칭을 입력해주세요.">
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">OPEN API KEY</label>
+                        <input class="form-control" type="text" id="lotteOnAccessKey" placeholder="롯데온 인증키를 입력해주세요.">
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="addlotteOnAccount();">추가하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 @section('scripts')
@@ -156,6 +179,24 @@
             popupLoader(0, '해당 계정 정보를 동기화 중입니다.');
             $.ajax({
                 url: "/api/partner/account-setting/st11",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    username,
+                    accessKey
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
+        function addlotteOnAccount() {
+            const username = $('#lotteOnUsername').val();
+            const accessKey = $('#lotteOnAccessKey').val();
+            popupLoader(0, '해당 계정 정보를 동기화 중입니다.');
+            $.ajax({
+                url: "/api/partner/account-setting/lotte-on",
                 type: "POST",
                 dataType: "JSON",
                 data: {
