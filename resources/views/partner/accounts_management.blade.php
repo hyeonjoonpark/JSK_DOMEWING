@@ -196,7 +196,7 @@
                         <input type="text" class="form-control" id="lotteOnUsername">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">OPEN API KEY</label>
+                        <label class="form-label">인증키</label>
                         <input type="text" class="form-control" id="lotteOnAccessKey">
                     </div>
                 </div>
