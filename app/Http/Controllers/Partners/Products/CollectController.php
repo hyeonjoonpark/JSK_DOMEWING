@@ -20,9 +20,19 @@ class CollectController extends Controller
             return redirect('/partner/products/manage');
         }
 
+        $lgCategory = $request->input('lgCategory', -1);
+        $mdCategory = $request->input('mdCategory', -1);
+        $smCategory = $request->input('smCategory', -1);
+        $xsCategory = $request->input('xsCategory', -1);
+
+        $combinedCategories = array_filter([$lgCategory, $mdCategory, $smCategory, $xsCategory], function ($category) {
+            return $category !== -1 && $category !== '-1';
+        });
+
+        $categoryName = implode('>', $combinedCategories);
+
         $productCodesStr = $request->input('productCodesStr', '');
         $searchKeyword = $request->input('searchKeyword', '');
-        $categoryId = $request->input('categoryId', '');
         $controller = new Controller();
         $marginValue = $controller->getMarginValue();
 
@@ -46,29 +56,95 @@ class CollectController extends Controller
             $query->whereIn('mp.productCode', $productCodesArr);
         }
 
-        if ($categoryId && $categoryId != '-1') {
-            $query->where('mp.categoryID', $categoryId);
+        if ($categoryName !== '') {
+            $query->where('oc.name', 'like', '%' . $categoryName . '%');
         }
 
         $products = $query->orderBy('createdAt', 'DESC')->paginate(500);
         $categories = $this->getCategories();
+        $lgCategories = $categories['lgCategories'];
+        $mdCategories = [];
+        $smCategories = [];
+        $xsCategories = [];
+        if ($lgCategory !== -1 && $lgCategory !== '-1') {
+            foreach ($categories['mdCategories'] as $category) {
+                if ($category['parent'] === $lgCategory && !in_array($category['this'], $mdCategories)) {
+                    $mdCategories[] = $category['this'];
+                }
+            }
+        }
+        if ($mdCategory !== -1 && $mdCategory !== '-1') {
+            foreach ($categories['smCategories'] as $category) {
+                if ($category['parent'] === $mdCategory && !in_array($category['this'], $smCategories)) {
+                    $smCategories[] = $category['this'];
+                }
+            }
+        }
+        if ($smCategory !== -1 && $smCategory !== '-1') {
+            foreach ($categories['xsCategories'] as $category) {
+                if ($category['parent'] === $smCategory && !in_array($category['this'], $xsCategories)) {
+                    $xsCategories[] = $category['this'];
+                }
+            }
+        }
         return view('partner/products_collect', [
             'products' => $products,
             'searchKeyword' => $searchKeyword,
             'productCodesStr' => $productCodesStr,
             'categories' => $categories,
-            'categoryId' => $categoryId,
-            'partnerTables' => $this->getPartnerTables(Auth::guard('partner')->id())
+            'partnerTables' => $this->getPartnerTables(Auth::guard('partner')->id()),
+            'lgCategory' => $lgCategory,
+            'mdCategory' => $mdCategory,
+            'smCategory' => $smCategory,
+            'xsCategory' => $xsCategory,
+            'categoryName' => $categoryName,
+            'lgCategories' => $lgCategories,
+            'smCategories' => $smCategories,
+            'mdCategories' => $mdCategories,
+            'xsCategories' => $xsCategories,
         ]);
     }
     public function getCategories()
     {
         $categories = DB::table('minewing_products AS mp')
             ->join('ownerclan_category AS oc', 'mp.categoryID', '=', 'oc.id')
-            ->select('oc.id', 'oc.name')
             ->distinct()
-            ->get();
-        return $categories;
+            ->pluck('oc.name')
+            ->toArray();
+        $lgCategories = [];
+        $mdCategories = [];
+        $smCategories = [];
+        $xsCategories = [];
+        foreach ($categories as $category) {
+            $parts = explode('>', $category);
+            if (!empty($parts[0]) && !in_array($parts[0], $lgCategories)) {
+                $lgCategories[] = $parts[0];
+            }
+            if (!empty($parts[1]) && !in_array($parts[1], $mdCategories)) {
+                $mdCategories[] = [
+                    'parent' => $parts[0],
+                    'this' => $parts[1]
+                ];
+            }
+            if (!empty($parts[2]) && !in_array($parts[2], $smCategories)) {
+                $smCategories[] = [
+                    'parent' => $parts[1],
+                    'this' => $parts[2]
+                ];
+            }
+            if (!empty($parts[3]) && !in_array($parts[3], $xsCategories)) {
+                $xsCategories[] = [
+                    'parent' => $parts[2],
+                    'this' => $parts[3]
+                ];
+            }
+        }
+        return [
+            'lgCategories' => $lgCategories,
+            'mdCategories' => $mdCategories,
+            'smCategories' => $smCategories,
+            'xsCategories' => $xsCategories
+        ];
     }
     private function getPartnerTables($partnerId)
     {
