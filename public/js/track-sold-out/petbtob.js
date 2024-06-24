@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
@@ -20,8 +20,16 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                 soldOutProductIds.push(product.id);
                 continue;
             }
+            let dialogAppeared = false;
+            page.once('dialog', async dialog => {
+                try {
+                    await dialog.accept();
+                } catch (error) { } finally {
+                    dialogAppeared = true;
+                }
+            });
             const isValid = await validateProduct(page);
-            if (isValid === false) {
+            if (isValid === false || dialogAppeared === true) {
                 soldOutProductIds.push(product.id);
             }
         }

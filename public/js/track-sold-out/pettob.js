@@ -20,8 +20,16 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                 soldOutProductIds.push(product.id); //품절상품 배열에 상품id값을 담아버림
                 continue; // 그리고 종료.
             }
+            let dialogAppeared = false;
+            page.once('dialog', async dialog => {
+                try {
+                    await dialog.accept();
+                } catch (error) { } finally {
+                    dialogAppeared = true;
+                }
+            });
             const isValid = await validateProduct(page); // 유효상품 검사
-            if (isValid === false) { // 유효하지 않을때
+            if (isValid === false || dialogAppeared === true) { // 유효하지 않을때
                 soldOutProductIds.push(product.id); // 품절상품 배열에 상품id값을 감아버림
             }
         }
