@@ -19,14 +19,22 @@ const { goToAttempts, signIn } = require('./trackwing-common');
         }
         const soldOutProductIds = [];
         for (const product of products) {
+            let dialogAppeared = false;
+            page.once('dialog', async dialog => {
+                try {
+                    await dialog.accept();
+                } catch (error) { } finally {
+                    dialogAppeared = true;
+                }
+            });
             const goToAttemptsResult = await goToAttempts(page, product.productHref, 'domcontentloaded');
             if (goToAttemptsResult === false) {
                 soldOutProductIds.push(product.id);
                 continue;
             }
             const isValid = await validateProduct(page);
-            if (isValid === false) {
-                soldOutProductIds.push(product.id);
+            if (isValid === false || dialogAppeared === true) { // 유효하지 않을때
+                soldOutProductIds.push(product.id); // 품절상품 배열에 상품id값을 감아버림
             }
         }
         const sopFile = path.join(__dirname, 'metaldiy_result.json');
