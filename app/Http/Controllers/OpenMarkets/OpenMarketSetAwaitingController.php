@@ -195,7 +195,7 @@ class OpenMarketSetAwaitingController extends Controller
         $receiptId = 0;
         $cancelCount = 0;
         $purchaseCount = 0;
-        if (isset($response['data']['data'])) return [
+        if (!isset($response['data']['data'])) return [
             'status' => false,
             'message' => '쿠팡 주문 조회가 되지 않습니다.'
         ];

@@ -386,8 +386,9 @@ class UploadedController extends Controller
         $data = [
             'originProduct' => [
                 'statusType' => 'SALE',
+                'leafCategoryId' => $product->code,
                 'name' => $productName,
-                'detailContent' => $product->productDetail,
+                'detailContent' => '<center><img src="https://www.sellwing.kr/images/CDN/ss_header.jpg"><br></center>' . $product->productDetail,
                 'images' => [
                     'representativeImage' => [
                         'url' => $productImage
@@ -402,8 +403,13 @@ class UploadedController extends Controller
                     'deliveryBundleGroupUsable' => false,
                     'deliveryFee' => [
                         'deliveryFeeType' => 'PAID',
-                        'deliveryFeePayType' => 'PREPAID',
                         'baseFee' => $shippingFee,
+                        'deliveryFeePayType' => 'PREPAID',
+                        'deliveryFeeByArea' => [
+                            'deliveryAreaType' => 'AREA_3',
+                            'area3extraFee' => $product->additional_shipping_fee,
+                            'area2extraFee' => $product->additional_shipping_fee
+                        ]
                     ],
                     'claimDeliveryInfo' => [
                         'returnDeliveryFee' => (int)$shippingFee,
@@ -413,7 +419,7 @@ class UploadedController extends Controller
                 ],
                 'detailAttribute' => [
                     'afterServiceInfo' => [
-                        'afterServiceTelephoneNumber' => (string)$partner->phone,
+                        'afterServiceTelephoneNumber' => $partner->phone,
                         'afterServiceGuideContent' => '평일 09:00 ~ 17:00까지 응대가 가능하며, 주말 및 공휴일은 쉽니다.'
                     ],
                     'originAreaInfo' => [
