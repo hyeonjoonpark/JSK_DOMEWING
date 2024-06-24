@@ -1,8 +1,13 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
+
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
@@ -22,6 +27,7 @@ const puppeteer = require('puppeteer');
         await browser.close();
     }
 })();
+
 async function signIn(page, username, password) {
     await page.goto('https://sapakorea.co.kr/member/login.html', { waitUntil: 'networkidle0' });
     await page.type('#member_id', username);
@@ -29,10 +35,11 @@ async function signIn(page, username, password) {
     await page.click('div > div > fieldset > a');
     await page.waitForNavigation({ waitUntil: 'load' });
 }
+
 async function scrapeProduct(page, url) {
     try {
-        await scrollToDetail(page)
-        await page.goto(url, { waitUntil: 'networkidle0' });
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await scrollToDetail(page);
         const productOptionData = await getProductOptions(page);
         const hasOption = productOptionData.hasOption;
         const productOptions = productOptionData.productOptions;
@@ -48,7 +55,7 @@ async function scrapeProduct(page, url) {
             const productDetail = [];
             for (const productDetailElement of productDetailElements) {
                 const tempProductDetailSrc = productDetailElement.src;
-                if (tempProductDetailSrc === '//www.mteshop.co.kr/sapa_photo/tw/notice/intro_with.jpg' || tempProductDetailSrc === '//www.mteshop.co.kr/sapa_photo/tw/notice/delivery.jpg' || tempProductDetailSrc === '//www.mteshop.co.kr/sapa_photo/tw/notice/SAPA_notice02.jpg' || tempProductDetailSrc === '//www.mteshop.co.kr/sapa_photo/tw/notice/SAPA_notice01.jpg') {
+                if (tempProductDetailSrc === 'https://www.mteshop.co.kr/sapa_photo/tw/notice/intro_with.jpg' || tempProductDetailSrc === 'https://www.mteshop.co.kr/sapa_photo/tw/notice/delivery.jpg' || tempProductDetailSrc === 'https://www.mteshop.co.kr/sapa_photo/tw/notice/SAPA_notice02.jpg' || tempProductDetailSrc === 'https://www.mteshop.co.kr/sapa_photo/tw/notice/SAPA_notice01.jpg' || tempProductDetailSrc === 'https://www.mteshop.co.kr/sapa_photo/tw/notice/notice.jpg') {
                     continue;
                 }
                 productDetail.push(productDetailElement.src);
@@ -80,9 +87,10 @@ async function scrapeProduct(page, url) {
         return false;
     }
 }
+
 async function getProductOptions(page) {
     async function reloadSelects() {
-        return await page.$$('table select'); // a.delete
+        return await page.$$('table select');
     }
     async function reselectOptions(selects, selectedOptions) {
         for (let i = 0; i < selectedOptions.length; i++) {
@@ -139,14 +147,19 @@ async function getProductOptions(page) {
         productOptions: productOptions
     };
 }
+
 async function scrollToDetail(page) {
     await page.evaluate(async () => {
-        const distance = 50;
-        const scrollInterval = 5;
-        while (true) {
+        const distance = 45; // 스크롤 이동 거리
+        const scrollInterval = 50; // 스크롤 간격
+        const maxScrollAttempts = 100; // 최대 스크롤 시도 횟수
+        let scrollAttempts = 0;
+
+        while (scrollAttempts < maxScrollAttempts) {
             const scrollTop = window.scrollY;
-            const prdDetailElement = document.getElementById('#prdDetail > ul');
-            const prdInfoElement = document.getElementById('#prdReview > div > p.ec-base-button.typeBorder');
+            const prdDetailElement = document.querySelector('#prdDetail > div > h3');
+            const prdInfoElement = document.querySelector('#prdInfo > ul');
+
             if (prdDetailElement) {
                 const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
                 if (scrollTop < targetScrollBottom) {
@@ -155,11 +168,12 @@ async function scrollToDetail(page) {
                     break;
                 }
             } else if (prdInfoElement) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
                 break;
             } else {
                 window.scrollBy(0, distance);
             }
+
+            scrollAttempts++;
             await new Promise(resolve => setTimeout(resolve, scrollInterval));
         }
     });
