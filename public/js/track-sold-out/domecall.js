@@ -19,21 +19,13 @@ const { goToAttempts, signIn } = require('./trackwing-common');
         }
         const soldOutProductIds = [];
         for (const product of products) {
-            let dialogAppeared = false;
-            page.once('dialog', async dialog => {
-                try {
-                    await dialog.accept();
-                } catch (error) { } finally {
-                    dialogAppeared = true;
-                }
-            });
             const goToAttemptsResult = await goToAttempts(page, product.productHref, 'domcontentloaded');
             if (goToAttemptsResult === false) {
                 soldOutProductIds.push(product.id);
                 continue;
             }
             const isValid = await validateProduct(page);
-            if (isValid === false || dialogAppeared === true) {
+            if (isValid === false) {
                 soldOutProductIds.push(product.id);
             }
         }
@@ -46,19 +38,43 @@ const { goToAttempts, signIn } = require('./trackwing-common');
     }
 })();
 async function validateProduct(page) {
+    let dialogAppeared = false;
+    let dialogContainsOnline = false;
+    page.once('dialog', async dialog => {
+        try {
+            const message = dialog.message();
+            if (message.includes('온라인')) {
+                dialogContainsOnline = true;
+            }
+            await dialog.accept();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            dialogAppeared = true;
+        }
+    });
     try {
-        return await page.evaluate(() => {
+        const result = await page.evaluate(() => {
             const soldOutTextElement = document.querySelector('#frmView > div > div.btn > a');
             if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('구매 불가')) {
                 return false;
             }
             const soldOutButton = document.querySelector('#frmView > div > div.btn > a.skinbtn.point2.btn-add-order');
             if (soldOutButton && soldOutButton.src.includes('바로 구매')) {
+                soldOutButton.click();
                 return true;
             }
             return true;
         });
+        // 잠시 대기하여 dialog 이벤트가 발생할 시간을 줍니다.
+        await page.waitForTimeout(1000); // 필요에 따라 대기 시간을 조정하세요.
+        // dialog 이벤트가 발생했고, 메시지에 '온라인'이 포함된 경우 false를 반환합니다.
+        if (dialogAppeared && dialogContainsOnline) {
+            return false;
+        }
+        return result;
     } catch (error) {
         return false;
     }
 }
+
