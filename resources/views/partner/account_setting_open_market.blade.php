@@ -105,7 +105,7 @@
                 <div class="card-inner">
                     <h6 class="title">롯데온</h6>
                     <p>
-                        롯데온 스토어센터의 OpenAPI관리에서 연동방법 - 직접입력 누르시고 서버 IP등록에 43.200.252.11를 반드시 입력 후 인증키를 발급해주세요. OPEN API KEY
+                        롯데온 스토어센터의 OpenAPI관리에서 (연동방법 - 직접입력 누르시고) 서버 IP등록에 43.200.252.11를 반드시 입력 후 인증키를 발급해주세요. 인증키
                         정보를 입력해주세요.
                     </p>
                     <div class="form-group">
@@ -114,7 +114,7 @@
                             placeholder="계정명 혹은 별칭을 입력해주세요.">
                     </div>
                     <div class="form-group">
-                        <label for="" class="form-label">OPEN API KEY</label>
+                        <label for="" class="form-label">인증키</label>
                         <input class="form-control" type="text" id="lotteOnAccessKey" placeholder="롯데온 인증키를 입력해주세요.">
                     </div>
                     <div class="text-center">

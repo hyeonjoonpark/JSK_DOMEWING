@@ -82,22 +82,70 @@
                     <form method="GET" action="{{ route('partner.products.collect') }}">
                         @csrf
                         <div class="row g-gs">
-                            <div class="col-12 col-lg-6">
+                            <div class="col-12 col-lg-3">
                                 <div class="form-group">
-                                    <label for="categoryId" class="form-label">카테고리</label>
-                                    <select class="form-select js-select2" data-search="on" name="categoryId"
-                                        id="categoryId">
-                                        <option value="-1">카테고리 선택</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}"
-                                                {{ $categoryId == $category->id ? 'selected' : '' }}>
-                                                {{ $category->name }}
+                                    <label for="lgCategory" class="form-label">대분류</label>
+                                    <select class="form-select js-select2" data-search="on" name="lgCategory"
+                                        id="lgCategory" onchange="loadCategoryChildren(0);">
+                                        <option value=-1>카테고리 선택</option>
+                                        @foreach ($categories['lgCategories'] as $category)
+                                            <option value="{{ $category }}"
+                                                {{ $category === $lgCategory ? 'selected' : '' }}>
+                                                {{ $category }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-12 col-lg-6">
+                            <div class="col-12 col-lg-3">
+                                <div class="form-group">
+                                    <label for="mdCategory" class="form-label">중분류</label>
+                                    <select class="form-select js-select2" data-search="on" name="mdCategory"
+                                        id="mdCategory" onchange="loadCategoryChildren(1);">
+                                        <option value=-1 {{ $category === $mdCategory ? 'selected' : '' }}>카테고리 선택
+                                        </option>
+                                        @foreach ($mdCategories as $item)
+                                            <option value="{{ $item }}"
+                                                {{ $mdCategory === $item ? 'selected' : '' }}>
+                                                {{ $item }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-3">
+                                <div class="form-group">
+                                    <label for="smCategory" class="form-label">소분류</label>
+                                    <select class="form-select js-select2" data-search="on" name="smCategory"
+                                        id="smCategory" onchange="loadCategoryChildren(2);">
+                                        <option value=-1 {{ $category === $smCategory ? 'selected' : '' }}>카테고리 선택
+                                        </option>
+                                        @foreach ($smCategories as $item)
+                                            <option value="{{ $item }}"
+                                                {{ $smCategory === $item ? 'selected' : '' }}>
+                                                {{ $item }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-3">
+                                <div class="form-group">
+                                    <label for="xsCategory" class="form-label">세분류</label>
+                                    <select class="form-select js-select2" data-search="on" name="xsCategory"
+                                        id="xsCategory">
+                                        <option value=-1 {{ $category === $xsCategory ? 'selected' : '' }}>카테고리 선택
+                                        </option>
+                                        @foreach ($xsCategories as $item)
+                                            <option value="{{ $item }}"
+                                                {{ $xsCategory === $item ? 'selected' : '' }}>
+                                                {{ $item }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
                                 <div class="form-group">
                                     <label for="" class="form-label">상품 검색</label>
                                     <input type="text" class="form-control" placeholder="검색 키워드를 기입해주세요"
@@ -130,7 +178,10 @@
                             'page' => $products->currentPage(),
                             'numPages' => $products->lastPage(),
                             'searchKeyword' => $searchKeyword,
-                            'categoryId' => $categoryId,
+                            'lgCategory' => $lgCategory,
+                            'mdCategory' => $mdCategory,
+                            'smCategory' => $smCategory,
+                            'xsCategory' => $xsCategory,
                         ])
                     </div>
                     <div class="table-responsive">
@@ -190,7 +241,10 @@
                             'page' => $products->currentPage(),
                             'numPages' => $products->lastPage(),
                             'searchKeyword' => $searchKeyword,
-                            'categoryId' => $categoryId,
+                            'lgCategory' => $lgCategory,
+                            'mdCategory' => $mdCategory,
+                            'smCategory' => $smCategory,
+                            'xsCategory' => $xsCategory,
                         ])
                     </div>
                 </div>
@@ -228,6 +282,7 @@
 @endsection
 @section('scripts')
     <script>
+        var categories = @json($categories);
         $(document).on('click', '#selectAll', function() {
             const isChecked = $(this).is(':checked');
             $('input[name="selectedProducts"]').prop('checked', isChecked);
@@ -328,6 +383,37 @@
         function topFunction() {
             document.body.scrollTop = 0; // For Safari
             document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }
+
+        function loadCategoryChildren(type) {
+            let childCategory, selectId, processedCategories = '<option value=-1>카테고리 선택</option>';
+            switch (parseInt(type)) {
+                case 0:
+                    childCategory = categories.mdCategories
+                    selectId = '#lgCategory';
+                    targetSelectId = '#mdCategory';
+                    break;
+                case 1:
+                    childCategory = categories.smCategories
+                    selectId = '#mdCategory';
+                    targetSelectId = '#smCategory';
+                    break;
+                case 2:
+                    childCategory = categories.xsCategories
+                    selectId = '#smCategory';
+                    targetSelectId = '#xsCategory';
+                    break;
+            }
+            const value = $(selectId).val();
+            for (const child of childCategory) {
+                if (child.parent === value && !processedCategories.includes(child.this)) {
+                    processedCategories += `
+                        <option value="${child.this}">${child.this}</option>
+                    `;
+                }
+            }
+            $(targetSelectId).html(processedCategories);
+            $(targetSelectId).select2();
         }
     </script>
 @endsection
