@@ -5,6 +5,10 @@ const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const products = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
@@ -36,7 +40,7 @@ const { goToAttempts, signIn } = require('./trackwing-common');
 async function validateProduct(page) {
     try {
         return await page.evaluate(() => {
-            const txtDescElement = document.querySelector('#info > div.goods_info.clearbox > form > div.total.price.clearbox > span');
+            const txtDescElement = document.querySelector('span.button.bgred');
             if (txtDescElement && txtDescElement.textContent.trim().includes('품절')) {
                 return false;
             }
