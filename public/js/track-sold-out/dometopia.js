@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -24,12 +24,20 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                 soldOutProductIds.push(product.id);
                 continue;
             }
+            let dialogAppeared = false;
+            page.once('dialog', async dialog => {
+                try {
+                    await dialog.accept();
+                } catch (error) { } finally {
+                    dialogAppeared = true;
+                }
+            });
             const isValid = await validateProduct(page);
-            if (isValid === false) {
+            if (isValid === false || dialogAppeared === true) {
                 soldOutProductIds.push(product.id);
             }
         }
-        const sopFile = path.join(__dirname, 'petbtob_result.json');
+        const sopFile = path.join(__dirname, 'dometopia_result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8');
     } catch (error) {
         console.error(error);
@@ -40,7 +48,7 @@ const { goToAttempts, signIn } = require('./trackwing-common');
 async function validateProduct(page) {
     try {
         return await page.evaluate(() => {
-            const txtDescElement = document.querySelector('span.button.bgred');
+            const txtDescElement = document.querySelector('div.total.price.clearbox > span.button.bgred');
             if (txtDescElement && txtDescElement.textContent.trim().includes('품절')) {
                 return false;
             }
@@ -50,11 +58,3 @@ async function validateProduct(page) {
         return false;
     }
 }
-// const soldOutImage = document.querySelector('div.infoArea img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
-// if (soldOutImage) {
-//     return false;
-// }
-// const buyButton = document.querySelector('a.first');
-// if (buyButton && buyButton.classList.contains('displaynone') && buyButton.textContent.trim().includes('구매하기')) {
-//     return false;
-// }

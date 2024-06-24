@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage(); //페이지 열고
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);

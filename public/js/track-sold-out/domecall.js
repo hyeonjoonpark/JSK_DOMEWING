@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -29,7 +29,7 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                 soldOutProductIds.push(product.id);
             }
         }
-        const sopFile = path.join(__dirname, 'metaldiy_result.json');
+        const sopFile = path.join(__dirname, 'domecall_result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8');
     } catch (error) {
         console.error(error);
@@ -38,19 +38,43 @@ const { goToAttempts, signIn } = require('./trackwing-common');
     }
 })();
 async function validateProduct(page) {
+    let dialogAppeared = false;
+    let dialogContainsOnline = false;
+    page.once('dialog', async dialog => {
+        try {
+            const message = dialog.message();
+            if (message.includes('인터넷')) {
+                dialogContainsOnline = true;
+            }
+            await dialog.accept();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            dialogAppeared = true;
+        }
+    });
     try {
-        return await page.evaluate(() => {
+        const result = await page.evaluate(() => {
             const soldOutTextElement = document.querySelector('#frmView > div > div.btn > a');
             if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('구매 불가')) {
                 return false;
             }
             const soldOutButton = document.querySelector('#frmView > div > div.btn > a.skinbtn.point2.btn-add-order');
             if (soldOutButton && soldOutButton.src.includes('바로 구매')) {
+                soldOutButton.click();
                 return true;
             }
             return true;
         });
+        // 잠시 대기하여 dialog 이벤트가 발생할 시간을 줍니다.
+        await page.waitForTimeout(1000); // 필요에 따라 대기 시간을 조정하세요.
+        // dialog 이벤트가 발생했고, 메시지에 '온라인'이 포함된 경우 false를 반환합니다.
+        if (dialogAppeared && dialogContainsOnline) {
+            return false;
+        }
+        return result;
     } catch (error) {
         return false;
     }
 }
+
