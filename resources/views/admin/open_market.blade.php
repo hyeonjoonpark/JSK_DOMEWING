@@ -588,8 +588,8 @@
                         <p><b>성함:</b> ${data.name}</p>
                         <p><b>전화번호:</b> ${data.phone}</p>
                         <p><b>주소:</b> ${data.address}</p>
-                        <p><b>요청사항:</b> ${data.receiverRemark}</p>
-                        <p><b>사유:</b> ${data.type}</p>
+                        <p><b>유형:</b> ${data.type}</p>
+                        <p><b>사유:</b> ${data.reason}</p>
                         <p><b>개수:</b> ${data.quantity}</p>
                         <p><b>총 가격:</b> ${data.amount}</p>
                         <p>
