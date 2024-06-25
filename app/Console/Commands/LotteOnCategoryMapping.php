@@ -33,9 +33,9 @@ class LotteOnCategoryMapping extends Command
                 ->first();
             if ($lotteOnCategory) {
                 DB::table('category_mapping')
-                    ->where('ownerclan_id', $ownerClanCategory->id)
+                    ->where('ownerclan', $ownerClanCategory->id)
                     ->update([
-                        'lotte_on_category_id' => $lotteOnCategory->id,
+                        'lotte_on' => $lotteOnCategory->id,
                     ]);
 
                 $this->info("Mapped ownerclan_category.id {$ownerClanCategory->id} to lotte_on_category.id {$lotteOnCategory->id}");
@@ -43,7 +43,6 @@ class LotteOnCategoryMapping extends Command
                 $this->warn("No matching lotte_on_category found for ownerclan_category.id {$ownerClanCategory->id} with name {$ownerClanCategory->name}");
             }
         }
-
         $this->info('Mapping completed!');
     }
 }
