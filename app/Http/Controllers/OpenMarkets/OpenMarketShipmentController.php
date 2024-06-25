@@ -83,7 +83,8 @@ class OpenMarketShipmentController extends Controller
                 DB::table('orders')
                     ->where('id', $orderId)
                     ->update([
-                        'shipping_fee_then' => DB::raw('shipping_fee_then + 5000')
+                        'shipping_fee_then' => DB::raw('shipping_fee_then + 5000'),
+                        'requested' => 'Y'
                     ]);
                 DB::table('wing_transactions')
                     ->where('id', $wingTransaction->id)
