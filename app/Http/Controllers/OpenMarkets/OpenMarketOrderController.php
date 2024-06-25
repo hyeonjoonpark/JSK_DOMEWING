@@ -309,7 +309,8 @@ class OpenMarketOrderController extends Controller
                 ->where('delivery_status', 'PENDING')
                 ->update([
                     'type' => 'CANCELLED',
-                    'remark' => $remark
+                    'remark' => $remark,
+                    'requested' => 'N'
                 ]);
             // 트랜잭션 커밋
             DB::commit();
@@ -350,7 +351,8 @@ class OpenMarketOrderController extends Controller
                 ->where('delivery_status', 'PENDING')
                 ->update([
                     'type' => 'CANCELLED',
-                    'remark' => $remark
+                    'remark' => $remark,
+                    'requested' => 'N'
                 ]);
             // 트랜잭션 커밋
             DB::commit();
