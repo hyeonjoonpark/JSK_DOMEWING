@@ -94,7 +94,8 @@ class OpenMarketExchangeController extends Controller
             ->where('product_order_number', $productOrderNumber)
             ->update([
                 'type' => 'CANCELLED',
-                'remark' => $remark
+                'remark' => $remark,
+                'requested' => 'N'
             ]);
         DB::table('wing_transactions')
             ->where('id', $order->wing_transaction_id)
@@ -119,6 +120,7 @@ class OpenMarketExchangeController extends Controller
                     'tracking_number' => $trackingNumber,
                     'delivery_company_id' => $deliveryCompanyId,
                     'delivery_status' => 'COMPLETE',
+                    'requested' => 'Y'
                 ]);
             DB::table('wing_transactions')
                 ->where('id', $order->wing_transaction_id)
