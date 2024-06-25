@@ -71,7 +71,7 @@ class AdminDashboardController extends Controller
         }
 
         $maxTarget = max(max($sales), max($recharges));
-        $max = ceil($maxTarget / 500000) * 500000;
+        $max = ceil($maxTarget / 1000000) * 1000000;
 
         $thisMonth = $this->getDateRangeForThisMonth();
         $lastMonth = $this->getDateRangeForLastMonth();

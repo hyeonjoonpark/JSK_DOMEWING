@@ -81,13 +81,10 @@ class SmartstoreProductUpload extends Controller
     }
     private function generateParam($product, $productImage)
     {
-        // $productKeywords = explode(',', $product->productKeywords);
-        // $sellerTags = [];
-        // foreach ($productKeywords as $keyword) {
-        //     $sellerTags[] = [
-        //         'text' => $keyword
-        //     ];
-        // }
+        $deliveryFeeType = 'PAID';
+        if ($product->bundle_quantity > 0) {
+            $deliveryFeeType = 'UNIT_QUANTITY_PAID';
+        }
         $data = [
             'originProduct' => [
                 'statusType' => 'SALE',
@@ -107,8 +104,9 @@ class SmartstoreProductUpload extends Controller
                     'deliveryCompany' => 'HYUNDAI',
                     'deliveryBundleGroupUsable' => false,
                     'deliveryFee' => [
-                        'deliveryFeeType' => 'PAID',
+                        'deliveryFeeType' => $deliveryFeeType,
                         'baseFee' => $product->shipping_fee,
+                        'repeatQuantity' => $product->bundle_quantity,
                         'deliveryFeePayType' => 'PREPAID',
                         'deliveryFeeByArea' => [
                             'deliveryAreaType' => 'AREA_3',
