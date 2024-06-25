@@ -210,4 +210,20 @@ class AdminDashboardController extends Controller
             ->sum('wt.amount');
         return $paidAmount - $refundAmount;
     }
+    public function getTopVendors()
+    {
+        $vendors = DB::table('orders AS o')
+            ->join('carts AS c', 'c.id', '=', 'o.cart_id')
+            ->join('minewing_products AS mp', 'mp.id', '=', 'c.product_id')
+            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
+            ->where('o.delivery_status', 'COMPLETE')
+            ->where('o.type', 'PAID')
+            ->whereBetween('o.created_at', [date("Y-m-01 00:00:00"), date("Y-m-t 23:59:59")])
+            ->groupBy('v.name')
+            ->select('v.name', DB::raw('SUM(c.quantity) as quantity'), DB::raw('COUNT(*) as count'))
+            ->orderByDesc('quantity')
+            ->limit(5)
+            ->get();
+        return $vendors;
+    }
 }

@@ -206,6 +206,7 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('weeklySales', [AdminDashboardController::class, 'getWeeklySales']);
         Route::post('action-center', [AdminDashboardController::class, 'getActionCenter']);
         Route::post('top-6-member-sales', [AdminDashboardController::class, 'getTop6MemberSales']);
+        Route::get('top-vendors', [AdminDashboardController::class, 'getTopVendors']);
     });
 
     Route::post('trackwing', [TrackSoldOutController::class, 'main'])->name('trackwing');
