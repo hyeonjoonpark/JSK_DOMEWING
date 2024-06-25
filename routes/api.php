@@ -212,8 +212,8 @@ Route::middleware(['auth.custom'])->group(function () {
 });
 
 //테스트
-Route::post('test', [St11OrderController::class, 'index']);
-// Route::post('test', [LotteOnApiController::class, 'index']);
+// Route::post('test', [St11OrderController::class, 'index']);
+Route::post('test', [LotteOnApiController::class, 'index']);
 Route::post('smart-store-return-test', [SmartStoreReturnController::class, 'index']);
 Route::post('smart-store-exchange-test', [SmartStoreExchangeController::class, 'index']);
 
