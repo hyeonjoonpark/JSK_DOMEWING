@@ -1,8 +1,12 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 1920,
+        height: 1080
+    });
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
@@ -32,6 +36,7 @@ async function signIn(page, username, password) {
 async function scrapeProduct(page, url) {
     try {
         await page.goto(url, { waitUntil: 'networkidle0' });
+        await scrollToDetail(page);
         const productOptionData = await getProductOptions(page);
         const hasOption = productOptionData.hasOption;
         const productOptions = productOptionData.productOptions;
@@ -92,7 +97,8 @@ async function getProductOptions(page) {
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
-                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value !== '*' && opt.value !== '**')
+                opts.map(opt => ({ value: opt.value, text: opt.text }))
+                    .filter(opt => opt.value !== '*' && opt.value !== '**' && !/각인.*o/.test(opt.text) && !opt.text.includes('[품절]'))
             );
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
@@ -107,9 +113,9 @@ async function getProductOptions(page) {
                         let optText = opt.text;
                         optionName = optionName.length > 0 ? `${optionName} / ${optText}` : optText;
                     });
-                    const optionPriceMatch = optionName.match(/\(([\d,]+)원\)/);
-                    const optionPrice = parseInt(optionPriceMatch ? optionPriceMatch[1].replace(/,/g, '') : "0");
-                    optionName = optionName.replace(/\(([\d,]+)원\)/, '').trim();
+                    const optionPriceMatch = optionName.match(/\(\+([\d,]+)원\)/);
+                    const optionPrice = optionPriceMatch ? parseInt(optionPriceMatch[1].replace(/,/g, ''), 10) : 0;
+                    optionName = optionName.replace(/\(\+[\d,]+원\)/, '').trim();
                     const productOption = { optionName, optionPrice };
                     productOptions.push(productOption);
                 }
@@ -134,4 +140,34 @@ async function getProductOptions(page) {
         hasOption: true,
         productOptions: productOptions
     };
+}
+async function scrollToDetail(page) {
+    await page.evaluate(async () => {
+        const distance = 45; // 스크롤 이동 거리
+        const scrollInterval = 50; // 스크롤 간격
+        const maxScrollAttempts = 100; // 최대 스크롤 시도 횟수
+        let scrollAttempts = 0;
+
+        while (scrollAttempts < maxScrollAttempts) {
+            const scrollTop = window.scrollY;
+            const prdDetailElement = document.querySelector('#prdDetail > div > h3');
+            const prdInfoElement = document.querySelector('#prdInfo > ul');
+
+            if (prdDetailElement) {
+                const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
+                if (scrollTop < targetScrollBottom) {
+                    window.scrollBy(0, distance);
+                } else {
+                    break;
+                }
+            } else if (prdInfoElement) {
+                break;
+            } else {
+                window.scrollBy(0, distance);
+            }
+
+            scrollAttempts++;
+            await new Promise(resolve => setTimeout(resolve, scrollInterval));
+        }
+    });
 }
