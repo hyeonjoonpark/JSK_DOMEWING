@@ -207,7 +207,8 @@ class UploadedController extends Controller
             'productName' => 'required|string',
             'price' => 'required|integer',
             'shippingFee' => 'required|integer',
-            'vendorId' => 'required|integer|exists:vendors,id'
+            'vendorId' => 'required|integer|exists:vendors,id',
+            'bundleQuantity' => 'required|min:0|max:9999'
         ], [
             'originProductNo' => '유효한 상품이 아닙니다.',
             'productName' => '상품명을 입력해주세요.',
@@ -264,7 +265,7 @@ class UploadedController extends Controller
         }
         // 벤더에 따라 올바른 메소드를 호출하도록 분기
         $methodName = $vendorEngName . 'EditRequest';
-        $response = $this->$methodName($originProductNo, $productName, $price, $shippingFee, $partner, $product);
+        $response = $this->$methodName($originProductNo, $productName, $price, $shippingFee, $partner, $product, $request->bundleQuantity);
         if ($response['status'] === false) {
             return $response;
         }
@@ -366,7 +367,7 @@ class UploadedController extends Controller
         return $cpac->putBuilder($account->access_key, $account->secret_key, $contentType, $url);
     }
 
-    public function smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product)
+    public function smart_storeEditRequest($originProductNo, $productName, $price, $shippingFee, $partner, $product, $bundleQuantity)
     {
         $ssac = new SmartStoreApiController();
         $account = DB::table('smart_store_accounts AS a')
@@ -383,6 +384,10 @@ class UploadedController extends Controller
             return $uploadImageResult;
         }
         $productImage = $uploadImageResult['data']['images'][0]['url'];
+        $deliveryFeeType = 'PAID';
+        if ($bundleQuantity > 0) {
+            $deliveryFeeType = 'UNIT_QUANTITY_PAID';
+        }
         $data = [
             'originProduct' => [
                 'statusType' => 'SALE',
@@ -402,8 +407,9 @@ class UploadedController extends Controller
                     'deliveryCompany' => 'HYUNDAI',
                     'deliveryBundleGroupUsable' => false,
                     'deliveryFee' => [
-                        'deliveryFeeType' => 'PAID',
-                        'baseFee' => $shippingFee,
+                        'deliveryFeeType' => $deliveryFeeType,
+                        'baseFee' => $product->shipping_fee,
+                        'repeatQuantity' => $bundleQuantity,
                         'deliveryFeePayType' => 'PREPAID',
                         'deliveryFeeByArea' => [
                             'deliveryAreaType' => 'AREA_3',
@@ -704,7 +710,8 @@ class UploadedController extends Controller
                         'price' => $newPrice,
                         'shippingFee' => $shippingFee,
                         'vendorId' => $openMarket->id,
-                        'apiToken' => $uploadedProduct->api_token
+                        'apiToken' => $uploadedProduct->api_token,
+                        'bundleQuantity' => $product['bundle_quantity']
                     ]);
 
                     // 제품 수정 요청 실행

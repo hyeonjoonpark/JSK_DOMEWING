@@ -71,7 +71,7 @@ class AdminDashboardController extends Controller
         }
 
         $maxTarget = max(max($sales), max($recharges));
-        $max = ceil($maxTarget / 500000) * 500000;
+        $max = ceil($maxTarget / 1000000) * 1000000;
 
         $thisMonth = $this->getDateRangeForThisMonth();
         $lastMonth = $this->getDateRangeForLastMonth();
@@ -209,5 +209,21 @@ class AdminDashboardController extends Controller
             ->whereBetween('wt.created_at', $dateRange)
             ->sum('wt.amount');
         return $paidAmount - $refundAmount;
+    }
+    public function getTopVendors()
+    {
+        $vendors = DB::table('orders AS o')
+            ->join('carts AS c', 'c.id', '=', 'o.cart_id')
+            ->join('minewing_products AS mp', 'mp.id', '=', 'c.product_id')
+            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
+            ->where('o.delivery_status', 'COMPLETE')
+            ->where('o.type', 'PAID')
+            ->whereBetween('o.created_at', [date("Y-m-01 00:00:00"), date("Y-m-t 23:59:59")])
+            ->groupBy('v.name')
+            ->select('v.name', DB::raw('SUM(c.quantity) as quantity'), DB::raw('COUNT(*) as count'))
+            ->orderByDesc('quantity')
+            ->limit(5)
+            ->get();
+        return $vendors;
     }
 }

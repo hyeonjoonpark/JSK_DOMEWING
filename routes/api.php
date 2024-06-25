@@ -206,14 +206,15 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('weeklySales', [AdminDashboardController::class, 'getWeeklySales']);
         Route::post('action-center', [AdminDashboardController::class, 'getActionCenter']);
         Route::post('top-6-member-sales', [AdminDashboardController::class, 'getTop6MemberSales']);
+        Route::get('top-vendors', [AdminDashboardController::class, 'getTopVendors']);
     });
 
     Route::post('trackwing', [TrackSoldOutController::class, 'main'])->name('trackwing');
 });
 
 //테스트
-Route::post('test', [St11OrderController::class, 'index']);
-// Route::post('test', [LotteOnApiController::class, 'index']);
+// Route::post('test', [St11OrderController::class, 'index']);
+Route::post('test', [LotteOnApiController::class, 'index']);
 Route::post('smart-store-return-test', [SmartStoreReturnController::class, 'index']);
 Route::post('smart-store-exchange-test', [SmartStoreExchangeController::class, 'index']);
 

@@ -20,7 +20,7 @@ class SmartstoreProductUpload extends Controller
     public function main()
     {
         $success = 0;
-        $error = '';
+        $errors = [];
         $ssac = new SmartStoreApiController();
         $smartstoreAccountId = $this->account->id;
         $duplicated = [];
@@ -52,7 +52,10 @@ class SmartstoreProductUpload extends Controller
                 $productName = $product->productName;
                 $this->store($smartstoreAccountId, $productId, $productPrice, $shippingFee, $originProductNo, $smartstoreChannelProductNo, $productName);
             } else {
-                $error = $result['error'];
+                $errors[] = [
+                    'productCode' => $product->productCode,
+                    'error' => $result['error']
+                ];
             }
         }
         $status = true;
@@ -63,7 +66,7 @@ class SmartstoreProductUpload extends Controller
         return [
             'status' => $status,
             'message' => "총 " . $numProducts . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
-            'error' => $error
+            'error' => $errors
         ];
     }
     protected function store($smartstoreAccountId, $productId, $productPrice, $shippingFee, $originProductNo, $smartstoreChannelProductNo, $productName)
@@ -81,13 +84,10 @@ class SmartstoreProductUpload extends Controller
     }
     private function generateParam($product, $productImage)
     {
-        // $productKeywords = explode(',', $product->productKeywords);
-        // $sellerTags = [];
-        // foreach ($productKeywords as $keyword) {
-        //     $sellerTags[] = [
-        //         'text' => $keyword
-        //     ];
-        // }
+        $deliveryFeeType = 'PAID';
+        if ($product->bundle_quantity > 0) {
+            $deliveryFeeType = 'UNIT_QUANTITY_PAID';
+        }
         $data = [
             'originProduct' => [
                 'statusType' => 'SALE',
@@ -107,8 +107,9 @@ class SmartstoreProductUpload extends Controller
                     'deliveryCompany' => 'HYUNDAI',
                     'deliveryBundleGroupUsable' => false,
                     'deliveryFee' => [
-                        'deliveryFeeType' => 'PAID',
+                        'deliveryFeeType' => $deliveryFeeType,
                         'baseFee' => $product->shipping_fee,
+                        'repeatQuantity' => $product->bundle_quantity,
                         'deliveryFeePayType' => 'PREPAID',
                         'deliveryFeeByArea' => [
                             'deliveryAreaType' => 'AREA_3',

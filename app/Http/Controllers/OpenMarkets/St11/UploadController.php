@@ -54,23 +54,35 @@ class UploadController extends Controller
             try {
                 $builderResult = $ac->builder($apiKey, $method, $url, $data);
                 if ($builderResult['status'] === false) {
-                    $error[] = $builderResult['error'];
+                    $error[] = [
+                        'productCode' => $product->productCode,
+                        'error' => $builderResult['error']
+                    ];
                     continue;
                 }
                 $resultCode = (int)$builderResult['data']->resultCode;
                 if ($resultCode !== 200 && $resultCode !== 210) {
-                    $error[] = $builderResult;
+                    $error[] = [
+                        'productCode' => $product->productCode,
+                        'error' => $builderResult
+                    ];
                     continue;
                 }
                 $originProductNo = $builderResult['data']->productNo;
                 $storeResult = $this->store($account->id, $product->id, $product->productPrice, $product->shipping_fee, $originProductNo, $product->productName);
                 if ($storeResult['status'] === false) {
-                    $error[] = $storeResult['error'];
+                    $error[] = [
+                        'productCode' => $product->productCode,
+                        'error' => $storeResult['error']
+                    ];
                     continue;
                 }
                 $success++;
             } catch (\Exception $e) {
-                $error[] = $e->getMessage();
+                $error[] = [
+                    'productCode' => $product->productCode,
+                    'error' => $e->getMessage()
+                ];
                 continue;
             }
         }

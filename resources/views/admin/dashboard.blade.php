@@ -86,34 +86,18 @@
                         <div class="card-inner">
                             <div class="card-title-group align-start mb-2">
                                 <div class="card-title">
-                                    <h6 class="title">Top Coin in Orders</h6>
-                                    <p>In last 15 days buy and sells overview.</p>
-                                </div>
-                                <div class="card-tools mt-n1 me-n1">
-                                    <div class="drodown">
-                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger"
-                                            data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
-                                        <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
-                                            <ul class="link-list-opt no-bdr">
-                                                <li><a href="#" class="active"><span>15 Days</span></a></li>
-                                                <li><a href="#"><span>30 Days</span></a></li>
-                                                <li><a href="#"><span>3 Months</span></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    <h6 class="title">탑 5 원청사</h6>
+                                    <p>이번 달 가장 높은 주문 수량/횟수를 가진 탑 5 원청사 리스트입니다.</p>
                                 </div>
                             </div><!-- .card-title-group -->
+                            <div class="text-center" id="topVendorsLoader">
+                                <img src="{{ asset('assets/images/search-loader.gif') }}">
+                            </div>
                             <div class="nk-coin-ovwg">
                                 <div class="nk-coin-ovwg-ck">
-                                    <canvas class="coin-overview-chart" id="coinOverview"></canvas>
+                                    <canvas id="topVendors"></canvas>
                                 </div>
-                                <ul class="nk-coin-ovwg-legends">
-                                    <li><span class="dot dot-lg sq" data-bg="#f98c45"></span><span>Bitcoin</span></li>
-                                    <li><span class="dot dot-lg sq" data-bg="#9cabff"></span><span>Ethereum</span></li>
-                                    <li><span class="dot dot-lg sq" data-bg="#8feac5"></span><span>NioCoin</span></li>
-                                    <li><span class="dot dot-lg sq" data-bg="#6b79c8"></span><span>Litecoin</span></li>
-                                    <li><span class="dot dot-lg sq" data-bg="#79f1dc"></span><span>Bitcoin Cash</span>
-                                    </li>
+                                <ul class="nk-coin-ovwg-legends" id="topVendorLegends">
                                 </ul>
                             </div><!-- .nk-coin-ovwg -->
                         </div><!-- .card-inner -->
@@ -175,6 +159,7 @@
             requestWeeklySales();
             requestActionCenter();
             top6MemberSales();
+            requestTopVendors();
         });
 
         function top6MemberSales() {
@@ -444,6 +429,164 @@
 
         function numberFormat(number) {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function requestTopVendors() {
+            $.ajax({
+                url: '/api/admin/dashboard/top-vendors',
+                type: 'GET',
+                dataType: 'JSON',
+                data: {
+                    rememberToken
+                },
+                success: function(response) {
+                    const vendors = response;
+                    const labels = [];
+                    const countData = [];
+                    const quantityData = [];
+                    const colors = ['#f98c45', '#9cabff', '#8feac5', '#6b79c8', '#79f1dc'];
+                    let topVendorLegends = '';
+                    let i = 0;
+                    for (const vendor of vendors) {
+                        labels.push(vendor.name);
+                        countData.push(vendor.count);
+                        quantityData.push(vendor.quantity);
+                        topVendorLegends += `
+                             <li><span class="dot dot-lg sq" data-bg="${colors[i]}" style="background: ${colors[i]};"></span><span>${vendor.name}</span></li>
+                        `;
+                        i++;
+                    }
+                    $('#topVendorLegends').html(topVendorLegends);
+
+                    const topVendors = {
+                        labels,
+                        stacked: true,
+                        datasets: [{
+                            label: "주문 횟수",
+                            color: ["#f98c45", "#6baafe", "#8feac5", "#6b79c8", "#79f1dc"],
+                            data: countData
+                        }, {
+                            label: "주문 수량",
+                            color: [
+                                NioApp.hexRGB('#f98c45', .2),
+                                NioApp.hexRGB('#6baafe', .4),
+                                NioApp.hexRGB('#8feac5', .4),
+                                NioApp.hexRGB('#6b79c8', .4),
+                                NioApp.hexRGB('#79f1dc', .4)
+                            ],
+                            data: quantityData
+                        }]
+                    };
+
+                    renderChart('#topVendors', topVendors);
+                    $('#topVendorsLoader').hide();
+                },
+                error: function(response) {
+                    console.log(response);
+                }
+            });
+        }
+
+        function createChartData(dataset) {
+            return {
+                label: dataset.label,
+                data: dataset.data,
+                backgroundColor: dataset.color,
+                borderWidth: 2,
+                borderColor: 'transparent',
+                hoverBorderColor: 'transparent',
+                borderSkipped: 'bottom',
+                barThickness: 8,
+                categoryPercentage: 0.5,
+                barPercentage: 1.0
+            };
+        }
+
+        function createChartOptions(_get_data) {
+            return {
+                legend: {
+                    display: _get_data.legend || false,
+                    rtl: NioApp.State.isRTL,
+                    labels: {
+                        boxWidth: 30,
+                        padding: 20,
+                        fontColor: '#6783b8'
+                    }
+                },
+                maintainAspectRatio: false,
+                tooltips: {
+                    enabled: true,
+                    rtl: NioApp.State.isRTL,
+                    callbacks: {
+                        title: (tooltipItem, data) => data.labels[tooltipItem[0].index],
+                        label: (tooltipItem, data) =>
+                            `${data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]} ${data.datasets[tooltipItem.datasetIndex].label}`
+                    },
+                    backgroundColor: '#eff6ff',
+                    titleFontSize: 13,
+                    titleFontColor: '#6783b8',
+                    titleMarginBottom: 6,
+                    bodyFontColor: '#9eaecf',
+                    bodyFontSize: 12,
+                    bodySpacing: 4,
+                    yPadding: 10,
+                    xPadding: 10,
+                    footerMarginTop: 0,
+                    displayColors: false
+                },
+                scales: {
+                    yAxes: [{
+                        display: false,
+                        stacked: _get_data.stacked || false,
+                        ticks: {
+                            beginAtZero: true,
+                            padding: 0
+                        },
+                        gridLines: {
+                            color: NioApp.hexRGB("#526484", .2),
+                            tickMarkLength: 0,
+                            zeroLineColor: NioApp.hexRGB("#526484", .2)
+                        }
+                    }],
+                    xAxes: [{
+                        display: false,
+                        stacked: _get_data.stacked || false,
+                        ticks: {
+                            fontSize: 9,
+                            fontColor: '#9eaecf',
+                            source: 'auto',
+                            padding: 0,
+                            reverse: NioApp.State.isRTL
+                        },
+                        gridLines: {
+                            color: "transparent",
+                            tickMarkLength: 0,
+                            zeroLineColor: 'transparent'
+                        }
+                    }]
+                }
+            };
+        }
+
+        function renderChart(selector, chartData) {
+            const $selector = selector ? $(selector) : $('#topVendors');
+            $selector.each(function() {
+                const $self = $(this);
+                const _self_id = $self.attr('id');
+                const selectCanvas = document.getElementById(_self_id).getContext("2d");
+
+                const datasets = chartData.datasets.map(createChartData);
+                const options = createChartOptions(chartData);
+
+                new Chart(selectCanvas, {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: chartData.labels,
+                        datasets
+                    },
+                    options
+                });
+            });
         }
     </script>
 @endsection

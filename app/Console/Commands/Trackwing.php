@@ -52,7 +52,6 @@ class Trackwing extends Command
             $tempFileName = date('YmdHis') . '_' . $vendorName . '.json';
             file_put_contents(public_path('assets/json/trackwing-results/' . $tempFileName), json_encode($tsocMainResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
             $this->info('#' . $index . ': Completed Trackwing for vendor ' . $vendorName . ' (ID: ' . $vendorId . ')');
-            return $vendorId;
         }
         $this->info('Completed Trackwing!');
     }

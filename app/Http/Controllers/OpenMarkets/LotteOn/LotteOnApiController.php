@@ -54,7 +54,6 @@ class LotteOnApiController extends Controller
     }
     public function postBuilder()
     {
-        $method = 'post';
         // API 주소
         $accessKey = '5d5b2cb498f3d20001665f4ed04a48bf370a4d37a64c6394431f2cef';
         $url = 'https://openapi.lotteon.com/v1/openapi/common/v1/identity';
@@ -88,6 +87,52 @@ class LotteOnApiController extends Controller
                 'result' => $result,
                 'httpcode' => $httpcode
             ]
+        ];
+    }
+    public function index()
+    {
+        // API 주소
+        $accessKey = '5d5b2cb498f3d20001665f4ed04a48bf370a4d37a64c6394431f2cef';
+        // $url = 'https://onpick-api.lotteon.com/cheetah/econCheetah.ecn?job=cheetahStandardCategory';
+        $url = 'https://onpick-api.lotteon.com/cheetah/econCheetah.ecn?job=cheetahDisplayCategory';
+        // cURL 세션 초기화
+        $ch = curl_init();
+        // cURL 옵션 설정
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 100); // 초 단위
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json', // 필수헤더 application/json
+            'Accept-Language: ko', // 필수헤더 국내접속일 경우 "ko"
+            'X-Timezone: GMT+09:00', // 필수헤더 국내접속일 경우 "GMT+09:00"
+            'Authorization: Bearer ' . $accessKey, // 인증키
+            'Cache-Control: no-cache', // 캐시 제어
+        ]);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+        $result = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        // 응답을 핸들링
+        if ($result === false) {
+            $error = curl_error($ch);
+            return [
+                'status' => false,
+                'message' => '마켓으로부터의 응답 시간이 초과하였습니다.',
+                'error' => $error
+            ];
+        }
+        if ($httpcode === 200) {
+            return [
+                'status' => true,
+                'data' => json_decode($result, true),
+                'httpcode' => $httpcode
+            ];
+        }
+        return [
+            'status' => false,
+            'message' => '마켓으로부터의 응답이 올바르지 않습니다.',
+            'error' => $result,
+            'httpcode' => $httpcode
         ];
     }
     public function build($method, $path, $accessKey, $secretKey, $params = "")

@@ -133,8 +133,8 @@ class OpenMarketOrderController extends Controller
             $vendors = $request->input('vendors');
             $orderStatus = $request->input('orderStatus');
             $orders = $this->getOrders($vendors, $orderStatus);
-            $processedOrders = array_map(function ($order) use ($orderStatus) {
-                return $this->transformOrderDetails($order, $orderStatus);
+            $processedOrders = array_map(function ($order) {
+                return $this->transformOrderDetails($order);
             }, $orders);
             $lowBalanceAccounts = $this->getUsersWithLowBalance();
         } catch (\Exception $e) {
@@ -655,7 +655,7 @@ class OpenMarketOrderController extends Controller
     }
 
 
-    private function transformOrderDetails($order, $orderStatus)
+    private function transformOrderDetails($order)
     {
         $product  = DB::table('minewing_products as mp')
             ->where('mp.id', $order->productId)
@@ -669,7 +669,7 @@ class OpenMarketOrderController extends Controller
                 $orderType = '교환';
                 break;
         }
-        $orderDate = ($order->deliveryStatus === 'COMPLETE') ? '발주일자 : ' . $order->updatedAt : '수집일자 : ' . $order->createdAt;
+        $orderDate = ($order->deliveryStatus === 'COMPLETE') ? '발주일자 :<br>' . $order->updatedAt : '수집일자 :<br>' . $order->createdAt;
         $productPrice = $order->productPrice;
         $shippingRate = $order->bundleQuantity < 1 ? 1 : ceil($order->quantity / $order->bundleQuantity);
         $shippingAmount = $order->shippingFee * $shippingRate;

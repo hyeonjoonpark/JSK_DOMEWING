@@ -66,7 +66,10 @@ class CoupangUploadController extends Controller
                 $this->store($account->id, $product->id, $salePrice, $shippingFee, $originProductNo, $product->productName);
                 $success++;
             } else {
-                $error[] = $uploadResult;
+                $error[] = [
+                    'productCode' => $product->productCode,
+                    'error' => $uploadResult
+                ];
             }
         }
         return [
