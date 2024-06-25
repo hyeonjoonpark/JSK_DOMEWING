@@ -23,10 +23,10 @@ const puppeteer = require('puppeteer');
     }
 })();
 async function signIn(page, username, password) {
-    await page.goto('https://www.mongtang.co.kr/shop/member/login.php', { waitUntil: 'networkidle0' });
-    await page.type('input[name="m_id"]', username);
-    await page.type('input[name="password"]', password);
-    await page.click('#form > table > tbody > tr:nth-child(2) > td.noline > input[type=image]');
+    await page.goto('https://dabone.kr/member/login.html', { waitUntil: 'networkidle0' });
+    await page.type('#member_id', username);
+    await page.type('#member_passwd', password);
+    await page.click('div > div > fieldset > a');
     await page.waitForNavigation({ waitUntil: 'load' });
 }
 async function scrapeProduct(page, url) {
@@ -36,17 +36,17 @@ async function scrapeProduct(page, url) {
         const hasOption = productOptionData.hasOption;
         const productOptions = productOptionData.productOptions;
         const productData = await page.evaluate(() => {
-            const productName = document.querySelector('#goods_spec > form > div:nth-child(4) > b').textContent.trim();
-            const productPrice = document.querySelector('#price').textContent.trim().replace(/[^\d]/g, '');
-            const productImage = document.querySelector('#objImg').src;
-            const productDetailElements = document.querySelectorAll('#contents img');
+            const productName = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > div.xans-element-.xans-product.xans-product-detaildesign > table > tbody > tr:nth-child(1) > td > span').textContent.trim();
+            const productPrice = document.querySelector('#span_product_price_text').textContent.trim().replace(/[^\d]/g, '');
+            const productImage = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img').src;
+            const productDetailElements = document.querySelectorAll('#prdDetail > div img');
             if (productDetailElements.length < 1) {
                 return false;
             }
             const productDetail = [];
             for (const productDetailElement of productDetailElements) {
                 const tempProductDetailSrc = productDetailElement.src;
-                if (tempProductDetailSrc === 'http://buzz71.godohosting.com/start/common/open_end.jpg' || tempProductDetailSrc === 'http://buzz71.godohosting.com/start/common/open_notice.jpg') {
+                if (tempProductDetailSrc === '*' || tempProductDetailSrc === '**') {
                     continue;
                 }
                 productDetail.push(productDetailElement.src);
@@ -92,7 +92,7 @@ async function getProductOptions(page) {
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
-                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value !== '' && opt.value !== '-1')
+                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value !== '*' && opt.value !== '**')
             );
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
