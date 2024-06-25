@@ -64,7 +64,7 @@ class ProcessProductUpload implements ShouldQueue
             'partner_id' => $partnerId,
             'status' => $status ? 'TRUE' : 'FALSE',
             'data' => "<b>$vendorName: $this->tableName 테이블 업로드 결과</b><br>$data",
-            'error' => $error
+            'error' => json_encode($error)
         ]);
     }
 }
