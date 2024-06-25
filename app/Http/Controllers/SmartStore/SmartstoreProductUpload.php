@@ -52,7 +52,10 @@ class SmartstoreProductUpload extends Controller
                 $productName = $product->productName;
                 $this->store($smartstoreAccountId, $productId, $productPrice, $shippingFee, $originProductNo, $smartstoreChannelProductNo, $productName);
             } else {
-                $errors[] = $result['error'];
+                $errors[] = [
+                    'productCode' => $product->productCode,
+                    'error' => $result['error']
+                ];
             }
         }
         $status = true;
