@@ -114,8 +114,9 @@
                                         <td><a href="{{ $product->productHref }}" target="_blank"><img
                                                     src="{{ $product->productImage }}" alt="상품 대표 이미지" width=100
                                                     height=100></a></td>
-                                        <td><a href="{{ $product->productHref }}"
-                                                target="_blank">{{ $product->productName }}</a></td>
+                                        <td><a
+                                                href="javascript:view('{{ $product->productCode }}');">{{ $product->productName }}</a>
+                                        </td>
                                         <td><a href="javascript:void(0);" id="copy{{ $product->productCode }}"
                                                 data-bs-toggle="tooltip" data-bs-placement="top" title="클릭하여 복사"
                                                 onclick="copyCode('{{ $product->productCode }}');">{{ $product->productCode }}</a>
@@ -285,6 +286,55 @@
                 .catch(err => {
                     console.error('복사 실패: ', err);
                 });
+        }
+
+        function view(productCode) {
+            popupLoader(1, "상품 정보를 불러오는 중입니다.");
+            $.ajax({
+                url: "/api/product/view",
+                type: 'POST',
+                dataType: "JSON",
+                data: {
+                    productCode,
+                    rememberToken
+                },
+                success: function(response) {
+                    closePopup();
+                    const {
+                        status,
+                        data,
+                        message
+                    } = response;
+                    if (status === true) {
+                        const {
+                            productName,
+                            productPrice,
+                            productImage,
+                            productDetail,
+                            shipping_fee,
+                            category
+                        } = data;
+                        $('#viewCategory').html(category);
+                        $('#viewProductName').html(productName);
+                        $("#viewProductCode").html(productCode);
+                        $('#viewProductPrice').html(
+                            `${numberFormat(productPrice)} <img class="wing" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />`
+                        );
+                        $('#viewProductImage').attr('src', productImage);
+                        $('#viewProductDetail').html(productDetail);
+                        $("#viewShippingFee").html(
+                            `${numberFormat(shipping_fee)} <img class="wing" src="{{ asset('assets/images/wing.svg') }}" alt="윙" />`
+                        );
+                        $("#viewProduct").modal('show');
+                    } else {
+                        swalWithReload(message, 'error');
+                    }
+                },
+                error: function(error) {
+                    closePopup();
+                    swalWithReload('API 통신 중 에러가 발생했습니다.', 'error');
+                }
+            });
         }
     </script>
 @endsection
