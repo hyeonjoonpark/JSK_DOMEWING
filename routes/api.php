@@ -244,6 +244,16 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
             Route::post('edit', [LotteOnAccountController::class, 'edit']);
             Route::post('delete', [LotteOnAccountController::class, 'delete']);
         });
+        Route::prefix('kakao-shopping')->group(function () {
+            Route::post('/', [LotteOnAccountController::class, 'add']);
+            Route::post('edit', [LotteOnAccountController::class, 'edit']);
+            Route::post('delete', [LotteOnAccountController::class, 'delete']);
+        });
+        Route::prefix('t-mon')->group(function () {
+            Route::post('/', [LotteOnAccountController::class, 'add']);
+            Route::post('edit', [LotteOnAccountController::class, 'edit']);
+            Route::post('delete', [LotteOnAccountController::class, 'delete']);
+        });
     });
     Route::prefix('product')->group(function () {
         Route::post('view', [ViewController::class, 'main']);
