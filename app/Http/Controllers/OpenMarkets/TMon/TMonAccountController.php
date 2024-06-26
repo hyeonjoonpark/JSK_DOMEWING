@@ -30,10 +30,10 @@ class TMonAccountController extends Controller
         }
         $accessKey = $request->accessKey;
         $username = $request->username;
-        $requestValidateApiKeyResult = $this->requestValidateApiKey($accessKey);
-        if ($requestValidateApiKeyResult['status'] === false) {
-            return $requestValidateApiKeyResult;
-        }
+        // $requestValidateApiKeyResult = $this->requestValidateApiKey($accessKey);
+        // if ($requestValidateApiKeyResult['status'] === false) {
+        //     return $requestValidateApiKeyResult;
+        // }
         $partnerId = DB::table('partners')
             ->where('api_token', $request->apiToken)
             ->value('id');
