@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Partners\Products;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
+use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnUploadController;
 use App\Http\Controllers\OpenMarkets\St11\UploadController as St11UploadController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
 use App\Jobs\ProcessProductUpload;
@@ -48,7 +49,7 @@ class UploadController extends Controller
             'partnerTables' => $partnerTables
         ]);
     }
-    public function create(Request $request)
+    public function create(Request $request) //이걸로 데이터 올리는중
     {
         set_time_limit(0);
         ini_set('memory_allow', '-1');
@@ -183,5 +184,10 @@ class UploadController extends Controller
     {
         $st11UploadController = new St11UploadController();
         return $st11UploadController->main($products, $partner, $account);
+    }
+    private function lotte_on($products, $partner, $account)
+    {
+        $lotteOnUploadController = new LotteOnUploadController($products, $partner, $account);
+        return $lotteOnUploadController->main();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\OpenMarkets\LotteOn;
+namespace App\Http\Controllers\OpenMarkets\TMon;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class LotteOnAccountController extends Controller
+class TMonAccountController extends Controller
 {
     public function add(Request $request)
     {
@@ -30,24 +30,23 @@ class LotteOnAccountController extends Controller
         }
         $accessKey = $request->accessKey;
         $username = $request->username;
-        $requestValidateApiKeyResult = $this->requestValidateApiKey($accessKey);
-        if ($requestValidateApiKeyResult['status'] === false) {
-            return $requestValidateApiKeyResult;
-        }
+        // $requestValidateApiKeyResult = $this->requestValidateApiKey($accessKey);
+        // if ($requestValidateApiKeyResult['status'] === false) {
+        //     return $requestValidateApiKeyResult;
+        // }
         $partnerId = DB::table('partners')
             ->where('api_token', $request->apiToken)
             ->value('id');
-        return $this->store($partnerId, $username, $accessKey, $partnerCode);
+        return $this->store($partnerId, $username, $accessKey);
     }
-    private function store($partnerId, $username, $accessKey, $partnerCode)
+    private function store($partnerId, $username, $accessKey)
     {
         try {
-            DB::table('lotte_on_accounts')
+            DB::table('tmon_accounts')
                 ->insert([
                     'partner_id' => $partnerId,
                     'username' => $username,
                     'access_key' => $accessKey,
-                    'partner_code' => $partnerCode,
                     'hash' => Str::uuid()
                 ]);
             return [
@@ -65,7 +64,7 @@ class LotteOnAccountController extends Controller
     public function requestValidateApiKey($accessKey)
     {
         $url = 'https://openapi.lotteon.com/v1/openapi/common/v1/identity';
-        $ac = new LotteOnApiController();
+        $ac = new TMonAccountController();
         $builderResult = $ac->getBuilder($accessKey, $url);
         if (!isset($builderResult['httpcode']) || $builderResult['httpcode'] !== 200) {
             return [
@@ -84,16 +83,13 @@ class LotteOnAccountController extends Controller
         $validator = Validator::make($request->all(), [
             'accessKey' => ['required', 'max:255'],
             'username' => ['required', 'max:255'],
-            'hash' => ['required', 'exists:lotte_on_accounts,hash'],
-            'partnerCode' => ['required', 'max:13']
+            'hash' => ['required', 'exists:tmon_accounts,hash']
         ], [
             'accessKey.required' => 'OPEN API KEY는 필수 항목입니다.',
             'accessKey.max' => 'OPEN API KEY는 최대 255자 이하로 입력해야 합니다.',
             'username.required' => '계정명 및 별칭은 필수 항목입니다.',
             'username.max' => '계정명 및 별칭은 최대 255자 이하로 입력해야 합니다.',
-            'hash' => '유효한 계정이 아닙니다.',
-            'partnerCode.required' => '거래처번호는 필수 항목입니다.',
-            'partnerCode.max' => '거래처번호는 최대 13자 이하로 입력해야 합니다.',
+            'hash' => '유효한 계정이 아닙니다.'
         ]);
         if ($validator->fails()) {
             return [
@@ -103,23 +99,21 @@ class LotteOnAccountController extends Controller
         }
         $accessKey = $request->accessKey;
         $username = $request->username;
-        $partnerCode = $request->partnerCode;
         $hash = $request->hash;
         $requestValidateApiKeyResult = $this->requestValidateApiKey($accessKey);
         if ($requestValidateApiKeyResult['status'] === false) {
             return $requestValidateApiKeyResult;
         }
-        return $this->update($hash, $username, $accessKey, $partnerCode);
+        return $this->update($hash, $username, $accessKey);
     }
-    private function update($hash, $username, $accessKey, $partnerCode)
+    private function update($hash, $username, $accessKey)
     {
         try {
-            DB::table('lotte_on_accounts')
+            DB::table('tmon_accounts')
                 ->where('hash', $hash)
                 ->update([
                     'username' => $username,
                     'access_key' => $accessKey,
-                    'partner_code' => $partnerCode
                 ]);
             return [
                 'status' => true,
@@ -136,7 +130,7 @@ class LotteOnAccountController extends Controller
     public function delete(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'hash' => ['required', 'exists:lotte_on_accounts,hash']
+            'hash' => ['required', 'exists:tmon_accounts,hash']
         ]);
         if ($validator->fails()) {
             return [
@@ -150,7 +144,7 @@ class LotteOnAccountController extends Controller
     private function destroy($hash)
     {
         try {
-            DB::table('lotte_on_accounts')
+            DB::table('tmon_accounts')
                 ->where('hash', $hash)
                 ->update([
                     'is_active' => 'INACTIVE'

@@ -53,6 +53,7 @@ use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
+use App\Http\Controllers\OpenMarkets\KakaoShopping\KakaoShoppingAccountController;
 use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnAccountController;
 use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnApiController;
 use App\Http\Controllers\OpenMarkets\OpenMarketExchangeController;
@@ -61,6 +62,7 @@ use App\Http\Controllers\OpenMarkets\OpenMarketRefundController;
 use App\Http\Controllers\OpenMarkets\OpenMarketShipmentController;
 use App\Http\Controllers\OpenMarkets\St11\AccountController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
+use App\Http\Controllers\OpenMarkets\TMon\TMonAccountController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\Products\ManageController;
 use App\Http\Controllers\Partners\Products\PartnerTableController;
@@ -243,6 +245,16 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
             Route::post('/', [LotteOnAccountController::class, 'add']);
             Route::post('edit', [LotteOnAccountController::class, 'edit']);
             Route::post('delete', [LotteOnAccountController::class, 'delete']);
+        });
+        Route::prefix('kakao-shopping')->group(function () {
+            Route::post('/', [KakaoShoppingAccountController::class, 'add']);
+            Route::post('edit', [KakaoShoppingAccountController::class, 'edit']);
+            Route::post('delete', [KakaoShoppingAccountController::class, 'delete']);
+        });
+        Route::prefix('tmon')->group(function () {
+            Route::post('/', [TMonAccountController::class, 'add']);
+            Route::post('edit', [TMonAccountController::class, 'edit']);
+            Route::post('delete', [TMonAccountController::class, 'delete']);
         });
     });
     Route::prefix('product')->group(function () {
