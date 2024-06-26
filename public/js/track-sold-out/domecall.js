@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
+
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -32,12 +33,12 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                     dialogAppeared = true;
                 }
             });
-            const isValid = await validateProduct(page);
-            if (isValid === false || dialogAppeared === true) {
+            const isValid = await validateProduct(page, dialogAppeared);
+            if (isValid === false) {
                 soldOutProductIds.push(product.id);
             }
         }
-        const sopFile = path.join(__dirname, 'petbtob_result.json');
+        const sopFile = path.join(__dirname, 'domecall_result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8');
     } catch (error) {
         console.error(error);
@@ -45,36 +46,22 @@ const { goToAttempts, signIn } = require('./trackwing-common');
         await browser.close();
     }
 })();
-async function validateProduct(page) {
+
+async function validateProduct(page, dialogAppeared) {
     try {
-        return await page.evaluate(() => {
+        const isProductValid = await page.evaluate(() => {
             const soldOutTextElement = document.querySelector('#frmView > div > div.btn > a');
             if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('구매 불가')) {
                 return false;
             }
             const soldOutButton = document.querySelector('#frmView > div > div.btn > a.skinbtn.point2.btn-add-order');
-            if (soldOutButton && soldOutButton.src.includes('바로 구매')) {
+            if (soldOutButton && soldOutButton.textContent.includes('바로 구매')) {
                 soldOutButton.click();
-                return true;
             }
             return true;
         });
+        return !dialogAppeared && isProductValid;
     } catch (error) {
         return false;
     }
 }
-
-
-// async function validateProduct(page) {
-//     try {
-//         return await page.evaluate(() => {
-//             const soldOutTextElement = document.querySelector('#frmView > div > div.btn > a');
-//             if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('구매 불가')) {
-//                 return false;
-//             }
-//             return true;
-//         });
-//     } catch (error) {
-//         return false;
-//     }
-// }

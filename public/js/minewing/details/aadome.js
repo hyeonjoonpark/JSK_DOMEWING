@@ -44,13 +44,13 @@ async function scrapeProduct(page, url) {
             const productDetail = [];
             for (const productDetailElement of productDetailElements) {
                 const tempProductDetailSrc = productDetailElement.src;
-                if (tempProductDetailSrc === 'https://gi.esmplus.com/do4kim/shopping/toyjjanggosi.jpg' || tempProductDetailSrc === 'https://gi.esmplus.com/do4kim/info_baesong.jpg' || tempProductDetailSrc === 'https://do4kim.openhost.cafe24.com/end/ft_1.jpg' || tempProductDetailSrc === 'https://do4kim.openhost.cafe24.com/end/ft_2.jpg' || tempProductDetailSrc === 'https://gi.esmplus.com/do4kim/kspage/brand.jpg') {
+                if (tempProductDetailSrc === 'https://gi.esmplus.com/do4kim/shopping/toyjjanggosi.jpg' || tempProductDetailSrc === 'https://gi.esmplus.com/do4kim/info_baesong.jpg' || tempProductDetailSrc === 'https://do4kim.openhost.cafe24.com/end/ft_1.jpg' || tempProductDetailSrc === 'https://do4kim.openhost.cafe24.com/end/ft_2.jpg' || tempProductDetailSrc === 'https://gi.esmplus.com/do4kim/kspage/brand.jpg' || tempProductDetailSrc === '//gi.esmplus.com/do4kim/shopping/toyjjanggosi.jpg' || tempProductDetailSrc === '//gi.esmplus.com/do4kim/info_baesong.jpg' || tempProductDetailSrc === '//gi.esmplus.com/do4kim/learningresourceskorea/LER_gosi.jpg' || tempProductDetailSrc === '//gi.esmplus.com/do4kim/learningresourceskorea/LER_BS.jpg') {
                     continue;
                 }
                 productDetail.push(productDetailElement.src);
             }
-            const hasOption = document.querySelectorAll('table.options').length > 0; // 예시로 옵션 테이블이 있는지 확인
-            const productOptions = []; // 옵션 추출은 생략
+            const hasOption = document.querySelectorAll('table.options').length > 0;
+            const productOptions = [];
             const productData = {
                 productName,
                 productPrice,
