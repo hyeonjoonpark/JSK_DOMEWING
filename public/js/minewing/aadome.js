@@ -22,10 +22,10 @@ const puppeteer = require('puppeteer');
     }
 })();
 async function signIn(page, username, password) {
-    await page.goto('https://dabone.kr/member/login.html', { waitUntil: 'networkidle0' });
+    await page.goto('https://aadome.com/member/login.html', { waitUntil: 'networkidle0' });
     await page.type('#member_id', username);
     await page.type('#member_passwd', password);
-    await page.click('div > div > fieldset > a');
+    await page.click('#member_login_module_id > fieldset > div.login__button > a.btnSubmit.gFull.sizeL');
     await page.waitForNavigation({ waitUntil: 'load' });
 }
 async function getNumPage(page, listUrl) {
@@ -35,7 +35,7 @@ async function getNumPage(page, listUrl) {
         const numProducts = parseInt(numProductsText.replace(/[^\d]/g, ''));
         return numProducts;
     });
-    const countProductInPage = 12;
+    const countProductInPage = 50;
     const numPage = Math.ceil(numProducts / countProductInPage);
     return numPage;
 }
@@ -60,23 +60,25 @@ async function scrapeProducts(page, forbiddenWords) {
         return products;
         function scrapeProduct(productElement, forbiddenWords) {
             try {
-                const soldOutImageElement = productElement.querySelector('img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
+                const soldOutImageElement = productElement.querySelector('img[src="//img.echosting.cafe24.com/design/common/icon_sellout.gif"]');
                 if (soldOutImageElement) {
                     return false;
                 }
-                const name = productElement.querySelector('div.description > strong > a > span:nth-child(2)').textContent.trim();
+                const nameElement = productElement.querySelector('div.description > div.name > a > span:nth-child(2)');
+                const name = nameElement.textContent.trim().replace(/^\(.*?\)\s*\S*\s*/, '').trim();
+
                 for (const forbiddenWord of forbiddenWords) {
                     if (name.includes(forbiddenWord)) {
                         return false;
                     }
                 }
-                const price = parseInt(productElement.querySelector('div.description > ul > li:nth-child(2) > span:nth-child(2)').textContent.trim().replace(/[^\d]/g, ''));
+                const price = parseInt(productElement.querySelector('div.description > ul > li > span:nth-child(2)').textContent.trim().replace(/[^\d]/g, ''));
                 if (price < 1) {
                     return false;
                 }
-                const image = productElement.querySelector('div.thumbnail > div.prdImg > a > img').src;
-                const href = productElement.querySelector('div.thumbnail > div.prdImg > a').href;
-                const platform = "오피스멀티";
+                const image = productElement.querySelector('div > div.thumbnail > a > img').src;
+                const href = productElement.querySelector('div > div.thumbnail > a').href;
+                const platform = "러닝리소스";
                 const product = { name, price, image, href, platform };
                 return product;
             } catch (error) {
