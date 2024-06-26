@@ -283,7 +283,7 @@
             const accessKey = $('#tMonAccessKey').val();
             popupLoader(0, '해당 계정 정보를 동기화 중입니다.');
             $.ajax({
-                url: "/api/partner/account-setting/t-mon",
+                url: "/api/partner/account-setting/tmon",
                 type: "POST",
                 dataType: "JSON",
                 data: {

@@ -291,8 +291,6 @@ class LotteOnUploadController extends Controller
                 [
                     "trGrpCd" => "거래처그룹코드",
                     "trNo" => "거래처번호",
-                    "lrtrNo" => "",
-                    "purTrNo" => "",
                     "scatNo" => "표준카테고리번호",
                     "dcatLst" => [
                         [
@@ -303,12 +301,8 @@ class LotteOnUploadController extends Controller
                     "epdNo" => "업체상품번호", //productCode
                     "slTypCd" => "GNRL",
                     "pdTypCd" => "GNRL_GNRL",
-                    "spdNm" => "상품명",
-                    "brdNo" => "", //브랜드명 생략예정
-                    "mfcrNm" => "", //제조사 생략
+                    "spdNm" => "상품명", //productName
                     "oplcCd" => "KR", //상품상세 참조로 변경 찾아야함 어디있는지
-                    "mdlNo" => "",
-                    "barCd" => "",
                     "tdfDvsCd" => "01",
                     "slStrtDttm" => $slStrtDttm, //현재시각 반영
                     "slEndDttm" => $slEndDttm, //현재시각으로부터 1년 뒤
@@ -361,7 +355,6 @@ class LotteOnUploadController extends Controller
                             ]
                         ]
                     ],
-                    "impPrxCd" => "NONE",
                     "sftyAthnLst" => [ //인증대상아님 삭제 예정
                         [
                             "sftyAthnTypCd" => "LIFE_SUPS",
@@ -397,23 +390,11 @@ class LotteOnUploadController extends Controller
                         "maxPurQty" => 1000 //단품별최대구매수량
                     ],
                     "ageLmtCd" => "0",
-                    "prstPsbYn" => "N",
                     "prstPckPsbYn" => "N",
                     "prstMsgPsbYn" => "N",
-                    "prcCmprEpsrYn" => "N",
+                    "prcCmprEpsrYn" => "N", //가격비교노출여부
                     "bookCultCstDdctYn" => "N",
                     "isbnCd" => "",
-                    "impDvsCd" => "NONE",
-                    "cshbltyPdYn" => "N",
-                    "gftvShpCd" => "",
-                    "dnDvPdYn" => "N",
-                    "toysPdYn" => "N",
-                    "intgSlPdNo" => "",
-                    "nmlPdYn" => "N",
-                    "lnchYm" => "",
-                    "prmmPdYn" => "N",
-                    "otltPdYn" => "N",
-                    "prmmInstPdYn" => "N",
                     "brkHmapPkcpPsbYn" => "N",
                     "mvCmcoCd" => "",
                     "ctrtTypCd" => "A",

@@ -14,15 +14,12 @@ class LotteOnAccountController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'accessKey' => ['required', 'max:255'],
-            'username' => ['required', 'max:255'],
-            'partnerCode' => ['required', 'max:13']
+            'username' => ['required', 'max:255']
         ], [
             'accessKey.required' => 'OPEN API KEY는 필수 항목입니다.',
             'accessKey.max' => 'OPEN API KEY는 최대 255자 이하로 입력해야 합니다.',
             'username.required' => '계정명 및 별칭은 필수 항목입니다.',
-            'username.max' => '계정명 및 별칭은 최대 255자 이하로 입력해야 합니다.',
-            'partnerCode.required' => '거래처번호는 필수 항목입니다.',
-            'partnerCode.max' => '거래처번호는 최대 13자 이하로 입력해야 합니다.',
+            'username.max' => '계정명 및 별칭은 최대 255자 이하로 입력해야 합니다.'
 
         ]);
         if ($validator->fails()) {
@@ -33,7 +30,6 @@ class LotteOnAccountController extends Controller
         }
         $accessKey = $request->accessKey;
         $username = $request->username;
-        $partnerCode = $request->partnerCode;
         $requestValidateApiKeyResult = $this->requestValidateApiKey($accessKey);
         if ($requestValidateApiKeyResult['status'] === false) {
             return $requestValidateApiKeyResult;
