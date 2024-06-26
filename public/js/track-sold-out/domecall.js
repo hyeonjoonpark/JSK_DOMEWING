@@ -24,12 +24,20 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                 soldOutProductIds.push(product.id);
                 continue;
             }
+            let dialogAppeared = false;
+            page.once('dialog', async dialog => {
+                try {
+                    await dialog.accept();
+                } catch (error) { } finally {
+                    dialogAppeared = true;
+                }
+            });
             const isValid = await validateProduct(page);
-            if (isValid === false) {
+            if (isValid === false || dialogAppeared === true) {
                 soldOutProductIds.push(product.id);
             }
         }
-        const sopFile = path.join(__dirname, 'domecall_result.json');
+        const sopFile = path.join(__dirname, 'petbtob_result.json');
         fs.writeFileSync(sopFile, JSON.stringify(soldOutProductIds), 'utf8');
     } catch (error) {
         console.error(error);
@@ -38,16 +46,8 @@ const { goToAttempts, signIn } = require('./trackwing-common');
     }
 })();
 async function validateProduct(page) {
-    let dialogAppeared = false;
-    page.once('dialog', async dialog => {
-        try {
-            await dialog.accept();
-        } catch (error) { } finally {
-            dialogAppeared = true;
-        }
-    });
     try {
-        const result = await page.evaluate(() => {
+        return await page.evaluate(() => {
             const soldOutTextElement = document.querySelector('#frmView > div > div.btn > a');
             if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('구매 불가')) {
                 return false;
@@ -59,15 +59,11 @@ async function validateProduct(page) {
             }
             return true;
         });
-        await page.waitForTimeout(1000);
-        if (dialogAppeared) {
-            return false;
-        }
-        return result;
     } catch (error) {
         return false;
     }
 }
+
 
 // async function validateProduct(page) {
 //     try {
