@@ -117,6 +117,11 @@
                         <label for="" class="form-label">인증키</label>
                         <input class="form-control" type="text" id="lotteOnAccessKey" placeholder="롯데온 인증키를 입력해주세요.">
                     </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">거래처번호</label>
+                        <input class="form-control" type="text" id="lotteOnPartnerCode"
+                            placeholder="롯데온 거래처번호를 입력해주세요.">
+                    </div>
                     <div class="text-center">
                         <button class="btn btn-primary" onclick="addlotteOnAccount();">추가하기</button>
                     </div>
@@ -194,6 +199,7 @@
         function addlotteOnAccount() {
             const username = $('#lotteOnUsername').val();
             const accessKey = $('#lotteOnAccessKey').val();
+            const partnerCode = $('#lotteOnPartnerCode').val();
             popupLoader(0, '해당 계정 정보를 동기화 중입니다.');
             $.ajax({
                 url: "/api/partner/account-setting/lotte-on",
@@ -202,7 +208,8 @@
                 data: {
                     apiToken,
                     username,
-                    accessKey
+                    accessKey,
+                    partnerCode
                 },
                 success: ajaxSuccessHandling,
                 error: AjaxErrorHandling
