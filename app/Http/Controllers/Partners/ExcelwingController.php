@@ -14,7 +14,7 @@ class ExcelwingController extends Controller
     {
         return [
             'status' => true,
-            'data' => $request
+            'data' => json_decode($request)
         ];
     }
     public function sdagetProducts(Request $request)

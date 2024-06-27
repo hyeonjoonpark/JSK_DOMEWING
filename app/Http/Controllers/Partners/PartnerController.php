@@ -52,7 +52,7 @@ class PartnerController extends Controller
         // if ($duplicates === true) {
         //     return redirect('admin/namewing');
         // }
-        return view('partner/excelwing', [
+        return view('partner/excel_export', [
             'b2Bs' => $b2Bs,
             'sellers' => $sellers
         ]);
@@ -77,5 +77,9 @@ class PartnerController extends Controller
             'b2Bs' => $b2Bs,
             'unmappedCategories' => $unmappedCategories
         ];
+    }
+    public function excelUploadIndex()
+    {
+        return view('partner/excel_upload');
     }
 }

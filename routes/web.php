@@ -58,9 +58,10 @@ Route::prefix('partner')->group(function () {
             Route::get('manage', [ManageController::class, 'index'])->name('partner.products.manage');
             Route::get('upload', [UploadController::class, 'index']);
             Route::get('sale', [UploadedController::class, 'index'])->name('partner.products.uploaded');
-            Route::get('excelwing', [PartnerController::class, 'excelwing']);
         });
         Route::get('open-market', [PartnerController::class, 'partnerOpenMarket']);
+        Route::get('excelwing-download', [PartnerController::class, 'excelwing']);
+        Route::get('excelwing-upload', [PartnerController::class, 'excelUploadIndex']);
     });
 });
 // 셀윙 관리자 패널.

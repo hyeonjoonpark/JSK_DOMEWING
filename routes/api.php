@@ -188,7 +188,6 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::prefix('partner')->group(function () {
         Route::post('update-is-active', [PartnersManagementController::class, 'updateIsActive']);
         Route::post('update-type', [PartnersManagementController::class, 'updateType']);
-        Route::post('excelwing', [PartnerExcelwingController::class, 'index']);
     });
 
     Route::post('apiwing/get-unset-categories', [IndexController::class, 'getUnsetCategories']);
@@ -276,6 +275,9 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
         Route::post('read-all', [NotificationController::class, 'readAll']);
     });
     Route::post('open-market-orders', [OpenMarketOrderController::class, 'indexPartner']);
+    Route::prefix('excelwings')->group(function () {
+        Route::post('export', [PartnerExcelwingController::class, 'index']);
+    });
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
 Route::post('sellwing-api/auth', [AuthController::class, 'main']);

@@ -97,16 +97,14 @@
             const sellerID = parseInt($("input[name='sellers']:checked").val());
             const b2BID = parseInt($("input[name='b2Bs']:checked").val());
             const marginRate = $('#partnerMargin').val();
-
             $('#partnerMarginModal').modal('hide');
-
             requestExcelwing(b2BID, sellerID, marginRate);
         }
 
         function requestExcelwing(b2BID, sellerID, marginRate) {
             popupLoader(1, "선택하신 상품셋을 B2B 업체를 위한 대량 등록 양식에 맞추어 엑셀 파일로 작성 중입니다.");
             $.ajax({
-                url: "/api/partner/excelwing",
+                url: "/api/partner/excelwings/export",
                 type: "POST",
                 dataType: "JSON",
                 data: {
@@ -142,14 +140,7 @@
                         });
                     }
                 },
-                error: function(response) {
-                    closePopup();
-                    Swal.fire({
-                        icon: 'error',
-                        html: '<img class="w-100" src="{{ asset('media/Asset_Notif_Error.svg') }}"><h4 class="swal2-title mt-5">예기치 못한 오류가 발생했습니다. 다시 시도해 주십시오.</h4>'
-                    });
-                    console.log(response);
-                }
+                error: AjaxErrorHandling
             });
         }
     </script>
