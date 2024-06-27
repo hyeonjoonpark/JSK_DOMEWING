@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Product;
+namespace App\Http\Controllers\Partners;
 
 use App\Http\Controllers\Admin\FormProductController;
 use App\Http\Controllers\Controller;
@@ -11,6 +11,13 @@ use ZipArchive;
 class ExcelwingController extends Controller
 {
     public function index(Request $request)
+    {
+        return [
+            'status' => true,
+            'data' => $request
+        ];
+    }
+    public function sdagetProducts(Request $request)
     {
         set_time_limit(0);
         ini_set('memory_limit', -1);

@@ -304,10 +304,10 @@ class LotteOnUploadController extends Controller
                     "spdNm" => "상품명", //productName
                     "oplcCd" => "KR", //상품상세 참조로 변경 찾아야함 어디있는지
                     "tdfDvsCd" => "01",
-                    "slStrtDttm" => $slStrtDttm, //현재시각 반영
-                    "slEndDttm" => $slEndDttm, //현재시각으로부터 1년 뒤
+                    "slStrtDttm" => $slStrtDttm,
+                    "slEndDttm" => $slEndDttm,
                     "pdItmsInfo" => [
-                        "pdItmsCd" => "38", //[38]기타(재화)로 상품품목코드하는지
+                        "pdItmsCd" => "38",
                         "pdItmsArtlLst" => [ //상품품목항목목록 찾아야함
                             [
                                 "pdArtlCd" => "0020",
@@ -355,13 +355,6 @@ class LotteOnUploadController extends Controller
                             ]
                         ]
                     ],
-                    "sftyAthnLst" => [ //인증대상아님 삭제 예정
-                        [
-                            "sftyAthnTypCd" => "LIFE_SUPS",
-                            "sftyAthnOrgnNm" => "[방송통신기자재]적합등록",
-                            "sftyAthnNo" => "1241251251"
-                        ]
-                    ],
                     "scatAttrLst" => [ // 표준카테고리속성목록
                         //표준카테고리에 매핑된 상품속성 입력시 하단의 항목을 입력한다.
                         [
@@ -385,19 +378,16 @@ class LotteOnUploadController extends Controller
                     ],
                     "purPsbQtyInfo" => [ //구매가능 수량정보
                         "itmByMinPurYn" => "Y", //단품별 취소구매여부
-                        "itmByMinPurQty" => 2, //단품별취소구매수량
-                        "itmByMaxPurPsbQtyYn" => "Y", //단품별최대구매가능수량여부
-                        "maxPurQty" => 1000 //단품별최대구매수량
+                        "itmByMinPurQty" => 1, //단품별 최소구매수량
+                        "itmByMaxPurPsbQtyYn" => "N", //단품별최대구매가능수량여부
                     ],
                     "ageLmtCd" => "0",
                     "prstPckPsbYn" => "N",
-                    "prstMsgPsbYn" => "N",
-                    "prcCmprEpsrYn" => "N", //가격비교노출여부
+
                     "bookCultCstDdctYn" => "N",
                     "ctrtTypCd" => "A",
                     "pdStatCd" => "NEW",
                     "dpYn" => "Y",
-                    "ltonDpYn" => "Y", //체크필요
                     "scKwdLst" => [ //productKetword넣기
                         "검색키워드1",
                         "검색키워드2",
@@ -405,18 +395,18 @@ class LotteOnUploadController extends Controller
                     ],
                     "epnLst" => [
                         [
-                            "pdEpnTypCd" => "DSCRP",
+                            "pdEpnTypCd" => "AS_CNTS",
                             "cnts" => "<html>~~~</html>" //productDetail
                         ]
                     ],
-                    "cnclPsbYn" => "Y", //취소가능여부인데 취소가능하게할지 불가능하게할지.
+                    "cnclPsbYn" => "Y",
                     "dmstOvsDvDvsCd" => "DMST",
-                    "pstkYn" => "N", //선재고여부?
+                    "pstkYn" => "Y",
                     "dvProcTypCd" => "LO_ENTP", //배송상품유형코드?
                     "dvPdTypCd" => "GNRL",
                     "sndBgtDdInfo" => [ //발송예정일정보 12시?
-                        "nldySndCloseTm" => "1300", //평일발송마감시간
-                        "satSndPsbYn" => "Y", //토요일 발송가능여부 [Y, N]
+                        "nldySndCloseTm" => "0900", //평일발송마감시간
+                        "satSndPsbYn" => "N",
                         "satSndCloseTm" => "1200" //토요일 발송가능여부 Y일시 토요일발송마감시간 필수
                     ],
                     "dvRgsprGrpCd" => "GN101", //배송가능지역코드??
@@ -424,15 +414,14 @@ class LotteOnUploadController extends Controller
                     "owhpNo" => $dvpNo, //출고지번호거래처 API
                     "dvCstPolNo" => "335", //배송비정책번호 API
                     "adtnDvCstPolNo" => "", //추가배송비정책번호
-                    "cmbnDvPsbYn" => "Y", //합배송가능여부
+                    "cmbnDvPsbYn" => "N", //합배송가능여부
                     "dvCstStdQty" => 0, //배송비기준수량  => 번들퀀티티
                     "rtngPsbYn" => "N", //반품가능여부
                     "xchgPsbYn" => "Y", //교환가능여부
-                    "cmbnRtngPsbYn" => "Y", //합반품가능여부
+                    "cmbnRtngPsbYn" => "N", //합반품가능여부
                     "rtrvTypCd" => "ENTP_RTRV",
                     "rtrpNo" => "115", //회수지번호 api사용
-                    "stkMgtYn" => "N", //재고관리여부 [Y, N]
-                    //'N'인 경우 재고가 999,999,999로 들어간다. 웹재고를 관리하지 않는다.
+                    "stkMgtYn" => "Y",
                     "sitmYn" => "N",
                     "itmLst" => [
                         [
@@ -454,7 +443,7 @@ class LotteOnUploadController extends Controller
                                 ]
                             ],
                             "slPrc" => 200000, //productPrice에 수수료?
-                            "stkQty" => 110
+                            "stkQty" => 300 //재고수량 300통일
                         ]
                     ],
                     "adtnPdYn" => "N",

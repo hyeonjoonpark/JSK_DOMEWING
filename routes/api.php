@@ -64,6 +64,8 @@ use App\Http\Controllers\OpenMarkets\St11\AccountController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
 use App\Http\Controllers\OpenMarkets\TMon\TMonAccountController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
+use App\Http\Controllers\Partners\ExcelwingController as PartnerExcelwingController;
+
 use App\Http\Controllers\Partners\Products\ManageController;
 use App\Http\Controllers\Partners\Products\PartnerTableController;
 use App\Http\Controllers\Partners\Products\UploadController;
@@ -186,6 +188,7 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::prefix('partner')->group(function () {
         Route::post('update-is-active', [PartnersManagementController::class, 'updateIsActive']);
         Route::post('update-type', [PartnersManagementController::class, 'updateType']);
+        Route::post('excelwing', [PartnerExcelwingController::class, 'index']);
     });
 
     Route::post('apiwing/get-unset-categories', [IndexController::class, 'getUnsetCategories']);

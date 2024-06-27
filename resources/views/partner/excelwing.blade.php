@@ -45,7 +45,7 @@
                                 </div>
                             @endforeach
                             <div class="d-flex justify-content-center">
-                                <button class="btn btn-warning" onclick="initExcelwing();">엑셀 추출하기</button>
+                                <button class="btn btn-warning" onclick="showMarginModal();">엑셀 추출하기</button>
                             </div>
                         </div>
                     </div>
@@ -53,25 +53,67 @@
             </div>
         </div>
     </div>
+    <div class="modal" role="dialog" id="partnerMarginModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">마진율 기입</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="partnerMargin" class="form-label">마진율(%)</label>
+                        <div class="row">
+                            <div class="col-auto">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="partnerMargin"
+                                        placeholder="마진율(%)을 기입해주세요." />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="initExcelwing();">생성하기</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">취소하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>
+        function showMarginModal() {
+            $('#partnerMarginModal').modal('show');
+        }
+
         function initExcelwing() {
             const sellerID = parseInt($("input[name='sellers']:checked").val());
             const b2BID = parseInt($("input[name='b2Bs']:checked").val());
-            requestExcelwing(b2BID, sellerID);
+            const marginRate = $('#partnerMargin').val();
+
+            $('#partnerMarginModal').modal('hide');
+
+            requestExcelwing(b2BID, sellerID, marginRate);
         }
 
-        function requestExcelwing(b2BID, sellerID) {
+        function requestExcelwing(b2BID, sellerID, marginRate) {
             popupLoader(1, "선택하신 상품셋을 B2B 업체를 위한 대량 등록 양식에 맞추어 엑셀 파일로 작성 중입니다.");
             $.ajax({
-                url: "/api/product/excelwing",
+                url: "/api/partner/excelwing",
                 type: "POST",
                 dataType: "JSON",
                 data: {
                     b2BID: b2BID,
                     sellerID: sellerID,
-                    rememberToken: rememberToken
+                    marginRate: marginRate,
+                    apiToken
                 },
                 success: function(response) {
                     console.log(response);
