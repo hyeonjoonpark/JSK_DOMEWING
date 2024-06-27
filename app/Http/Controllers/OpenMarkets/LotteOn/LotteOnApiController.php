@@ -89,7 +89,7 @@ class LotteOnApiController extends Controller
     {
         // API 주소
         $accessKey = '5d5b2cb498f3d20001665f4ed04a48bf370a4d37a64c6394431f2cef';
-        $url = 'https://openapi.lotteon.com/v1/openapi/contract/v1/dvp/getDvpListSr';
+        $url = 'https://openapi.lotteon.com/v1/openapi/contract/v1/dvl/getDvCstListSr';
         // POST 데이터 설정 (JSON 형식으로 인코딩)
         $postData = json_encode([
             'afflTrCd' => 'LO10043084'
