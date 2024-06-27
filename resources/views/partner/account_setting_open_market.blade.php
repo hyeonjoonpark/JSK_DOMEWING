@@ -117,8 +117,57 @@
                         <label for="" class="form-label">인증키</label>
                         <input class="form-control" type="text" id="lotteOnAccessKey" placeholder="롯데온 인증키를 입력해주세요.">
                     </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">거래처번호</label>
+                        <input class="form-control" type="text" id="lotteOnPartnerCode"
+                            placeholder="롯데온 거래처번호를 입력해주세요.">
+                    </div>
                     <div class="text-center">
-                        <button class="btn btn-primary" onclick="addlotteOnAccount();">추가하기</button>
+                        <button class="btn btn-primary" onclick="addLotteOnAccount();">추가하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">카카오쇼핑</h6>
+                    <p>
+                        카카오쇼핑에서 발급받은 인증키 정보를 입력해주세요.
+                    </p>
+                    <div class="form-group">
+                        <label for="" class="form-label">스토어명</label>
+                        <input class="form-control" type="text" id="kakaoShoppingUsername"
+                            placeholder="계정명 혹은 별칭을 입력해주세요.">
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">인증키</label>
+                        <input class="form-control" type="text" id="kakaoShoppAccessKey"
+                            placeholder="카카오쇼핑 인증키를 입력해주세요.">
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="addKakaoShoppingAccount();">추가하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">티몬</h6>
+                    <p>
+                        티몬에서 발급받은 인증키 정보를 입력해주세요.
+                    </p>
+                    <div class="form-group">
+                        <label for="" class="form-label">스토어명</label>
+                        <input class="form-control" type="text" id="tMonUsername" placeholder="계정명 혹은 별칭을 입력해주세요.">
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label">인증키</label>
+                        <input class="form-control" type="text" id="tMonAccessKey" placeholder="티몬 인증키를 입력해주세요.">
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="addTMonAccount();">추가하기</button>
                     </div>
                 </div>
             </div>
@@ -191,9 +240,10 @@
             });
         }
 
-        function addlotteOnAccount() {
+        function addLotteOnAccount() {
             const username = $('#lotteOnUsername').val();
             const accessKey = $('#lotteOnAccessKey').val();
+            const partnerCode = $('#lotteOnPartnerCode').val();
             popupLoader(0, '해당 계정 정보를 동기화 중입니다.');
             $.ajax({
                 url: "/api/partner/account-setting/lotte-on",
@@ -202,7 +252,44 @@
                 data: {
                     apiToken,
                     username,
-                    accessKey
+                    accessKey,
+                    partnerCode
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
+        function addKakaoShoppingAccount() {
+            const username = $('#kakaoShoppingUsername').val();
+            const accessKey = $('#kakaoShoppingAccessKey').val();
+            popupLoader(0, '해당 계정 정보를 동기화 중입니다.');
+            $.ajax({
+                url: "/api/partner/account-setting/kakao-shopping",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    username,
+                    accessKey,
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
+        function addTMonAccount() {
+            const username = $('#tMonUsername').val();
+            const accessKey = $('#tMonAccessKey').val();
+            popupLoader(0, '해당 계정 정보를 동기화 중입니다.');
+            $.ajax({
+                url: "/api/partner/account-setting/tmon",
+                type: "POST",
+                dataType: "JSON",
+                data: {
+                    apiToken,
+                    username,
+                    accessKey,
                 },
                 success: ajaxSuccessHandling,
                 error: AjaxErrorHandling

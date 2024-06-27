@@ -64,7 +64,7 @@
                         @foreach ($lotteOnAccounts as $item)
                             <div class="col-auto">
                                 <button class="btn btn-primary"
-                                    onclick="viewLotteOnAccount('{{ $item->username }}','{{ $item->access_key }}', '{{ $item->hash }}');">{{ $item->username }}</button>
+                                    onclick="viewLotteOnAccount('{{ $item->username }}','{{ $item->access_key }}','{{ $item->partner_code }}', '{{ $item->hash }}');">{{ $item->username }}</button>
                             </div>
                         @endforeach
                     </div>
@@ -199,6 +199,10 @@
                         <label class="form-label">인증키</label>
                         <input type="text" class="form-control" id="lotteOnAccessKey">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">거래처번호</label>
+                        <input type="text" class="form-control" id="lotteOnPartnerCode">
+                    </div>
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button class="btn btn-success" onclick="lotteOnEdit();">수정하기</button>
@@ -238,10 +242,11 @@
             $('#viewSt11Modal').modal('show');
         }
 
-        function viewLotteOnAccount(username, accessKey, hash) {
+        function viewLotteOnAccount(username, accessKey, partnerCode, hash) {
             hashVar = hash;
             $('#lotteOnUsername').val(username);
             $('#lotteOnAccessKey').val(accessKey);
+            $('#lotteOnPartnerCode').val(partnerCode);
             $('#viewLotteOnModal').modal('show');
         }
 
@@ -416,6 +421,7 @@
             popupLoader(1, '수정된 사항을 적용 중입니다.');
             const username = $('#lotteOnUsername').val();
             const accessKey = $('#lotteOnAccessKey').val();
+            const partnerCode = $('#lotteOnPartnerCode').val();
             $.ajax({
                 url: "/api/partner/account-setting/lotte-on/edit",
                 type: "POST",
@@ -424,7 +430,8 @@
                     apiToken,
                     hash: hashVar,
                     username,
-                    accessKey
+                    accessKey,
+                    partnerCode
                 },
                 success: ajaxSuccessHandling,
                 error: AjaxErrorHandling
