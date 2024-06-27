@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -51,6 +51,20 @@ async function validateProduct(page) {
             const txtDescElement = document.querySelector('div.total.price.clearbox > span.button.bgred');
             if (txtDescElement && txtDescElement.textContent.trim().includes('품절')) {
                 return false;
+            }
+            const txtCodeElement = document.querySelector('#info > div.goods_info.clearbox > form > div.container > table > tbody > tr:nth-child(1) > td:nth-child(2) > span');
+            if (txtCodeElement) {
+                const txtContent = txtCodeElement.textContent.trim();
+                if (txtContent.includes('GKM') || txtContent.includes('GDR') || txtContent.includes('GDF') || txtContent.includes('AKS') || txtContent.includes('GKD') || txtContent.includes('ATS')) {
+                    return false;
+                }
+            }
+            const stockElement = document.querySelector('#select_option_lay > div.quantity_box > table > tbody > tr:nth-child(2) > td');
+            if (stockElement) {
+                const stock = parseInt(stockElement.textContent.trim().replace(/[^\d]/g, ''));
+                if (stock < 5) {
+                    return false;
+                }
             }
             return true;
         });
