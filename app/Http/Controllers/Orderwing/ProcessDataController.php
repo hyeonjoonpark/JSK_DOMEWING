@@ -87,6 +87,7 @@ class ProcessDataController extends Controller
             'D' => 'senderPhone',
             'E' => 'receiverName',
             'F' => 'receiverPhone',
+            'G' => 'receiverPhoneAdditional', // New column for the additional receiver phone
             'H' => 'postcode',
             'I' => 'address',
             'J' => 'productName',
@@ -112,6 +113,7 @@ class ProcessDataController extends Controller
             $cellIterator->setIterateOnlyExistingCells(false);
 
             $rowData = [];
+            $receiverPhone = ''; // Variable to hold the receiverPhone value
             foreach ($cellIterator as $cell) {
                 $columnLetter = $cell->getColumn();
                 if (isset($columnMappings[$columnLetter])) {
@@ -120,9 +122,20 @@ class ProcessDataController extends Controller
                     if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
                         $value = preg_replace('/[^0-9]/', '', $value);
                     }
-                    $rowData[$columnMappings[$columnLetter]] = $value;
+                    if ($columnMappings[$columnLetter] == 'receiverPhone') {
+                        $receiverPhone = $value;
+                    } elseif ($columnMappings[$columnLetter] == 'receiverPhoneAdditional' && empty($receiverPhone)) {
+                        $receiverPhone = $value;
+                    } else {
+                        $rowData[$columnMappings[$columnLetter]] = $value;
+                    }
                 }
             }
+            // Set the receiverPhone value
+            if (!empty($receiverPhone)) {
+                $rowData['receiverPhone'] = $receiverPhone;
+            }
+
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
@@ -144,6 +157,7 @@ class ProcessDataController extends Controller
         gc_collect_cycles();
         return $data;
     }
+
     public function domeatoz($excelPath)
     {
         $spreadsheet = IOFactory::load($excelPath);

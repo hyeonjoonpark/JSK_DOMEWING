@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Partner extends Authenticatable
 {
@@ -32,5 +31,9 @@ class Partner extends Authenticatable
     public function partnerClass()
     {
         return $this->belongsTo(PartnerClass::class, 'partner_class_id', 'id');
+    }
+    public function godwings()
+    {
+        return $this->hasMany(Godwing::class);
     }
 }
