@@ -21,4 +21,8 @@ class Vendor extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+    public function godwings()
+    {
+        return $this->hasMany(Godwing::class);
+    }
 }
