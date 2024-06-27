@@ -32,26 +32,13 @@ class PartnerController extends Controller
             ->join('vendors AS v', 'pr.vendor_id', '=', 'v.id')
             ->where('v.is_active', 'ACTIVE')
             ->where('pr.is_active', 'Y')
+            ->where('v.type', 'B2B')
             ->select('v.id', 'v.name')
             ->get();
         $sellers = DB::table('product_search AS ps')
             ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
             ->where('ps.is_active', 'Y')
             ->get();
-        $response = $this->getUnmappedCategories();
-        $unmappedCategories = $response['unmappedCategories'];
-        // if (count($unmappedCategories) > 0) {
-        //     return redirect('admin/mappingwing/unmapped');
-        // }
-        $duplicates = DB::table('minewing_products')
-            ->select('productName', DB::raw('COUNT(*) as count'))
-            ->where('isActive', 'Y')
-            ->groupBy('productName')
-            ->havingRaw('COUNT(*) > 1')
-            ->exists();
-        // if ($duplicates === true) {
-        //     return redirect('admin/namewing');
-        // }
         return view('partner/excel_export', [
             'b2Bs' => $b2Bs,
             'sellers' => $sellers

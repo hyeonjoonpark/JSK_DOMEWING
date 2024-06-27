@@ -276,7 +276,7 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     });
     Route::post('open-market-orders', [OpenMarketOrderController::class, 'indexPartner']);
     Route::prefix('excelwings')->group(function () {
-        Route::post('export', [PartnerExcelwingController::class, 'index']);
+        Route::post('export', [PartnerExcelwingController::class, 'downloadExcel']);
     });
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
