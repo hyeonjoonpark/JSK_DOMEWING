@@ -43,7 +43,7 @@
                 popupLoader(1, '업로드한 주문들을 데이터베이스에 반영 중입니다.');
                 const formData = new FormData();
                 formData.append('orders', orders);
-                formData.append(apiToken);
+                formData.append('apiToken', apiToken);
                 $.ajax({
                     url: '/api/partner/excelwings/upload',
                     type: 'POST',
