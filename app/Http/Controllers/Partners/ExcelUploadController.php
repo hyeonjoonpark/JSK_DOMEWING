@@ -64,39 +64,26 @@ class ExcelUploadController extends Controller
                 ];
                 $validateColumnsResult = $this->validateColumns($rowData);
                 if ($validateColumnsResult['status'] === false) {
-                    $productCode = $validateColumnsResult['return']['productCode'];
-                    $error = $validateColumnsResult['return']['error'];
-                    $errors[] = [
-                        'productCode' => $productCode,
-                        'error' => $error
-                    ];
+                    $productCode = $validateColumnsResult['return']['data'];
+                    $message = $validateColumnsResult['return']['message'];
+                    $errors[] = $productCode . $message;
                 } else {
-                    $products[] = $validateColumnsResult['return'];
+                    $products[] = $rowData;
                 }
             }
             if (count($errors) > 0) {
                 return [
                     'status' => false,
-                    'return' => '일부 상품에서 오류가 검출되었습니다.',
+                    'message' => '일부 상품에서 오류가 검출되었습니다.',
                     'errors' => $errors
                 ];
             }
-            // 파트너스 업로드된 상품들에 반영.
-            $uc = new UploadedController();
-            $partnerErrors = $uc->fetchEdittedProducts($products);
-            // END.
-            $productCodes = [];
             foreach ($products as $product) {
-                $this->updateProduct($product);
-                $productCodes[] = $product['productCode'];
+                $this->storeOrder($product); //주문 넣기 시작
             }
-            $productCodesStr = join(',', $productCodes);
             return [
                 'status' => true,
-                'return' => '상품셋 정보를 성공적으로 업데이트했습니다.',
-                'errors' => $errors,
-                'productCodes' => $productCodesStr,
-                'partnerErrors' => $partnerErrors
+                'return' => '상품셋 정보를 성공적으로 업데이트했습니다.'
             ];
         } catch (\Exception $e) {
             return [
@@ -106,7 +93,7 @@ class ExcelUploadController extends Controller
             ];
         }
     }
-    private function updateProduct($product)
+    private function storeOrder($product)
     {
         try {
             $productName = $this->nameController->index($product['productName']);
@@ -141,10 +128,24 @@ class ExcelUploadController extends Controller
         if ($productCode === false) {
             return [
                 'status' => false,
-                'return' => [
-                    'productCode' => $rowData['productCode'],
-                    'error' => '유효한 상품 코드가 아닙니다.'
-                ]
+                'message' => '유효하지 않은 상품코드입니다.',
+                'data' => $rowData['productCode']
+            ];
+        }
+        $product = $this->validateIsActive($rowData['productCode']);
+        if ($product === false) {
+            return [
+                'status' => false,
+                'message' => '품절처리된 상품입니다.',
+                'data' => $rowData['productCode']
+            ];
+        }
+        $quantity = $this->validateQuantity($rowData['quantity']);
+        if ($quantity === false) {
+            return [
+                'status' => false,
+                'message' => '1개 이상의 상품을 주문해주세요.',
+                'data' => $rowData['productCode']
             ];
         }
         return [
@@ -152,35 +153,23 @@ class ExcelUploadController extends Controller
             'return' => $rowData
         ];
     }
-    private function validateIsActive($isActive)
+    private function validateIsActive($productCode)
     {
-        if ($isActive === 'Y' || $isActive === 'N') {
-            return true;
-        }
-        return false;
-    }
-    private function validateProductPrice($productPrice)
-    {
-        try {
-            $productPrice = intval($productPrice);
-        } catch (\Exception $e) {
-            return false;
-        }
-        if ($productPrice > 0) {
-            return true;
-        }
-        return false;
-    }
-    private function validateCategoryId($categoryId)
-    {
-        return DB::table('ownerclan_category')
-            ->where('id', $categoryId)
-            ->exists();
+        $isActive = DB::table('minewing_products')
+            ->where('productCode', $productCode)
+            ->select('isActive');
+        if ($isActive === 'N') return false;
+        return true;
     }
     private function validateProductCode($productCode)
     {
         return DB::table('minewing_products')
             ->where('productCode', $productCode)
             ->exists();
+    }
+    private function validateQuantity($quantity)
+    {
+        if ($quantity < 1) return false;
+        return true;
     }
 }

@@ -137,6 +137,8 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('margin-rate', [AccountSettingController::class, 'changeMarginRate']);
         Route::post('shipping-fee', [ShippingFeeController::class, 'index']);
         Route::put('update-commission', [AccountSettingController::class, 'updateVendorCommission']);
+        Route::post('excel-margin-rate', [AccountSettingController::class, 'changeExcelMarginRate']);
+        Route::put('update-excel-commission', [AccountSettingController::class, 'updateExcelCommission']);
     });
     // minewing
     Route::post('/minewing/unique-product-hrefs', [UniqueProductHrefsController::class, 'index']);

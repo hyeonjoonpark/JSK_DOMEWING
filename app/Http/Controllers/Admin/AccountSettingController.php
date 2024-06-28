@@ -20,6 +20,14 @@ class AccountSettingController extends Controller
         $marginRate = $request->marginRate;
         return $this->updateMarginRate($request->mrID, $request->marginRate);
     }
+    protected function changeExcelMarginRate(Request $request)
+    {
+        $validator = $this->validateRate($request);
+        if ($validator->fails()) {
+            return $this->getResponseData(-1, $validator->errors()->first());
+        }
+        return $this->updateExcelMarginRate($request->mrID, $request->marginRate);
+    }
     protected function validateRate(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -38,6 +46,19 @@ class AccountSettingController extends Controller
                     'pr.margin_rate' => $rate
                 ]);
             return $this->getResponseData(true, '마진율을 성공적으로 변경했습니다.');
+        } catch (Exception $e) {
+            return $this->getResponseData(false, $e->getMessage());
+        }
+    }
+    protected function updateExcelMarginRate($mrID, $rate)
+    {
+        try {
+            DB::table('product_register AS pr')
+                ->where('pr.vendor_id', $mrID)
+                ->update([
+                    'pr.excel_margin_rate' => $rate
+                ]);
+            return $this->getResponseData(true, 'b2b 엑셀윙 마진율을 성공적으로 변경했습니다.');
         } catch (Exception $e) {
             return $this->getResponseData(false, $e->getMessage());
         }
@@ -69,6 +90,29 @@ class AccountSettingController extends Controller
         return [
             'status' => true,
             'message' => '오픈 마켓 수수료를 성공적으로 업데이트했습니다.'
+        ];
+    }
+    public function updateExcelCommission(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'commission' => 'required|numeric'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first(),
+            ];
+        }
+        $title = $request->title;
+        $commission = $request->commission;
+        $updated = DB::table('sellwing_config')
+            ->where('title', $title)
+            ->update(['value' => $commission]);
+        return [
+            'status' => true,
+            'message' => '파트너스 엑셀 주문 마진률을 성공적으로 업데이트했습니다.',
+            'data' => $updated
         ];
     }
 }
