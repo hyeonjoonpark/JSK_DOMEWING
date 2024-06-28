@@ -18,8 +18,8 @@
                         </a>
                     </p>
                     <div class="d-flex text-nowrap">
-                        <input type="file" class="form-control" id="products">
-                        <button class="btn btn-primary" onclick="editProducts();">업로드</button>
+                        <input type="file" class="form-control" id="orders">
+                        <button class="btn btn-primary" onclick="uploadOrder();">업로드</button>
                     </div>
                 </div>
             </div>
@@ -28,15 +28,15 @@
 @endsection
 @section('scripts')
     <script>
-        function editProducts() {
-            const products = $('#products')[0].files[0];
-            if (products) {
-                popupLoader(1, '수정된 상품들을 데이터베이스에 반영 중입니다.');
+        function uploadOrder() {
+            const orders = $('#orders')[0].files[0];
+            if (orders) {
+                popupLoader(1, '업로드한 주문들을 데이터베이스에 반영 중입니다.');
                 const formData = new FormData();
-                formData.append('products', products);
-                formData.append('rememberToken', '{{ Auth::guard('user')->user()->remember_token }}');
+                formData.append('orders', orders);
+                formData.append(apiToken);
                 $.ajax({
-                    url: '/api/product/edit',
+                    url: '/api/partner/excelwings/upload',
                     type: 'POST',
                     dataType: 'JSON',
                     data: formData,
