@@ -56,7 +56,7 @@ class ExcelwingController
     {
         $marginRate = DB::table("product_register")
             ->where("vendor_id", $vendorID)
-            ->value('margin_rate');
+            ->value('excel_margin_rate');
         $marginRate = (float)((100 + (int)$marginRate) / 100);
         $partnerMargin = (float)((100 + (int)$partnerMargin) / 100);
         $sellwingRate = 1.1;
