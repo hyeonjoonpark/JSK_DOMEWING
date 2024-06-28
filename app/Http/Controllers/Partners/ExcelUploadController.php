@@ -2,25 +2,16 @@
 
 namespace App\Http\Controllers\Partners;
 
-use App\Http\Controllers\Admin\ProductDataValidityController;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Minewing\SaveController;
-use App\Http\Controllers\Partners\Products\UploadedController;
-use App\Http\Controllers\Product\NameController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Str;
 
 class ExcelUploadController extends Controller
 {
-    private $productDataValidityController;
-    private $nameController;
-    public function __construct()
-    {
-        $this->productDataValidityController = new ProductDataValidityController();
-        $this->nameController = new NameController();
-    }
     public function uploadExcel(Request $request)
     {
         set_time_limit(0);
@@ -42,6 +33,11 @@ class ExcelUploadController extends Controller
     private function extractOrdersExcelFile($productsExcelFile)
     {
         try {
+            $partnerId = Auth::guard('partner')->id(); //이거 파트너스 계정 확인
+            return DB::table('partner_domewing_accounts')
+                ->where('partner_id', $partnerId)
+                ->where('is_active', 'Y')
+                ->first();
             $spreadsheet = IOFactory::load($productsExcelFile->getRealPath());
             $sheet = $spreadsheet->getSheet(0);
             $errors = [];
@@ -79,7 +75,7 @@ class ExcelUploadController extends Controller
                 ];
             }
             foreach ($products as $product) {
-                $this->storeOrder($product); //주문 넣기 시작
+                $this->createOrder($product); //주문 넣기 시작
             }
             return [
                 'status' => true,
@@ -93,22 +89,13 @@ class ExcelUploadController extends Controller
             ];
         }
     }
-    private function storeOrder($product)
+    private function createOrder($product)
     {
         try {
-            $productName = $this->nameController->index($product['productName']);
-            $sc = new SaveController();
-            $sc->insertMappingwing($product['categoryID']);
-            DB::table('minewing_products')
-                ->where('productCode', $product['productCode'])
-                ->update([
-                    'categoryID' => $product['categoryID'],
-                    'productName' => $productName,
-                    'productKeywords' => $product['productKeywords'],
-                    'productPrice' => $product['productPrice'],
-                    'shipping_fee' => $product['shipping_fee'],
-                    'bundle_quantity' => $product['bundle_quantity']
-                ]);
+            //w주무냉성시작 cart랑 order랑 wingTransaction생성
+            $this->storeCart($memberId, $productId, $quantity);
+            $this->storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen, $orderDate = null);
+            $this->storeWingTransaction($memberId, $type, $amount, $remark);
             return [
                 'status' => true,
             ];
@@ -119,6 +106,94 @@ class ExcelUploadController extends Controller
                     'productCode' => $product['productCode'],
                     'error' => $e->getMessage()
                 ]
+            ];
+        }
+    }
+    private function storeCart($memberId, $productId, $quantity)
+    {
+        try {
+            $cartId = DB::table('carts')
+                ->insertGetId([
+                    'member_id' => $memberId,
+                    'product_id' => $productId,
+                    'quantity' => $quantity,
+                    'code' => (string) Str::uuid(),
+                    'status' => 'PAID'
+                ]);
+
+            return [
+                'status' => true,
+                'data' => [
+                    'cartId' => $cartId
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '신규 주문을 저장하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    // Wing 거래 저장
+    private function storeWingTransaction($memberId, $type, $amount, $remark)
+    {
+        try {
+            $wingTransactionId = DB::table('wing_transactions')
+                ->insertGetId([
+                    'member_id' => $memberId,
+                    'order_number' => (string) Str::uuid(),
+                    'type' => $type,
+                    'amount' => $amount,
+                    'remark' => $remark
+                ]);
+
+            return [
+                'status' => true,
+                'data' => [
+                    'wingTransactionId' => $wingTransactionId
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '주문 내역을 저장하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+    private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen, $orderDate = null)
+    {
+        try {
+            $orderData = [
+                'wing_transaction_id' => $wingTransactionId,
+                'cart_id' => $cartId,
+                'product_order_number' => (string) Str::uuid(),
+                'receiver_name' => $receiverName,
+                'receiver_phone' => $receiverPhone,
+                'receiver_address' => $receiverAddress,
+                'receiver_remark' => $receiverRemark,
+                'delivery_status' => 'PENDING',
+                'type' => 'PAID',
+                'price_then' => $priceThen,
+                'shipping_fee_then' => $shippingFeeThen,
+                'bundle_quantity_then' => $bundleQuantityThen,
+            ];
+            if ($orderDate !== null) {
+                $orderData['created_at'] = $orderDate;
+            }
+            $orderId = DB::table('orders')->insertGetId($orderData);
+            return [
+                'status' => true,
+                'data' => [
+                    'orderId' => $orderId
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '주문 내역을 저장하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
             ];
         }
     }
