@@ -280,7 +280,7 @@ class LotteOnUploadController extends Controller
         }
         return $optionName;
     }
-    private function generateData($categoryCode)
+    private function generateData($categoryCode, $dvpNo)
     {
         $now = new DateTime();
         $slStrtDttm = $now->format('YmdHis');
@@ -304,10 +304,10 @@ class LotteOnUploadController extends Controller
                     "spdNm" => "상품명", //productName
                     "oplcCd" => "KR", //상품상세 참조로 변경 찾아야함 어디있는지
                     "tdfDvsCd" => "01",
-                    "slStrtDttm" => $slStrtDttm, //현재시각 반영
-                    "slEndDttm" => $slEndDttm, //현재시각으로부터 1년 뒤
+                    "slStrtDttm" => $slStrtDttm,
+                    "slEndDttm" => $slEndDttm,
                     "pdItmsInfo" => [
-                        "pdItmsCd" => "38", //[38]기타(재화)로 상품품목코드하는지
+                        "pdItmsCd" => "38",
                         "pdItmsArtlLst" => [ //상품품목항목목록 찾아야함
                             [
                                 "pdArtlCd" => "0020",
@@ -355,13 +355,6 @@ class LotteOnUploadController extends Controller
                             ]
                         ]
                     ],
-                    "sftyAthnLst" => [ //인증대상아님 삭제 예정
-                        [
-                            "sftyAthnTypCd" => "LIFE_SUPS",
-                            "sftyAthnOrgnNm" => "[방송통신기자재]적합등록",
-                            "sftyAthnNo" => "1241251251"
-                        ]
-                    ],
                     "scatAttrLst" => [ // 표준카테고리속성목록
                         //표준카테고리에 매핑된 상품속성 입력시 하단의 항목을 입력한다.
                         [
@@ -385,122 +378,61 @@ class LotteOnUploadController extends Controller
                     ],
                     "purPsbQtyInfo" => [ //구매가능 수량정보
                         "itmByMinPurYn" => "Y", //단품별 취소구매여부
-                        "itmByMinPurQty" => 2, //단품별취소구매수량
-                        "itmByMaxPurPsbQtyYn" => "Y", //단품별최대구매가능수량여부
-                        "maxPurQty" => 1000 //단품별최대구매수량
+                        "itmByMinPurQty" => 1, //단품별 최소구매수량
+                        "itmByMaxPurPsbQtyYn" => "N", //단품별최대구매가능수량여부
                     ],
                     "ageLmtCd" => "0",
                     "prstPckPsbYn" => "N",
-                    "prstMsgPsbYn" => "N",
-                    "prcCmprEpsrYn" => "N", //가격비교노출여부
+
                     "bookCultCstDdctYn" => "N",
-                    "isbnCd" => "",
-                    "brkHmapPkcpPsbYn" => "N",
-                    "mvCmcoCd" => "",
                     "ctrtTypCd" => "A",
-                    "pdSzInfo" => [ //배송사이즈정보 생략
-                        "pdWdthSz" => "100",
-                        "pdLnthSz" => "200",
-                        "pdHghtSz" => "300",
-                        "pckWdthSz" => "110",
-                        "pckLnthSz" => "210",
-                        "pckHghtSz" => "310"
-                    ],
                     "pdStatCd" => "NEW",
                     "dpYn" => "Y",
-                    "ltonDpYn" => "Y", //체크필요
                     "scKwdLst" => [ //productKetword넣기
                         "검색키워드1",
                         "검색키워드2",
                         "검색키워드3"
                     ],
-                    "pdFileLst" => [ //중고아니라 생략
-                        [
-                            "fileTypCd" => "PD",
-                            "fileDvsCd" => "WDTH",
-                            "origFileNm" => "https://image.ellotte.com/ellt.static.lotteeps.com/goods/img/95/53/78/07/10/1007785395_mast.jpg"
-                        ],
-                        [
-                            "fileTypCd" => "PD",
-                            "fileDvsCd" => "VDO_URL",
-                            "origFileNm" => "https://simage.lottemart.com/lim/static_root/images/prodimg/video/88094/3379/8809433791613.mp4"
-                        ]
-                    ],
                     "epnLst" => [
                         [
-                            "pdEpnTypCd" => "DSCRP",
+                            "pdEpnTypCd" => "AS_CNTS",
                             "cnts" => "<html>~~~</html>" //productDetail
                         ]
                     ],
-                    "cnclPsbYn" => "Y", //취소가능여부인데 취소가능하게할지 불가능하게할지.
+                    "cnclPsbYn" => "Y",
                     "dmstOvsDvDvsCd" => "DMST",
-                    "pstkYn" => "N", //선재고여부?
+                    "pstkYn" => "Y",
                     "dvProcTypCd" => "LO_ENTP", //배송상품유형코드?
                     "dvPdTypCd" => "GNRL",
-                    "sndBgtNday" => "0",
                     "sndBgtDdInfo" => [ //발송예정일정보 12시?
-                        "nldySndCloseTm" => "1300",
-                        "satSndPsbYn" => "Y", //토요일 발송가능여부 [Y, N]
-                        "satSndCloseTm" => "1200"
+                        "nldySndCloseTm" => "0900", //평일발송마감시간
+                        "satSndPsbYn" => "N",
+                        "satSndCloseTm" => "1200" //토요일 발송가능여부 Y일시 토요일발송마감시간 필수
                     ],
-                    "dvRgsprGrpCd" => "GN101", //배송가능지역코드?
+                    "dvRgsprGrpCd" => "GN101", //배송가능지역코드??
                     "dvMnsCd" => "DPCL",
-                    "owhpNo" => "115", //출고지번호거래처 API
-                    "hdcCd" => "0001", //택배사 생략예정
-                    "dvCstPolNo" => "335", //배송비정책번호
+                    "owhpNo" => $dvpNo, //출고지번호거래처 API
+                    "dvCstPolNo" => "335", //배송비정책번호 API
                     "adtnDvCstPolNo" => "", //추가배송비정책번호
-                    "cmbnDvPsbYn" => "Y", //합배송가능여부
+                    "cmbnDvPsbYn" => "N", //합배송가능여부
                     "dvCstStdQty" => 0, //배송비기준수량  => 번들퀀티티
-                    "qckDvUseYn" => "N",
-                    "crdayDvPsbYn" => "N",
-                    "hpDdDvPsbYn" => "N", //희망일배송가능여부
-                    'hpDdDvPsbPrd' => 1231231322, //희망일배송가능기간
-                    "saveTypCd" => "NONE",
-                    "shopCnvMsgPsbYn" => "N",
-                    "rgnLmtPdYn" => "N",
-                    "fprdDvPsbYn" => "N",
-                    "spcfSqncPdYn" => "N",
                     "rtngPsbYn" => "N", //반품가능여부
                     "xchgPsbYn" => "Y", //교환가능여부
-                    "cmbnRtngPsbYn" => "Y", //합반품가능여부
-                    "rtngHdcCd" => "0001", //생략예정
-                    "rtngRtrvPsbYn" => "Y", //반품회수가능여부
+                    "cmbnRtngPsbYn" => "N", //합반품가능여부
                     "rtrvTypCd" => "ENTP_RTRV",
-                    "rtrpNo" => "115",
-                    "stkMgtYn" => "N", //재고관리여부 [Y, N]
-                    //'N'인 경우 재고가 999,999,999로 들어간다. 웹재고를 관리하지 않는다.
-                    "sitmYn" => "Y",/*
-                    판매자단품여부 [Y, N]
-Y이면 단품속성목록을 설정해야 한다.
-N이면 단품속성목록을 설정 안한다. 옵션이 없는 단품 한가지로 설정된다.*/
-                    "optSrtLst" => [
-                        [
-                            "optSeq" => 1,
-                            "optNm" => "색상",
-                            "optValSrtLst" => [
-                                [
-                                    "optValSeq" => 1,
-                                    "optVal" => "맛있는초코색"
-                                ]
-                            ]
-                        ]
-                    ],
+                    "rtrpNo" => "115", //회수지번호 api사용
+                    "stkMgtYn" => "Y",
+                    "sitmYn" => "N",
                     "itmLst" => [
                         [
-                            "eitmNo" => "ITM_1",
+                            "eitmNo" => "ITM_1", //productCode?
                             "dpYn" => "Y",
                             "sortSeq" => 1,
-                            "itmOptLst" => [
-                                [
-                                    "optNm" => "색상",
-                                    "optVal" => "맛있는초코색"
-                                ]
-                            ],
                             "itmImgLst" => [
                                 [
                                     "epsrTypCd" => "IMG",
                                     "epsrTypDtlCd" => "IMG_SQRE",
-                                    "origImgFileNm" => "https://image.ellotte.com/ellt.static.lotteeps.com/goods/img/95/53/78/07/10/1007785395_mast.jpg",
+                                    "origImgFileNm" => "https://image.ellotte.com/ellt.static.lotteeps.com/goods/img/95/53/78/07/10/1007785395_mast.jpg", //productImage
                                     "rprtImgYn" => "Y"
                                 ],
                                 [
@@ -510,33 +442,11 @@ N이면 단품속성목록을 설정 안한다. 옵션이 없는 단품 한가�
                                     "rprtImgYn" => "N"
                                 ]
                             ],
-                            "pdUtStdInfo" => [
-                                "pdCapa" => 10
-                            ],
-                            "slPrc" => 200000,
-                            "stkQty" => 110
+                            "slPrc" => 200000, //productPrice에 수수료?
+                            "stkQty" => 300 //재고수량 300통일
                         ]
                     ],
-                    "adtnPdYn" => "Y",
-                    "adtnPdInfo" => [
-                        "sortCd" => "NAME_ASC",
-                        "adtnTypeLst" => [
-                            [
-                                "adtnTypNm" => "추가유형명입니다.",
-                                "epsrPrirRnkg" => 11,
-                                "adtnPdLst" => [
-                                    [
-                                        "adtnPdNm" => "이름입니다",
-                                        "epdNo" => "YSM_ADTN_NUMBER",
-                                        "epsrPrirRnkg" => 12,
-                                        "slPrc" => 1700,
-                                        "stkQty" => 1203,
-                                        "useYn" => "Y"
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
+                    "adtnPdYn" => "N",
                 ]
             ]
         ];
@@ -561,18 +471,69 @@ N이면 단품속성목록을 설정 안한다. 옵션이 없는 단품 한가�
         // 추출한 disp_cat_id 배열 반환
         return $disp_cat_ids;
     }
-    private function extractDvpNo($ac, $account, $afflTrCd)
+    private function getDvpNo($ac, $account)
     {
+        // JSON 데이터를 생성
         $postData = json_encode([
-            'afflTrCd' => $afflTrCd
+            'afflTrCd' => $account->partner_code
         ]);
+        // API 호출
         $response = $ac->postBuilder($account->access_key, 'https://openapi.lotteon.com/v1/openapi/contract/v1/dvp/getDvpListSr', $postData);
-        $resultData = $response['data']['result']['data'];
-        foreach ($resultData as $item) {
-            if ($item['dvpTypCd'] === "01") {
-                return $item['dvpNo'];
+        if (isset($response['data']['result']['data']) && is_array($response['data']['result']['data'])) {
+            $resultData = $response['data']['result']['data'];
+            foreach ($resultData as $item) {
+                if ($item['dvpTypCd'] === "01") {
+                    return [
+                        'status' => true,
+                        'data' => $item['dvpNo']
+                    ];
+                }
             }
         }
-        return null;
+        return [
+            'status' => false,
+            'message' => '유효한 응답 데이터를 받지 못했습니다.'
+        ];
+    }
+
+    private function getDvCstPolDetails($ac, $account)
+    {
+        // JSON 데이터를 생성
+        $postData = json_encode([
+            'afflTrCd' => $account->partner_code
+        ]);
+
+        // API 호출
+        $response = $ac->postBuilder($account->access_key, 'https://openapi.lotteon.com/v1/openapi/contract/v1/dvl/getDvCstListSr', $postData);
+
+        // 결과를 담을 배열 초기화
+        $results = [];
+
+        // 응답 데이터가 유효한지 확인
+        if (isset($response['data']['result']['data']) && is_array($response['data']['result']['data'])) {
+            $resultData = $response['data']['result']['data'];
+
+            // 각 항목을 반복하여 처리
+            foreach ($resultData as $item) {
+                $dvCstPolNo = isset($item['dvCstPolNo']) ? $item['dvCstPolNo'] : null;
+                $inrmAdtnDvCst = isset($item['inrmAdtnDvCst']) ? $item['inrmAdtnDvCst'] : null;
+
+                $results[] = [
+                    'dvCstPolNo' => $dvCstPolNo,
+                    'inrmAdtnDvCst' => $inrmAdtnDvCst
+                ];
+            }
+
+            return [
+                'status' => true,
+                'data' => $results
+            ];
+        }
+
+        // 유효한 데이터를 찾지 못한 경우
+        return [
+            'status' => false,
+            'message' => '배송비정책 조회가 되지 않습니다.'
+        ];
     }
 }
