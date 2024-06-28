@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -20,13 +19,10 @@ class OpenMarketOrderController extends Controller
 {
     public function index()
     {
-        // Charles: allPartners 를 불러올 때, pda 로부터 member_id 를 호출할 수 있잖아?
         $allPartners = $this->getAllPartners(); //모든 파트너 조회
         $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
         foreach ($allPartners as $partner) { //모든 파트너 반복문
-            // Charles: 첫 줄에서 member_id 를 한꺼번에 불러온다면 매 반복마다 DB 조회를 안 해도 됨. DB 를 조회한다는 것은 리소스를 엄청 잡아먹는 일임.
-            $partnerDomewingAccount = $this->getPartnerDomewingAccount($partner->id); // 반복분 해당 파트너 조회
-            $memberId = $partnerDomewingAccount->domewing_account_id;
+            $memberId = $partner->domewing_account_id;
             foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
                 $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
                 // Charles: 현재 계정이 존재하는지 DB 조회 1번, 나중에 계정 정보 불러올 때 1번. 총 2번의 DB 호출이 발생하고 있음.
@@ -437,13 +433,6 @@ class OpenMarketOrderController extends Controller
         }
         return $lowBalanceAccounts; // 결과를 반환
     }
-    private function getPartnerDomewingAccount($partnerId)
-    {
-        return DB::table('partner_domewing_accounts')
-            ->where('partner_id', $partnerId)
-            ->where('is_active', 'Y')
-            ->first();
-    }
     private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen, $orderDate = null)
     {
         try {
@@ -714,7 +703,7 @@ class OpenMarketOrderController extends Controller
             ->join('partner_domewing_accounts as pda', 'p.id', '=', 'pda.partner_id')
             ->where('p.is_active', 'ACTIVE')
             ->where('pda.is_active', 'Y')
-            ->select('p.*')
+            ->select('p.*', 'pda.domewing_account_id')
             ->get();
     }
     private function getAllOpenMarkets()
