@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\B2bProductOption;
+use App\Models\NalmeokProductOption;
 use Illuminate\Http\Request;
 
-class B2bProductOptionController extends Controller
+class NalmeokProductOptionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class B2bProductOptionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(B2bProductOption $b2bProductOption)
+    public function show(NalmeokProductOption $nalmeokProductOption)
     {
         //
     }
@@ -42,7 +42,7 @@ class B2bProductOptionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(B2bProductOption $b2bProductOption)
+    public function edit(NalmeokProductOption $nalmeokProductOption)
     {
         //
     }
@@ -50,7 +50,7 @@ class B2bProductOptionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, B2bProductOption $b2bProductOption)
+    public function update(Request $request, NalmeokProductOption $nalmeokProductOption)
     {
         //
     }
@@ -58,7 +58,7 @@ class B2bProductOptionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(B2bProductOption $b2bProductOption)
+    public function destroy(NalmeokProductOption $nalmeokProductOption)
     {
         //
     }

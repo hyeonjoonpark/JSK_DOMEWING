@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('b2b_product_options', function (Blueprint $table) {
+        Schema::create('nalmeok_product_options', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained('b2b_products')->onDelete('cascade');
-            $table->string('option_name');
-            $table->string('option_values');
+            $table->foreignId('nalmeok_product_id')->constrained('nalmeok_products')->onDelete('cascade');
+            $table->string('name');
+            $table->string('values');
             $table->timestamp('created_at')->useCurrent()->notNullable();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('b2b_product_options');
+        Schema::dropIfExists('nalmeok_product_options');
     }
 };

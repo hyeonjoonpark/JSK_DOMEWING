@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\B2bProduct;
+use App\Models\NalmeokOrderClaim;
 use Illuminate\Http\Request;
 
-class B2bProductController extends Controller
+class NalmeokOrderClaimController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class B2bProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(B2bProduct $b2bProduct)
+    public function show(NalmeokOrderClaim $nalmeokOrderClaim)
     {
         //
     }
@@ -42,7 +42,7 @@ class B2bProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(B2bProduct $b2bProduct)
+    public function edit(NalmeokOrderClaim $nalmeokOrderClaim)
     {
         //
     }
@@ -50,7 +50,7 @@ class B2bProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, B2bProduct $b2bProduct)
+    public function update(Request $request, NalmeokOrderClaim $nalmeokOrderClaim)
     {
         //
     }
@@ -58,7 +58,7 @@ class B2bProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(B2bProduct $b2bProduct)
+    public function destroy(NalmeokOrderClaim $nalmeokOrderClaim)
     {
         //
     }

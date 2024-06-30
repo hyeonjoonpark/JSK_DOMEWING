@@ -92,6 +92,24 @@
                         </li>
                         <li class="nk-menu-item has-sub">
                             <a href="#" class="nk-menu-link nk-menu-toggle">
+                                <span class="nk-menu-icon"><em class="icon fa-solid fa-burst"></em></span>
+                                <span class="nk-menu-text">날먹윙</span>
+                            </a>
+                            <ul class="nk-menu-sub">
+                                <li class="nk-menu-item">
+                                    <a href="/admin/nalmeokwing/index" class="nk-menu-link">
+                                        <span class="nk-menu-text">상품 조회</span>
+                                    </a>
+                                </li>
+                                <li class="nk-menu-item">
+                                    <a href="/admin/nalmeokwing/create" class="nk-menu-link">
+                                        <span class="nk-menu-text">상품 생성</span>
+                                    </a>
+                                </li>
+                            </ul><!-- .nk-menu-sub -->
+                        </li><!-- .nk-menu-item -->
+                        <li class="nk-menu-item has-sub">
+                            <a href="#" class="nk-menu-link nk-menu-toggle">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-truck"></em></span>
                                 <span class="nk-menu-text">오더윙</span>
                             </a>

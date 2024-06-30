@@ -49,6 +49,7 @@ use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\NalmeokProductController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
@@ -214,6 +215,10 @@ Route::middleware(['auth.custom'])->group(function () {
     });
 
     Route::post('trackwing', [TrackSoldOutController::class, 'main'])->name('trackwing');
+    // 날먹윙
+    Route::prefix('nalmeokwing')->group(function () {
+        Route::post('store', [NalmeokProductController::class, 'store']);
+    });
 });
 
 //테스트

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Admin\PartnersManagementController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\NalmeokProductController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\AccountManagementController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
@@ -100,6 +101,15 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cms_dashboard/content_management_system/{id}', [DomainController::class, 'loadCMS']);
     Route::get('/cms/{id}', [CMSController::class, 'loadSellerCMS']);
     Route::get('contact-us', [ContactUsController::class, 'index']);
+    // 날먹윙
+    Route::prefix('nalmeokwing')->group(function () {
+        Route::get('/', [NalmeokProductController::class, 'index']);
+        Route::get('index', [NalmeokProductController::class, 'index']);
+        Route::get('create', [NalmeokProductController::class, 'create']);
+    });
+    // 갓윙
+    Route::prefix('godwing')->group(function () {
+    });
 });
 // ?? 뭐야 씨발
 Route::get('lang/{languageId}', function ($languageId) {

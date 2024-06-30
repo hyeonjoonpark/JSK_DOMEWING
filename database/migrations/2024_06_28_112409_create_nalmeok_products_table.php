@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('b2b_products', function (Blueprint $table) {
+        Schema::create('nalmeok_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vendor_id')->constrained('vendors')->onDelete('cascade');
             $table->foreignId('ownerclan_category_id')->constrained('ownerclan_category')->onDelete('cascade');
-            $table->tinyInteger('is_active')->default(1)->comment('0: false, 1: true');
+            $table->foreignId('vendor_id')->constrained('vendors')->onDelete('cascade');
             $table->string('code');
             $table->string('name');
-            $table->integer('price');
-            $table->integer('shipping_fee')->default(3000);
-            $table->integer('bundle_quantity')->default(0);
+            $table->integer('price', false, true);
+            $table->tinyInteger('shipping_type', false, true)->comment('1: PREPAID, 2: BUNDLE, 3: FREE');
+            $table->integer('shipping_fee', false, true);
+            $table->integer('return_shipping_fee', false, true);
             $table->string('image');
             $table->string('keywords');
             $table->longText('detail');
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('b2b_products');
+        Schema::dropIfExists('nalmeok_products');
     }
 };
