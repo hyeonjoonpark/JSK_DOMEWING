@@ -64,6 +64,7 @@ use App\Http\Controllers\OpenMarkets\OpenMarketShipmentController;
 use App\Http\Controllers\OpenMarkets\St11\AccountController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
 use App\Http\Controllers\OpenMarkets\TMon\TMonAccountController;
+use App\Http\Controllers\Partners\ExcelUploadController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\ExcelwingController as PartnerExcelwingController;
 
@@ -137,6 +138,8 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('margin-rate', [AccountSettingController::class, 'changeMarginRate']);
         Route::post('shipping-fee', [ShippingFeeController::class, 'index']);
         Route::put('update-commission', [AccountSettingController::class, 'updateVendorCommission']);
+        Route::post('excel-margin-rate', [AccountSettingController::class, 'changeExcelMarginRate']);
+        Route::put('update-excel-commission', [AccountSettingController::class, 'updateExcelCommission']);
     });
     // minewing
     Route::post('/minewing/unique-product-hrefs', [UniqueProductHrefsController::class, 'index']);
@@ -282,6 +285,7 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
     Route::post('open-market-orders', [OpenMarketOrderController::class, 'indexPartner']);
     Route::prefix('excelwings')->group(function () {
         Route::post('export', [PartnerExcelwingController::class, 'downloadExcel']);
+        Route::post('upload', [ExcelUploadController::class, 'uploadExcel']);
     });
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);

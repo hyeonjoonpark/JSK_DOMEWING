@@ -18,25 +18,34 @@
                         </a>
                     </p>
                     <div class="d-flex text-nowrap">
-                        <input type="file" class="form-control" id="products">
-                        <button class="btn btn-primary" onclick="editProducts();">업로드</button>
+                        <input type="file" class="form-control" id="orders">
+                        <button class="btn btn-primary" onclick="uploadOrder();">업로드</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card card-bordered">
+            <div class="card-inner">
+                <h5 class="card-title">업로드 결과</h5>
+                <h6 class="card-subtitle">상품 코드와 해당 에러 메시지가 출력됩니다.</h6>
+                <p id="errors" class="mt-3"></p>
             </div>
         </div>
     </div>
 @endsection
 @section('scripts')
     <script>
-        function editProducts() {
-            const products = $('#products')[0].files[0];
-            if (products) {
-                popupLoader(1, '수정된 상품들을 데이터베이스에 반영 중입니다.');
+        function uploadOrder() {
+            const orders = $('#orders')[0].files[0];
+            if (orders) {
+                popupLoader(1, '업로드한 주문들을 데이터베이스에 반영 중입니다.');
                 const formData = new FormData();
-                formData.append('products', products);
-                formData.append('rememberToken', '{{ Auth::guard('user')->user()->remember_token }}');
+                formData.append('orders', orders);
+                formData.append('apiToken', apiToken);
                 $.ajax({
-                    url: '/api/product/edit',
+                    url: '/api/partner/excelwings/upload',
                     type: 'POST',
                     dataType: 'JSON',
                     data: formData,
@@ -45,37 +54,26 @@
                     success: function(response) {
                         console.log(response);
                         closePopup();
-                        const status = response.status;
-                        if (status === true) {
-                            $("#errors").html("모든 상품이 성공적으로 수정됐습니다.");
-                            const productCodes = response.productCodes;
-                            $("#copyProductCodes").html(productCodes);
-                            document.getElementById('copyProductCodes').addEventListener('click', function() {
-                                const text = this.innerText;
-                                navigator.clipboard.writeText(text).then(function() {
-                                    alert('클립보드에 복사되었습니다: ' + text);
-                                }, function(err) {
-                                    console.error('클립보드 복사에 실패했습니다.', err);
-                                });
-                            });
-                            swalSuccess(response.return);
-                        } else {
-                            if (response.message) {
-                                swalError(response.message);
-                            }
+                        if (!response.status) {
+                            swalError(response.message);
                             const errors = response.errors;
                             let html = "";
-                            for (const error of errors) {
-                                const productCode = error.productCode;
-                                const message = error.error;
-                                html += productCode + ": " + message + "<br>";
+                            if (errors.length > 0) {
+                                for (const error of errors) {
+                                    html += error;
+                                }
                             }
                             $("#errors").html(html);
+                        } else {
+                            swalSuccess(response.message);
+                            $("#errors").html("모든 주문이 성공적으로 입력되었습니다.");
                         }
+
                     },
                     error: function(response) {
                         closePopup();
                         console.error(response);
+                        swalError("주문 업로드에 실패하였습니다. 엑셀 파일을 다시 확인해주세요.");
                     }
                 });
             } else {

@@ -16,11 +16,12 @@ class ExcelwingController
         ini_set('memory_limit', -1);
         $b2BID = $request->b2BID;
         $sellerID = $request->sellerID;
+        $partnerMargin = $request->marginRate;
         $shippingFee = $this->getShippingFee($sellerID);
         $products = $this->getProducts($sellerID);
         $numChunks = $this->getNumChunks($b2BID);
         $productsChunks = array_chunk($products->toArray(), $numChunks);
-        $marginRate = $this->getMarginRate($b2BID);
+        $marginRate = $this->getMarginRate($b2BID, $partnerMargin);
         $vendor = $this->getVendor($b2BID);
         $vendorEngName = $vendor->name_eng;
         $formProductController = new FormProductController();
@@ -51,13 +52,15 @@ class ExcelwingController
         return $products;
     }
 
-    private function getMarginRate($vendorID)
+    private function getMarginRate($vendorID, $partnerMargin)
     {
         $marginRate = DB::table("product_register")
             ->where("vendor_id", $vendorID)
-            ->value('margin_rate');
+            ->value('excel_margin_rate');
         $marginRate = (float)((100 + (int)$marginRate) / 100);
-        return $marginRate;
+        $partnerMargin = (float)((100 + (int)$partnerMargin) / 100);
+        $sellwingRate = 1.1;
+        return $marginRate * $partnerMargin * $sellwingRate;
     }
 
     private function getVendor($vendorID)

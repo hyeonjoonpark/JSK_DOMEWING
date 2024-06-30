@@ -140,6 +140,9 @@ class AdminController extends Controller
     {
         $controller = new Controller();
         $b2Bs = $controller->getActiveB2Bs();
+        $partnersExcelwingMargin = DB::table('sellwing_config')
+            ->where('title', 'partners_excelwing_margin')
+            ->first();
         $vendors = DB::table('product_search AS ps')
             ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
             ->where('v.is_active', 'ACTIVE')
@@ -152,7 +155,8 @@ class AdminController extends Controller
         return view('admin/account-setting', [
             'b2Bs' => $b2Bs,
             'vendors' => $vendors,
-            'vendorCommissions' => $vendorCommissions
+            'vendorCommissions' => $vendorCommissions,
+            'partnersExcelwingMargin' => $partnersExcelwingMargin
         ]);
     }
 

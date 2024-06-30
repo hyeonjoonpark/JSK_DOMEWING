@@ -4,14 +4,12 @@ const puppeteer = require('puppeteer');
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
-    await page.setViewport({
-        width: 1920,
-        height: 1080
-    });
-
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // const urls = ['https://gienmall.co.kr/product/detail.html?product_no=6105&cate_no=76&display_group=1'];
+        // const username = "jskorea2023";
+        // const password = "tjddlf88!@";
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -30,10 +28,10 @@ const puppeteer = require('puppeteer');
 })();
 
 async function signIn(page, username, password) {
-    await page.goto('https://dabone.kr/member/login.html', { waitUntil: 'networkidle0' });
+    await page.goto('https://gienmall.co.kr/member/login.html', { waitUntil: 'networkidle0' });
     await page.type('#member_id', username);
     await page.type('#member_passwd', password);
-    await page.click('div > div > fieldset > a');
+    await page.click('div > div > fieldset > a > img');
     await page.waitForNavigation({ waitUntil: 'load' });
 }
 
@@ -45,9 +43,9 @@ async function scrapeProduct(page, url) {
         const hasOption = productOptionData.hasOption;
         const productOptions = productOptionData.productOptions;
         const productData = await page.evaluate(() => {
-            const productNameElem = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.infoArea > div.xans-element-.xans-product.xans-product-detaildesign > table > tbody > tr:nth-child(1) > td > span');
+            const productNameElem = document.querySelector('div.xans-element-.xans-product.xans-product-detaildesign > table > tbody > tr:nth-child(1) > td > span');
             const productPriceElem = document.querySelector('#span_product_price_text');
-            const productImageElem = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > div > a > img');
+            const productImageElem = document.querySelector('div.xans-element-.xans-product.xans-product-image.imgArea > div.keyImg > a > img');
             const productDetailElements = document.querySelectorAll('#prdDetail > div img');
 
             if (!productNameElem || !productPriceElem || !productImageElem || productDetailElements.length < 1) {
@@ -55,22 +53,12 @@ async function scrapeProduct(page, url) {
             }
 
             let productName = productNameElem.textContent.trim();
-            productName = productName.replace(/\[도매\]/g, '').trim(); // [도매] 문자열 제거
+            productName = productName.replace(/\[.*?\]/g, '').trim(); // 첫 대괄호 안의 문자열 제거
             const productPrice = productPriceElem.textContent.trim().replace(/[^\d]/g, '');
             const productImage = productImageElem.src;
-            const productDetail = [productImage]; // productImage를 먼저 추가
-
-            for (const productDetailElement of productDetailElements) {
-                const tempProductDetailSrc = productDetailElement.src;
-                if (tempProductDetailSrc === 'https://www.omw.co.kr/goods_data/2015/06/img4.jpg' || tempProductDetailSrc === 'https://www.omw.co.kr/goods_data/2015/02/sksksk02.jpg' || tempProductDetailSrc === 'https://www.omw.co.kr/goods_data/2013/02/qhrwnajslsl.jpg' || tempProductDetailSrc === 'https://www.omw.co.kr/goods_data/2017/07/0727j/22.jpg') {
-                    continue;
-                }
-                productDetail.push(tempProductDetailSrc);
-            }
-
-            if (productDetail.length < 1) {
-                return false;
-            }
+            const productDetail = Array.from(productDetailElements)
+                .map(el => el.src)
+                .filter(src => src !== 'http://buzz71.godohosting.com/start/common/open_end.jpg' && src !== 'http://buzz71.godohosting.com/start/common/open_notice.jpg');
 
             const productData = {
                 productName,
@@ -81,7 +69,7 @@ async function scrapeProduct(page, url) {
             return productData;
         });
 
-        if (productData === false) {
+        if (!productData) {
             return false;
         }
 
@@ -94,7 +82,7 @@ async function scrapeProduct(page, url) {
             hasOption,
             productOptions,
             productHref: url,
-            sellerID: 72
+            sellerID: 75
         };
         return product;
     } catch (error) {
@@ -105,24 +93,15 @@ async function scrapeProduct(page, url) {
 
 async function getProductOptions(page) {
     async function reloadSelects() {
-        return await page.$$('table select');
-    }
-
-    async function reselectOptions(selects, selectedOptions) {
-        for (let i = 0; i < selectedOptions.length; i++) {
-            await selects[i].select(selectedOptions[i].value);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            if (i < selectedOptions.length - 1) {
-                selects = await reloadSelects();
-            }
-        }
+        const selects = await page.$$('table select');
+        return selects.slice(1); // 첫 번째 select를 건너뛰고 나머지를 반환
     }
 
     async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
         if (currentDepth < selects.length) {
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
                 opts.map(opt => ({ value: opt.value, text: opt.text }))
-                    .filter(opt => opt.value !== '*' && opt.value !== '**' && !/각인.*o/.test(opt.text) && !opt.text.includes('[품절]'))
+                    .filter(opt => opt.value !== '*' && opt.value !== '**' && !opt.text.includes('[품절]'))
             );
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
@@ -137,16 +116,11 @@ async function getProductOptions(page) {
                         let optText = opt.text;
                         optionName = optionName.length > 0 ? `${optionName} / ${optText}` : optText;
                     });
-                    const optionPriceMatch = optionName.match(/\(\+([\d,]+)원\)/);
-                    const optionPrice = optionPriceMatch ? parseInt(optionPriceMatch[1].replace(/,/g, ''), 10) : 0;
-                    optionName = optionName.replace(/\(\+[\d,]+원\)/, '').trim();
+                    const optionPriceMatch = optionName.match(/\(([\d,]+)원\)/);
+                    const optionPrice = parseInt(optionPriceMatch ? optionPriceMatch[1].replace(/,/g, '') : "0");
+                    optionName = optionName.replace(/\(([\d,]+)원\)/, '').trim();
                     const productOption = { optionName, optionPrice };
                     productOptions.push(productOption);
-                }
-                selects = await reloadSelects();
-                if (currentDepth > 0) {
-                    await reselectOptions(selects, selectedOptions);
-                    selects = await reloadSelects();
                 }
             }
         }
@@ -154,7 +128,7 @@ async function getProductOptions(page) {
     }
 
     let selects = await reloadSelects();
-    if (selects.length < 1) {
+    if (selects.length < 1) { // 최소 하나의 셀렉터가 있어야 함 (첫 번째는 건너뛰므로 최소 두 개 있어야 원래 한 개 있는 것과 동일)
         return {
             hasOption: false,
             productOptions: []
@@ -176,7 +150,7 @@ async function scrollToDetail(page) {
 
         while (scrollAttempts < maxScrollAttempts) {
             const scrollTop = window.scrollY;
-            const prdDetailElement = document.querySelector('#prdDetail > div > h3');
+            const prdDetailElement = document.querySelector('#prdDetail > div');
             const prdInfoElement = document.querySelector('#prdInfo > ul');
 
             if (prdDetailElement) {
