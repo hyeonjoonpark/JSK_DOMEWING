@@ -66,7 +66,7 @@ class ExcelUploadController extends Controller
                     'errors' => $errors
                 ];
             }
-            foreach ($datas as $data) {
+            foreach ($datas as $data) { //엑셀의 데이터를 이미 검증했기 때문에 여기서 transaction 사용 X
                 $this->createOrder($data, $memberId);
             }
             return [
@@ -241,13 +241,22 @@ class ExcelUploadController extends Controller
 
         $productPrice = $promotion ?? $originProductPrice;
 
-        $margin = DB::table('sellwing_config')->where('id', 1)->value('value');
+        $margin = DB::table('sellwing_config')->where('id', 2)->value('value');
         $marginRate = ($margin / 100) + 1;
 
         return ceil($productPrice * $marginRate);
     }
     private function validateColumns($rowData)
     {
+        foreach ($rowData as $key => $value) {
+            if (empty($value)) {
+                return [
+                    'status' => false,
+                    'message' => '모든 열에 값이 있어야 합니다. 비어 있는 값이 있습니다.',
+                    'data' => $rowData['productCode'] ?? 'N/A'
+                ];
+            }
+        }
         $productCode = $this->validateProductCode($rowData['productCode']);
         if ($productCode === false) {
             return [
