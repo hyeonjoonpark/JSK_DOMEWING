@@ -55,7 +55,7 @@ class MainController extends Controller
             }
             for ($i = 2; $i <= $highestRow; $i++) {
                 $rowData = [
-                    'productCode' => $sheet->getCell('A' . $i)->getValue(),
+                    'productCode' => trim($sheet->getCell('A' . $i)->getValue()),
                     'categoryID' => $sheet->getCell('B' . $i)->getValue(),
                     'productName' => $sheet->getCell('C' . $i)->getValue(),
                     'productKeywords' => $sheet->getCell('D' . $i)->getValue(),
