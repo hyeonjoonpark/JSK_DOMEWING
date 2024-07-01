@@ -103,7 +103,6 @@ class ExcelUploadController extends Controller
                 'status' => false,
                 'message' => '품절되었거나 존재하지 않는 상품입니다.'
             ];
-            //w주무냉성시작 cart랑 order랑 wingTransaction생성
             $cart = $this->storeCart($memberId, $product->id, $data['quantity']);
             $cartId = $cart['data']['cartId'];
             $amount = $this->getCartAmount($cartId);
@@ -249,7 +248,7 @@ class ExcelUploadController extends Controller
     private function validateColumns($rowData)
     {
         foreach ($rowData as $key => $value) {
-            if (empty($value)) {
+            if ($key !== 'receiverRemark' && empty($value)) {
                 return [
                     'status' => false,
                     'message' => '모든 열에 값이 있어야 합니다. 비어 있는 값이 있습니다.',
