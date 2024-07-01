@@ -68,6 +68,7 @@ class ExcelUploadController extends Controller
             }
             foreach ($datas as $data) {
                 $createOrderResult = $this->createOrder($data, $memberId);
+                return $createOrderResult;
                 if ($createOrderResult['status'] === false) {
                     $errors[] = $data['productCode'] . ' ' . $createOrderResult['error'];
                 }
@@ -107,13 +108,13 @@ class ExcelUploadController extends Controller
                 'message' => '품절되었거나 존재하지 않는 상품입니다.'
             ];
             //w주무냉성시작 cart랑 order랑 wingTransaction생성
-            $cart = $this->storeCart($memberId, $product->id, $data->quantity);
+            $cart = $this->storeCart($memberId, $product->id, $data['quantity']);
             $cartId = $cart['data']['cartId'];
             $amount = $this->getCartAmount($cartId);
             $wingTransaction = $this->storeWingTransaction($memberId, 'PAYMENT', $amount, "");
             $wingTransactionId = $wingTransaction['data']['wingTransactionId'];
             $priceThen = $this->getSalePrice($product->id);
-            $this->storeOrder($wingTransactionId, $cartId, $data->receiverName, $data->receiverPhone, $data->receiverAddress, $data->receiverRemark, $priceThen, $product->shipping_fee, $product->bundle_quantity, $orderDate = null);
+            $this->storeOrder($wingTransactionId, $cartId, $data['receiverName'], $data['receiverPhone'], $data['receiverAddress'], $data['receiverRemark'], $priceThen, $product->shipping_fee, $product->bundle_quantity, $orderDate = null);
             return [
                 'status' => true,
             ];
