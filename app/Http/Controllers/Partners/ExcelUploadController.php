@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Partners;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -16,6 +15,11 @@ class ExcelUploadController extends Controller
     {
         set_time_limit(0);
         ini_set('memory_allow', '-1');
+        $memberId = DB::table('partners')
+            ->join('partner_domewing_accounts as pda', 'partners.id', '=', 'pda.partner_id')
+            ->where('partners.api_token', $request->apiToken)
+            ->where('pda.is_active', 'Y')
+            ->first(['pda.domewing_account_id']);
         $validator = Validator::make($request->all(), [
             'orders' => 'required|file|mimes:xlsx'
         ], [
@@ -28,20 +32,15 @@ class ExcelUploadController extends Controller
             ];
         }
         $ordersExcelFile = $request->orders;
-        return $this->extractOrdersExcelFile($ordersExcelFile);
+        return $this->extractOrdersExcelFile($ordersExcelFile, $memberId);
     }
-    private function extractOrdersExcelFile($productsExcelFile)
+    private function extractOrdersExcelFile($ordersExcelFile, $memberId)
     {
         try {
-            $partnerId = Auth::guard('partner')->id(); //이거 파트너스 계정 확인
-            return DB::table('partner_domewing_accounts')
-                ->where('partner_id', $partnerId)
-                ->where('is_active', 'Y')
-                ->first();
-            $spreadsheet = IOFactory::load($productsExcelFile->getRealPath());
+            $spreadsheet = IOFactory::load($ordersExcelFile->getRealPath());
             $sheet = $spreadsheet->getSheet(0);
             $errors = [];
-            $products = [];
+            $datas = [];
             $highestRow = $sheet->getHighestRow();
             if ($highestRow >= 501) {
                 return [
@@ -50,21 +49,14 @@ class ExcelUploadController extends Controller
                 ];
             }
             for ($i = 2; $i <= $highestRow; $i++) {
-                $rowData = [
-                    'productCode' => $sheet->getCell('A' . $i)->getValue(),
-                    'quantity' => $sheet->getCell('B' . $i)->getValue(),
-                    'receiverName' => $sheet->getCell('C' . $i)->getValue(),
-                    'receiverPhone' => $sheet->getCell('D' . $i)->getValue(),
-                    'receiverAddress' => $sheet->getCell('E' . $i)->getValue(),
-                    'receiverRemark' => $sheet->getCell('F' . $i)->getValue()
-                ];
+                $rowData = $this->getRowData($sheet, $i);
                 $validateColumnsResult = $this->validateColumns($rowData);
                 if ($validateColumnsResult['status'] === false) {
                     $productCode = $validateColumnsResult['return']['data'];
                     $message = $validateColumnsResult['return']['message'];
                     $errors[] = $productCode . $message;
                 } else {
-                    $products[] = $rowData;
+                    $datas[] = $rowData;
                 }
             }
             if (count($errors) > 0) {
@@ -74,8 +66,12 @@ class ExcelUploadController extends Controller
                     'errors' => $errors
                 ];
             }
-            foreach ($products as $product) {
-                $this->createOrder($product); //주문 넣기 시작
+            foreach ($datas as $data) {
+                $createOrderResult = $this->createOrder($data, $memberId);
+                return $createOrderResult;
+                if ($createOrderResult['status'] === false) {
+                    $errors[] = $data['productCode'] . ' ' . $createOrderResult['error'];
+                }
             }
             return [
                 'status' => true,
@@ -89,13 +85,36 @@ class ExcelUploadController extends Controller
             ];
         }
     }
-    private function createOrder($product)
+    private function getRowData($sheet, $row)
+    {
+        return [
+            'productCode' => $sheet->getCell('A' . $row)->getValue(),
+            'quantity' => $sheet->getCell('B' . $row)->getValue(),
+            'receiverName' => $sheet->getCell('C' . $row)->getValue(),
+            'receiverPhone' => $sheet->getCell('D' . $row)->getValue(),
+            'receiverAddress' => $sheet->getCell('E' . $row)->getValue(),
+            'receiverRemark' => $sheet->getCell('F' . $row)->getValue()
+        ];
+    }
+    private function createOrder($data, $memberId)
     {
         try {
+            $product = DB::table('minewing_products')
+                ->where('productCode', $data['productCode'])
+                ->where('isActive', 'Y')
+                ->first();
+            if (!$product) return [
+                'status' => false,
+                'message' => '품절되었거나 존재하지 않는 상품입니다.'
+            ];
             //w주무냉성시작 cart랑 order랑 wingTransaction생성
-            $this->storeCart($memberId, $productId, $quantity);
-            $this->storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen, $orderDate = null);
-            $this->storeWingTransaction($memberId, $type, $amount, $remark);
+            $cart = $this->storeCart($memberId, $product->id, $data['quantity']);
+            $cartId = $cart['data']['cartId'];
+            $amount = $this->getCartAmount($cartId);
+            $wingTransaction = $this->storeWingTransaction($memberId, 'PAYMENT', $amount, "");
+            $wingTransactionId = $wingTransaction['data']['wingTransactionId'];
+            $priceThen = $this->getSalePrice($product->id);
+            $this->storeOrder($wingTransactionId, $cartId, $data['receiverName'], $data['receiverPhone'], $data['receiverAddress'], $data['receiverRemark'], $priceThen, $product->shipping_fee, $product->bundle_quantity, $orderDate = null);
             return [
                 'status' => true,
             ];
@@ -103,7 +122,7 @@ class ExcelUploadController extends Controller
             return [
                 'status' => false,
                 'return' => [
-                    'productCode' => $product['productCode'],
+                    'productCode' => $data['productCode'],
                     'error' => $e->getMessage()
                 ]
             ];
@@ -196,6 +215,42 @@ class ExcelUploadController extends Controller
                 'error' => $e->getMessage()
             ];
         }
+    }
+    // 카트 금액 계산
+    private function getCartAmount($cartId)
+    {
+        $cart = DB::table('carts AS c')
+            ->join('minewing_products AS mp', 'mp.id', '=', 'c.product_id')
+            ->where('c.id', $cartId)
+            ->first();
+
+        $salePrice = $this->getSalePrice($cart->product_id);
+        $shippingRate = $cart->bundle_quantity === 0 ? 1 : ceil($cart->quantity / $cart->bundle_quantity);
+        return $salePrice * $cart->quantity + $cart->shipping_fee * $shippingRate;
+    }
+    // 판매 가격 계산
+    private function getSalePrice($productId)
+    {
+        $originProductPrice = DB::table('minewing_products')
+            ->where('id', $productId)
+            ->value('productPrice');
+
+        $promotion = DB::table('promotion_products AS pp')
+            ->join('promotion AS p', 'p.id', '=', 'pp.promotion_id')
+            ->where('product_id', $productId)
+            ->where('p.end_at', '>', now())
+            ->where('p.is_active', 'Y')
+            ->where('pp.is_active', 'Y')
+            ->where('p.band_promotion', 'N')
+            ->where('pp.band_product', 'N')
+            ->value('pp.product_price');
+
+        $productPrice = $promotion ?? $originProductPrice;
+
+        $margin = DB::table('sellwing_config')->where('id', 1)->value('value');
+        $marginRate = ($margin / 100) + 1;
+
+        return ceil($productPrice * $marginRate);
     }
     private function validateColumns($rowData)
     {

@@ -55,13 +55,13 @@ class MainController extends Controller
             }
             for ($i = 2; $i <= $highestRow; $i++) {
                 $rowData = [
-                    'productCode' => $sheet->getCell('A' . $i)->getValue(),
-                    'categoryID' => $sheet->getCell('B' . $i)->getValue(),
-                    'productName' => $sheet->getCell('C' . $i)->getValue(),
-                    'productKeywords' => $sheet->getCell('D' . $i)->getValue(),
-                    'productPrice' => $sheet->getCell('E' . $i)->getValue(),
-                    'shipping_fee' => $sheet->getCell('F' . $i)->getValue(),
-                    'bundle_quantity' => $sheet->getCell('G' . $i)->getValue(),
+                    'productCode' => trim($sheet->getCell('A' . $i)->getValue()),
+                    'categoryID' => trim($sheet->getCell('B' . $i)->getValue()),
+                    'productName' => trim($sheet->getCell('C' . $i)->getValue()),
+                    'productKeywords' => trim($sheet->getCell('D' . $i)->getValue()),
+                    'productPrice' => trim($sheet->getCell('E' . $i)->getValue()),
+                    'shipping_fee' => trim($sheet->getCell('F' . $i)->getValue()),
+                    'bundle_quantity' => trim($sheet->getCell('G' . $i)->getValue()),
                 ];
                 $validateColumnsResult = $this->validateColumns($rowData);
                 if ($validateColumnsResult['status'] === false) {
