@@ -19,7 +19,7 @@ class ExcelUploadController extends Controller
             ->join('partner_domewing_accounts as pda', 'partners.id', '=', 'pda.partner_id')
             ->where('partners.api_token', $request->apiToken)
             ->where('pda.is_active', 'Y')
-            ->first(['pda.domewing_account_id']);
+            ->value('pda.domewing_account_id');
         $validator = Validator::make($request->all(), [
             'orders' => 'required|file|mimes:xlsx'
         ], [
@@ -28,7 +28,7 @@ class ExcelUploadController extends Controller
         if ($validator->fails()) {
             return [
                 'status' => false,
-                'return' => $validator->errors()->first()
+                'error' => $validator->errors()->first()
             ];
         }
         $ordersExcelFile = $request->orders;
@@ -52,9 +52,9 @@ class ExcelUploadController extends Controller
                 $rowData = $this->getRowData($sheet, $i);
                 $validateColumnsResult = $this->validateColumns($rowData);
                 if ($validateColumnsResult['status'] === false) {
-                    $productCode = $validateColumnsResult['return']['data'];
-                    $message = $validateColumnsResult['return']['message'];
-                    $errors[] = $productCode . $message;
+                    $productCode = $validateColumnsResult['data'];
+                    $message = $validateColumnsResult['message'];
+                    $errors[] = $productCode . " => " . $message . "<br>";
                 } else {
                     $datas[] = $rowData;
                 }
@@ -67,20 +67,16 @@ class ExcelUploadController extends Controller
                 ];
             }
             foreach ($datas as $data) {
-                $createOrderResult = $this->createOrder($data, $memberId);
-                return $createOrderResult;
-                if ($createOrderResult['status'] === false) {
-                    $errors[] = $data['productCode'] . ' ' . $createOrderResult['error'];
-                }
+                $this->createOrder($data, $memberId);
             }
             return [
                 'status' => true,
-                'return' => '상품셋 정보를 성공적으로 업데이트했습니다.'
+                'message' => '상품셋 정보를 성공적으로 업데이트했습니다.'
             ];
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                'return' => '엑셀 파일로부터 상품 정보들을 추출하는 과정에서 에러가 발생했습니다.',
+                'message' => '엑셀 파일로부터 상품 정보들을 추출하는 과정에서 에러가 발생했습니다.',
                 'error' => $e->getMessage()
             ];
         }
@@ -121,10 +117,8 @@ class ExcelUploadController extends Controller
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                'return' => [
-                    'productCode' => $data['productCode'],
-                    'error' => $e->getMessage()
-                ]
+                'data' => $data['productCode'],
+                'error' => $e->getMessage()
             ];
         }
     }
@@ -280,7 +274,7 @@ class ExcelUploadController extends Controller
         }
         return [
             'status' => true,
-            'return' => $rowData
+            'data' => $rowData
         ];
     }
     private function validateIsActive($productCode)
