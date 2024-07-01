@@ -488,7 +488,7 @@ class AdminController extends Controller
             ->join('carts as c', 'c.product_id', '=', 'mp.id')
             ->join('orders as o', 'o.cart_id', '=', 'c.id')
             ->whereNotIn('o.type', ['CANCELLED'])
-            ->where('v.is_active', 'ACTIVE')
+            // ->where('v.is_active', 'ACTIVE')
             ->where('v.type', 'SELLER')
             ->select('v.id', 'v.name', 'v.is_active', 'v.type')
             ->groupBy('v.id', 'v.name', 'v.is_active', 'v.type')
