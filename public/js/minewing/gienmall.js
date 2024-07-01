@@ -60,6 +60,10 @@ async function scrapeProducts(page, forbiddenWords) {
         return products;
         function scrapeProduct(productElement, forbiddenWords) {
             try {
+                const soldOutImageElement = productElement.querySelector('img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif');
+                if (soldOutImageElement) {
+                    return false;
+                }
                 const name = productElement.querySelector('div > p > a > span').textContent.trim();
                 for (const forbiddenWord of forbiddenWords) {
                     if (name.includes(forbiddenWord)) {
