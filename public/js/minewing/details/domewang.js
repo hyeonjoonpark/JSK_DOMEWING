@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import puppeteer from 'puppeteer';
 import { goToAttempts, scrollDown, signIn } from '../common.js';
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     const [tempFilePath, username, password] = process.argv.slice(2);
     const fileContent = await fs.readFile(tempFilePath, 'utf8');
