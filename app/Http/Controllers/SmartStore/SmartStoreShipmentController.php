@@ -24,9 +24,7 @@ class SmartStoreShipmentController extends Controller
             $deliveryCompanyId = $request->input('deliveryCompanyId');
             $productOrderNumber = $request->input('productOrderNumber');
             $deliveryCompany = $this->getDeliveryCompany($deliveryCompanyId);
-
             $order = $this->getOrder($productOrderNumber);
-            $partner = $this->getPartnerByWingTransactionId($order->wing_transaction_id);
             $productOrder = $this->getProductOrder($order->id);
             $account = $this->getAccount($productOrder->account_id);
         } catch (\Exception $e) {
@@ -35,6 +33,12 @@ class SmartStoreShipmentController extends Controller
                 'message' => '데이터 조회 중 오류가 발생했습니다: ' . $e->getMessage(),
             ];
         }
+        $isCancelOrder = $this->getIsCancelOrder($account, $productOrderNumber);
+        if (!$isCancelOrder['status']) return [
+            'status' => false,
+            'message' => $isCancelOrder['message']
+        ];
+
         $responseApi = $this->postApi($account, $productOrder->product_order_number, $deliveryCompany->smart_store, $trackingNumber);
         if (!$responseApi['status']) {
             return [
@@ -45,6 +49,22 @@ class SmartStoreShipmentController extends Controller
         return [
             'status' => true,
             'data' => $responseApi
+        ];
+    }
+    private function getIsCancelOrder($account, $productOrderNumber)
+    {
+        $contentType = 'application/json';
+        $method = 'POST';
+        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query';
+        $data = ['productOrderIds' => [$productOrderNumber]];
+        $controller = new SmartStoreApiController();
+        $builderResponse =  $controller->builder($account, $contentType, $method, $url, $data); //조회해서 상태확인
+        if (isset($builderResponse['data']['data'][0]['cancel'])) return [
+            'status' => false,
+            'message' => '취소요청이 들어온 주문입니다. 강제출고를 위해 파트너스 회원에게 연락바랍니다.'
+        ];
+        return [
+            'status' => true,
         ];
     }
     private function postApi($account, $productOrderId, $deliveryCompany, $trackingNumber)
@@ -72,33 +92,18 @@ class SmartStoreShipmentController extends Controller
             ->where('dc.id', $deliveryCompanyId)
             ->first();
     }
-
     private function getOrder($productOrderNumber)
     {
         return DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
             ->first();
     }
-
-    private function getPartnerByWingTransactionId($wingTransactionId)
-    {
-        return DB::table('wing_transactions as wt')
-            ->join('partner_domewing_accounts as pda', 'wt.member_id', '=', 'pda.domewing_account_id')
-            ->join('partners as p', 'pda.partner_id', '=', 'p.id')
-            ->where('wt.id', $wingTransactionId)
-            ->where('pda.is_active', 'Y')
-            ->select('p.*')
-            ->first();
-    }
-
-
     private function getProductOrder($orderId)
     {
         return DB::table('partner_orders as ps')
             ->where('ps.order_id', $orderId)
             ->first();
     }
-
     private function getAccount($accountId)
     {
         return DB::table('smart_store_accounts')
