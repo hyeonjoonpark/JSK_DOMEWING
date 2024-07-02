@@ -3,9 +3,6 @@
 namespace App\Http\Controllers\OpenMarkets\LotteOn;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 
 class LotteOnApiController extends Controller
