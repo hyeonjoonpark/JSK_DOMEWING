@@ -666,6 +666,8 @@ class UploadedController extends Controller
     }
     public function fetchEdittedProducts(array $products)
     {
+        set_time_limit(0);
+        ini_set('memory_allow', '-1');
         // 활성화된 'OPEN_MARKET' 타입의 모든 벤더를 조회하여 $openMarkets에 저장
         $openMarkets = DB::table('vendors')
             ->where('is_active', 'ACTIVE')

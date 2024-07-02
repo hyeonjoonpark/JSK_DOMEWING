@@ -41,6 +41,8 @@ class MainController extends Controller
     }
     private function extractProductsExcelFile($productsExcelFile)
     {
+        set_time_limit(0);
+        ini_set('memory_allow', '-1');
         try {
             $spreadsheet = IOFactory::load($productsExcelFile->getRealPath());
             $sheet = $spreadsheet->getSheet(0);
@@ -109,6 +111,8 @@ class MainController extends Controller
     }
     private function updateProduct($product)
     {
+        set_time_limit(0);
+        ini_set('memory_allow', '-1');
         try {
             $productName = $this->nameController->index($product['productName']);
             $sc = new SaveController();
