@@ -22,15 +22,17 @@ class LotteOnUploadController extends Controller
     {
         $products = $this->products;
         $account = $this->account;
-        $contentType = 'application/json;charset=UTF-8';
-        $method = 'POST';
-        $path = '/v2/providers/seller_api/apis/api/v1/marketplace/seller-products';
         $ac = new LotteOnApiController();
         $accessKey = $account->access_key;
         $secretKey = $account->secret_key;
         $success = 0;
         $duplicated = [];
         $error = [];
+        $address = $this->getAddresses($ac, $account); // 출고지 반품지 조회
+        $returnAddress = $address['returnAddress'];
+        $shippingAddress = $address['shippingAddress'];
+
+        $dvCstPolNo = $this->getDvCstPolDetails($ac, $account);
         $responseOutbound = $this->getOutbound($accessKey, $secretKey);
         $responseReturn = $this->getReturnCenter($accessKey, $secretKey, $account->code);
         if ($responseOutbound['status'] === false) {
@@ -76,209 +78,17 @@ class LotteOnUploadController extends Controller
             'error' => $error
         ];
     }
-    protected function store($coupangAccountId, $productId, $price, $shippingFee, $originProductNo, $productName)
+    protected function store($lotteOnAccountId, $productId, $price, $shippingFee, $originProductNo, $productName)
     {
-        DB::table('coupang_uploaded_products')
+        DB::table('lotte_on_uploaded_products')
             ->insert([
-                'coupang_account_id' => $coupangAccountId,
+                'lotte_on_account_id' => $lotteOnAccountId,
                 'product_id' => $productId,
                 'price' => $price,
                 'shipping_fee' => $shippingFee,
                 'origin_product_no' => $originProductNo,
                 'product_name' => $productName
             ]);
-    }
-    protected function getCategoryRelatedMeta($accessKey, $secretKey, $categoryCode)
-    {
-        $contentType = 'application/json;charset=UTF-8';
-        $path = '/v2/providers/seller_api/apis/api/v1/marketplace/meta/category-related-metas/display-category-codes/' . $categoryCode;
-        $ac = new LotteOnApiController();
-        $response = $ac->getBuilder($accessKey, $secretKey, $contentType, $path);
-        return $response['data']['data'];
-    }
-    public function getReturnCenter($accessKey, $secretKey, $vendorId)
-    {
-        $contentType = 'application/json;charset=UTF-8';
-        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $vendorId . '/returnShippingCenters';
-        $query = 'pageNum=1';
-        $ac = new LotteOnApiController();
-        $response = $ac->getBuilder($accessKey, $secretKey, $contentType, $path, $query);
-        $returnCenter = '';
-        if ($response['status'] === true) {
-            $data = $response['data']['data'];
-            $trueOutbounds = $data['content'];
-            foreach ($trueOutbounds as $item) {
-                if ($item['usable'] === true) {
-                    $returnCenter = $item;
-                    break;
-                }
-            }
-        }
-        if ($returnCenter !== '') {
-            return [
-                'status' => true,
-                'data' => $returnCenter
-            ];
-        }
-        return [
-            'status' => false,
-            'message' => '쿠팡윙에서 반품지 주소를 올바르게 설정해주세요.<br>혹은 쿠팡 API 에 43.200.252.11 IP 주소를 기입해주세요.',
-            'error' => $response
-        ];
-    }
-    public function getOutbound($accessKey, $secretKey)
-    {
-        $contentType = 'application/json;charset=UTF-8';
-        $path = '/v2/providers/marketplace_openapi/apis/api/v1/vendor/shipping-place/outbound';
-        $query = 'pageNum=1';
-        $ac = new LotteOnApiController();
-        $response = $ac->getBuilder($accessKey, $secretKey, $contentType, $path, $query);
-        $outboundCode = '';
-        if ($response['status'] === true) {
-            $data = $response['data'];
-            $trueOutbounds = $data['content'];
-            foreach ($trueOutbounds as $item) {
-                if ($item['usable'] === true) {
-                    $outboundCode = $item['outboundShippingPlaceCode'];
-                    break;
-                }
-            }
-        }
-        if ($outboundCode !== '') {
-            return [
-                'status' => true,
-                'data' => $outboundCode
-            ];
-        }
-        return [
-            'status' => false,
-            'message' => '쿠팡윙에서 출고지 주소를 올바르게 설정해주세요.',
-            'error' => $response
-        ];
-    }
-    // protected function generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee, $productPrice)
-    // {
-    //     $optionName = '단일 상품';
-    //     if ($product->hasOption === 'Y') {
-    //         $optionName = $this->extractOptionName($product->productDetail);
-    //     }
-    //     $deliveryChargeType = "NOT_FREE";
-    //     if ($productPrice >= 5000) {
-    //         $deliveryChargeType = "FREE";
-    //     }
-    //     $deliveryCharge = $shippingFee;
-    //     return [
-    //         'displayCategoryCode' => $product->code,
-    //         'sellerProductName' => $product->productName,
-    //         'vendorId' => $account->code,
-    //         'saleStartedAt' => date("Y-m-d\TH:i:s"),
-    //         'saleEndedAt' => date("2099-12-31\TH:i:s"),
-    //         'displayProductName' => $product->productName,
-    //         'brand' => '제이에스',
-    //         'generalProductName' => $product->productName,
-    //         'deliveryMethod' => 'SEQUENCIAL',
-    //         'deliveryCompanyCode' => 'HYUNDAI',
-    //         'deliveryChargeType' => $deliveryChargeType,
-    //         'deliveryCharge' => $deliveryCharge,
-    //         'freeShipOverAmount' => 0,
-    //         'deliveryChargeOnReturn' => $product->shipping_fee,
-    //         'remoteAreaDeliverable' => 'Y',
-    //         'unionDeliveryType' => 'NOT_UNION_DELIVERY',
-    //         'returnCenterCode' => $returnCenter['returnCenterCode'],
-    //         'returnChargeName' => $returnCenter['shippingPlaceName'],
-    //         'companyContactNumber' => $returnCenter['placeAddresses'][0]['companyContactNumber'],
-    //         'returnZipCode' => $returnCenter['placeAddresses'][0]['returnZipCode'],
-    //         'returnAddress' => $returnCenter['placeAddresses'][0]['returnAddress'],
-    //         'returnAddressDetail' => $returnCenter['placeAddresses'][0]['returnAddressDetail'],
-    //         'returnCharge' => $product->shipping_fee,
-    //         'outboundShippingPlaceCode' => $outboundCode,
-    //         'vendorUserId' => $account->username,
-    //         'requested' => true,
-    //         'items' => [
-    //             [
-    //                 'itemName' => $optionName,
-    //                 'originalPrice' => $salePrice,
-    //                 'salePrice' => $salePrice,
-    //                 'maximumBuyCount' => 9999,
-    //                 'maximumBuyForPerson' => 0,
-    //                 'maximumBuyForPersonPeriod' => 1,
-    //                 'outboundShippingTimeDay' => 1,
-    //                 'unitCount' => 0,
-    //                 'adultOnly' => 'EVERYONE',
-    //                 'taxType' => 'TAX',
-    //                 'parallelImported' => 'NOT_PARALLEL_IMPORTED',
-    //                 'overseasPurchased' => 'NOT_OVERSEAS_PURCHASED',
-    //                 'pccNeeded' => false,
-    //                 'externalVendorSku' => $product->productCode,
-    //                 'searchTags' => explode(',', $product->productKeywords),
-    //                 'images' => [
-    //                     [
-    //                         'imageOrder' => 0,
-    //                         'imageType' => 'REPRESENTATION',
-    //                         'vendorPath' => $product->productImage
-    //                     ]
-    //                 ],
-    //                 'notices' => [
-    //                     [
-    //                         'noticeCategoryName' => '기타 재화',
-    //                         'noticeCategoryDetailName' => '품명 및 모델명',
-    //                         'content' => '상세페이지 참조'
-    //                     ],
-    //                     [
-    //                         'noticeCategoryName' => '기타 재화',
-    //                         'noticeCategoryDetailName' => '인증/허가 사항',
-    //                         'content' => '상세페이지 참조'
-    //                     ],
-    //                     [
-    //                         'noticeCategoryName' => '기타 재화',
-    //                         'noticeCategoryDetailName' => '제조국(원산지)',
-    //                         'content' => '상세페이지 참조'
-    //                     ],
-    //                     [
-    //                         'noticeCategoryName' => '기타 재화',
-    //                         'noticeCategoryDetailName' => '제조자(수입자)',
-    //                         'content' => '상세페이지 참조'
-    //                     ],
-    //                     [
-    //                         'noticeCategoryName' => '기타 재화',
-    //                         'noticeCategoryDetailName' => '소비자상담 관련 전화번호',
-    //                         'content' => '상세페이지 참조'
-    //                     ],
-    //                 ],
-    //                 'contents' => [
-    //                     [
-    //                         'contentsType' => 'HTML',
-    //                         'contentDetails' => [
-    //                             [
-    //                                 'content' => $product->productDetail,
-    //                                 'detailType' => 'TEXT'
-    //                             ]
-    //                         ]
-    //                     ]
-    //                 ],
-    //                 'offerCondition' => 'NEW',
-    //                 'manufacture' => '제이에스',
-    //                 'attributes' => []
-    //             ]
-    //         ]
-    //     ];
-    // }
-    public function extractOptionName($productDetail)
-    {
-        $encodedHtml = mb_convert_encoding($productDetail, 'HTML-ENTITIES', 'UTF-8');
-
-        $doc = new DOMDocument();
-        libxml_use_internal_errors(true); // HTML5 태그 등의 경고를 무시합니다.
-        $doc->loadHTML($encodedHtml);
-        libxml_clear_errors();
-
-        $xpath = new DOMXPath($doc);
-        $h1Elements = $xpath->query('//h1');
-        $optionName = "단일 상품";
-        if ($h1Elements->length > 0) {
-            $optionName = trim($h1Elements->item(0)->textContent);
-        }
-        return $optionName;
     }
     private function generateData($categoryCode, $dvpNo)
     {
@@ -451,7 +261,7 @@ class LotteOnUploadController extends Controller
             ]
         ];
     }
-    private function getDispCatId($ac, $account, $categoryCode)
+    private function getDispCatId($ac, $account, $categoryCode) //카테고리 조회 이젠 필요없음
     {
         $response = $ac->getBuilder($account->access_key, 'https://onpick-api.lotteon.com/cheetah/econCheetah.ecn?job=cheetahStandardCategory&filter_1=' . $categoryCode);
         // JSON 데이터를 PHP 배열로 디코딩
@@ -471,66 +281,69 @@ class LotteOnUploadController extends Controller
         // 추출한 disp_cat_id 배열 반환
         return $disp_cat_ids;
     }
-    private function getDvpNo($ac, $account)
+    private function getAddresses($ac, $account) // 출고지 반품지 조회
     {
         // JSON 데이터를 생성
         $postData = json_encode([
             'afflTrCd' => $account->partner_code
         ]);
+
         // API 호출
         $response = $ac->postBuilder($account->access_key, 'https://openapi.lotteon.com/v1/openapi/contract/v1/dvp/getDvpListSr', $postData);
+
+        // 초기화
+        $returnAddress = null;
+        $shippingAddress = null;
+
+        // 응답 데이터 처리
         if (isset($response['data']['result']['data']) && is_array($response['data']['result']['data'])) {
-            $resultData = $response['data']['result']['data'];
-            foreach ($resultData as $item) {
-                if ($item['dvpTypCd'] === "01") {
-                    return [
-                        'status' => true,
-                        'data' => $item['dvpNo']
-                    ];
+            foreach ($response['data']['result']['data'] as $address) {
+                if ($address['dvpTypCd'] == "01") {
+                    $returnAddress = $address;
+                } elseif ($address['dvpTypCd'] == "02") {
+                    $shippingAddress = $address;
                 }
             }
+            return [
+                'status' => true,
+                'data' => [
+                    'returnAddress' => $returnAddress,
+                    'shippingAddress' => $shippingAddress
+                ]
+            ];
         }
+
         return [
             'status' => false,
             'message' => '유효한 응답 데이터를 받지 못했습니다.'
         ];
     }
 
-    private function getDvCstPolDetails($ac, $account)
+
+    private function getDvCstPolDetails($ac, $account) // 배송비정책리스트조회
     {
         // JSON 데이터를 생성
         $postData = json_encode([
             'afflTrCd' => $account->partner_code
         ]);
-
         // API 호출
         $response = $ac->postBuilder($account->access_key, 'https://openapi.lotteon.com/v1/openapi/contract/v1/dvl/getDvCstListSr', $postData);
-
-        // 결과를 담을 배열 초기화
         $results = [];
-
-        // 응답 데이터가 유효한지 확인
         if (isset($response['data']['result']['data']) && is_array($response['data']['result']['data'])) {
             $resultData = $response['data']['result']['data'];
-
-            // 각 항목을 반복하여 처리
             foreach ($resultData as $item) {
-                $dvCstPolNo = isset($item['dvCstPolNo']) ? $item['dvCstPolNo'] : null;
-                $inrmAdtnDvCst = isset($item['inrmAdtnDvCst']) ? $item['inrmAdtnDvCst'] : null;
-
-                $results[] = [
-                    'dvCstPolNo' => $dvCstPolNo,
-                    'inrmAdtnDvCst' => $inrmAdtnDvCst
-                ];
+                // dvCstTypCd에 따라 shippingFee 또는 additionalShippingFee 설정
+                if ($item['dvCstTypCd'] == 'DV_CST') {
+                    $results['shippingFee'] = $item['dvCst'];
+                } elseif ($item['dvCstTypCd'] == 'ADTN_DV_CST') {
+                    $results['additionalShippingFee'] = $item['inrmAdtnDvCst'];
+                }
             }
-
             return [
                 'status' => true,
                 'data' => $results
             ];
         }
-
-        // 유효한 데이터를 찾지 못한 경우
         return [
             'status' => false,
             'message' => '배송비정책 조회가 되지 않습니다.'
