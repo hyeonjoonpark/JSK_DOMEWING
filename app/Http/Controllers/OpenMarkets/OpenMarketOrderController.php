@@ -549,6 +549,14 @@ class OpenMarketOrderController extends Controller
             ->join('members as m', 'm.id', '=', 'wt.member_id')
             ->join('carts as c', 'c.id', '=', 'o.cart_id')
             ->join('minewing_products as mp', 'mp.id', '=', 'c.product_id')
+            ->leftJoin('coupang_accounts as ca', function ($join) {
+                $join->on('ca.id', '=', 'po.account_id')
+                    ->where('po.vendor_id', 40);
+            })
+            ->leftJoin('smart_store_accounts as ssa', function ($join) {
+                $join->on('ssa.id', '=', 'po.account_id')
+                    ->where('po.vendor_id', 51);
+            })
             ->whereIn('mp.sellerID', $vendors)
             ->select(
                 'm.username as member_username',
@@ -580,8 +588,10 @@ class OpenMarketOrderController extends Controller
                 'mp.productCode as productCode',
                 'o.admin_remark as adminRemark',
                 'o.bundle_quantity_then as bundleQuantity',
-                'o.delivery_status as deliveryStatus'
+                'o.delivery_status as deliveryStatus',
+                DB::raw('COALESCE(ca.username, ssa.username) as username')
             );
+
         $oneMonthAgo = Carbon::now()->subMonth();
         switch ($orderStatus) {
             case 'PAID_REQUEST':
@@ -646,6 +656,7 @@ class OpenMarketOrderController extends Controller
     }
 
 
+
     private function transformOrderDetails($order)
     {
         $product  = DB::table('minewing_products as mp')
@@ -695,6 +706,7 @@ class OpenMarketOrderController extends Controller
             'deliveryCompany' => $order->deliveryCompany,
             'productCode' => $order->productCode,
             'adminRemark' => $order->adminRemark ? $order->adminRemark : null,
+            'username' => $order->username
         ];
     }
     private function getAllPartners()
