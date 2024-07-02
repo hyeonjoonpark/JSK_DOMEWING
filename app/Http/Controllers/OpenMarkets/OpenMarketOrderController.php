@@ -706,7 +706,7 @@ class OpenMarketOrderController extends Controller
             'deliveryCompany' => $order->deliveryCompany,
             'productCode' => $order->productCode,
             'adminRemark' => $order->adminRemark ? $order->adminRemark : null,
-            'username' => $order->username
+            'username' => $order->username ? $order->username : '도매윙'
         ];
     }
     private function getAllPartners()
