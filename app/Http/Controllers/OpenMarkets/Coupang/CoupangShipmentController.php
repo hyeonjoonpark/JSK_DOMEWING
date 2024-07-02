@@ -39,12 +39,23 @@ class CoupangShipmentController extends Controller
             $shipmentBoxId = $partnerOrder->product_order_number;
             $orderId = $singleOrder['data']['data']['orderId'];
             $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
-            /*
-                ● false
-                해당 주문번호에 대해 처음으로 분리배송처리 할 경우
-                ● true
-                해당 주문번호에 이미 분리배송을 진행한 상품이 있을 경우
-            */
+            $isCancelOrder = $this->getIsCancelOrder($account, $orderId, $shipmentBoxId);
+            if ($isCancelOrder['status']) {
+                //강제출고처리
+                $forceResult = $this->forceShipOrder($account, $isCancelOrder['receiptId'], $deliveryCompany->coupang, $trackingNumber);
+                if (!$forceResult['status']) {
+                    return [
+                        'status' => false,
+                        'message' => '쿠팡 강제 출고 중 오류가 발생하였습니다.',
+                        'data' => $forceResult,
+                    ];
+                }
+                return [
+                    'status' => true,
+                    'message' => '쿠팡 강제 출고에 성공하였습니다.',
+                    'data' => $forceResult,
+                ];
+            }
             //singleOrderd의 orderId와 setProductd의 shipmentBoxId를 사용해서 postApi사용
             $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId);
             if (!$responseApi['status']) {
@@ -71,6 +82,54 @@ class CoupangShipmentController extends Controller
         $contentType = 'application/json;charset=UTF-8';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets' . '/' .  $productOrderNumber;
         return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
+    }
+    private function forceShipOrder($account, $receiptId, $deliveryCompanyCode, $invoiceNumber)
+    {
+        $contentType = 'application/json;charset=UTF-8';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests/' . $receiptId . '/completedShipment';
+        $data = [
+            'vendorId' => $account->code,
+            'receiptId' => $receiptId,
+            'deliveryCompanyCode' => $deliveryCompanyCode,
+            'invoiceNumber' => $invoiceNumber,
+        ];
+        return $this->ssac->putBuilder($account->access_key, $account->secret_key, $contentType, $path,  $data);
+    }
+    private function getIsCancelOrder($account, $orderId, $shipmentBoxId)
+    {
+        $contentType = 'application/json';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests';
+        $startDate = (new DateTime('now - 4 days'))->format('Y-m-d');
+        $endDate = (new DateTime('now'))->format('Y-m-d');
+        $baseQuery = [
+            'createdAtFrom' => $startDate,
+            'createdAtTo' => $endDate,
+            'orderId' => $orderId
+        ];
+        $queryString = http_build_query($baseQuery);
+        $controller = new ApiController();
+        $response =  $controller->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $queryString); //발주서 단건조회
+        $receiptId = 0;
+        $cancelCount = 0;
+        if (!isset($response['data']['data'])) return [
+            'status' => false,
+            'message' => '쿠팡 주문 조회가 되지 않습니다.'
+        ];
+        foreach ($response['data']['data'] as $orderItem) {
+            if ($orderItem['returnItems'][0]['shipmentBoxId'] == $shipmentBoxId) {
+                $receiptId = $orderItem['receiptId'];
+                $cancelCount = $orderItem['returnItems'][0]['cancelCount'];
+                break;
+            }
+        }
+        if ($cancelCount === 0) return [
+            'status' => false,
+            'message' => '주문 취소 건이 아닙니다.'
+        ];
+        return [
+            'status' => true,
+            'receiptId' => $receiptId
+        ];
     }
 
     private function postApi($account, $shipmentBoxId, $orderId, $deliveryCompanyCode, $invoiceNumber, $vendorItemId)

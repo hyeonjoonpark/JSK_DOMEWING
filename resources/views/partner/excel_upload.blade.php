@@ -12,6 +12,7 @@
                 <div class="card-inner">
                     <h6 class="title">상품 대량 주문 엑셀 업로드</h6>
                     <p>주문 정보 기입이 완료된 엑셀 양식을 업로드해주세요.</p>
+                    <p>엑셀 업로드 시 한번에 최대 500개까지의 주문입력이 가능합니다.</p>
                     <p>
                         <a href="{{ asset('assets/excel/partner_upload_order.xlsx') }}" target="_blank" download>
                             빈 엑셀 양식 다운로드

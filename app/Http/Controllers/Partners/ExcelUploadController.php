@@ -19,7 +19,7 @@ class ExcelUploadController extends Controller
             ->join('partner_domewing_accounts as pda', 'partners.id', '=', 'pda.partner_id')
             ->where('partners.api_token', $request->apiToken)
             ->where('pda.is_active', 'Y')
-            ->first(['pda.domewing_account_id']);
+            ->value('pda.domewing_account_id');
         $validator = Validator::make($request->all(), [
             'orders' => 'required|file|mimes:xlsx'
         ], [
@@ -28,7 +28,7 @@ class ExcelUploadController extends Controller
         if ($validator->fails()) {
             return [
                 'status' => false,
-                'return' => $validator->errors()->first()
+                'error' => $validator->errors()->first()
             ];
         }
         $ordersExcelFile = $request->orders;
@@ -52,9 +52,9 @@ class ExcelUploadController extends Controller
                 $rowData = $this->getRowData($sheet, $i);
                 $validateColumnsResult = $this->validateColumns($rowData);
                 if ($validateColumnsResult['status'] === false) {
-                    $productCode = $validateColumnsResult['return']['data'];
-                    $message = $validateColumnsResult['return']['message'];
-                    $errors[] = $productCode . $message;
+                    $productCode = $validateColumnsResult['data'];
+                    $message = $validateColumnsResult['message'];
+                    $errors[] = $productCode . " => " . $message . "<br>";
                 } else {
                     $datas[] = $rowData;
                 }
@@ -66,21 +66,17 @@ class ExcelUploadController extends Controller
                     'errors' => $errors
                 ];
             }
-            foreach ($datas as $data) {
-                $createOrderResult = $this->createOrder($data, $memberId);
-                return $createOrderResult;
-                if ($createOrderResult['status'] === false) {
-                    $errors[] = $data['productCode'] . ' ' . $createOrderResult['error'];
-                }
+            foreach ($datas as $data) { //엑셀의 데이터를 이미 검증했기 때문에 여기서 transaction 사용 X
+                $this->createOrder($data, $memberId);
             }
             return [
                 'status' => true,
-                'return' => '상품셋 정보를 성공적으로 업데이트했습니다.'
+                'message' => '상품셋 정보를 성공적으로 업데이트했습니다.'
             ];
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                'return' => '엑셀 파일로부터 상품 정보들을 추출하는 과정에서 에러가 발생했습니다.',
+                'message' => '엑셀 파일로부터 상품 정보들을 추출하는 과정에서 에러가 발생했습니다.',
                 'error' => $e->getMessage()
             ];
         }
@@ -107,7 +103,6 @@ class ExcelUploadController extends Controller
                 'status' => false,
                 'message' => '품절되었거나 존재하지 않는 상품입니다.'
             ];
-            //w주무냉성시작 cart랑 order랑 wingTransaction생성
             $cart = $this->storeCart($memberId, $product->id, $data['quantity']);
             $cartId = $cart['data']['cartId'];
             $amount = $this->getCartAmount($cartId);
@@ -121,10 +116,8 @@ class ExcelUploadController extends Controller
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                'return' => [
-                    'productCode' => $data['productCode'],
-                    'error' => $e->getMessage()
-                ]
+                'data' => $data['productCode'],
+                'error' => $e->getMessage()
             ];
         }
     }
@@ -247,13 +240,22 @@ class ExcelUploadController extends Controller
 
         $productPrice = $promotion ?? $originProductPrice;
 
-        $margin = DB::table('sellwing_config')->where('id', 1)->value('value');
+        $margin = DB::table('sellwing_config')->where('id', 2)->value('value');
         $marginRate = ($margin / 100) + 1;
 
         return ceil($productPrice * $marginRate);
     }
     private function validateColumns($rowData)
     {
+        foreach ($rowData as $key => $value) {
+            if ($key !== 'receiverRemark' && empty($value)) {
+                return [
+                    'status' => false,
+                    'message' => '모든 열에 값이 있어야 합니다. 비어 있는 값이 있습니다.',
+                    'data' => $rowData['productCode'] ?? 'N/A'
+                ];
+            }
+        }
         $productCode = $this->validateProductCode($rowData['productCode']);
         if ($productCode === false) {
             return [
@@ -280,7 +282,7 @@ class ExcelUploadController extends Controller
         }
         return [
             'status' => true,
-            'return' => $rowData
+            'data' => $rowData
         ];
     }
     private function validateIsActive($productCode)
