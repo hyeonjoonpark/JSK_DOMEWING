@@ -77,30 +77,17 @@ async function scrapeProduct(page, productHref) {
     }
 }
 async function getProductOptions(page) {
-    // Retrieve all select elements.
     const selectElements = await page.$$('select[name="opt[]"]');
-
-    // Initialize an array to hold all product options.
     let productOptions = [];
-
-    // Ensure that there are at least two select elements.
     if (selectElements.length > 1) {
-        // Retrieve values and texts of options from the first select element.
         const firstOptionValues = await selectElements[0].evaluate(select =>
             Array.from(select.options)
                 .filter(option => option.value.trim() !== '')
                 .map(option => ({ value: option.value, text: option.textContent.trim() }))
         );
-
-        // Loop through each option value of the first select element.
         for (const { value: firstOptionValue, text: firstOptionText } of firstOptionValues) {
-            // Select the option in the first select element.
             await selectElements[0].select(firstOptionValue);
-
-            // Wait for any dynamic content to load.
             await new Promise((page) => setTimeout(page, 1000));
-
-            // Evaluate the second select element after selecting an option in the first.
             const secondSelectOptions = await selectElements[1].evaluate(select =>
                 Array.from(select.options)
                     .filter(option => option.value.trim() !== '') // 빈 값이 아닌 모든 옵션을 포함
@@ -119,8 +106,6 @@ async function getProductOptions(page) {
                         return { name, price };
                     })
             );
-
-            // Combine options from the first and second select elements and add them to the productOptions array.
             secondSelectOptions.forEach(({ name: secondOptionName, price }) => {
                 productOptions.push({
                     optionName: `${firstOptionText} ${secondOptionName}`,
@@ -152,6 +137,5 @@ async function getProductOptions(page) {
     return productOptions;
 }
 async function getHasOption(page) {
-    // Directly return the evaluation result.
     return page.evaluate(() => document.querySelectorAll('select[name="opt[]"]').length > 0);
 }

@@ -6,11 +6,8 @@ const { timeout } = require('puppeteer');
     const page = await browser.newPage();
     try {
         const args = process.argv.slice(2);
-        // const [tempFilePath, username, password] = args;
-        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const urls = ['https://www.2bpet.co.kr/product/content.asp?guid=207126&cate=14423&params='];
-        const username = "jskorea2024";
-        const password = "tjddlf88!@";
+        const [tempFilePath, username, password] = args;
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {

@@ -2,14 +2,11 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const urls = ['https://gienmall.co.kr/product/detail.html?product_no=6105&cate_no=76&display_group=1'];
-        // const username = "jskorea2023";
-        // const password = "tjddlf88!@";
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {
@@ -53,7 +50,7 @@ async function scrapeProduct(page, url) {
             }
 
             let productName = productNameElem.textContent.trim();
-            productName = productName.replace(/\[.*?\]/g, '').trim(); // 첫 대괄호 안의 문자열 제거
+            productName = productName.replace(/\[.*?\]/g, '').replace('도매-', '').trim();
             const productPrice = productPriceElem.textContent.trim().replace(/[^\d]/g, '');
             const productImage = productImageElem.src;
             const productDetail = Array.from(productDetailElements)
