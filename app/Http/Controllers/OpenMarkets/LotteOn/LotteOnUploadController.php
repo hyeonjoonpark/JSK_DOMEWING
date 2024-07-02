@@ -20,63 +20,6 @@ class LotteOnUploadController extends Controller
     }
     public function main()
     {
-        $products = $this->products;
-        $account = $this->account;
-        $ac = new LotteOnApiController();
-        $accessKey = $account->access_key;
-        $secretKey = $account->secret_key;
-        $success = 0;
-        $duplicated = [];
-        $error = [];
-        $address = $this->getAddresses($ac, $account); // 출고지 반품지 조회
-        $returnAddress = $address['returnAddress'];
-        $shippingAddress = $address['shippingAddress'];
-
-        $dvCstPolNo = $this->getDvCstPolDetails($ac, $account);
-        $responseOutbound = $this->getOutbound($accessKey, $secretKey);
-        $responseReturn = $this->getReturnCenter($accessKey, $secretKey, $account->code);
-        if ($responseOutbound['status'] === false) {
-            return $responseOutbound;
-        }
-        if ($responseReturn['status'] === false) {
-            return $responseReturn;
-        }
-        $outboundCode = $responseOutbound['data'];
-        $returnCenter = $responseReturn['data'];
-        foreach ($products as $product) {
-            $exists = DB::table('coupang_uploaded_products')
-                ->where('is_active', 'Y')
-                ->where('coupang_account_id', $account->id)
-                ->where('product_id', $product->id)
-                ->exists();
-            if ($exists === true) {
-                $duplicated[] = $product->productCode;
-                continue;
-            }
-            // 5,000원 미만 상품들은 상품가와 배송비를 따로 구분
-            $productPrice = $product->productPrice;
-            $shippingFee = $product->shipping_fee;
-            $salePrice = $productPrice;
-            // 5,000원 이상 상품들은 상품가에 배송비를 더한 후, 배송비를 0원 처리
-            if ($productPrice >= 5000) {
-                $salePrice = (int)($product->productPrice + $product->shipping_fee);
-                $shippingFee = 0;
-            }
-            $data = $this->generateData($product, $account, $outboundCode, $returnCenter, $salePrice, $shippingFee, $productPrice);
-            $uploadResult = $ac->builder($accessKey, $secretKey, $method, $contentType, $path, $data);
-            if ($uploadResult['status'] === true && $uploadResult['data']['code'] === 'SUCCESS') {
-                $originProductNo = $uploadResult['data']['data'];
-                $this->store($account->id, $product->id, $salePrice, $shippingFee, $originProductNo, $product->productName);
-                $success++;
-            } else {
-                $error[] = $uploadResult;
-            }
-        }
-        return [
-            'status' => true,
-            'message' => "총 " . count($this->products) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.<br>" . count($duplicated) . "개의 중복 상품을 필터링했습니다.",
-            'error' => $error
-        ];
     }
     protected function store($lotteOnAccountId, $productId, $price, $shippingFee, $originProductNo, $productName)
     {
