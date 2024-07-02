@@ -5,6 +5,7 @@ namespace App\Http\Controllers\OpenMarkets;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangCancelController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
+use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
 use App\Http\Controllers\SmartStore\SmartStoreCancelController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\WingController;
@@ -820,15 +821,20 @@ class OpenMarketOrderController extends Controller
             ->first();
     }
 
-    private function callSmart_storeOrderApi($id, $startDate, $endDate)
+    private function callSmart_storeOrderApi($id)
     {
         $controller = new SmartStoreOrderController();
-        return $controller->index($id, $startDate, $endDate);
+        return $controller->index($id);
     }
-    private function callCoupangOrderApi($id, $startDate, $endDate)
+    private function callCoupangOrderApi($id)
     {
         $controller = new CoupangOrderController();
-        return $controller->index($id, $startDate, $endDate);
+        return $controller->index($id);
+    }
+    private function callSt11OrderApi($id)
+    {
+        $controller = new St11OrderController();
+        return $controller->index($id);
     }
     private function callSmart_storeCancelApi($productOrderNumber)
     {
@@ -857,6 +863,14 @@ class OpenMarketOrderController extends Controller
             ->select('id')
             ->first();
     }
+    private function getSt11UploadedProductId($productId)
+    {
+        return DB::table('st11_uploaded_products')
+            ->where('product_id', $productId)
+            // ->where('is_active', 'Y')
+            ->select('id')
+            ->first();
+    }
     private function isExistSmart_storeAccount($partnerId)
     {
         return DB::table('smart_store_accounts')
@@ -867,6 +881,13 @@ class OpenMarketOrderController extends Controller
     private function isExistCoupangAccount($partnerId)
     {
         return DB::table('coupang_accounts')
+            ->where('partner_id', $partnerId)
+            ->where('is_active', 'ACTIVE')
+            ->exists();
+    }
+    private function isExistSt11Account($partnerId)
+    {
+        return DB::table('st11_accounts')
             ->where('partner_id', $partnerId)
             ->where('is_active', 'ACTIVE')
             ->exists();

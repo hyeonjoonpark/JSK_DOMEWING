@@ -16,46 +16,68 @@ class St11OrderController extends Controller
     {
         $this->ssac = new ApiController();
     }
-    public function index($id = 13)
+    public function index($id = 13) //null로수정 partners를 위함
     {
-        // if ($id == null) {
-        //     $id = Auth::guard('partner')->id();
-        // }
-        $id = 13;
+        if ($id == null) {
+            $id = Auth::guard('partner')->id();
+        }
         $orderList = $this->getOrderList($id);
+
         return $orderList;
     }
     private function getOrderList($id)
     {
-        $account = $this->getAccounts($id);
-        if (!$account) {
+        $accounts = $this->getAccounts($id);
+        if (!$accounts) {
             return false;
         }
-        $response = [];
+        $orderList = [];
         $startDate = (new DateTime('now - 4 days'))->format('YmdHi');
         $endDate = (new DateTime('now'))->format('YmdHi');
-
         $method = 'GET';
         $url = 'https://api.11st.co.kr/rest/ordservices/complete/' . $startDate . '/' . $endDate;
-        // $url = 'https://api.11st.co.kr/rest/ordservices/complete/20240618837686159'; //실제 주문번호로 조회
-        // foreach ($accounts as $account) {
-        $apiKey = $account->access_key;
-        $builderResult = $this->ssac->orderBuilder($apiKey, $method, $url); //날짜별 주문내역 조회
-        // if ($builderResult['status'] === false) continue; //오류는 그냥 넘겨
-
-        // $addrSeq = $builderResult['data']->xpath('//ns2:order')[0]->addrSeq;
-        // $confirmResult = $this->confirmOrder($apiKey, $builderResult['ordNo'], $builderResult['ordPrdSeq'], $builderResult['dlvNo']); //상품준비중처리
-        // if ($confirmResult['status'] === false) {
-        //     return $confirmResult;
-        // }
-        //상품 준비중 처리까지하면 builderResult를 한쪽에 잘 정렬해서 넣고 return
-        $response[] = $builderResult;
-        // }
+        foreach ($accounts as $account) {
+            $apiKey = $account->access_key;
+            $builderResult = $this->ssac->orderBuilder($apiKey, $method, $url); //날짜별 결제완료 주문내역 조회
+            if ($builderResult['status'] === false) continue; //오류는 그냥 넘겨
+            $orderList[] = $this->getProcessOrder($builderResult, $account);
+        }
         return [
             'status' => true,
             'message' => '성공하였습니다.',
-            'data' => $response
+            'data' => $orderList
         ];
+    }
+    private function getProcessOrder($data, $account)
+    {
+        $orderList = [];
+        if (isset($data['data']['ns2:order']) && is_array($data['data']['ns2:order'])) {
+            foreach ($data['data']['ns2:order'] as $order) {
+                $orderList[] = [
+                    'market' => '11번가',
+                    'marketEngName' => 'st11',
+                    'orderId' => $order['ordNo'],
+                    'productOrderId' => $order['ordPrdSeq'],
+                    'orderName' => $order['ordNm'],
+                    'productName' => $order['prdNm'],
+                    'quantity' => $order['ordQty'],
+                    'unitPrice' => $order['selPrc'],
+                    'totalPaymentAmount' => $order['ordPayAmt'],
+                    'deliveryFeeAmount' => $order['lstDlvCst'],
+                    'productOrderStatus' => '결제완료',
+                    'orderDate' => (new DateTime($order['ordDt']))->format('Y-m-d H:i:s'),
+                    'receiverName' => $order['rcvrNm'],
+                    'receiverPhone' => $order['rcvrPrtblNo'],
+                    'postCode' => $order['rcvrMailNo'],
+                    'address' => $order['rcvrBaseAddr'] . ' ' . $order['rcvrDtlsAddr'],
+                    'addressName' => '기본배송지',
+                    'productCode' => $order['sellerPrdCd'],
+                    'remark' => $order['ordDlvReqCont'],
+                    'accountId' => $account->id
+                ];
+            }
+        }
+        return $orderList;
     }
     private function confirmOrder($apiKey, $ordNo, $ordPrdSeq, $dlvNo)
     {
@@ -93,6 +115,6 @@ class St11OrderController extends Controller
         return DB::table('st11_accounts')
             ->where('partner_id', $id)
             ->where('is_active', 'ACTIVE')
-            ->first();
+            ->get();
     }
 }
