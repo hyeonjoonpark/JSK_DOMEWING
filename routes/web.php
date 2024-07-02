@@ -19,6 +19,7 @@ use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\OpenMarketOrderController;
 use App\Http\Controllers\Partners\PartnerAccountSetting;
 use App\Http\Controllers\Partners\DashboardController as PartnersDashboardController;
+use App\Http\Controllers\Partners\EmailVerificationController;
 use App\Http\Controllers\Partners\ForgotPasswordController;
 use App\Http\Controllers\Partners\LoginController as PartnersLoginController;
 use App\Http\Controllers\Partners\PartnerController;
@@ -41,6 +42,7 @@ Route::prefix('partner')->group(function () {
         Route::get('forgot-password', [ForgotPasswordController::class, 'index']);
         Route::post('forgot-password', [ForgotPasswordController::class, 'main']);
         Route::get('logout', [PartnersLoginController::class, 'logout']);
+        Route::get('email-verification', [EmailVerificationController::class, 'main']);
     });
     Route::middleware(['auth.partner'])->group(function () {
         Route::get('/dashboard', [PartnersDashboardController::class, 'index'])->name('partner.dashboard');
@@ -127,4 +129,7 @@ Route::prefix('auth')->group(function () {
     Route::get('verify-email', [RegisterController::class, 'verifyEmail'])->name('auth.verifyEmail');
     Route::post('login', [LoginController::class, 'login']);
     Route::get('logout', [LoginController::class, 'logout']);
+});
+Route::get('email-test', function () {
+    return view('emails.email_verification');
 });

@@ -92,7 +92,9 @@
                                 <td style="text-align: center; padding-bottom:25px">
                                     <a href="#"><img style="height: 40px"
                                             src="{{ asset('assets/images/logo.png') }}" alt="이 자리에 로고가 들어갑니다"></a>
-                                    <p style="font-size: 14px; color: #6576ff; padding-top: 12px;">당신의 도매에 날개를 달아줄</p>
+                                    <p style="font-size: 14px; color: #6576ff; padding-top: 12px;">
+                                        셀윙과 함께하는 스마트한 이커머스 통합 솔루션 - 모든 마켓, 모든 상품, 하나의 플랫폼에서.
+                                    </p>
                                 </td>
                             </tr>
                         </tbody>
@@ -102,28 +104,19 @@
                             <tr>
                                 <td style="padding: 30px 30px 15px 30px;">
                                     <h2 style="font-size: 18px; color: #6576ff; font-weight: 600; margin: 0;">
-                                        저희 도매윙 | 셀윙 파트너스에 대한 관심에 깊이 감사드립니다.
+                                        셀윙 파트너스에 회원가입해주셔서 대단히 감사드립니다.
                                     </h2>
                                 </td>
                             </tr>
                             <tr>
                                 <td style="padding: 0 30px 20px">
                                     <p style="margin-bottom: 10px;">안녕하십니까, {{ $name }} 님.</p>
-                                    <p style="margin-bottom: 10px;">아래 문의 내용에 대한 답변을 전해 드립니다.</p>
+                                    <p style="margin-bottom: 10px;">아래 버튼을 눌러 이메일 인증을 완료해주세요.</p>
                                     <p style="margin-bottom: 10px;">
-                                        문의 내용:<br>
-                                        {{ $message }}
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0 30px">
-                                    <h4
-                                        style="font-size: 15px; color: #000000; font-weight: 600; margin: 0; text-transform: uppercase; margin-bottom: 10px">
-                                        문의에 대한 답변:
-                                    </h4>
-                                    <p style="margin-bottom: 10px;">
-                                        {{ $answer }}
+                                        <a href="{{ url('/partner/auth/email-verification?token=' . $token) }}"
+                                            style="display: inline-block; padding: 0.375rem 0.75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; text-decoration: none; color: #fff; background-color: #007bff; border: 1px solid #007bff; border-radius: 0.25rem; transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;">
+                                            인증 완료
+                                        </a>
                                     </p>
                                 </td>
                             </tr>
@@ -145,7 +138,7 @@
                                         Powered By <a style="color: #6576ff; text-decoration:none;"
                                             href="https://sellwing.kr">(주) 제이에스코리아</a>.</p>
                                     <p style="padding-top: 15px; font-size: 12px;">
-                                        이 메일은 문의 답변을 위해 셀윙 파트너스로부터 작성되었습니다.
+                                        이 메일은 회원가입 이메일 인증을 위해 셀윙 파트너스로부터 작성되었습니다.
                                     </p>
                                 </td>
                             </tr>
