@@ -442,7 +442,7 @@
                     <td class="text-nowrap">
                         <div class="row g-gs mb-3">
                             <div class="col-12">
-                                <p><b>이름:</b><br>${order.senderName}<br><b>연락처:</b><br>${order.senderPhone}<br><b>이메일:</b><br>${order.senderEmail}<br></p>
+                                <p><b>계정:</b><br>${order.username}<br><b>이름:</b><br>${order.senderName}<br><b>연락처:</b><br>${order.senderPhone}<br><b>이메일:</b><br>${order.senderEmail}<br></p>
                                 ${partnerStatusHtml}
                             </div>
                         </div>
