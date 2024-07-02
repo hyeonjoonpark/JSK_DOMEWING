@@ -33,9 +33,29 @@ class ExcelUploadController extends Controller
             ];
         }
         $ordersExcelFile = $request->orders;
-        return $this->extractOrdersExcelFile($ordersExcelFile, $memberId);
+        $orderDataResult = $this->extractOrdersExcelFile($ordersExcelFile);
+        if ($orderDataResult['status'] === false) {
+            return $orderDataResult;
+        }
+        $orderDatas = $orderDataResult['data'];
+        $balanceCheck = $this->verifyBalance($memberId, $orderDatas);
+        if ($balanceCheck['status'] === false) {
+            return $balanceCheck;
+        }
+        $response = $this->createOrder($orderDatas, $memberId);
+        if ($response) {
+            return [
+                'status' => true,
+                'message' => '상품셋 정보를 성공적으로 업데이트했습니다.',
+                'data' => $response
+            ];
+        }
+        return [
+            'status' => false,
+            'message' => '알 수 없는 오류가 발생하였습니다. 관리자에게 문의 바랍니다.'
+        ];
     }
-    private function extractOrdersExcelFile($ordersExcelFile, $memberId)
+    private function extractOrdersExcelFile($ordersExcelFile)
     {
         try {
             $spreadsheet = IOFactory::load($ordersExcelFile->getRealPath());
@@ -67,27 +87,9 @@ class ExcelUploadController extends Controller
                     'errors' => $errors
                 ];
             }
-            $wc = new WingController();
-            $balance = $wc->getBalance($memberId);
-            $totalAmount = 0;
-            foreach ($datas as $data) {
-                $totalAmount += $this->getOrderAmount($data['productCode'], $data['quantity']);
-                if ($balance < $totalAmount) return [
-                    'status' => false,
-                    'message' => '잔액이 주문 총 금액보다 부족합니다. 잔액 충전 후 다시 업로드 해주세요.'
-                ];
-            }
-            //엑셀의 데이터를 이미 검증했기 때문에 여기서 transaction 사용 X
-            $response = $this->createOrder($datas, $memberId);
-            if ($response)
-                return [
-                    'status' => true,
-                    'message' => '상품셋 정보를 성공적으로 업데이트했습니다.',
-                    'data' => $response
-                ];
             return [
-                'status' => false,
-                'message' => '알수 없는 오류가 발생하였습니다. 관리자에게 문의바랍니다.'
+                'status' => true,
+                'data' => $datas
             ];
         } catch (\Exception $e) {
             return [
@@ -96,6 +98,24 @@ class ExcelUploadController extends Controller
                 'error' => $e->getMessage()
             ];
         }
+    }
+    private function verifyBalance($memberId, $orderDatas)
+    {
+        $wingController = new WingController();
+        $currentBalance = $wingController->getBalance($memberId);
+        $totalOrderCost = 0;
+        foreach ($orderDatas as $orderData) {
+            $totalOrderCost += $this->getOrderAmount($orderData['productCode'], $orderData['quantity']);
+            if ($currentBalance < $totalOrderCost) {
+                return [
+                    'status' => false,
+                    'message' => '잔액이 주문 총 금액보다 부족합니다. 잔액 충전 후 다시 업로드 해주세요.'
+                ];
+            }
+        }
+        return [
+            'status' => true
+        ];
     }
     private function getRowData($sheet, $row)
     {
@@ -108,18 +128,20 @@ class ExcelUploadController extends Controller
             'receiverRemark' => $sheet->getCell('F' . $row)->getValue()
         ];
     }
-    private function createOrder($datas, $memberId)
+    private function createOrder($orderData, $memberId)
     {
         try {
-            foreach ($datas as $data) {
+            foreach ($orderData as $data) {
                 $product = DB::table('minewing_products')
                     ->where('productCode', $data['productCode'])
-                    ->where('isActive', 'Y')
+                    // ->where('isActive', 'Y') 이미 데이터 검증할 때 품절 검증함
                     ->first();
-                if (!$product) return [
-                    'status' => false,
-                    'message' => '품절되었거나 존재하지 않는 상품입니다.'
-                ];
+                if (!$product) {
+                    return [
+                        'status' => false,
+                        'message' => '품절되었거나 존재하지 않는 상품입니다.'
+                    ];
+                }
                 $cart = $this->storeCart($memberId, $product->id, $data['quantity']);
                 $cartId = $cart['data']['cartId'];
                 $amount = $this->getCartAmount($cartId);
@@ -150,7 +172,6 @@ class ExcelUploadController extends Controller
                     'code' => (string) Str::uuid(),
                     'status' => 'PAID'
                 ]);
-
             return [
                 'status' => true,
                 'data' => [
@@ -165,7 +186,6 @@ class ExcelUploadController extends Controller
             ];
         }
     }
-    // Wing 거래 저장
     private function storeWingTransaction($memberId, $type, $amount, $remark)
     {
         try {
@@ -177,7 +197,6 @@ class ExcelUploadController extends Controller
                     'amount' => $amount,
                     'remark' => $remark
                 ]);
-
             return [
                 'status' => true,
                 'data' => [
@@ -227,14 +246,12 @@ class ExcelUploadController extends Controller
             ];
         }
     }
-    // 카트 금액 계산
     private function getCartAmount($cartId)
     {
         $cart = DB::table('carts AS c')
             ->join('minewing_products AS mp', 'mp.id', '=', 'c.product_id')
             ->where('c.id', $cartId)
             ->first();
-
         $salePrice = $this->getSalePrice($cart->product_id);
         $shippingRate = $cart->bundle_quantity === 0 ? 1 : ceil($cart->quantity / $cart->bundle_quantity);
         return $salePrice * $cart->quantity + $cart->shipping_fee * $shippingRate;
@@ -246,13 +263,11 @@ class ExcelUploadController extends Controller
         $shippingRate = $product->bundle_quantity === 0 ? 1 : ceil($quantity / $product->bundle_quantity);
         return $salePrice * $quantity + $product->shipping_fee * $shippingRate;
     }
-    // 판매 가격 계산
     private function getSalePrice($productId)
     {
         $originProductPrice = DB::table('minewing_products')
             ->where('id', $productId)
             ->value('productPrice');
-
         $promotion = DB::table('promotion_products AS pp')
             ->join('promotion AS p', 'p.id', '=', 'pp.promotion_id')
             ->where('product_id', $productId)
@@ -262,12 +277,9 @@ class ExcelUploadController extends Controller
             ->where('p.band_promotion', 'N')
             ->where('pp.band_product', 'N')
             ->value('pp.product_price');
-
         $productPrice = $promotion ?? $originProductPrice;
-
         $margin = DB::table('sellwing_config')->where('id', 2)->value('value');
         $marginRate = ($margin / 100) + 1;
-
         return ceil($productPrice * $marginRate);
     }
     private function validateColumns($rowData)
@@ -297,8 +309,8 @@ class ExcelUploadController extends Controller
                 'data' => $rowData['productCode']
             ];
         }
-        $quantity = $this->validateQuantity($rowData['quantity']);
-        if ($quantity === false) {
+        $quantityValid = $this->validateQuantity($rowData['quantity']);
+        if ($quantityValid === false) {
             return [
                 'status' => false,
                 'message' => '1개 이상의 상품을 주문해주세요.',
@@ -314,9 +326,8 @@ class ExcelUploadController extends Controller
     {
         $isActive = DB::table('minewing_products')
             ->where('productCode', $productCode)
-            ->select('isActive');
-        if ($isActive === 'N') return false;
-        return true;
+            ->value('isActive');
+        return $isActive === 'Y';
     }
     private function validateProductCode($productCode)
     {
@@ -326,7 +337,6 @@ class ExcelUploadController extends Controller
     }
     private function validateQuantity($quantity)
     {
-        if ($quantity < 1) return false;
-        return true;
+        return $quantity >= 1;
     }
 }
