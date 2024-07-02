@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Partners;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\WingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -66,12 +67,27 @@ class ExcelUploadController extends Controller
                     'errors' => $errors
                 ];
             }
-            foreach ($datas as $data) { //엑셀의 데이터를 이미 검증했기 때문에 여기서 transaction 사용 X
-                $this->createOrder($data, $memberId);
+            $wc = new WingController();
+            $balance = $wc->getBalance($memberId);
+            $totalAmount = 0;
+            foreach ($datas as $data) {
+                $totalAmount += $this->getOrderAmount($data['productCode'], $data['quantity']);
+                if ($balance < $totalAmount) return [
+                    'status' => false,
+                    'message' => '잔액이 주문 총 금액보다 부족합니다. 잔액 충전 후 다시 업로드 해주세요.'
+                ];
             }
+            //엑셀의 데이터를 이미 검증했기 때문에 여기서 transaction 사용 X
+            $response = $this->createOrder($datas, $memberId);
+            if ($response)
+                return [
+                    'status' => true,
+                    'message' => '상품셋 정보를 성공적으로 업데이트했습니다.',
+                    'data' => $response
+                ];
             return [
-                'status' => true,
-                'message' => '상품셋 정보를 성공적으로 업데이트했습니다.'
+                'status' => false,
+                'message' => '알수 없는 오류가 발생하였습니다. 관리자에게 문의바랍니다.'
             ];
         } catch (\Exception $e) {
             return [
@@ -92,24 +108,26 @@ class ExcelUploadController extends Controller
             'receiverRemark' => $sheet->getCell('F' . $row)->getValue()
         ];
     }
-    private function createOrder($data, $memberId)
+    private function createOrder($datas, $memberId)
     {
         try {
-            $product = DB::table('minewing_products')
-                ->where('productCode', $data['productCode'])
-                ->where('isActive', 'Y')
-                ->first();
-            if (!$product) return [
-                'status' => false,
-                'message' => '품절되었거나 존재하지 않는 상품입니다.'
-            ];
-            $cart = $this->storeCart($memberId, $product->id, $data['quantity']);
-            $cartId = $cart['data']['cartId'];
-            $amount = $this->getCartAmount($cartId);
-            $wingTransaction = $this->storeWingTransaction($memberId, 'PAYMENT', $amount, "");
-            $wingTransactionId = $wingTransaction['data']['wingTransactionId'];
-            $priceThen = $this->getSalePrice($product->id);
-            $this->storeOrder($wingTransactionId, $cartId, $data['receiverName'], $data['receiverPhone'], $data['receiverAddress'], $data['receiverRemark'], $priceThen, $product->shipping_fee, $product->bundle_quantity, $orderDate = null);
+            foreach ($datas as $data) {
+                $product = DB::table('minewing_products')
+                    ->where('productCode', $data['productCode'])
+                    ->where('isActive', 'Y')
+                    ->first();
+                if (!$product) return [
+                    'status' => false,
+                    'message' => '품절되었거나 존재하지 않는 상품입니다.'
+                ];
+                $cart = $this->storeCart($memberId, $product->id, $data['quantity']);
+                $cartId = $cart['data']['cartId'];
+                $amount = $this->getCartAmount($cartId);
+                $wingTransaction = $this->storeWingTransaction($memberId, 'PAYMENT', $amount, "");
+                $wingTransactionId = $wingTransaction['data']['wingTransactionId'];
+                $priceThen = $this->getSalePrice($product->id);
+                $this->storeOrder($wingTransactionId, $cartId, $data['receiverName'], $data['receiverPhone'], $data['receiverAddress'], $data['receiverRemark'], $priceThen, $product->shipping_fee, $product->bundle_quantity, $orderDate = null);
+            }
             return [
                 'status' => true,
             ];
@@ -221,6 +239,13 @@ class ExcelUploadController extends Controller
         $shippingRate = $cart->bundle_quantity === 0 ? 1 : ceil($cart->quantity / $cart->bundle_quantity);
         return $salePrice * $cart->quantity + $cart->shipping_fee * $shippingRate;
     }
+    private function getOrderAmount($productCode, $quantity)
+    {
+        $product = DB::table('minewing_products')->where('productCode', $productCode)->first();
+        $salePrice = $this->getSalePrice($product->id);
+        $shippingRate = $product->bundle_quantity === 0 ? 1 : ceil($quantity / $product->bundle_quantity);
+        return $salePrice * $quantity + $product->shipping_fee * $shippingRate;
+    }
     // 판매 가격 계산
     private function getSalePrice($productId)
     {
@@ -248,7 +273,7 @@ class ExcelUploadController extends Controller
     private function validateColumns($rowData)
     {
         foreach ($rowData as $key => $value) {
-            if ($key !== 'receiverRemark' && empty($value)) {
+            if ($key !== 'receiverRemark' && (is_null($value) || trim($value) === '')) {
                 return [
                     'status' => false,
                     'message' => '모든 열에 값이 있어야 합니다. 비어 있는 값이 있습니다.',
