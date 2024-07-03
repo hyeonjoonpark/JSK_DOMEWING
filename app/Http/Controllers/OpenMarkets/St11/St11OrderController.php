@@ -4,10 +4,8 @@ namespace App\Http\Controllers\OpenMarkets\St11;
 
 use App\Http\Controllers\Controller;
 use DateTime;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class St11OrderController extends Controller
 {
@@ -22,7 +20,6 @@ class St11OrderController extends Controller
             $id = Auth::guard('partner')->id();
         }
         $orderList = $this->getOrderList($id);
-
         return $orderList;
     }
     private function getOrderList($id)
@@ -40,75 +37,62 @@ class St11OrderController extends Controller
             $apiKey = $account->access_key;
             $builderResult = $this->ssac->orderBuilder($apiKey, $method, $url); //날짜별 결제완료 주문내역 조회
             if ($builderResult['status'] === false) continue; //오류는 그냥 넘겨
-            $orderList[] = $this->getProcessOrder($builderResult, $account);
+            $processedOrders = $this->getProcessOrder($builderResult, $account);
+            foreach ($processedOrders as $order) {
+                $this->confirmOrder($apiKey, $order['orderId'], $order['productOrderId']); // 각 주문 확인
+            }
+            $orderList = array_merge($orderList, $processedOrders);
         }
-        return [
-            'status' => true,
-            'message' => '성공하였습니다.',
-            'data' => $orderList
-        ];
+        return $orderList;
     }
     private function getProcessOrder($data, $account)
     {
         $orderList = [];
-        if (isset($data['data']['ns2:order']) && is_array($data['data']['ns2:order'])) {
-            foreach ($data['data']['ns2:order'] as $order) {
-                $orderList[] = [
-                    'market' => '11번가',
-                    'marketEngName' => 'st11',
-                    'orderId' => $order['ordNo'],
-                    'productOrderId' => $order['ordPrdSeq'],
-                    'orderName' => $order['ordNm'],
-                    'productName' => $order['prdNm'],
-                    'quantity' => $order['ordQty'],
-                    'unitPrice' => $order['selPrc'],
-                    'totalPaymentAmount' => $order['ordPayAmt'],
-                    'deliveryFeeAmount' => $order['lstDlvCst'],
-                    'productOrderStatus' => '결제완료',
-                    'orderDate' => (new DateTime($order['ordDt']))->format('Y-m-d H:i:s'),
-                    'receiverName' => $order['rcvrNm'],
-                    'receiverPhone' => $order['rcvrPrtblNo'],
-                    'postCode' => $order['rcvrMailNo'],
-                    'address' => $order['rcvrBaseAddr'] . ' ' . $order['rcvrDtlsAddr'],
-                    'addressName' => '기본배송지',
-                    'productCode' => $order['sellerPrdCd'],
-                    'remark' => $order['ordDlvReqCont'],
-                    'accountId' => $account->id
-                ];
+        if (isset($data['data']['ns2:order'])) {
+            if (is_array($data['data']['ns2:order']) && isset($data['data']['ns2:order'][0])) {
+                // 주문이 여러 개일 때
+                foreach ($data['data']['ns2:order'] as $order) {
+                    $orderList[] = $this->processOrder($order, $account);
+                }
+            } else {
+                // 주문이 하나일 때
+                $orderList[] = $this->processOrder($data['data']['ns2:order'], $account);
             }
         }
         return $orderList;
     }
-    private function confirmOrder($apiKey, $ordNo, $ordPrdSeq, $dlvNo)
-    {
-        $method = 'GET';
-        $url = 'https: //api.11st.co.kr/rest/ordservices/reqpackaging/' . $ordNo . '/' . $ordPrdSeq . '/N/0/' . $dlvNo;
-        $builderResult = $this->ssac->builder($apiKey, $method, $url);
-    }
-    private function processData($response, $account)
+
+    private function processOrder($order, $account)
     {
         return [
             'market' => '11번가',
             'marketEngName' => 'st11',
-            //'orderId' => ordNo,
-            //'productOrderId' => strval($item['shipmentBoxId']),
-            //'orderName' => ordNm,
-            //'productName' => $orderItem['vendorItemName'],
-            //'quantity' => ordQty,
-            //'unitPrice' => $orderItem['salesPrice'],
-            //'totalPaymentAmount' => $orderItem['orderPrice'],
-            //'deliveryFeeAmount' => $item['shippingPrice'],
-            //'productOrderStatus' => '결제완료',
-            //'orderDate' => (new DateTime($item['ordDt']))->format('Y-m-d H:i:s'),
-            //'receiverName' => rcvrNm,
-            //'receiverPhone' => rcvrPrtblNo,
-            //'postCode' => rcvrMailNo,
-            //'address' => rcvrBaseAddr . rcvrDtlsAddr,
+            'orderId' => $order['ordNo'],
+            'productOrderId' => $order['ordPrdSeq'] . '/' . $order['dlvNo'],
+            'orderName' => $order['ordNm'],
+            'productName' => $order['prdNm'],
+            'quantity' => $order['ordQty'],
+            'unitPrice' => $order['selPrc'],
+            'totalPaymentAmount' => $order['ordPayAmt'],
+            'deliveryFeeAmount' => $order['lstDlvCst'],
+            'productOrderStatus' => '결제완료',
+            'orderDate' => (new DateTime($order['ordDt']))->format('Y-m-d H:i:s'),
+            'receiverName' => $order['rcvrNm'],
+            'receiverPhone' => $order['rcvrPrtblNo'],
+            'postCode' => $order['rcvrMailNo'],
+            'address' => $order['rcvrBaseAddr'] . ' ' . $order['rcvrDtlsAddr'],
             'addressName' => '기본배송지',
-            //'productCode' => sellerPrdCd,
-            //'remark' => ordDlvReqCont,
-            'accountId' => $account->id
+            'productCode' => $order['sellerPrdCd'],
+            'remark' => $order['ordDlvReqCont'],
+            'accountId' => $account->id,
         ];
+    }
+    private function confirmOrder($apiKey, $orderId, $productOrderNumber)
+    {
+        $method = 'GET';
+        list($ordPrdSeq, $dlvNo) = explode('/', $productOrderNumber);
+        $url = 'https://api.11st.co.kr/rest/ordservices/reqpackaging/' . $orderId . '/' . $ordPrdSeq . '/N/0/' . $dlvNo;
+        return $this->ssac->builder($apiKey, $method, $url);
     }
     private function getAccounts($id)
     {
