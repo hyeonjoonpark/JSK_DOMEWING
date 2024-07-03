@@ -121,13 +121,13 @@ class OpenMarketSetAwaitingController extends Controller
             $response = $this->coupangCancelApi($controller, $account, $contentType, $receiptDetails['receiptId'], $receiptDetails['cancelCount']); //취소 승인 api
             if (!$response['status']) return [
                 'status' => false,
-                'message' => '취소 승인에 실패하였습니다.',
+                'message' => '쿠팡 취소 주문이어서 취소 처리중 취소 승인에 실패하였습니다.',
                 'data' => $response
             ];
             $updated = $this->updateCancel($order);
             if (!$updated['status']) return [
                 'status' => false,
-                'message' => '업데이트에 실패하였습니다.',
+                'message' => '쿠팡에서는 취소하고 도매윙 업데이트에 실패하였습니다.',
                 'cancelled' => false
             ];
             return [
@@ -148,7 +148,8 @@ class OpenMarketSetAwaitingController extends Controller
         $partnerOrder = DB::table('partner_orders')
             ->where('order_id', $order->id)
             ->first();
-        $account = DB::table('coupang_accounts as ca')
+        list($ordPrdSeq, $dlvNo) = explode('/', $partnerOrder->product_order_number);
+        $account = DB::table('st11_accounts as ca')
             ->where('ca.id', $partnerOrder->account_id)
             ->first();
         $apiKey = $account->access_key;
@@ -157,18 +158,70 @@ class OpenMarketSetAwaitingController extends Controller
         $startDate = (new DateTime('now - 4 days'))->format('YmdHi');
         $endDate = (new DateTime('now'))->format('YmdHi');
         $url = 'http://api.11st.co.kr/rest/claimservice/cancelorders/' . $startDate . '/' . $endDate;
-        $builderResult = $controller->builder($apiKey, $method, $url); //날짜별 취소내역 조회
+        $data = $controller->orderBuilder($apiKey, $method, $url); // 취소신청목록조회
 
-
-        // $this->st11CancelApi($apiKey);
+        if (isset($data['data']['ns2:order'])) {
+            if (is_array($data['data']['ns2:order']) && isset($data['data']['ns2:order'][0])) {
+                // 주문이 여러 개일 때
+                foreach ($data['data']['ns2:order'] as $stOrder) {
+                    if (strpos($stOrder['dlvNo'], $dlvNo) !== false && $stOrder['ordCnStatCd'] === '01') {
+                        $cancelResponse = $this->st11CancelApi($controller, $apiKey, $stOrder['ordPrdCnSeq'], $partnerOrder->order_number, $ordPrdSeq); //여기서 주문 취소처리
+                        if (!$cancelResponse['status']) return [
+                            'status' => false,
+                            'message' => '11번가 취소주문이어서 취소 처리중 오류가 발생하였습니다.',
+                            'data' => $cancelResponse
+                        ];
+                        $updated = $this->updateCancel($order);
+                        if (!$updated['status']) return [
+                            'status' => false,
+                            'message' => '11번가에서는 취소하고 도매윙 업데이트에 실패하였습니다.',
+                            'cancelled' => false
+                        ];
+                        return [
+                            'status' => true,
+                            'message' => '11번가에서 취소요청인 주문이어서 취소요청 승인하였습니다.',
+                            'data' => $cancelResponse,
+                            'cancelled' => true
+                        ];
+                    }
+                }
+            } else {
+                // 주문이 하나일 때
+                $stOrder = $data['data']['ns2:order'];
+                if (strpos($stOrder['dlvNo'], $dlvNo) !== false && $stOrder['ordCnStatCd'] === '01') {
+                    $cancelResponse = $this->st11CancelApi($controller, $apiKey, $stOrder['ordPrdCnSeq'], $partnerOrder->order_number, $ordPrdSeq); //여기서 주문 취소처리
+                    if (!$cancelResponse['status']) return [
+                        'status' => false,
+                        'message' => '11번가 취소주문이어서 취소 처리중 오류가 발생하였습니다.',
+                        'data' => $cancelResponse
+                    ];
+                    $updated = $this->updateCancel($order);
+                    if (!$updated['status']) return [
+                        'status' => false,
+                        'message' => '11번가에서는 취소하고 도매윙 업데이트에 실패하였습니다.',
+                        'cancelled' => false
+                    ];
+                    return [
+                        'status' => true,
+                        'message' => '11번가에서 취소요청인 주문이어서 취소요청 승인하였습니다.',
+                        'data' => $cancelResponse,
+                        'cancelled' => true
+                    ];
+                }
+            }
+        }
+        return [
+            'status' => true,
+            'message' => '11번가 취소 요청건이 아닙니다.',
+            'cancelled' => false
+        ];
     }
-    private function st11CancelApi($apiKey, $ordPrdCnSeq, $ordNo, $ordPrdSeq)
-    {
-        $controller = new St11ApiController();
-        $method = 'GET';
-        $url = 'http: //api.11st.co.kr/rest/claimservice/cancelreqconf/[ordPrdCnSeq]/[ordNo]/[ordPrdSeq]';
 
-        $builderResult = $controller->builder($apiKey, $method, $url); //주문취소승인
+    private function st11CancelApi($controller, $apiKey, $ordPrdCnSeq, $orderId, $ordPrdSeq)
+    {
+        $method = 'GET';
+        $url = 'http://api.11st.co.kr/rest/claimservice/cancelreqconf/' . $ordPrdCnSeq . '/' . $orderId . '/' . $ordPrdSeq;
+        return $controller->orderBuilder($apiKey, $method, $url); //주문취소승인
     }
     private function smartStoreCancelApi($controller, $account, $contentType, $method, $productOrderNumber)
     {

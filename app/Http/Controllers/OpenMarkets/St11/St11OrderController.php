@@ -83,7 +83,7 @@ class St11OrderController extends Controller
             'address' => $order['rcvrBaseAddr'] . ' ' . $order['rcvrDtlsAddr'],
             'addressName' => '기본배송지',
             'productCode' => $order['sellerPrdCd'],
-            'remark' => $order['ordDlvReqCont'],
+            'remark' => is_array($order['ordDlvReqCont']) ? '' : $order['ordDlvReqCont'],
             'accountId' => $account->id,
         ];
     }
