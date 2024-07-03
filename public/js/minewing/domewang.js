@@ -1,7 +1,7 @@
-import puppeteer from 'puppeteer';
-import { goToAttempts, signIn } from './common.js';
+const puppeteer = require('puppeteer');
+const { goToAttempts, signIn } = require('./common.js');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const [listUrl, username, password] = process.argv.slice(2);
     try {

@@ -52,5 +52,4 @@ const scrollDown = async (page) => {
         }
     });
 }
-export { goToAttempts, scrollDown, signIn };
-
+module.exports = { goToAttempts, scrollDown, signIn };

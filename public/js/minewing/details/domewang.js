@@ -1,12 +1,11 @@
-import { promises as fs } from 'fs';
-import puppeteer from 'puppeteer';
-import { goToAttempts, scrollDown, signIn } from '../common.js';
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+const { goToAttempts, scrollDown, signIn } = require('../common.js');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const [tempFilePath, username, password] = process.argv.slice(2);
-    const fileContent = await fs.readFile(tempFilePath, 'utf8');
-    const urls = JSON.parse(fileContent);
+    const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
     try {
         await signIn(page, username, password, 'https://domewang.co.kr/member/login.html', '#member_id', '#member_passwd', 'div > div > fieldset > a > img');
         const products = [];
