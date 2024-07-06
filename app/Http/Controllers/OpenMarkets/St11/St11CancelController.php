@@ -3,18 +3,31 @@
 namespace App\Http\Controllers\OpenMarkets\St11;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
-class St11OrderController extends Controller
+class St11CancelController extends Controller
 {
     private $ssac;
     public function __construct()
     {
         $this->ssac = new ApiController();
     }
-    public function cancelOrder($account, $ordNo, $ordPrdSeq)
+
+    public function index($productOrderNumber)
     {
-        $method = 'GET';
-        $url = 'https://api.11st.co.kr/rest/claimservice/reqrejectorder/' . $ordNo . '/' . $ordPrdSeq . '/06/[ordCnDtlsRsn]';
+        $order = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->first();
+        $partnerOrder = DB::table('partner_orders')
+            ->where('order_id', $order->id)
+            ->first();
+        $account = DB::table('st11_accounts')
+            ->where('id', $partnerOrder->account_id)
+            ->first();
+        list($ordPrdSeq, $dlvNo) = explode('/', $partnerOrder->product_order_number);
+        $method = 'GET'; //사유 넘겨주기
+        $remark = '배송 지연이 예상됨으로 취소처리하였습니다. 죄송합니다.';
+        $url = 'https://api.11st.co.kr/rest/claimservice/reqrejectorder/' . $partnerOrder->order_number . '/' . $ordPrdSeq . '/06/' . $remark;
         /*
         배송업체
 → 06 : 배송 지연 예상
