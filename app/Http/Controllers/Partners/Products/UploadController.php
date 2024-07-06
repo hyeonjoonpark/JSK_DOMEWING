@@ -146,23 +146,17 @@ class UploadController extends Controller
         $tableName = DB::table('partner_tables')
             ->where('token', $partnerTableToken)
             ->value('title');
-        // 큐에 작업 추가
-        $queues = ['uploads1', 'uploads2', 'uploads3'];
-
         // 각 큐의 현재 대기열 길이 확인
         $queueLengths = [];
-        foreach ($queues as $queue) {
-            $queueLengths[$queue] = DB::table('jobs')->where('queue', $queue)->count();
+        for ($i = 1; $i < 11; $i++) {
+            $queueName = 'queue' . $i;
+            $queueLengths[$queueName] = DB::table('jobs')->where('queue', $queueName)->count();
         }
-
         // 가장 대기열이 짧은 큐 선택
         $currentQueue = array_keys($queueLengths, min($queueLengths))[0];
-
         ProcessProductUpload::dispatch($products, $partner, $account, $vendor, $tableName)->onQueue($currentQueue);
-
         $numJobs = $queueLengths[$currentQueue];
-        $queueIndex = array_search($currentQueue, $queues) + 1;
-
+        $queueIndex = array_search($currentQueue, array_keys($queueLengths)) + 1;
         return [
             'status' => true,
             'message' => '총 ' . count($products) . '개의 상품 업로드 요청이 성공적으로 큐에 배치되었습니다.<br>' .
