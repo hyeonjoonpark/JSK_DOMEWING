@@ -64,6 +64,10 @@ async function validateProduct(page) {
                     return false;
                 }
             }
+            const OrderLimit = document.querySelector('p.info');
+            if (OrderLimit && OrderLimit.textContent.trim().includes('1')) {
+                return false;
+            }
             return true;
         });
     } catch (error) {
