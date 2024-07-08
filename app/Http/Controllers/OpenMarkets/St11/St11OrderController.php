@@ -14,7 +14,7 @@ class St11OrderController extends Controller
     {
         $this->ssac = new ApiController();
     }
-    public function index($id = 13) //null로수정 partners를 위함
+    public function index($id = null) //null로수정 partners를 위함
     {
         if ($id == null) {
             $id = Auth::guard('partner')->id();
