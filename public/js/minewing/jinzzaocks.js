@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, checkImageUrl } = require('common.js');
+const { goToAttempts, signIn, checkImageUrl } = require('./common.js');
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
