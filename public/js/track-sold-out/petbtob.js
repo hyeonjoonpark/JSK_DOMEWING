@@ -65,8 +65,13 @@ async function validateProduct(page) {
                 }
             }
             const OrderLimit = document.querySelector('p.info');
-            if (OrderLimit && OrderLimit.textContent.trim().includes('1')) {
-                return false;
+            if (OrderLimit) {
+                const orderLimitText = OrderLimit.textContent.trim();
+                if (orderLimitText.includes('최소주문수량 1개 이상')) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
             return true;
         });
