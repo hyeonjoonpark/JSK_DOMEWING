@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -19,11 +19,6 @@ const { goToAttempts, signIn } = require('./trackwing-common');
         }
         const soldOutProductIds = [];
         for (const product of products) {
-            const goToAttemptsResult = await goToAttempts(page, product.productHref, 'domcontentloaded');
-            if (goToAttemptsResult === false) {
-                soldOutProductIds.push(product.id);
-                continue;
-            }
             let dialogAppeared = false;
             page.once('dialog', async dialog => {
                 try {
@@ -32,6 +27,11 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                     dialogAppeared = true;
                 }
             });
+            const goToAttemptsResult = await goToAttempts(page, product.productHref, 'domcontentloaded');
+            if (goToAttemptsResult === false) {
+                soldOutProductIds.push(product.id);
+                continue;
+            }
             const isValid = await validateProduct(page);
             if (isValid === false || dialogAppeared === true) {
                 soldOutProductIds.push(product.id);
