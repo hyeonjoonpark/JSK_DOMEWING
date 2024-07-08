@@ -16,17 +16,15 @@ class ExcelwingController
         ini_set('memory_limit', -1);
         $b2BID = $request->b2BID;
         $sellerID = $request->sellerID;
-        $partnerMargin = $request->marginRate;
+        $marginRate = $request->marginRate;
         $shippingFee = $this->getShippingFee($sellerID);
         $products = $this->getProducts($sellerID);
         $numChunks = $this->getNumChunks($b2BID);
         $productsChunks = array_chunk($products->toArray(), $numChunks);
-        $marginRate = $this->getMarginRate($b2BID, $partnerMargin);
         $vendor = $this->getVendor($b2BID);
         $vendorEngName = $vendor->name_eng;
         $formProductController = new FormProductController();
         $downloadURLs = [];
-        // Process each chunk
         foreach ($productsChunks as $index => $productsChunk) {
             $response = $formProductController->$vendorEngName($productsChunk, $marginRate, $vendorEngName, $shippingFee, $index);
             if ($response['status']) {
@@ -38,7 +36,6 @@ class ExcelwingController
                 ];
             }
         }
-        // Create ZIP file
         return $this->createZipFile($vendorEngName, $downloadURLs);
     }
     private function getProducts($sellerID)
@@ -48,21 +45,8 @@ class ExcelwingController
             ->where("sellerID", $sellerID)
             ->whereNotNull('categoryID')
             ->get();
-
         return $products;
     }
-
-    private function getMarginRate($vendorID, $partnerMargin)
-    {
-        $marginRate = DB::table("product_register")
-            ->where("vendor_id", $vendorID)
-            ->value('excel_margin_rate');
-        $marginRate = (float)((100 + (int)$marginRate) / 100);
-        $partnerMargin = (float)((100 + (int)$partnerMargin) / 100);
-        $sellwingRate = 1.1;
-        return $marginRate * $partnerMargin * $sellwingRate;
-    }
-
     private function getVendor($vendorID)
     {
         $vendor = DB::table("product_register AS pr")
@@ -74,7 +58,6 @@ class ExcelwingController
             ->first();
         return $vendor;
     }
-
     private function getShippingFee($vendorID)
     {
         $shippingFee = DB::table('product_search')
@@ -84,22 +67,18 @@ class ExcelwingController
             ->shipping_fee;
         return $shippingFee;
     }
-
     private function getNumChunks($b2BID)
     {
         $numChunksMapping = [
             35 => 300,
             33 => 100,
         ];
-
         return $numChunksMapping[$b2BID] ?? 500;
     }
-
     private function createZipFile($vendorEngName, $downloadURLs)
     {
         $zip = new ZipArchive();
         $zipFileName = public_path('assets/excel/formed/' . $vendorEngName . '_' . date('YmdHis') . '.zip');
-
         if ($zip->open($zipFileName, ZipArchive::CREATE) === TRUE) {
             foreach ($downloadURLs as $file) {
                 $localPath = public_path(parse_url($file, PHP_URL_PATH));
