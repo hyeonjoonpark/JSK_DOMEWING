@@ -12,7 +12,7 @@
                 <div class="card-inner">
                     <h6 class="title">쿠팡</h6>
                     <p>
-                        API 생성하실 때, 반드시 sellwing.kr 도메인과 43.200.252.11 IP 주소를 기입해주세요.
+                        API 생성하실 때, 반드시 sellwing.kr 도메인과 3.38.96.202 IP 주소를 기입해주세요.
                     </p>
                     <div class="form-group">
                         <label for="" class="form-label">업체코드</label>
