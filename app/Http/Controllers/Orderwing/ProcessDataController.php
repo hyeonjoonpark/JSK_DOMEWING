@@ -833,7 +833,7 @@ class ProcessDataController extends Controller
             'M' => 'address',
             'C' => 'productName',
             'F' => 'quantity',
-            'G' => 'productPrice',
+            'G' => 'amount',  // amount가 G열의 값
             'A' => 'orderCode',
             'N' => 'shippingRemark',
             'O' => 'productCode',
@@ -859,12 +859,16 @@ class ProcessDataController extends Controller
                 if (isset($columnMappings[$columnLetter])) {
                     // Extract value and convert it to UTF-8
                     $value = $cell->getValue();
-                    if ($columnMappings[$columnLetter] == 'productPrice' || $columnMappings[$columnLetter] == 'shippingCost' || $columnMappings[$columnLetter] == 'amount') {
+                    if ($columnMappings[$columnLetter] == 'amount' || $columnMappings[$columnLetter] == 'shippingCost') {
                         $value = preg_replace('/[^0-9]/', '', $value);
                     }
                     $rowData[$columnMappings[$columnLetter]] = $value;
                 }
             }
+
+            // Calculate productPrice
+            $rowData['productPrice'] = (int)$rowData['amount'] / (int)$rowData['quantity'];
+
             $productCode = $rowData['productCode'];
             $extractOrderController = new ExtractOrderController();
             $response = $extractOrderController->getProductHref($productCode);
@@ -881,7 +885,7 @@ class ProcessDataController extends Controller
             } else {
                 $rowData['productName'] .= ' = (품절 상품)';
             }
-            $rowData['amount'] = (int)$rowData['productPrice'] * (int)$rowData['quantity'] + (int)$rowData['shippingCost'];
+
             $rowData['orderStatus'] = '배송준비';
             $rowData['b2BName'] = "온채널";
             if (!empty($rowData)) {
@@ -893,6 +897,7 @@ class ProcessDataController extends Controller
         gc_collect_cycles();
         return $data;
     }
+
     public function funn($excelPath)
     {
         $spreadsheet = IOFactory::load($excelPath);
