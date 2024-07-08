@@ -24,7 +24,8 @@ class SmartStoreReturnController extends Controller
         }
         $allOrderDetails = [];
         foreach ($accounts as $account) {
-            $orderList = $this->getOrderList($account);
+            $orderList = $this->getReturnOrderList($account);
+            return $orderList;
             $orderIds = $this->getOrderIds($orderList);
             $orderDetails = $this->getOrderDetails($account, $orderIds);
             if (isset($orderDetails['error'])) {
@@ -34,21 +35,28 @@ class SmartStoreReturnController extends Controller
         }
         return  $allOrderDetails;
     }
-    private function getOrderList($account)
+    private function getReturnOrderList($account)
     {
         $contentType = 'application/json';
         $method = 'GET';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses';
         $startDate = new DateTime('now - 7 days');
         $endDate = new DateTime('now');
-        $responses = [];
+        $returnOrders = [];
         for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
             $formattedDate = $this->convertDateFormat($date->format('Y-m-d'));
             $data = ['lastChangedFrom' => $formattedDate];
             $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
-            $responses[$formattedDate] = $response;
+            $returnOrders[] = $response;
+            // if ($response['status']) {
+            //     foreach ($response['data']['data']['lastChangeStatuses'] as $status) {
+            //         if ($status['productOrderStatus'] === 'RETURNED') {
+            //             $returnOrders[$formattedDate][] = $status;
+            //         }
+            //     }
+            // }
         }
-        return $responses;
+        return $returnOrders;
     }
     private function convertDateFormat($inputDate)
     {
@@ -79,64 +87,18 @@ class SmartStoreReturnController extends Controller
         if (!isset($response['data']['data'])) {
             return ['error' => '응답 데이터가 올바르지 않습니다.'];
         }
-
-        if (isset($response['data']['data']['return'])) return $response['data']['data']['return'];
+        foreach ($response['data']['data'] as $item) {
+            if (isset($item['return'])) {
+                return $item['return'];
+            }
+        }
         return [];
-
-        // $statusMap = [
-        //     'CANCEL_REQUEST' => '취소 요청',
-        //     'CANCELING' => '취소 처리 중',
-        //     'CANCEL_DONE' => '취소 처리 완료',
-        //     'CANCEL_REJECT' => '취소 철회',
-        //     'RETURN_REQUEST' => '반품 요청',
-        //     'EXCHANGE_REQUEST' => '교환 요청',
-        //     'COLLECTING' => '수거 처리 중',
-        //     'COLLECT_DONE' => '수거 완료',
-        //     'EXCHANGE_REDELIVERING' => '교환 재배송 중',
-        //     'RETURN_DONE' => '반품 완료',
-        //     'EXCHANGE_DONE' => '교환 완료',
-        //     'RETURN_REJECT' => '반품 철회',
-        //     'EXCHANGE_REJECT' => '교환 철회',
-        //     'PURCHASE_DECISION_HOLDBACK' => '구매 확정 보류',
-        //     'PURCHASE_DECISION_REQUEST' => '구매 확정 요청',
-        //     'PURCHASE_DECISION_HOLDBACK_RELEASE' => '구매 확정 보류 해제',
-        //     'ADMIN_CANCELING' => '직권 취소 중',
-        //     'ADMIN_CANCEL_DONE' => '직권 취소 완료',
-        //     'ADMIN_CANCEL_REJECT' => '직권 취소 철회',
-        // ];
-        // $formattedResponse = array_map(function ($item) use ($statusMap, $account) {
-        //     $return = $item['return'] ?? null;
-        //     $accountId = $account->id;
-        //     return [
-        //         'market' => $item['order']['market'] ?? '스마트스토어',
-        //         'marketEngName' => 'smart_store',
-        //         'orderId' => $item['order']['orderId'] ?? 'N/A',
-        //         'productOrderId' => $item['productOrder']['productOrderId'] ?? 'N/A',
-        //         'orderName' => $item['order']['ordererName'] ?? 'N/A',
-        //         'productName' => $item['productOrder']['productName'] ?? 'N/A',
-        //         'quantity' => $item['productOrder']['quantity'] ?? 'N/A',
-        //         'unitPrice' => $item['productOrder']['unitPrice'] ?? 'N/A',
-        //         'totalPaymentAmount' => $item['productOrder']['totalPaymentAmount'] ?? 'N/A',
-        //         'deliveryFeeAmount' => $item['productOrder']['deliveryFeeAmount'] ?? 'N/A',
-        //         'productOrderStatus' => $statusMap[$item['return']['claimStatus']] ?? '상태 미정',
-        //         'orderDate' => isset($item['order']['orderDate']) ? (new DateTime($item['order']['orderDate']))->format('Y-m-d H:i:s') : 'N/A',
-        //         'receiverName' => $item['collectAddress']['name'] ?? 'N/A',
-        //         'receiverPhone' => $item['collectAddress']['tel1'] ?? 'N/A',
-        //         'postCode' => $item['collectAddress']['zipCode'] ?? 'N/A',
-        //         'address' => ($item['collectAddress']['baseAddress'] . ' ' . ($item['collectAddress']['detailedAddress'] ?? '')) ?? 'N/A',
-        //         'addressName' => '기본배송지',
-        //         'productCode' => $item['productOrder']['sellerProductCode'] ?? 'N/A',
-        //         'remark' => $item['productOrder']['shippingMemo'] ?? 'N/A',
-        //         'accountId' => $accountId
-
-        //     ];
-        // }, $response['data']['data']);
-        return $formattedResponse;
     }
     private function getAccounts() //id값주기
     {
         return DB::table('smart_store_accounts')
             // ->where('partner_id', $id)
+            ->where('partner_id', 13)
             ->where('is_active', 'ACTIVE')
             ->get();
     }
