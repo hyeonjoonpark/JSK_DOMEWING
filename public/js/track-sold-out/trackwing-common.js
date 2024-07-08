@@ -24,7 +24,7 @@ const signIn = async function (page, username, password, url, usernameSelector, 
         return false;
     }
     try {
-        await page.waitForNavigation({ waitUntil: 'load', timeout: 1000 });
+        await page.waitForNavigation({ waitUntil: 'load', timeout: 5000 });
     } catch (error) {
         return true;
     }

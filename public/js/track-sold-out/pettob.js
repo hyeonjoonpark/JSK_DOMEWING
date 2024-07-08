@@ -15,11 +15,6 @@ const { goToAttempts, signIn } = require('./trackwing-common');
         }
         const soldOutProductIds = []; //품절상품 담을 배열
         for (const product of products) { // 상품조회 반복
-            const goToAttemptsResult = await goToAttempts(page, product.productHref, 'domcontentloaded'); //페이지 접속 3번 시도
-            if (goToAttemptsResult === false) { // 3번 시도후 실패한다면
-                soldOutProductIds.push(product.id); //품절상품 배열에 상품id값을 담아버림
-                continue; // 그리고 종료.
-            }
             let dialogAppeared = false;
             page.once('dialog', async dialog => {
                 try {
@@ -28,6 +23,11 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                     dialogAppeared = true;
                 }
             });
+            const goToAttemptsResult = await goToAttempts(page, product.productHref, 'domcontentloaded'); //페이지 접속 3번 시도
+            if (goToAttemptsResult === false) { // 3번 시도후 실패한다면
+                soldOutProductIds.push(product.id); //품절상품 배열에 상품id값을 담아버림
+                continue; // 그리고 종료.
+            }
             const isValid = await validateProduct(page); // 유효상품 검사
             if (isValid === false || dialogAppeared === true) { // 유효하지 않을때
                 soldOutProductIds.push(product.id); // 품절상품 배열에 상품id값을 감아버림
