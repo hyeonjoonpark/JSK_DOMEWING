@@ -52,23 +52,25 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="nk-menu-item has-sub">
-                            <a href="#" class="nk-menu-link nk-menu-toggle">
-                                <span class="nk-menu-icon"><em class="icon fa-solid fa-file-excel"></em></span>
-                                <span class="nk-menu-text">엑셀윙</span>
-                            </a>
-                            <ul class="nk-menu-sub">
-                                <li class="nk-menu-item">
-                                    <a href="/partner/excelwing-download" class="nk-menu-link"><span
-                                            class="nk-menu-text">다운로드</span>
-                                    </a>
-                                </li>
-                                <li class="nk-menu-item">
-                                    <a href="/partner/excelwing-upload" class="nk-menu-link"><span
-                                            class="nk-menu-text">업로드</span></a>
-                                </li>
-                            </ul>
-                        </li>
+                        @if (Auth::guard('partner')->user()->partner_class_id === 4)
+                            <li class="nk-menu-item has-sub">
+                                <a href="#" class="nk-menu-link nk-menu-toggle">
+                                    <span class="nk-menu-icon"><em class="icon fa-solid fa-file-excel"></em></span>
+                                    <span class="nk-menu-text">엑셀윙</span>
+                                </a>
+                                <ul class="nk-menu-sub">
+                                    <li class="nk-menu-item">
+                                        <a href="/partner/excelwing-download" class="nk-menu-link"><span
+                                                class="nk-menu-text">다운로드</span>
+                                        </a>
+                                    </li>
+                                    <li class="nk-menu-item">
+                                        <a href="/partner/excelwing-upload" class="nk-menu-link"><span
+                                                class="nk-menu-text">업로드</span></a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endif
                         <li class="nk-menu-item">
                             <a href="/partner/open-market" class="nk-menu-link">
                                 <span class="nk-menu-icon"><em class="icon fa-solid fa-truck"></em></span>
