@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const { goToAttempts, scrollDown, signIn } = require('../common.js');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const [tempFilePath, username, password] = process.argv.slice(2);
     const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
@@ -122,8 +122,11 @@ async function getproductOptions(page) {
     return await page.evaluate(() => {
         const productOptionElements = document.querySelectorAll('optgroup option');
         const productOptions = Array.from(productOptionElements)
-            .map(poe => poe.textContent.trim())
-            .filter(option => !option.includes('품절'));
+            .map(poe => ({
+                optionName: poe.textContent.trim(),
+                optionPrice: 0
+            }))
+            .filter(option => !option.optionName.includes('품절'));
         if (productOptionElements.length > 0 && productOptions.length < 1) {
             return false;
         }
