@@ -256,16 +256,6 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
             Route::post('edit', [LotteOnAccountController::class, 'edit']);
             Route::post('delete', [LotteOnAccountController::class, 'delete']);
         });
-        Route::prefix('kakao-shopping')->group(function () {
-            Route::post('/', [KakaoShoppingAccountController::class, 'add']);
-            Route::post('edit', [KakaoShoppingAccountController::class, 'edit']);
-            Route::post('delete', [KakaoShoppingAccountController::class, 'delete']);
-        });
-        Route::prefix('tmon')->group(function () {
-            Route::post('/', [TMonAccountController::class, 'add']);
-            Route::post('edit', [TMonAccountController::class, 'edit']);
-            Route::post('delete', [TMonAccountController::class, 'delete']);
-        });
     });
     Route::prefix('product')->group(function () {
         Route::post('view', [ViewController::class, 'main']);
@@ -283,9 +273,11 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
         Route::post('read-all', [NotificationController::class, 'readAll']);
     });
     Route::post('open-market-orders', [OpenMarketOrderController::class, 'indexPartner']);
-    Route::prefix('excelwings')->group(function () {
-        Route::post('export', [PartnerExcelwingController::class, 'downloadExcel']);
-        Route::post('upload', [ExcelUploadController::class, 'uploadExcel']);
+    Route::middleware('godwings.api')->group(function () {
+        Route::prefix('excelwings')->group(function () {
+            Route::post('export', [PartnerExcelwingController::class, 'downloadExcel']);
+            Route::post('upload', [ExcelUploadController::class, 'uploadExcel']);
+        });
     });
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);

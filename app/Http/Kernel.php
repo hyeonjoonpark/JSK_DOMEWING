@@ -4,6 +4,8 @@ namespace App\Http;
 
 use App\Http\Middleware\AuthenticatePartner;
 use App\Http\Middleware\CustomAuthMiddleware;
+use App\Http\Middleware\GodwingApi;
+use App\Http\Middleware\Godwings;
 use App\Http\Middleware\MembersAuth;
 use App\Http\Middleware\PartnerApi;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -75,5 +77,7 @@ class Kernel extends HttpKernel
         'auth.members' => MembersAuth::class,
         'translation' => \App\Http\Middleware\Translation::class,
         'category' => \App\Http\Middleware\Category::class,
+        'godwings' => Godwings::class,
+        'godwings.api' => GodwingApi::class
     ];
 }
