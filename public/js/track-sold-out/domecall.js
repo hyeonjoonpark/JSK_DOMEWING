@@ -33,7 +33,7 @@ const { goToAttempts, signIn } = require('./trackwing-common');
                 soldOutProductIds.push(product.id);
                 continue;
             }
-            const isValid = await validateProduct(page, dialogAppeared);
+            const isValid = await validateProduct(page);
             if (isValid === false) {
                 soldOutProductIds.push(product.id);
             }
@@ -47,20 +47,39 @@ const { goToAttempts, signIn } = require('./trackwing-common');
     }
 })();
 
-async function validateProduct(page, dialogAppeared) {
+async function validateProduct(page) {
+    let dialogAppeared = false;
     try {
-        const isProductValid = await page.evaluate(() => {
-            const soldOutTextElement = document.querySelector('#frmView > div > div.btn > a');
-            if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('구매 불가')) {
-                return false;
+        page.once('dialog', async dialog => {
+            try {
+                await dialog.accept();
+            } catch (error) { } finally {
+                dialogAppeared = true;
             }
+        });
+        const isProductValid = await page.evaluate(() => {
+            // const soldOutTextElement = document.querySelector('#frmView > div > div.btn > a');
+            // if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('구매 불가')) {
+            //     return false;
+            // }
             const soldOutButton = document.querySelector('#frmView > div > div.btn > a.skinbtn.point2.btn-add-order');
             if (soldOutButton && soldOutButton.textContent.includes('바로 구매')) {
                 soldOutButton.click();
+                return true;
             }
             return true;
         });
-        return !dialogAppeared && isProductValid;
+        await Promise.race([
+            page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
+            new Promise(resolve => {
+                setTimeout(resolve, 5000);
+            })
+        ]);
+        if (dialogAppeared) {
+            return false;
+        }
+
+        return isProductValid;
     } catch (error) {
         return false;
     }

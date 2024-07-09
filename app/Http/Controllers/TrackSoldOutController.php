@@ -148,7 +148,7 @@ class TrackSoldOutController extends Controller
         $vendorId = $request->vendorId;
         $products = DB::table('minewing_products')
             ->where('sellerID', $vendorId)
-            ->whereBetween('id', [155309, 155330])
+            ->limit(1000)
             ->get([
                 'id',
                 'productHref',
