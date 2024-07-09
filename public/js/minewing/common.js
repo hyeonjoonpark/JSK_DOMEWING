@@ -1,3 +1,13 @@
+const axios = require('axios');
+
+const checkImageUrl = async (url) => {
+    try {
+        const response = await axios.head(url);
+        return response.status !== 404;
+    } catch (error) {
+        return false;
+    }
+};
 const goToAttempts = async (page, url, waitUntil, attempt = 0, maxAttempts = 3) => {
     if (attempt >= maxAttempts) {
         return false;
@@ -52,4 +62,6 @@ const scrollDown = async (page) => {
         }
     });
 }
-module.exports = { goToAttempts, scrollDown, signIn };
+
+module.exports = { goToAttempts, scrollDown, signIn, checkImageUrl };
+
