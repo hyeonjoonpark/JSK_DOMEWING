@@ -136,7 +136,10 @@ async function getproductOptions(page) {
     return await page.evaluate(() => {
         const productOptionElements = document.querySelectorAll('#product_option_id1 option');
         const productOptions = Array.from(productOptionElements)
-            .map(poe => poe.textContent.trim())
+            .map(poe => ({
+                optionName: poe.textContent.trim(),
+                optionPrice: 0
+            }))
             .filter(option => !option.includes('품절') && !option.includes('필수') && !option.includes('-------------------'));
         if (productOptionElements.length > 0 && productOptions.length < 1) {
             return false;
