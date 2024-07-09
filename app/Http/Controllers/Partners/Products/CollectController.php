@@ -42,10 +42,7 @@ class CollectController extends Controller
             ->where('mp.isActive', 'Y')
             ->whereNot('categoryID', null)
             ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'mp.shipping_fee', 'oc.name');
-        $isGodwing = [0];
-        if (Auth::guard('partner')->user()->partner_class_id === 4) {
-            $isGodwing[] = 1;
-        }
+        $isGodwing = Auth::guard('partner')->user()->partner_class_id === 4 ? [0, 1] : [0];
         $query = $query->whereIn('v.is_godwing', $isGodwing);
         if ($searchKeyword) {
             $query->where(function ($query) use ($searchKeyword) {
