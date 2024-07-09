@@ -73,13 +73,18 @@ class ExtractOrderController extends Controller
 
     private function getUploadedProductHref($productCode)
     {
-        return DB::table('uploaded_products AS up')
+        $product = DB::table('uploaded_products AS up')
             ->join('collected_products AS cp', 'up.productId', '=', 'cp.id')
             ->where('up.isActive', 'Y')
             ->where('up.productId', $productCode)
-            ->select('cp.productHref AS productHref', 'up.newImageHref AS productImage')
+            ->select('cp.productHref AS productHref', 'up.newImageHref AS productImage', 'up.newProductName as productName')
             ->first();
+        if ($product && str_contains($product->productName, '여명')) {
+            return null;
+        }
+        return $product;
     }
+
 
     public function extractExcelData($excelPath, $b2BEngName)
     {
