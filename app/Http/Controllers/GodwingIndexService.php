@@ -5,15 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class NalmeokProductCreateController extends Controller
+class GodwingIndexService extends Controller
 {
     public function main()
     {
         $vendors = DB::table('vendors')
-            ->where('type', 'B2B')
             ->where('is_active', 'ACTIVE')
-            ->get(['id', 'name']);
-        return view('admin/nalmeok_product_create', [
+            ->whereIn('type', ['SELLER', 'B2B'])
+            ->get();
+        return view('admin.godwing_index', [
             'vendors' => $vendors
         ]);
     }

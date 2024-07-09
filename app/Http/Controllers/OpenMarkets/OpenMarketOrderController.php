@@ -738,7 +738,6 @@ class OpenMarketOrderController extends Controller
     {
         return DB::table('smart_store_uploaded_products')
             ->where('product_id', $productId)
-            // ->where('is_active', 'Y')
             ->select('id')
             ->first();
     }
@@ -746,7 +745,6 @@ class OpenMarketOrderController extends Controller
     {
         return DB::table('coupang_uploaded_products')
             ->where('product_id', $productId)
-            // ->where('is_active', 'Y')
             ->select('id')
             ->first();
     }
@@ -754,7 +752,6 @@ class OpenMarketOrderController extends Controller
     {
         return DB::table('st11_uploaded_products')
             ->where('product_id', $productId)
-            // ->where('is_active', 'Y')
             ->select('id')
             ->first();
     }

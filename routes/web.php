@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DomainController;
 use App\Http\Controllers\Admin\PartnersManagementController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\GodwingController;
 use App\Http\Controllers\NalmeokProductController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\AccountManagementController;
@@ -63,8 +64,11 @@ Route::prefix('partner')->group(function () {
             Route::get('sale', [UploadedController::class, 'index'])->name('partner.products.uploaded');
         });
         Route::get('open-market', [PartnerController::class, 'partnerOpenMarket']);
-        Route::get('excelwing-download', [PartnerController::class, 'excelwing']);
-        Route::get('excelwing-upload', [PartnerController::class, 'excelUploadIndex']);
+        // 셀윙 파트너스 갓윙
+        Route::middleware('godwings')->group(function () {
+            Route::get('excelwing-download', [PartnerController::class, 'excelwing']);
+            Route::get('excelwing-upload', [PartnerController::class, 'excelUploadIndex']);
+        });
     });
 });
 // 셀윙 관리자 패널.
@@ -103,14 +107,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cms_dashboard/content_management_system/{id}', [DomainController::class, 'loadCMS']);
     Route::get('/cms/{id}', [CMSController::class, 'loadSellerCMS']);
     Route::get('contact-us', [ContactUsController::class, 'index']);
-    // 날먹윙
-    Route::prefix('nalmeokwing')->group(function () {
-        Route::get('/', [NalmeokProductController::class, 'index']);
-        Route::get('index', [NalmeokProductController::class, 'index']);
-        Route::get('create', [NalmeokProductController::class, 'create']);
-    });
     // 갓윙
     Route::prefix('godwing')->group(function () {
+        Route::get('index', [GodwingController::class, 'index']);
     });
 });
 // ?? 뭐야 씨발

@@ -122,8 +122,11 @@ async function getproductOptions(page) {
     return await page.evaluate(() => {
         const productOptionElements = document.querySelectorAll('optgroup option');
         const productOptions = Array.from(productOptionElements)
-            .map(poe => poe.textContent.trim())
-            .filter(option => !option.includes('품절'));
+            .map(poe => ({
+                optionName: poe.textContent.trim(),
+                optionPrice: 0
+            }))
+            .filter(option => !option.optionName.includes('품절'));
         if (productOptionElements.length > 0 && productOptions.length < 1) {
             return false;
         }

@@ -49,6 +49,7 @@ use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\GodwingController;
 use App\Http\Controllers\NalmeokProductController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\NotificationController;
@@ -215,11 +216,10 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('top-6-member-sales', [AdminDashboardController::class, 'getTop6MemberSales']);
         Route::get('top-vendors', [AdminDashboardController::class, 'getTopVendors']);
     });
-
     Route::post('trackwing', [TrackSoldOutController::class, 'main'])->name('trackwing');
-    // 날먹윙
-    Route::prefix('nalmeokwing')->group(function () {
-        Route::post('store', [NalmeokProductController::class, 'store']);
+    Route::prefix('godwing')->group(function () {
+        Route::post('update', [GodwingController::class, 'update']);
+        Route::delete('destroy/{vendorId}', [GodwingController::class, 'destroy']);
     });
 });
 
@@ -256,16 +256,6 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
             Route::post('edit', [LotteOnAccountController::class, 'edit']);
             Route::post('delete', [LotteOnAccountController::class, 'delete']);
         });
-        Route::prefix('kakao-shopping')->group(function () {
-            Route::post('/', [KakaoShoppingAccountController::class, 'add']);
-            Route::post('edit', [KakaoShoppingAccountController::class, 'edit']);
-            Route::post('delete', [KakaoShoppingAccountController::class, 'delete']);
-        });
-        Route::prefix('tmon')->group(function () {
-            Route::post('/', [TMonAccountController::class, 'add']);
-            Route::post('edit', [TMonAccountController::class, 'edit']);
-            Route::post('delete', [TMonAccountController::class, 'delete']);
-        });
     });
     Route::prefix('product')->group(function () {
         Route::post('view', [ViewController::class, 'main']);
@@ -283,9 +273,11 @@ Route::prefix('partner')->middleware('auth.partner.api')->group(function () {
         Route::post('read-all', [NotificationController::class, 'readAll']);
     });
     Route::post('open-market-orders', [OpenMarketOrderController::class, 'indexPartner']);
-    Route::prefix('excelwings')->group(function () {
-        Route::post('export', [PartnerExcelwingController::class, 'downloadExcel']);
-        Route::post('upload', [ExcelUploadController::class, 'uploadExcel']);
+    Route::middleware('godwings.api')->group(function () {
+        Route::prefix('excelwings')->group(function () {
+            Route::post('export', [PartnerExcelwingController::class, 'downloadExcel']);
+            Route::post('upload', [ExcelUploadController::class, 'uploadExcel']);
+        });
     });
 });
 Route::post('submit-contact-us', [BusinessPageController::class, 'submitContactUs']);
