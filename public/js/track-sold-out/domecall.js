@@ -4,7 +4,7 @@ const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
