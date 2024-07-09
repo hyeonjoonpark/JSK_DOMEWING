@@ -4,7 +4,7 @@ const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setViewport({
         width: 1920,
@@ -58,10 +58,10 @@ async function validateProduct(page) {
             }
         });
         const isProductValid = await page.evaluate(() => {
-            // const soldOutTextElement = document.querySelector('#frmView > div > div.btn > a');
-            // if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('구매 불가')) {
-            //     return false;
-            // }
+            const soldOutTextElement = document.querySelector('#frmView > div > div.btn > a');
+            if (soldOutTextElement && soldOutTextElement.textContent.trim().includes('구매 불가')) {
+                return false;
+            }
             const soldOutButton = document.querySelector('#frmView > div > div.btn > a.skinbtn.point2.btn-add-order');
             if (soldOutButton && soldOutButton.textContent.includes('바로 구매')) {
                 soldOutButton.click();
@@ -78,7 +78,6 @@ async function validateProduct(page) {
         if (dialogAppeared) {
             return false;
         }
-
         return isProductValid;
     } catch (error) {
         return false;
