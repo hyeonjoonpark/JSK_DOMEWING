@@ -38,10 +38,15 @@ class CollectController extends Controller
 
         $query = DB::table('minewing_products AS mp')
             ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
+            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->where('mp.isActive', 'Y')
             ->whereNot('categoryID', null)
             ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'mp.shipping_fee', 'oc.name');
-
+        $isGodwing = 0;
+        if (Auth::guard('partner')->user()->partner_class_id === 4) {
+            $isGodwing = 1;
+        }
+        $query = $query->where('v.is_godwing', $isGodwing);
         if ($searchKeyword) {
             $query->where(function ($query) use ($searchKeyword) {
                 $query->where('mp.productName', 'like', "%$searchKeyword%")

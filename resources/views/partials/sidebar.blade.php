@@ -135,6 +135,11 @@
                                             class="nk-menu-text">업체 별 환경설정</span></a>
                                 </li>
                                 <li class="nk-menu-item">
+                                    <a href="/admin/godwing/index" class="nk-menu-link">
+                                        <span class="nk-menu-text">갓윙 환경설정</span>
+                                    </a>
+                                </li>
+                                <li class="nk-menu-item">
                                     <a href="/admin/edit-testmonials" class="nk-menu-link"><span
                                             class="nk-menu-text">제품후기</span></a>
                                 </li>

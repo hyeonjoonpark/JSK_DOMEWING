@@ -49,6 +49,7 @@ use App\Http\Controllers\Productwing\SoldOutController;
 
 use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\GodwingController;
 use App\Http\Controllers\NalmeokProductController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\NotificationController;
@@ -215,11 +216,10 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('top-6-member-sales', [AdminDashboardController::class, 'getTop6MemberSales']);
         Route::get('top-vendors', [AdminDashboardController::class, 'getTopVendors']);
     });
-
     Route::post('trackwing', [TrackSoldOutController::class, 'main'])->name('trackwing');
-    // 날먹윙
-    Route::prefix('nalmeokwing')->group(function () {
-        Route::post('store', [NalmeokProductController::class, 'store']);
+    Route::prefix('godwing')->group(function () {
+        Route::post('update', [GodwingController::class, 'update']);
+        Route::delete('destroy/{vendorId}', [GodwingController::class, 'destroy']);
     });
 });
 
