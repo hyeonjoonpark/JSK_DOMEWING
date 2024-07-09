@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const { goToAttempts, signIn, checkImageUrl } = require('../common.js');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     await page.setDefaultNavigationTimeout(0);
@@ -140,7 +140,11 @@ async function getproductOptions(page) {
                 optionName: poe.textContent.trim(),
                 optionPrice: 0
             }))
-            .filter(option => !option.includes('품절') && !option.includes('필수') && !option.includes('-------------------'));
+            .filter(option =>
+                !option.optionName.includes('품절') &&
+                !option.optionName.includes('필수') &&
+                !option.optionName.includes('-------------------')
+            );
         if (productOptionElements.length > 0 && productOptions.length < 1) {
             return false;
         }
