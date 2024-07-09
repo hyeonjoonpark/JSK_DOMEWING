@@ -44,7 +44,6 @@ class PartnerController extends Controller
                     ->orWhere('v.id', '=', 64);
             })
             ->get();
-
         return view('partner/excel_export', [
             'b2Bs' => $b2Bs,
             'sellers' => $sellers
@@ -73,7 +72,7 @@ class PartnerController extends Controller
     }
     public function excelUploadIndex()
     {
-        $partnerId = Auth::guard('partner')->id();
+        $partnerId = Auth::guard('partner')->id(); //갓윙 미들웨어 적용되면 삭제예정
         // 연동된 도매윙 계정이 있는지 검사.
         $hasSync = DB::table('partner_domewing_accounts')
             ->where('partner_id', $partnerId)
