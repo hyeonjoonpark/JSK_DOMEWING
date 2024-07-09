@@ -39,10 +39,7 @@ class PartnerController extends Controller
             ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
             ->where('ps.is_active', 'Y')
             ->where('v.is_active', 'ACTIVE')
-            ->where(function ($query) {
-                $query->where('ps.id', '<=', 43)
-                    ->orWhere('v.id', '=', 64);
-            })
+            ->where('v.is_godwing', 0)
             ->get();
         return view('partner/excel_export', [
             'b2Bs' => $b2Bs,
