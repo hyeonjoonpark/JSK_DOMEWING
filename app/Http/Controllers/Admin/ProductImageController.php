@@ -19,10 +19,10 @@ class ProductImageController extends Controller
 
     function index($imageUrl, $hasWatermark)
     {
-        $newWidth = 1000;
-        $newHeight = 1000;
-        $savePath = public_path('images/CDN/product/'); // 경로 수정
         try {
+            $newWidth = 1000;
+            $newHeight = 1000;
+            $savePath = public_path('images/CDN/product/'); // 경로 수정
             $image = Image::make($imageUrl)->resize($newWidth, $newHeight);
 
             $path = parse_url($imageUrl, PHP_URL_PATH);
@@ -41,7 +41,6 @@ class ProductImageController extends Controller
                 'return' => "https://www.sellwing.kr/images/CDN/product/" . $newImageName
             ];
         } catch (Exception $e) {
-            error_log("Error processing image: " . $e->getMessage());
             return [
                 'status' => false,
                 'return' => $e->getMessage()
@@ -138,7 +137,7 @@ class ProductImageController extends Controller
     {
         $hostedImages = array_map(fn ($url) => $this->saveImageAndGetNewUrl($url), $imageUrls);
         // 에러가 발생한 이미지를 필터링하여 제거
-        return array_filter($hostedImages, fn ($url) => $url !== null);
+        return array_filter($hostedImages, fn ($result) => $result['status'] === true);
     }
     public function saveImageAndGetNewUrl($url)
     {
@@ -167,9 +166,15 @@ class ProductImageController extends Controller
             }
 
             // 새 이미지 URL 반환
-            return 'https://www.sellwing.kr/images/CDN/detail/' . $img;
+            return [
+                'status' => true,
+                'data' => 'https://www.sellwing.kr/images/CDN/detail/' . $img
+            ];
         } catch (Exception $e) {
-            return $e->getMessage();
+            return [
+                'status' => false,
+                'error' => $e->getMessage()
+            ];
         }
     }
     protected function encodeUrl($url)

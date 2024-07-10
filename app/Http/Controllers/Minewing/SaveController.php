@@ -59,7 +59,11 @@ class SaveController extends Controller
             } else {
                 $productImageSrc = $product['productImage'];
             }
-            $productImage = $productImageController->index($productImageSrc, $hasWatermark)['return'];
+            $productImage = $productImageController->index($productImageSrc, $hasWatermark);
+            if (!$productImage['status']) {
+                continue;
+            }
+            $productImage = $productImage['return'];
             $headerImage = DB::table('product_search')
                 ->where('vendor_id', $product['sellerID'])
                 ->select('header_image')
@@ -68,7 +72,7 @@ class SaveController extends Controller
             if (isset($product['productDetail'])) {
                 $productDetail = $productImageController->processImages($product['productDetail'], $headerImage);
             } else {
-                $productDetail = '<center><img src="https://www.sellwing.kr/images/CDN/' . $headerImage . '"></center>';
+                continue;
             }
             $productPrice = (int)$product['productPrice'];
             $productHref = $product['productHref'];
