@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const checkProductName = async (productName) => {
-    const testForbiddenWord = [
+    const forbiddenword = [
         '온라인',
         '금지',
         '최소',
@@ -24,11 +24,16 @@ const checkProductName = async (productName) => {
         '본사',
         '공급'
     ].filter(forbiddenword => productName.includes(forbiddenword));
-    return testForbiddenWord.length > 0 ? false : true;
+    return forbiddenword.length > 0 ? false : true;
 };
-const trimProductNameBrackets = async (productName) => {
-    const bracketProduct = productName.replace(/\[[^\]]*\]/g, '');
-    return bracketProduct.replace(/\s+/g, ' ').trim();
+const formatProductName = async (productName) => {
+    const formattedProductName = productName.replace(/_[A-Z0-9]+/, '');
+
+    if (!formattedProductName) {
+        return false;
+    }
+
+    return formattedProductName;
 }
 const trimProductCodes = async (productName) => {
     //sample could be "Castelbajac Women's Golf (Short) 4-Pair_CSW-127"
@@ -109,5 +114,5 @@ const scrollDown = async (page) => {
     });
 }
 
-module.exports = { goToAttempts, scrollDown, signIn, checkImageUrl, checkProductName, trimProductNameBrackets, trimProductCodes };
+module.exports = { goToAttempts, scrollDown, signIn, checkImageUrl, checkProductName, formatProductName, trimProductCodes };
 

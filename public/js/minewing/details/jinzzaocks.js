@@ -1,6 +1,6 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, checkImageUrl, checkProductName } = require('../common.js');
+const { goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName } = require('../common.js');
 
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
@@ -84,12 +84,16 @@ async function getProductName(page) {
         return productNameElement.textContent.trim();
     });
 
+    if (!productName) {
+        return false;
+    }
+
     const validProductName = await checkProductName(productName);
     if (!validProductName) {
         return false;
     }
 
-    return productName;
+    return await formatProductName(productName);
 }
 async function getproductPrice(page) {
     return await page.evaluate(() => {

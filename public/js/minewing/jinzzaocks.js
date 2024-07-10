@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, checkImageUrl, checkProductName } = require('./common.js');
+const { goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName } = require('./common.js');
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -19,6 +19,7 @@ const { goToAttempts, signIn, checkImageUrl, checkProductName } = require('./com
                 const isValidImage = await checkImageUrl(product.image);
                 const isValidProduct = await checkProductName(product.name);
                 if (isValidImage && isValidProduct) {
+                    product.name = await formatProductName(product.name);
                     products.push(product);
                 }
             }
