@@ -1,63 +1,47 @@
-
 const puppeteer = require('puppeteer');
-const { scrollDown, goToAttempts, signIn } = require('./common.js');
+const { goToAttempts, signIn, checkImageUrl } = require('./common.js');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false, args: ['--start-maximized'] });
-    const page = await browser.newPage();
-    await page.setViewport({ 'width': 1900, 'height': 1080 });
-    const [listUrl, username, password] = process.argv.slice(2);
-    await page.setDefaultNavigationTimeout(0);
-    const products = [];
-    let exitType = 0;
-    let errMsg = 'Error occurred';
-    try {
-        await signIn(page, username, password, 'https://goodsdeco.com/member/login.php', '#loginId', '#loginPwd', '#formLogin > div.member_login_box > div.login_input_sec > button');
-        await goToAttempts(page, listUrl, 'domcontentloaded');
-        if (listUrl.match(/page=(\d+)/)) {
-            await goToAttempts(page, listUrl, 'domcontentloaded');
-            const listProducts = await getListProducts(page);
-            products.push(...listProducts);
-        } else {
 
-            const lastPageNumber = await getLastPageNumber(page);
-            for (let i = lastPageNumber; i > 0; i--) {
-                await goToAttempts(page, listUrl + '&page=' + i, 'domcontentloaded');
-                const listProducts = await getListProducts(page);
-                products.push(...listProducts);
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.setViewport({ 'width': 1500, 'height': 1000 });
+    const [listUrl, username, password] = process.argv.slice(2);
+
+    await page.setDefaultNavigationTimeout(0);
+
+    try {
+        await signIn(page, username, password, 'https://goodsdeco.com/member/login.php', '#loginId', '#loginPwd', 'div.login_input_sec > button');
+        await goToAttempts(page, listUrl, 'domcontentloaded');
+
+        const totalProducts = await getNumPage(page);
+        await goToAttempts(page, listUrl + '&pageNum=' + totalProducts, 'domcontentloaded');
+
+        const products = [];
+        const listProducts = await getListProducts(page);
+        for (const product of listProducts) {
+            const isValidImage = await checkImageUrl(product.image);
+            if (isValidImage) {
+                products.push(product);
             }
         }
+
+        console.log(JSON.stringify(products));
     } catch (error) {
-        exitType = 1;
-        errMsg = error;
+        console.error(error);
     } finally {
-        if (exitType === 0) {
-            console.log(JSON.stringify(products));
-        } else if (exitType === 1) {
-            if (products.length > 0) {
-                console.log(JSON.stringify(products));
-            } else {
-                console.error(errMsg);
-            }
-        }
-        process.exit(exitType)
+        await browser.close();
     }
 })();
-async function getLastPageNumber(page) {
-
-    const lastPageNumber = await page.evaluate(() => {
-        const lastPageUrl = document.querySelector('li.btn_page.btn_page_last > a').getAttribute('href');
-
-        let match = lastPageUrl.match(/page=(\d+)/);
-        if (match[1] !== undefined) {
-            pageValue = match[1];
-        }
-        return pageValue;
+async function getNumPage(page) {
+    return await page.evaluate(() => {
+        const numProductsText = document.querySelector('div.goods_pick_list > span > strong').textContent.trim();
+        const numProducts = parseInt(numProductsText.replace(/[^\d]/g, ''));
+        return numProducts;
     });
-    return lastPageNumber ? parseInt(lastPageNumber) : 1;
 }
 async function getListProducts(page) {
     const products = await page.evaluate(() => {
-        const productElements = document.querySelectorAll('div.goods_list_item > div.goods_list > div > div.item_basket_type > ul > li');
+        const productElements = document.querySelectorAll('div.item_basket_type > ul > li');
         const products = [];
         for (const pe of productElements) {
             const product = buildProduct(pe);
@@ -66,7 +50,11 @@ async function getListProducts(page) {
             }
         }
         function buildProduct(pe) {
-            const nameElement = pe.querySelector('li > div > div.item_info_cont > div.item_tit_box > a > strong');
+            const isSoldOut = Array.from(pe.querySelectorAll('div.item_icon_box > img')).some(img => img.src === 'https://cdn-pro-web-250-83.cdn-nhncommerce.com/gdeco8066_godomall_com/data/icon/goods_icon/icon_soldout.gif');
+            if (isSoldOut) {
+                return false;
+            }
+            const nameElement = pe.querySelector('div.item_tit_box > a > strong');
             if (!nameElement) {
                 return false;
             }
@@ -89,8 +77,7 @@ async function getListProducts(page) {
             }
             const name = nameElement.textContent.trim();
             const image = imageElement.src;
-            let href = 'https://goodsdeco.com' + hrefElement.getAttribute('href');
-            href = href.replace('.com..', '.com');
+            let href = 'https://goodsdeco.com/' + hrefElement.getAttribute('href');
             const platform = '굿즈데코';
             return { name, price, image, href, platform };
         }

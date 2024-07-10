@@ -1,9 +1,9 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, checkImageUrl } = require('../common.js');
+const { goToAttempts, signIn, checkImageUrl, checkProductName } = require('../common.js');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     await page.setDefaultNavigationTimeout(0);
@@ -76,13 +76,20 @@ async function isValid(page) {
     });
 }
 async function getProductName(page) {
-    return await page.evaluate(() => {
+    const productName = await page.evaluate(() => {
         const productNameElement = document.querySelector('div.xans-element-.xans-product.xans-product-detaildesign > table > tbody > tr:nth-child(1) > td > span');
         if (!productNameElement) {
             return false;
         }
         return productNameElement.textContent.trim();
     });
+
+    const validProductName = await checkProductName(productName);
+    if (!validProductName) {
+        return false;
+    }
+
+    return productName;
 }
 async function getproductPrice(page) {
     return await page.evaluate(() => {
@@ -91,7 +98,7 @@ async function getproductPrice(page) {
         if (!productPriceElement && !salePriceElement) {
             return false;
         }
-        const price = productPriceElement || salePriceElement;
+        const price = salePriceElement || productPriceElement;
 
         return price.textContent.replace(/[^0-9]/g, '').trim();
     });
@@ -140,11 +147,7 @@ async function getproductOptions(page) {
                 optionName: poe.textContent.trim(),
                 optionPrice: 0
             }))
-            .filter(option =>
-                !option.optionName.includes('품절') &&
-                !option.optionName.includes('필수') &&
-                !option.optionName.includes('-------------------')
-            );
+            .filter(option => !option.optionName.includes('품절') && !option.optionName.includes('필수') && !option.optionName.includes('-------------------'));
         if (productOptionElements.length > 0 && productOptions.length < 1) {
             return false;
         }

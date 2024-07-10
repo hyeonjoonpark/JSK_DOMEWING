@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, checkImageUrl } = require('./common.js');
+const { goToAttempts, signIn, checkImageUrl, checkProductName } = require('./common.js');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const [listUrl, username, password] = process.argv.slice(2);
 
@@ -17,7 +17,8 @@ const { goToAttempts, signIn, checkImageUrl } = require('./common.js');
             const listProducts = await getListProducts(page);
             for (const product of listProducts) {
                 const isValidImage = await checkImageUrl(product.image);
-                if (isValidImage) {
+                const isValidProduct = await checkProductName(product.name);
+                if (isValidImage && isValidProduct) {
                     products.push(product);
                 }
             }
@@ -79,7 +80,7 @@ async function getListProducts(page) {
                 return false;
             }
 
-            const price = originalPrice || salePrice;
+            const price = salePrice || originalPrice;
 
             const imageElement = pe.querySelector('img.thumb')
             if (!imageElement) {
@@ -94,7 +95,6 @@ async function getListProducts(page) {
             const href = 'https://jinzzaocks.net/' + hrefElement.getAttribute('href');
             const platform = '샵엔샵몰';
             return { name, price, image, href, platform };
-
         }
         return products;
     });
