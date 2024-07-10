@@ -1,6 +1,6 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, checkImageUrl, checkProductName } = require('../common.js');
+const { goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName } = require('../common.js');
 
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
@@ -84,23 +84,25 @@ async function getProductName(page) {
         return productNameElement.textContent.trim();
     });
 
+    if (!productName) {
+        return false;
+    }
+
     const validProductName = await checkProductName(productName);
     if (!validProductName) {
         return false;
     }
 
-    return productName;
+    return await formatProductName(productName);
 }
 async function getproductPrice(page) {
     return await page.evaluate(() => {
-        const productPriceElement = document.querySelector('#span_product_price_custom');
-        const salePriceElement = document.querySelector('#span_product_price_text');
-        if (!productPriceElement && !salePriceElement) {
+        const productPriceElement = document.querySelector('#span_product_price_text');
+        if (!productPriceElement) {
             return false;
         }
-        const price = salePriceElement || productPriceElement;
 
-        return price.textContent.replace(/[^0-9]/g, '').trim();
+        return productPriceElement.textContent.replace(/[^0-9]/g, '').trim();
     });
 }
 async function getproductImage(page) {

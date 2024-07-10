@@ -1,0 +1,13 @@
+@extends('layouts.main')
+@section('title')
+    제목
+@endsection
+@section('subtitle')
+    <p>
+        부제목
+    </p>
+@endsection
+@section('content')
+@endsection
+@section('scripts')
+@endsection

@@ -14,6 +14,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\GodwingController;
 use App\Http\Controllers\NalmeokProductController;
+use App\Http\Controllers\Nalmeokwings\NalmeokwingController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\OpenMarkets\AccountManagementController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
@@ -107,6 +108,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/cms_dashboard/content_management_system/{id}', [DomainController::class, 'loadCMS']);
     Route::get('/cms/{id}', [CMSController::class, 'loadSellerCMS']);
     Route::get('contact-us', [ContactUsController::class, 'index']);
+    // 날먹윙
+    Route::prefix('nalmeokwing')->group(function () {
+        Route::get('create', [NalmeokwingController::class, 'create']);
+    });
     // 갓윙
     Route::prefix('godwing')->group(function () {
         Route::get('index', [GodwingController::class, 'index']);
