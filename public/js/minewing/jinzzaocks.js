@@ -60,27 +60,16 @@ async function getListProducts(page) {
                 return false;
             }
 
-            // Get the original price element
-            const originalPriceElement = pe.querySelector('li[rel="소비자가"] span[style="font-size:12px;color:#555555;text-decoration:line-through;"]');
-            var originalPrice = null;
-            if (originalPriceElement) {
-                let originalPriceText = originalPriceElement.textContent.trim();
-                originalPrice = parseInt(originalPriceText.replace(/[^0-9]/g, '').trim());
+            const priceElements = pe.querySelectorAll('li[rel="판매가"] span[style="font-size:12px;color:#ff3333;font-weight:bold;"]');
+            let priceText = '';
+            for (const priceElement of priceElements) {
+                priceText += priceElement.textContent.trim();
             }
 
-            // Get the sale price element
-            const salePriceElements = pe.querySelectorAll('li[rel="판매가"] span[style="font-size:12px;color:#ff3333;font-weight:bold;"]');
-            let salePriceText = '';
-            for (const salePriceElement of salePriceElements) {
-                salePriceText += salePriceElement.textContent.trim();
-            }
-            const salePrice = parseInt(salePriceText.replace(/[^0-9]/g, '').trim());
-
-            if (!originalPrice && !salePrice) {
+            const price = parseInt(priceText.replace(/[^0-9]/g, '').trim());
+            if (!price) {
                 return false;
             }
-
-            const price = salePrice || originalPrice;
 
             const imageElement = pe.querySelector('img.thumb')
             if (!imageElement) {

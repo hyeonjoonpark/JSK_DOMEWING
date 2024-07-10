@@ -1,5 +1,51 @@
 const axios = require('axios');
 
+const checkProductName = async (productName) => {
+    const testForbiddenWord = [
+        '온라인',
+        '금지',
+        '최소',
+        '준수',
+        '특가',
+        '불가',
+        '삭제',
+        '대량',
+        '박스',
+        '해외',
+        '직구',
+        '대행',
+        '업체',
+        '오프라인',
+        '매장',
+        '주문',
+        '재고',
+        '할인',
+        '세일',
+        '본사',
+        '공급'
+    ].filter(forbiddenword => productName.includes(forbiddenword));
+    return testForbiddenWord.length > 0 ? false : true;
+};
+const trimProductNameBrackets = async (productName) => {
+    const bracketProduct = productName.replace(/\[[^\]]*\]/g, '');
+    return bracketProduct.replace(/\s+/g, ' ').trim();
+}
+const trimProductCodes = async (productName) => {
+    //sample could be "Castelbajac Women's Golf (Short) 4-Pair_CSW-127"
+    const splitProductName = productName.split(' ');
+    const productCodesGetString = splitProductName[splitProductName.length - 1];
+
+    const productCodeRegex = /([A-Z0-9]+-[\d]+)$/;
+    let match = productCodesGetString.match(productCodeRegex);
+    if (match) {
+        splitProductName.pop();
+        return splitProductName.join(' ') + ' ' + productCodesGetString.replace(match[0], '').replace('_', '');
+        // Castelbajac Women's Golf (Short) 4-Pair
+    }
+    return productName; // if no match of product codes then return original.
+}
+
+
 const checkImageUrl = async (url) => {
     try {
         const response = await axios.head(url);
@@ -63,5 +109,5 @@ const scrollDown = async (page) => {
     });
 }
 
-module.exports = { goToAttempts, scrollDown, signIn, checkImageUrl };
+module.exports = { goToAttempts, scrollDown, signIn, checkImageUrl, checkProductName, trimProductNameBrackets, trimProductCodes };
 

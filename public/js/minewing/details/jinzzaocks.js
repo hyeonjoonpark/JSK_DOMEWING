@@ -93,14 +93,12 @@ async function getProductName(page) {
 }
 async function getproductPrice(page) {
     return await page.evaluate(() => {
-        const productPriceElement = document.querySelector('#span_product_price_custom');
-        const salePriceElement = document.querySelector('#span_product_price_text');
-        if (!productPriceElement && !salePriceElement) {
+        const productPriceElement = document.querySelector('#span_product_price_text');
+        if (!productPriceElement) {
             return false;
         }
-        const price = salePriceElement || productPriceElement;
 
-        return price.textContent.replace(/[^0-9]/g, '').trim();
+        return productPriceElement.textContent.replace(/[^0-9]/g, '').trim();
     });
 }
 async function getproductImage(page) {
