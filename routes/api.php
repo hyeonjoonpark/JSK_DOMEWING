@@ -51,6 +51,7 @@ use App\Http\Controllers\BusinessPageController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\GodwingController;
 use App\Http\Controllers\NalmeokProductController;
+use App\Http\Controllers\Nalmeokwings\NalmeokwingController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
@@ -220,6 +221,9 @@ Route::middleware(['auth.custom'])->group(function () {
     Route::prefix('godwing')->group(function () {
         Route::post('update', [GodwingController::class, 'update']);
         Route::delete('destroy/{vendorId}', [GodwingController::class, 'destroy']);
+    });
+    Route::prefix('nalmeokwing')->group(function () {
+        Route::post('store', [NalmeokwingController::class, 'store']);
     });
 });
 
