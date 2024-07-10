@@ -1,48 +1,41 @@
-
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, scrollDown } = require('../common.js');
+const { goToAttempts, signIn, checkImageUrl } = require('../common.js');
+
 (async () => {
-    const browser = await puppeteer.launch({ headless: false, args: ['--start-maximized'] });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.setViewport({ 'width': 1900, 'height': 1080 });
-    let [tempFilePath, username, password] = process.argv.slice(2);
+
     await page.setDefaultNavigationTimeout(0);
+    await page.setViewport({ 'width': 1500, 'height': 1000 });
+    await page.setDefaultNavigationTimeout(0);
+    const [tempFilePath, username, password] = process.argv.slice(2);
+
+
     const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-    const products = [];
-    let exitType = 0;
     try {
-        await signIn(page, username, password, 'https://goodsdeco.com/member/login.php', '#loginId', '#loginPwd', '#formLogin > div.member_login_box > div.login_input_sec > button');
+        await signIn(page, username, password, 'https://goodsdeco.com/member/login.php', '#loginId', '#loginPwd', 'div.login_input_sec > button');
+        const products = [];
         for (const url of urls) {
             const goToAttemptsResult = await goToAttempts(page, url, 'domcontentloaded');
             if (!goToAttemptsResult) {
                 continue;
             }
             const product = await buildProduct(page, url);
-
             if (!product) {
                 continue;
             }
             products.push(product);
-
         }
+        console.log(JSON.stringify(products));
     } catch (error) {
-        exitType = 1;
-        errMsg = error;
+        console.error(error);
     } finally {
-        if (exitType === 0) {
-            console.log(JSON.stringify(products));
-        } else if (exitType === 1) {
-            if (products.length > 0) {
-                console.log(JSON.stringify(products));
-            } else {
-                console.error(errMsg);
-            }
-        }
-        process.exit(exitType)
+        await browser.close();
     }
 })();
 async function buildProduct(page, productHref) {
+
     const productName = await getProductName(page);
     if (!productName) {
         return false;
@@ -74,9 +67,10 @@ async function buildProduct(page, productHref) {
         sellerID: 77
     };
 }
+
 async function getProductName(page) {
     return await page.evaluate(() => {
-        const productNameElement = document.querySelector('#frmView > div > div > div.item_detail_tit > h3');
+        const productNameElement = document.querySelector('#frmView div.item_detail_tit > h3');
         if (!productNameElement) {
             return false;
         }
@@ -85,60 +79,70 @@ async function getProductName(page) {
 }
 async function getproductPrice(page) {
     return await page.evaluate(() => {
-        const productPriceElement = document.querySelector('#frmView > div > div > div.item_detail_list > dl.item_price > dd');
-        if (!productPriceElement) {
+        const productPriceElement = document.querySelector('#frmView dl:first-child > dd > span');
+        const salePriceElement = document.querySelector('#frmView dl.item_price > dd > strong');
+        if (!productPriceElement && !salePriceElement) {
             return false;
         }
-        return productPriceElement.textContent.replace(/[^0-9]/g, '').trim();
+        const price = productPriceElement || salePriceElement;
+
+        return price.textContent.replace(/[^0-9]/g, '').trim();
     });
 }
 async function getproductImage(page) {
-    return await page.evaluate(() => {
-        const productImageElement = document.querySelector('#mainImage > img');
-        if (!productImageElement) {
-            return false;
-        }
-        return productImageElement.src;
+    const imageUrl = await page.evaluate(() => {
+        const productImageElement = document.querySelector('#contents div.content_box li:first-child > a > img.middle');
+        return productImageElement ? productImageElement.src : null;
     });
+
+    if (!imageUrl) {
+        return false;
+    }
+
+    const isValid = await checkImageUrl(imageUrl);
+    return isValid ? imageUrl : false;
 }
 async function getproductDetail(page) {
-    return await page.evaluate(() => {
-
-        let productDetail = [];
-
-        const productDetailElementsImgCheckValid = document.querySelectorAll('#mainImage > img');
-        const extraImg = document.querySelectorAll('#detail > div.detail_cont > div > div.txt-manual > div > img');
-        const productDetailElements = document.querySelector('#contents > div > div.content_box > div.item_photo_info_sec > div + #frmView');
-        if (!productDetailElements) {
-            return false;
-        }
-        for (const imgs of productDetailElementsImgCheckValid) {
-            const productDetailSrc = imgs.src;
-            if (productDetailSrc)
-                productDetail.push(productDetailSrc);
-        }
-        for (const imgs of extraImg) {
-            const productDetailSrc = imgs.src;
-            if (productDetailSrc)
-                productDetail.push(productDetailSrc);
-
-        }
-        if (productDetail.length < 1) {
-            return false;
-        }
+    const imageUrls = await page.evaluate(() => {
+        const productDetailElements = document.querySelectorAll('#detail > div.detail_cont div.txt-manual > div > img');
+        const productDetail = [];
+        productDetailElements.forEach(element => {
+            if (element.src) {
+                productDetail.push(element.src);
+            }
+        });
         return productDetail;
     });
-}
-async function getproductOptions(page) {
-    return await page.evaluate(() => {
-        const productOptionElements = document.querySelectorAll('#frmView > div > div > div.item_detail_list > div > dl > dd > select option');
-        const productOptionsObjec = Array.from(productOptionElements)
-            .map(poe => poe)
-            .filter(option => !option.getAttribute('disabled'));
-        const productOptions = productOptionsObjec.map((val) => val.textContent.trim());
-        if (productOptionElements.length > 0 && productOptions.length < 1) {
-            return false;
+
+    const validImageUrls = [];
+    for (const url of imageUrls) {
+        const isValid = await checkImageUrl(url);
+        if (isValid) {
+            validImageUrls.push(url);
         }
-        return productOptions;
+    }
+
+    return validImageUrls.length > 0 ? validImageUrls : false;
+}
+
+
+async function getproductOptions(page) {
+
+    return await page.evaluate(() => {
+
+        const productOptionElements = document.querySelectorAll('#frmView div.item_detail_list select option');
+        const productOptions = Array.from(productOptionElements)
+            .map(poe => {
+                const [optionName, optionPrice] = poe.textContent.trim().split(':');
+                return {
+                    optionName: optionName.trim(),
+                    optionPrice: optionPrice ? optionPrice.replace(/[^0-9]/g, '').trim() : '0'
+                };
+            })
+            .filter(option => option.optionName && option.optionPrice &&
+                !option.optionName.includes('옵션') && !option.optionPrice.includes('가격'));
+
+        return productOptions.length > 0 ? productOptions : false;
     });
 }
+
