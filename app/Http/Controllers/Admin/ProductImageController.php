@@ -19,12 +19,12 @@ class ProductImageController extends Controller
 
     function index($imageUrl, $hasWatermark)
     {
+        ini_set('memory_limit', '-1');
+        $newWidth = 1000;
+        $newHeight = 1000;
+        $savePath = public_path('images/CDN/product/'); // 경로 수정
         try {
-            $newWidth = 1000;
-            $newHeight = 1000;
-            $savePath = public_path('images/CDN/product/'); // 경로 수정
             $image = Image::make($imageUrl)->resize($newWidth, $newHeight);
-
             $path = parse_url($imageUrl, PHP_URL_PATH);
             $imageExtension = pathinfo($path, PATHINFO_EXTENSION);
             $newImageName = uniqid() . '.' . $imageExtension;
