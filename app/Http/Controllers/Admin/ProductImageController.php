@@ -135,9 +135,14 @@ class ProductImageController extends Controller
     }
     public function hostImages($imageUrls)
     {
-        $hostedImages = array_map(fn ($url) => $this->saveImageAndGetNewUrl($url), $imageUrls);
-        // 에러가 발생한 이미지를 필터링하여 제거
-        return array_filter($hostedImages, fn ($result) => $result['status'] === true);
+        $hostedImages = [];
+        foreach ($imageUrls as $iu) {
+            $saveImageAndGetNewUrlResult = $this->saveImageAndGetNewUrl($iu);
+            if ($saveImageAndGetNewUrlResult['status']) {
+                $hostedImages[] = $saveImageAndGetNewUrlResult['data'];
+            }
+        }
+        return $hostedImages;
     }
     public function saveImageAndGetNewUrl($url)
     {
