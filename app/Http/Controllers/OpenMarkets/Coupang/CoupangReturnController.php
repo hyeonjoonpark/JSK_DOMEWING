@@ -100,7 +100,8 @@ class CoupangReturnController extends Controller
             'newProductOrderNumber' => $returnData['receiptId'],
             'receiverName' => $returnData['requesterName'],
             'receiverPhone' => $returnData['requesterPhoneNumber'] ? $returnData['requesterPhoneNumber'] : $returnData['requesterRealPhoneNumber'],
-            'receiverAddress' => $returnData['requesterAddress'] . ' ' . $returnData['requesterAddressDetail']
+            'receiverAddress' => $returnData['requesterAddress'] . ' ' . $returnData['requesterAddressDetail'],
+            'createdAt' => $returnData['createdAt']
         ];
     }
     public function confirmReturnReceipt($account, $receiptId)

@@ -52,6 +52,8 @@ class CoupangCancelController extends Controller
             CCTTER // 재고 연동 오류 : 재고 문제로 취소가 발생하는 경우
             CCPNER // 제휴사이트 오류 : 주소 문제로 고객 배송지 생성 불가시 취소 되는 오류
             CCPRER // 가격등재오류 : 양사간 상품 가격오류 발생시 취소 되는 오류
+            상품준비중 상태의 상품 취소(출고중지완료) 시에는 입력값과 상관없이 사유 카테고리가 각각 "배송불만", "품절"로 고정됩니다.
+            취소 상세 사유는 "파트너 API 강제 취소"로 기록됩니다.
             */
             'userId' => $account->username,
             'vendorId' => $account->code
