@@ -42,6 +42,31 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="form-label">기간</label>
+                        <div class="form-control-wrap">
+                            <div class="input-daterange date-picker-range input-group">
+                                <div class="form-icon form-icon-left">
+                                    <em class="icon ni ni-calendar"></em>
+                                </div>
+                                <input type="text" class="form-control" name="startOn" value="{{ $startOn }}"
+                                    data-date-format="yyyy-mm-dd" />
+                                <div class="input-group-addon">TO</div>
+                                <div class="form-icon form-icon-right">
+                                    <em class="icon ni ni-calendar-alt"></em>
+                                </div>
+                                <input type="text" class="form-control" name="endOn" value="{{ $endOn }}"
+                                    data-date-format="yyyy-mm-dd" />
+                            </div>
+                        </div>
+                        <div class="btn-group mt-2">
+                            <button class="btn btn-outline-primary" onclick="setDateRange(1)">1일</button>
+                            <button class="btn btn-outline-primary" onclick="setDateRange(7)">1주일</button>
+                            <button class="btn btn-outline-primary" onclick="setDateRange(30)">1달</button>
+                            <button class="btn btn-outline-primary" onclick="setDateRange(60)">2달</button>
+                            <button class="btn btn-outline-primary" onclick="setDateRange(90)">3달</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="orderStatus" id="newOrder"
                                 value="PAID_REQUEST" checked>
@@ -365,6 +390,8 @@
         function showData() {
             popupLoader(0, '"주문 내역을 데이터베이스로부터 추출하겠습니다."');
             const orderStatus = $('input[name="orderStatus"]:checked').val();
+            const startOn = $('input[name="startOn"]').val();
+            const endOn = $('input[name="endOn"]').val();
             const vendors = getSelectedVendors();
             $.ajax({
                 url: '/api/show-data',
@@ -373,7 +400,9 @@
                 data: {
                     rememberToken,
                     vendors,
-                    orderStatus
+                    orderStatus,
+                    startOn,
+                    endOn
                 },
                 success: function(response) {
                     closePopup();
@@ -591,7 +620,7 @@
                         <p><b>유형:</b> ${data.type}</p>
                         <p><b>사유:</b> ${data.reason}</p>
                         <p><b>개수:</b> ${data.quantity}</p>
-                        <p><b>총 가격:</b> ${data.amount}</p>
+                        <p><b>총 가격:</b> ${numberFormat(data.amount)}원</p>
                         <p>
                             <b>증빙 이미지:</b><br>
                             ${imageContent}
@@ -605,6 +634,19 @@
             });
         }
 
+        function setDateRange(days) {
+            const startDate = new Date();
+            const endDate = new Date();
+            startDate.setDate(endDate.getDate() - days);
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+            $('input[name="startOn"]').val(formatDate(startDate));
+            $('input[name="endOn"]').val(formatDate(endDate));
+        }
 
         function calculateTotalAmount(orders) {
             return orders.reduce((accumulator, order) => accumulator + parseInt(order.amount || 0, 10), 0);
