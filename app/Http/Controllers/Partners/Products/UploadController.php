@@ -150,7 +150,7 @@ class UploadController extends Controller
         $queueLengths = [];
         for ($i = 1; $i < 11; $i++) {
             $queueName = 'queue' . $i;
-            $queueLengths[$queueName] = DB::table('jobs')->where('queue', $queueName)->count();
+            $queueLengths[$queueName] = DB::table('jobs')->where('uploads', $queueName)->count();
         }
         // 가장 대기열이 짧은 큐 선택
         $currentQueue = array_keys($queueLengths, min($queueLengths))[0];

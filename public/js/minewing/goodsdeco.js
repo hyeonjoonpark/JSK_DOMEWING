@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, checkImageUrl } = require('./common.js');
+const { goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName } = require('./common.js');
 (async () => {
 
     const browser = await puppeteer.launch({ headless: true });
@@ -20,7 +20,9 @@ const { goToAttempts, signIn, checkImageUrl } = require('./common.js');
         const listProducts = await getListProducts(page);
         for (const product of listProducts) {
             const isValidImage = await checkImageUrl(product.image);
-            if (isValidImage) {
+            const isValidProduct = await checkProductName(product.name);
+            if (isValidImage && isValidProduct) {
+                product.name = await formatProductName(product.name);
                 products.push(product);
             }
         }
@@ -58,7 +60,7 @@ async function getListProducts(page) {
             if (!nameElement) {
                 return false;
             }
-            const priceElements = pe.querySelectorAll('#contents > div > div.content > div.goods_list_item > div.goods_list > div > div.item_basket_type > ul > li > div > div.item_info_cont > div.item_money_box > del')
+            const priceElements = pe.querySelectorAll('div.content > div.goods_list_item > div.goods_list div.item_info_cont > div.item_money_box > strong')
             let priceText = '';
             for (const priceElement of priceElements) {
                 priceText += priceElement.textContent.trim();
