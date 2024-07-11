@@ -4,8 +4,10 @@ namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
+use App\Http\Controllers\SmartStore\SmartStoreReturnController;
 use App\Http\Controllers\WingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -96,6 +98,23 @@ class OpenMarketOrderController extends Controller
                         'error' => $e->getMessage(),
                     ];
                 }
+                // 현재 쿠팡만 환불 자동수집중
+                if ($openMarketEngName !== 'coupang') continue;
+                $returnMethod = 'get'  . ucfirst($openMarketEngName) . 'ReturnOrder';
+                $returnResult = call_user_func([$this, $returnMethod], $partner->id);
+                if (!$returnResult['status']) return [
+                    'status' => false,
+                    'message' => $returnResult['message'],
+                    'data' => $returnResult
+                ];
+                // 아직 교환 자동수집 안됌
+                // $exchangeMethod = 'get'  . ucfirst($openMarketEngName) . 'ExchangeOrder';
+                // $exchangeResult = call_user_func([$this, $exchangeMethod], $partner->id);
+                // if (!$exchangeResult['status']) return [
+                //     'status' => false,
+                //     'message' => $exchangeResult['message'],
+                //     'data' => $exchangeResult
+                // ];
             }
         }
         return [
@@ -327,10 +346,10 @@ class OpenMarketOrderController extends Controller
             $balance = $wc->getBalance($account->id);
             if ($balance < 0) {
                 $name = $account->last_name . '' . $account->first_name;
-                $lowBalanceAccounts[] = $name; // 배열에 값을 추가하는 방식으로 수정
+                $lowBalanceAccounts[] = $name;
             }
         }
-        return $lowBalanceAccounts; // 결과를 반환
+        return $lowBalanceAccounts;
     }
     private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen, $orderDate = null)
     {
@@ -733,6 +752,20 @@ class OpenMarketOrderController extends Controller
     {
         $controller = new St11OrderController();
         return $controller->index($id);
+    }
+    private function getSmart_StoreReturnOrder()
+    {
+    }
+    private function getCoupangReturnOrder($partnerId)
+    {
+        $controller = new CoupangReturnController();
+        return $controller->index($partnerId);
+    }
+    private function getSmart_StoreExchangeOrder()
+    {
+    }
+    private function getCoupangExchangeOrder()
+    {
     }
     private function getSmart_storeUploadedProductId($productId)
     {
