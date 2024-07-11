@@ -27,7 +27,7 @@ class SmartStoreOrderController extends Controller
         }
         $allOrderDetails = [];
         foreach ($accounts as $account) {
-            $orderList = $this->getOrderList($account, $start, $end);
+            $orderList = $this->getPayedOrderList($account, $start, $end);
             $orderIds = $this->getOrderIds($orderList);
             $orderDetails = $this->getOrderDetails($account, $orderIds);
             if (isset($orderDetails['error'])) {
@@ -36,10 +36,9 @@ class SmartStoreOrderController extends Controller
             $response = $this->confirm($account, $orderIds);
             $allOrderDetails = array_merge($allOrderDetails, $orderDetails);
         }
-
         return  $allOrderDetails;
     }
-    private function getOrderList($account, $start = null, $end = null)
+    private function getPayedOrderList($account, $start = null, $end = null)
     {
         $contentType = 'application/json';
         $method = 'GET';
@@ -51,8 +50,13 @@ class SmartStoreOrderController extends Controller
             $formattedDate = $this->convertDateFormat($date->format('Y-m-d'));
             $data = ['lastChangedFrom' => $formattedDate];
             $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
-            if (!$response || isset($response['error']) || !is_array($response)) continue;
-            $responses[$formattedDate] = $response;
+            if ($response['status'] && isset($response['data']['data']['lastChangeStatuses'])) {
+                foreach ($response['data']['data']['lastChangeStatuses'] as $status) {
+                    if ($status['productOrderStatus'] === 'PAYED') {
+                        $returnOrders[] = $status;
+                    }
+                }
+            }
         }
         return $responses;
     }
@@ -69,17 +73,11 @@ class SmartStoreOrderController extends Controller
         $date = new DateTime($inputDate, new DateTimeZone('Asia/Seoul'));
         return $date->format('Y-m-d\TH:i:s.vP');
     }
-    private function getOrderIds($response)
+    private function getOrderIds($orderList)
     {
         $orderIds = [];
-        foreach ($response as $dateKey => $dateData) {
-            if (isset($dateData['data']['data']['lastChangeStatuses'])) {
-                foreach ($dateData['data']['data']['lastChangeStatuses'] as $status) {
-                    if (isset($status['productOrderId'])) {
-                        $orderIds[] = $status['productOrderId'];
-                    }
-                }
-            }
+        foreach ($orderList as $order) {
+            $orderIds[] = $order['productOrderId'];
         }
         return $orderIds;
     }

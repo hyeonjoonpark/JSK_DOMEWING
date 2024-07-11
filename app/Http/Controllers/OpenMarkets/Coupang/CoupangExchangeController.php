@@ -15,12 +15,15 @@ class CoupangExchangeController extends Controller
     }
     public function index()
     { //교환 신청 목록 가져오기
-        $accounts = DB::table('coupang_accounts')->where('is_active', 'ACTIVE')->get();
+        $accounts = DB::table('coupang_accounts')->where('is_active', 'ACTIVE')->where('partner_id', 3)->get();
         $apiResults = [];
         foreach ($accounts as $account) {
             $apiResults[] = $this->getExchangeResult($account); //모든 신청내역 불러오기
         }
         return $apiResults;
+
+
+
         foreach ($apiResults as $apiResult) {
             $exchangeId = $apiResult['data']['exchangeAddressDtoV1']['exchangeId'];
         }

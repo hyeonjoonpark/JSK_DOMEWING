@@ -55,7 +55,9 @@ use App\Http\Controllers\Nalmeokwings\NalmeokwingController;
 use App\Http\Controllers\Namewing\NamewingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangController;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangExchangeController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
 use App\Http\Controllers\OpenMarkets\KakaoShopping\KakaoShoppingAccountController;
 use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnAccountController;
 use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnApiController;
@@ -233,6 +235,8 @@ Route::post('test', [St11OrderController::class, 'index']);
 // Route::post('test', [LotteOnApiController::class, 'index']);
 Route::post('smart-store-return-test', [SmartStoreReturnController::class, 'index']);
 Route::post('smart-store-exchange-test', [SmartStoreExchangeController::class, 'index']);
+Route::post('coupang-return-test', [CoupangReturnController::class, 'index']);
+Route::post('coupang-exchange-test', [CoupangExchangeController::class, 'index']);
 
 
 

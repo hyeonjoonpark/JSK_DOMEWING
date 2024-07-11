@@ -34,7 +34,7 @@ class SmartStoreShipmentController extends Controller
             ];
         }
         $isCancelOrder = $this->getIsCancelOrder($account, $productOrderNumber);
-        if (!$isCancelOrder['status']) return [
+        if ($isCancelOrder['status']) return [
             'status' => false,
             'message' => $isCancelOrder['message']
         ];
@@ -60,11 +60,11 @@ class SmartStoreShipmentController extends Controller
         $controller = new SmartStoreApiController();
         $builderResponse =  $controller->builder($account, $contentType, $method, $url, $data); //조회해서 상태확인
         if (isset($builderResponse['data']['data'][0]['cancel'])) return [
-            'status' => false,
-            'message' => '취소요청이 들어온 주문입니다. 강제출고를 위해 파트너스 회원에게 연락바랍니다.'
+            'status' => true,
+            'message' => '스마트스토어 주문취소 주문입니다. 관리자에게 문의해주세요.'
         ];
         return [
-            'status' => true,
+            'status' => false,
         ];
     }
     private function postApi($account, $productOrderId, $deliveryCompany, $trackingNumber)
