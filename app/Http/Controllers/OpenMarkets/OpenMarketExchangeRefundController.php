@@ -42,7 +42,8 @@ class OpenMarketExchangeRefundController extends Controller
             'priceThen' => $order->price_then,
             'shippingFeeThen' => $order->shipping_fee_then,
             'bundleQuantityThen' => $order->bundle_quantity_then,
-            'productOrderNumber' => $order->product_order_number
+            'productOrderNumber' => $order->product_order_number,
+            'createdAt' => $order->createdAt
         ]);
         // 교환 및 환불 요청 저장
         return $this->storeExchangeRefund($data, $partnerOriginOrder);
@@ -93,7 +94,8 @@ class OpenMarketExchangeRefundController extends Controller
                     'type' => $data['requestType'],
                     'price_then' => $data['priceThen'],
                     'shipping_fee_then' => $data['shippingFeeThen'],
-                    'bundle_quantity_then' => $data['bundleQuantityThen']
+                    'bundle_quantity_then' => $data['bundleQuantityThen'],
+                    'created_at' => $data['createdAt']
                 ]);
             DB::table('partner_orders')
                 ->insertGetId([

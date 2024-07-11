@@ -19,7 +19,7 @@ class OpenMarketCancelController extends Controller
         $order = DB::table('orders as o') //주문내역가지고 작업하기전에 유효한지 확인하고 없으면 return
             ->where('product_order_number', $productOrderNumber)
             ->where('delivery_status', 'PENDING')
-            ->where('type', 'PAID')
+            ->where('type', '!=', 'CANCELLED')
             ->first();
         if (!$order) return [
             'status' => false,
@@ -50,9 +50,13 @@ class OpenMarketCancelController extends Controller
                 ->where('product_order_number', $productOrderNumber)
                 ->where('delivery_status', 'PENDING')
                 ->update([
-                    'type' => 'CANCELLED',
                     'remark' => $remark,
                     'requested' => 'N'
+                ]);
+            DB::table('wing_transactions')
+                ->where('id', $order->wing_trasaction_id)
+                ->update([
+                    'status' => 'REJECTED'
                 ]);
             // 트랜잭션 커밋
             DB::commit();
@@ -79,7 +83,7 @@ class OpenMarketCancelController extends Controller
         $order = DB::table('orders as o') //주문내역가지고 작업하기전에 유효한지 확인하고 없으면 return
             ->where('product_order_number', $productOrderNumber)
             ->where('delivery_status', 'PENDING')
-            ->where('type', 'PAID')
+            ->where('type', '!=', 'CANCELLED')
             ->first();
         if (!$order) return [
             'status' => false,
@@ -92,9 +96,13 @@ class OpenMarketCancelController extends Controller
                 ->where('product_order_number', $productOrderNumber)
                 ->where('delivery_status', 'PENDING')
                 ->update([
-                    'type' => 'CANCELLED',
                     'remark' => $remark,
                     'requested' => 'N'
+                ]);
+            DB::table('wing_transactions')
+                ->where('id', $order->wing_trasaction_id)
+                ->update([
+                    'status' => 'REJECTED'
                 ]);
             // 트랜잭션 커밋
             DB::commit();

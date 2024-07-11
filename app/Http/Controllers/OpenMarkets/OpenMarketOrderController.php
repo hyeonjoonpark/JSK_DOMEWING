@@ -9,6 +9,7 @@ use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\SmartStore\SmartStoreReturnController;
 use App\Http\Controllers\WingController;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -144,9 +145,12 @@ class OpenMarketOrderController extends Controller
                     'error' => $validator->errors(),
                 ];
             }
+            $startOn = $request->input('startOn');
+            $endOn = $request->input('endOn');
+
             $vendors = $request->input('vendors');
             $orderStatus = $request->input('orderStatus');
-            $orders = $this->getOrders($vendors, $orderStatus);
+            $orders = $this->getOrders($vendors, $orderStatus, $startOn, $endOn);
             $processedOrders = array_map(function ($order) {
                 return $this->transformOrderDetails($order);
             }, $orders);
@@ -439,7 +443,6 @@ class OpenMarketOrderController extends Controller
         $originProductPrice = DB::table('minewing_products')
             ->where('id', $productId)
             ->value('productPrice');
-
         $promotion = DB::table('promotion_products AS pp')
             ->join('promotion AS p', 'p.id', '=', 'pp.promotion_id')
             ->where('product_id', $productId)
@@ -449,16 +452,17 @@ class OpenMarketOrderController extends Controller
             ->where('p.band_promotion', 'N')
             ->where('pp.band_product', 'N')
             ->value('pp.product_price');
-
         $productPrice = $promotion ?? $originProductPrice;
-
         $margin = DB::table('sellwing_config')->where('id', 1)->value('value');
         $marginRate = ($margin / 100) + 1;
-
         return ceil($productPrice * $marginRate);
     }
-    private function getOrders($vendors, $orderStatus)
+    private function getOrders($vendors, $orderStatus, $startOn, $endOn)
     {
+        // $endOn에 1일을 추가
+        $endOnDate = new DateTime($endOn);
+        $endOnDate->modify('+1 day');
+        $endOn = $endOnDate->format('Y-m-d');
         $query = DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
             ->leftJoin('vendors as v', 'v.id', '=', 'po.vendor_id')
@@ -509,32 +513,33 @@ class OpenMarketOrderController extends Controller
                 'o.delivery_status as deliveryStatus',
                 DB::raw('COALESCE(ca.username, ssa.username) as username')
             );
-
-        $oneMonthAgo = Carbon::now()->subMonth();
         switch ($orderStatus) {
             case 'PAID_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('o.type', 'PAID')
-                    ->where('o.requested', 'N');
+                    ->where('o.requested', 'N')
+                    ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'PAID_PROCESS':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('o.type', 'PAID')
-                    ->where('o.requested', 'Y');
+                    ->where('o.requested', 'Y')
+                    ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'PAID_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
                     ->where('o.type', 'PAID')
-                    ->where('o.updated_at', '>=', $oneMonthAgo);
+                    ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
             case 'CANCEL_COMPLETE':
                 $query->where('o.type', 'CANCELLED')
-                    ->where('o.updated_at', '>=', $oneMonthAgo);
+                    ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
             case 'RETURN_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('o.type', 'REFUND')
-                    ->where('o.requested', 'N');
+                    ->where('o.requested', 'N')
+                    ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
                 // case 'RETURN_PROCESS':
                 //     $query->where('o.delivery_status', 'PENDING')
@@ -544,32 +549,32 @@ class OpenMarketOrderController extends Controller
             case 'RETURN_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
                     ->where('o.type', 'REFUND')
-                    ->where('o.updated_at', '>=', $oneMonthAgo);
+                    ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
-                    ->where('o.requested', 'N');
+                    ->where('o.requested', 'N')
+                    ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_PROCESS':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
-                    ->where('o.requested', 'Y');
+                    ->where('o.requested', 'Y')
+                    ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
                     ->where('o.type', 'EXCHANGE')
-                    ->where('o.updated_at', '>=', $oneMonthAgo);
+                    ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
         }
-
         $orders = [];
         $query->orderBy('o.created_at', 'asc')->chunk(200, function ($chunk) use (&$orders) {
             foreach ($chunk as $order) {
                 $orders[] = $order;
             }
         });
-
         return $orders;
     }
 

@@ -39,15 +39,6 @@ class CoupangShipmentController extends Controller
             $shipmentBoxId = $partnerOrder->product_order_number;
             $isCancelOrder = $this->getIsCancelOrder($account, $orderId, $shipmentBoxId);
             if ($isCancelOrder['status']) {
-                //강제출고처리
-                // $forceResult = $this->forceShipOrder($account, $isCancelOrder['receiptId'], $deliveryCompany->coupang, $trackingNumber);
-                // if (!$forceResult['status']) {
-                //     return [
-                //         'status' => false,
-                //         'message' => '쿠팡 강제 출고 중 오류가 발생하였습니다.',
-                //         'data' => $forceResult,
-                //     ];
-                // }
                 return [
                     'status' => true,
                     'message' => '쿠팡 주문취소 주문입니다. 관리자에게 문의해주세요.',
