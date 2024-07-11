@@ -24,14 +24,13 @@ class SmartStoreReturnController extends Controller
         }
         $allOrderDetails = [];
         foreach ($accounts as $account) {
-            $orderList = $this->getReturnOrderList($account);
-            return $orderList;
-            $orderIds = $this->getOrderIds($orderList);
+            $returnOrderList = $this->getReturnOrderList($account);
+            $orderIds = $this->getOrderIds($returnOrderList);
             $orderDetails = $this->getOrderDetails($account, $orderIds);
             if (isset($orderDetails['error'])) {
                 continue; // 오류가 있으면 다음 계정으로 넘어감
             }
-            $allOrderDetails[] = $orderDetails;
+            $allOrderDetails[] = $returnOrderList;
         }
         return  $allOrderDetails;
     }
@@ -40,21 +39,20 @@ class SmartStoreReturnController extends Controller
         $contentType = 'application/json';
         $method = 'GET';
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses';
-        $startDate = new DateTime('now - 7 days');
+        $startDate = new DateTime('now - 4 days');
         $endDate = new DateTime('now');
         $returnOrders = [];
         for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
             $formattedDate = $this->convertDateFormat($date->format('Y-m-d'));
             $data = ['lastChangedFrom' => $formattedDate];
             $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
-            $returnOrders[] = $response;
-            // if ($response['status']) {
-            //     foreach ($response['data']['data']['lastChangeStatuses'] as $status) {
-            //         if ($status['productOrderStatus'] === 'RETURNED') {
-            //             $returnOrders[$formattedDate][] = $status;
-            //         }
-            //     }
-            // }
+            if ($response['status'] && isset($response['data']['data']['lastChangeStatuses'])) {
+                foreach ($response['data']['data']['lastChangeStatuses'] as $status) {
+                    if ($status['productOrderStatus'] === 'RETURNED') {
+                        $returnOrders[] = $status;
+                    }
+                }
+            }
         }
         return $returnOrders;
     }
@@ -63,17 +61,11 @@ class SmartStoreReturnController extends Controller
         $date = new DateTime($inputDate, new DateTimeZone('Asia/Seoul'));
         return $date->format('Y-m-d\TH:i:s.vP');
     }
-    private function getOrderIds($response)
+    private function getOrderIds($returnOrderList)
     {
         $orderIds = [];
-        foreach ($response as $dateKey => $dateData) {
-            if (isset($dateData['data']['data']['lastChangeStatuses'])) {
-                foreach ($dateData['data']['data']['lastChangeStatuses'] as $status) {
-                    if (isset($status['productOrderId'])) {
-                        $orderIds[] = $status['productOrderId'];
-                    }
-                }
-            }
+        foreach ($returnOrderList as $returnOrder) {
+            $orderIds[] = $returnOrder['productOrderId'];
         }
         return $orderIds;
     }
@@ -88,17 +80,18 @@ class SmartStoreReturnController extends Controller
             return ['error' => '응답 데이터가 올바르지 않습니다.'];
         }
         foreach ($response['data']['data'] as $item) {
+            // if (isset($item['return']) && $item['return']['claimStatus'] == 'RETURN_REQUEST') {
             if (isset($item['return'])) {
                 return $item['return'];
             }
         }
         return [];
     }
-    private function getAccounts() //id값주기
+    private function getAccounts()
     {
         return DB::table('smart_store_accounts')
             // ->where('partner_id', $id)
-            ->where('partner_id', 13)
+            ->where('partner_id', 3)
             ->where('is_active', 'ACTIVE')
             ->get();
     }

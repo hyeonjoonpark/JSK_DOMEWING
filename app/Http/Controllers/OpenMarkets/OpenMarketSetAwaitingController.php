@@ -159,7 +159,6 @@ class OpenMarketSetAwaitingController extends Controller
         $endDate = (new DateTime('now'))->format('YmdHi');
         $url = 'http://api.11st.co.kr/rest/claimservice/cancelorders/' . $startDate . '/' . $endDate;
         $data = $controller->orderBuilder($apiKey, $method, $url); // 취소신청목록조회
-
         if (isset($data['data']['ns2:order'])) {
             if (is_array($data['data']['ns2:order']) && isset($data['data']['ns2:order'][0])) {
                 // 주문이 여러 개일 때
