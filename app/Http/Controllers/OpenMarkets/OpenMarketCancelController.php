@@ -54,7 +54,7 @@ class OpenMarketCancelController extends Controller
                     'requested' => 'N'
                 ]);
             DB::table('wing_transactions')
-                ->where('id', $order->wing_trasaction_id)
+                ->where('id', $order->wing_transaction_id)
                 ->update([
                     'status' => 'REJECTED'
                 ]);
@@ -100,7 +100,7 @@ class OpenMarketCancelController extends Controller
                     'requested' => 'N'
                 ]);
             DB::table('wing_transactions')
-                ->where('id', $order->wing_trasaction_id)
+                ->where('id', $order->wing_transaction_id)
                 ->update([
                     'status' => 'REJECTED'
                 ]);
