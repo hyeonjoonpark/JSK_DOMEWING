@@ -1,19 +1,17 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName } = require('../common.js');
+const { goToAttempts, signIn, scrollDown, checkImageUrl, checkProductName, formatProductName } = require('../common.js');
 
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     await page.setDefaultNavigationTimeout(0);
-    await page.setViewport({ 'width': 1500, 'height': 1000 });
+
     const [tempFilePath, username, password] = process.argv.slice(2);
     const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-
-
     try {
-        await signIn(page, username, password, 'https://goodsdeco.com/member/login.php', '#loginId', '#loginPwd', 'div.login_input_sec > button');
+        await signIn(page, username, password, 'https://monster99.co.kr/member/login.html', '#member_id', '#member_passwd', 'div > fieldset > a > img');
         const products = [];
         for (const url of urls) {
             const goToAttemptsResult = await goToAttempts(page, url, 'domcontentloaded');
@@ -34,27 +32,30 @@ const { goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName
     }
 })();
 async function buildProduct(page, productHref) {
-
+    await scrollDown(page);
+    const isValidResult = await isValid(page);
+    if (!isValidResult) {
+        return false;
+    }
     const productName = await getProductName(page);
     if (!productName) {
-
+        return false;
     }
     const productPrice = await getproductPrice(page);
     if (!productPrice) {
-
+        return false;
     }
     const productImage = await getproductImage(page);
     if (!productImage) {
-
+        return false;
     }
     const productDetail = await getproductDetail(page);
     if (!productDetail) {
-
+        return false;
     }
     const productOptions = await getproductOptions(page);
     if (productOptions === false) return false;
     const hasOption = productOptions.length > 0;
-
     return {
         productName,
         productPrice,
@@ -63,13 +64,21 @@ async function buildProduct(page, productHref) {
         hasOption,
         productOptions,
         productHref,
-        sellerID: 77
+        sellerID: 82
     };
 }
-
+async function isValid(page) {
+    return await page.evaluate(() => {
+        const isSoldOut = Array.from(document.querySelectorAll('div.infoArea > div.headingArea > span.icon > img')).some(img => img.src === 'https://monster99.co.kr/web/upload/custom_11.gif');
+        if (isSoldOut) {
+            return false;
+        }
+        return true;
+    });
+}
 async function getProductName(page) {
     const productName = await page.evaluate(() => {
-        const productNameElement = document.querySelector('#frmView div.item_detail_tit > h3');
+        const productNameElement = document.querySelector('div.xans-element-.xans-product.xans-product-detaildesign > table > tbody > tr:nth-child(1) > td > span');
         if (!productNameElement) {
             return false;
         }
@@ -79,28 +88,29 @@ async function getProductName(page) {
     if (!productName) {
         return false;
     }
-    const cleanedProductName = productName.replace(/\[.*?\]/g, '').trim();
+    const match = productName.match(/\(([^)]+)\)/);
+    const cleanedProductName = match ? match[1].trim() : productName;
+
     const validProductName = await checkProductName(cleanedProductName);
     if (!validProductName) {
         return false;
     }
+
     return await formatProductName(cleanedProductName);
 }
 async function getproductPrice(page) {
     return await page.evaluate(() => {
-        const productPriceElement = document.querySelector('#frmView dl:first-child > dd > span');
-        const salePriceElement = document.querySelector('#frmView dl.item_price > dd > strong');
-        if (!productPriceElement && !salePriceElement) {
+        const productPriceElement = document.querySelector('#span_product_price_text');
+        if (!productPriceElement) {
             return false;
         }
-        const price = salePriceElement || productPriceElement
 
-        return price.textContent.replace(/[^0-9]/g, '').trim();
+        return productPriceElement.textContent.replace(/[^0-9]/g, '').trim();
     });
 }
 async function getproductImage(page) {
     const imageUrl = await page.evaluate(() => {
-        const productImageElement = document.querySelector('#contents div.content_box li:first-child > a > img.middle');
+        const productImageElement = document.querySelector('div.keyImg > div > a > img');
         return productImageElement ? productImageElement.src : null;
     });
 
@@ -111,9 +121,10 @@ async function getproductImage(page) {
     const isValid = await checkImageUrl(imageUrl);
     return isValid ? imageUrl : false;
 }
+
 async function getproductDetail(page) {
     const imageUrls = await page.evaluate(() => {
-        const productDetailElements = document.querySelectorAll('div.txt-manual > div img');
+        const productDetailElements = document.querySelectorAll('#prdDetail > div.cont img');
         const productDetail = [];
         productDetailElements.forEach(element => {
             if (element.src) {
@@ -133,31 +144,18 @@ async function getproductDetail(page) {
 
     return validImageUrls.length > 0 ? validImageUrls : false;
 }
-
-
 async function getproductOptions(page) {
     return await page.evaluate(() => {
-        const productOptionElements = document.querySelectorAll('#frmView div.item_detail_list select option');
+        const productOptionElements = document.querySelectorAll('#product_option_id1 option');
         const productOptions = Array.from(productOptionElements)
-            .filter(poe => {
-                const optionText = poe.textContent.trim();
-                return !optionText.includes('품절'); // Filter out sold-out options
-            })
-            .map(poe => {
-                const optionText = poe.textContent.trim();
-                const [optionName, optionPrice] = optionText.split(':');
-                return {
-                    optionName: optionName.trim(),
-                    optionPrice: optionPrice ? optionPrice.replace(/[^0-9]/g, '').trim() : '0'
-                };
-            })
-            .filter(option => option.optionName && option.optionPrice &&
-                !option.optionName.includes('옵션') && !option.optionPrice.includes('가격')); // Placeholder optionName, placeholder optionPrice
+            .map(poe => ({
+                optionName: poe.textContent.trim(),
+                optionPrice: 0
+            }))
+            .filter(option => !option.optionName.includes('품절') && !option.optionName.includes('필수') && !option.optionName.includes('-------------------'));
         if (productOptionElements.length > 0 && productOptions.length < 1) {
             return false;
         }
         return productOptions;
     });
 }
-
-
