@@ -34,36 +34,27 @@ class CoupangShipmentController extends Controller
         }
         try {
             $singleOrder = $this->getSingleOrder($account, $partnerOrder->product_order_number); //발주서 단건 조회
-
             // setProduct를 하면 묶음배송번호가 변경됨으로 이거를 이용해서 송장번호 입력해야함
+            $orderId = $partnerOrder->order_number;
             $shipmentBoxId = $partnerOrder->product_order_number;
-            $orderId = $singleOrder['data']['data']['orderId'];
-            $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
             $isCancelOrder = $this->getIsCancelOrder($account, $orderId, $shipmentBoxId);
             if ($isCancelOrder['status']) {
-                //강제출고처리
-                $forceResult = $this->forceShipOrder($account, $isCancelOrder['receiptId'], $deliveryCompany->coupang, $trackingNumber);
-                if (!$forceResult['status']) {
-                    return [
-                        'status' => false,
-                        'message' => '쿠팡 강제 출고 중 오류가 발생하였습니다.',
-                        'data' => $forceResult,
-                    ];
-                }
                 return [
                     'status' => true,
-                    'message' => '쿠팡 강제 출고에 성공하였습니다.',
-                    'data' => $forceResult,
+                    'message' => '쿠팡 주문취소 주문입니다. 관리자에게 문의해주세요.',
+                    'data' => $isCancelOrder,
                 ];
             }
-            //singleOrderd의 orderId와 setProductd의 shipmentBoxId를 사용해서 postApi사용
-            $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId);
-            if (!$responseApi['status']) {
-                return [
-                    'status' => false,
-                    'message' => '쿠팡 송장번호 입력 중 오류가 발생하였습니다.',
-                    'data' => $responseApi,
-                ];
+            if ($singleOrder['status']) {
+                $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
+                $responseApi = $this->postApi($account, $shipmentBoxId, $orderId, $deliveryCompany->coupang, $trackingNumber, $vendorItemId);
+                if (!$responseApi['status']) {
+                    return [
+                        'status' => false,
+                        'message' => '쿠팡 송장번호 입력 중 오류가 발생하였습니다.',
+                        'data' => $responseApi,
+                    ];
+                }
             }
             return [
                 'status' => true,
@@ -108,7 +99,7 @@ class CoupangShipmentController extends Controller
         ];
         $queryString = http_build_query($baseQuery);
         $controller = new ApiController();
-        $response =  $controller->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $queryString); //발주서 단건조회
+        $response =  $controller->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $queryString);
         $receiptId = 0;
         $cancelCount = 0;
         if (!isset($response['data']['data'])) return [

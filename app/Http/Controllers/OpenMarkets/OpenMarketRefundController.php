@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -22,7 +23,6 @@ class OpenMarketRefundController extends Controller
             'deliveryCompanyId.exists' => '유효한 택배사를 선택해주세요.',
             'productOrderNumber.exists' => '유효한 주문이 아닙니다.',
         ]);
-
         if ($validator->fails()) {
             return [
                 'status' => false,
@@ -44,26 +44,25 @@ class OpenMarketRefundController extends Controller
         }
         $deliveryCompanyId = $request->deliveryCompanyId;
         $trackingNumber = $request->trackingNumber;
+        $openMarket = DB::table('orders as o')
+            ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
+            ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
+            ->where('o.product_order_number', $productOrderNumber)
+            ->where('v.is_active', 'ACTIVE')
+            ->select('v.*')
+            ->first(['v.name_eng', 'v.name']);
+        if ($openMarket && $openMarket->name_eng == 'coupang') { //일단은 쿠팡만 적용
+            $method = 'call' . ucfirst($openMarket->name_eng) . 'ReturnShipmentApi';
+            $updateApiResult = $this->$method($request);
+            if (!$updateApiResult['status']) {
+                return $updateApiResult;
+            }
+        }
         if ($trackingNumber && $deliveryCompanyId) {
             return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
         } else {
             return $this->updateWithoutTracking($order->id);
         }
-        // $openMarket = DB::table('orders as o')
-        //     ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
-        //     ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
-        //     ->where('o.product_order_number', $productOrderNumber)
-        //     ->where('v.is_active', 'ACTIVE')
-        //     ->select('v.*')
-        //     ->first(['v.name_eng', 'v.name']);
-        // if ($openMarket) {
-        //     $method = 'call' . ucfirst($openMarket->name_eng) . 'ShipmentApi';
-        //     $updateApiResult = $this->$method($request);
-        //     if ($updateApiResult['status'] === false) {
-        //         return $updateApiResult;
-        //     }
-        // }
-        return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
     }
     public function cancelRefund(Request $request)
     {
@@ -170,5 +169,12 @@ class OpenMarketRefundController extends Controller
                 'error' => $e->getMessage()
             ];
         }
+    }
+    private function callCoupangReturnShipmentApi($request)
+    {
+        $partnerOrder = DB::table('partner_orders')->where('product_order_number', $request->productOrderNumber)->first();
+        $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
+        $controller = new CoupangReturnController();
+        return $controller->confirmReturnReceipt($account, $request->productOrderNumber);
     }
 }

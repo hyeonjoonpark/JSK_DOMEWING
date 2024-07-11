@@ -8,7 +8,7 @@
 @section('content')
     <div class="row g-gs">
         <div class="col-12 text-center">
-            <img class="w-50" src="{{ asset('assets/images/on_update.jpg') }}">
+            <img class="w-50" src="{{ asset('assets/images/on_update.svg') }}">
         </div>
         <div class="col-12 text-center">
             <h4 class="title">업데이트 중입니다</h4>

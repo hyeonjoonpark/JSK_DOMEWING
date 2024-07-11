@@ -499,10 +499,15 @@ class AdminController extends Controller
         foreach ($columns as $column) {
             $query->whereNotNull($column);
         }
+        $currentDate = new DateTime();
+        $startOn = $currentDate->modify('-1 week')->format('Y-m-d');
+        $endOn = $currentDate->modify('+1 week')->format('Y-m-d');
         $deliveryCompanies =  $query->get();
         return view('admin/open_market', [
             'vendors' => $vendors,
-            'deliveryCompanies' => $deliveryCompanies
+            'deliveryCompanies' => $deliveryCompanies,
+            'startOn' => $startOn,
+            'endOn' => $endOn
         ]);
     }
 
