@@ -27,9 +27,6 @@ class OpenMarketOrderController extends Controller
             $memberId = $partner->domewing_account_id;
             foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
                 $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
-                // Charles: 현재 계정이 존재하는지 DB 조회 1번, 나중에 계정 정보 불러올 때 1번. 총 2번의 DB 호출이 발생하고 있음.
-                // Charles: first() 메소드를 이용한다면, 계정이 없을시 null 을 리턴함. 이 부분을 활용하면 한 번의 DB 호출로
-                // Charles: 계정이 없는지/있으면 계정 정보를 가져오는 처리를 한 번에 수행할 수 있음.
                 $isExistAccount = 'isExist'  . ucfirst($openMarketEngName) . 'Account';
                 $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
                 if (!$isExistOpenMarketAccount) continue;
@@ -184,7 +181,6 @@ class OpenMarketOrderController extends Controller
             ];
         }
         $wc = new WingController();
-        $wing = $wc->getBalance($domewingAndPartner->domewing_account_id);
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
         $results = [];
@@ -213,13 +209,6 @@ class OpenMarketOrderController extends Controller
                 'api_result' => $apiResult
             ];
         }
-        // if ($totalAmountRequired > $wing) {
-        //     return [
-        //         'status' => false,
-        //         'message' => 'wing 잔액이 부족합니다.',
-        //         'data' => $totalAmountRequired - $wing,
-        //     ];
-        // }
         return [
             'status' => true,
             'message' => '성공적으로 오더윙을 가동하였습니다.',
@@ -516,27 +505,37 @@ class OpenMarketOrderController extends Controller
         switch ($orderStatus) {
             case 'PAID_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'PAID')
                     ->where('o.requested', 'N')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'PAID_PROCESS':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'PAID')
                     ->where('o.requested', 'Y')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'PAID_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'PAID')
                     ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
             case 'CANCEL_COMPLETE':
-                $query->where('o.type', 'CANCELLED')
-                    ->whereBetween('o.updated_at', [$startOn, $endOn]);
+                $query->where(function ($query) {
+                    $query->where('o.type', 'CANCELLED')
+                        ->orWhere(function ($query) {
+                            $query->where('o.type', '!=', 'CANCELLED')
+                                ->where('wt.status', 'REJECTED');
+                        });
+                })->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
+
             case 'RETURN_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'PENDING')
                     ->where('o.type', 'REFUND')
                     ->where('o.requested', 'N')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
@@ -548,23 +547,27 @@ class OpenMarketOrderController extends Controller
                 //     break;
             case 'RETURN_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'REFUND')
                     ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
                     ->where('o.requested', 'N')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_PROCESS':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
                     ->where('o.requested', 'Y')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'EXCHANGE')
                     ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;

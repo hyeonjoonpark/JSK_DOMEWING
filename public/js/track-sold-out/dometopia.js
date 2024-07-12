@@ -59,10 +59,10 @@ async function validateProduct(page) {
                     return false;
                 }
             }
-            const stockElement = document.querySelector('#select_option_lay > div.quantity_box > table > tbody > tr:nth-child(2) > td');
+            const stockElement = document.querySelector('#info > div.goods_info.clearbox > form > div.container > table > tbody > tr:nth-child(4) > td');
             if (stockElement) {
                 const stock = parseInt(stockElement.textContent.trim().replace(/[^\d]/g, ''));
-                if (stock < 5) {
+                if (stock > 1) {
                     return false;
                 }
             }
