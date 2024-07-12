@@ -172,9 +172,10 @@ class OpenMarketRefundController extends Controller
     }
     private function callCoupangReturnShipmentApi($request)
     {
-        $partnerOrder = DB::table('partner_orders')->where('product_order_number', $request->productOrderNumber)->first();
+        $order = DB::table('orders')->where('product_order_number', $request->productOrderNumber)->first();
+        $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
         $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new CoupangReturnController();
-        return $controller->confirmReturnReceipt($account, $request->productOrderNumber);
+        return $controller->confirmReturnReceipt($account, $partnerOrder->product_order_number);
     }
 }
