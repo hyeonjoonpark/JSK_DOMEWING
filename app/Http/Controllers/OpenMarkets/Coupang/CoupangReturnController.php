@@ -9,21 +9,16 @@ use Illuminate\Support\Facades\DB;
 
 class CoupangReturnController extends Controller
 {
-    private $ssac;
-    public function __construct()
-    {
-        $this->ssac = new ApiController();
-    }
     public function index($partnerId)
     {
         try {
-            $accounts = $this->getActiveAccounts($partnerId);
+            $accounts = $this->getActiveAccounts($partnerId); //모든 계정 가져오기
             $customerResponsibilityReasons = $this->getCustomerResponsibilityReasons();
             $results = [];
             foreach ($accounts as $account) {
                 $apiResult = $this->getReturnList($account);
                 if (!$apiResult['status'] || !isset($apiResult['data']['data'])) continue;
-                foreach ($apiResult['data']['data'] as $returnData) {
+                foreach ($apiResult['data']['data'] as $returnData) { //응답이 올바르면 정보삽입
                     $reasonCode = $returnData['reasonCode'];
                     $reasonType = in_array($reasonCode, $customerResponsibilityReasons) ? '단순변심' : '상품정보와 상이';
                     $results[] = $this->transformReturnData($returnData, $reasonType);
@@ -37,7 +32,11 @@ class CoupangReturnController extends Controller
             }
             return ['status' => true, 'message' => '쿠팡환불요청수집에 성공하였습니다', 'data' => $createResult];
         } catch (\Exception $e) {
-            return ['status' => false, 'message' => '쿠팡환불요청수집에 에러가 발생하였습니다', 'error' => $e->getMessage()];
+            return [
+                'status' => false,
+                'message' => '쿠팡환불요청수집에 에러가 발생하였습니다',
+                'error' => $e->getMessage(),
+            ];
         }
     }
     private function isExistReturnOrder($newProductOrderNumber)
@@ -87,7 +86,8 @@ class CoupangReturnController extends Controller
             'status' => 'UC'
         ];
         $query = 'searchType=timeFrame&' . http_build_query($baseQuery);
-        return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $query);
+        $ac = new ApiController();
+        return $ac->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $query);
     }
     private function transformReturnData($returnData, $reasonType)
     {
@@ -99,7 +99,7 @@ class CoupangReturnController extends Controller
             'quantity' => $returnData['returnItems'][0]['cancelCount'],
             'newProductOrderNumber' => $returnData['receiptId'],
             'receiverName' => $returnData['requesterName'],
-            'receiverPhone' => $returnData['requesterPhoneNumber'] ? $returnData['requesterPhoneNumber'] : $returnData['requesterRealPhoneNumber'],
+            'receiverPhone' => $returnData['requesterPhoneNumber'] ?? $returnData['requesterRealPhoneNumber'] ?? '01000000000',
             'receiverAddress' => $returnData['requesterAddress'] . ' ' . $returnData['requesterAddressDetail'],
             'createdAt' => $returnData['createdAt']
         ];
@@ -114,6 +114,7 @@ class CoupangReturnController extends Controller
             'vendorId' => $account->code,
             'receiptId' => $receiptId
         ];
-        return $this->ssac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
+        $ac = new ApiController();
+        return $ac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
     }
 }

@@ -505,27 +505,37 @@ class OpenMarketOrderController extends Controller
         switch ($orderStatus) {
             case 'PAID_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'PAID')
                     ->where('o.requested', 'N')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'PAID_PROCESS':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'PAID')
                     ->where('o.requested', 'Y')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'PAID_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'PAID')
                     ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
             case 'CANCEL_COMPLETE':
-                $query->where('o.type', 'CANCELLED')
-                    ->whereBetween('o.updated_at', [$startOn, $endOn]);
+                $query->where(function ($query) {
+                    $query->where('o.type', 'CANCELLED')
+                        ->orWhere(function ($query) {
+                            $query->where('o.type', '!=', 'CANCELLED')
+                                ->where('wt.status', 'REJECTED');
+                        });
+                })->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
+
             case 'RETURN_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'PENDING')
                     ->where('o.type', 'REFUND')
                     ->where('o.requested', 'N')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
@@ -537,23 +547,27 @@ class OpenMarketOrderController extends Controller
                 //     break;
             case 'RETURN_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'REFUND')
                     ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
                     ->where('o.requested', 'N')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_PROCESS':
                 $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
                     ->where('o.requested', 'Y')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
+                    ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'EXCHANGE')
                     ->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;

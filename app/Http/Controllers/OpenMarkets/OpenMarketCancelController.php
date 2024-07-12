@@ -16,10 +16,13 @@ class OpenMarketCancelController extends Controller
             'status' => false,
             'message' => '취소사유는 필수입니다.',
         ];
-        $order = DB::table('orders as o') //주문내역가지고 작업하기전에 유효한지 확인하고 없으면 return
-            ->where('product_order_number', $productOrderNumber)
-            ->where('delivery_status', 'PENDING')
-            ->where('type', '!=', 'CANCELLED')
+        $order = DB::table('orders as o')
+            ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
+            ->where('o.product_order_number', $productOrderNumber)
+            ->where('o.delivery_status', 'PENDING')
+            ->where('o.type', '!=', 'CANCELLED')
+            ->where('wt.status', '!=', 'REJECTED')
+            ->select('o.*')
             ->first();
         if (!$order) return [
             'status' => false,
@@ -80,10 +83,13 @@ class OpenMarketCancelController extends Controller
             'status' => false,
             'message' => '취소사유는 필수입니다.',
         ];
-        $order = DB::table('orders as o') //주문내역가지고 작업하기전에 유효한지 확인하고 없으면 return
-            ->where('product_order_number', $productOrderNumber)
-            ->where('delivery_status', 'PENDING')
-            ->where('type', '!=', 'CANCELLED')
+        $order = DB::table('orders as o')
+            ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
+            ->where('o.product_order_number', $productOrderNumber)
+            ->where('o.delivery_status', 'PENDING')
+            ->where('o.type', '!=', 'CANCELLED')
+            ->where('wt.status', '!=', 'REJECTED')
+            ->select('o.*')
             ->first();
         if (!$order) return [
             'status' => false,

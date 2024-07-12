@@ -31,7 +31,7 @@ class Godwing extends Command
     {
         set_time_limit(0);
         ini_set('memory_allow', '-1');
-        $partnerId = 20;
+        $partnerId = 10;
         $vendorIds = [
             1,
             2,
