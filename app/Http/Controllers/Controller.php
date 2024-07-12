@@ -55,7 +55,6 @@ class Controller extends BaseController
             }
             $isExist = DB::table($table)
                 ->where('productCode', $productCode)
-                ->where('isActive', 'Y')
                 ->exists();
         } while ($isExist);
         return $productCode;
