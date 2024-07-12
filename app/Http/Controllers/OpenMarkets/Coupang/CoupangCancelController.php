@@ -135,7 +135,7 @@ class CoupangCancelController extends Controller
     private function acceptCancel($account, $receiptId, $cancelCount)
     {
         $contentType = 'application/json;charset=UTF-8';
-        $path = '/v2/providers/openapi/apis/api/v4/vendors/{vendorId}/returnRequests/{receiptId}/stoppedShipment';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests/' . $receiptId . '/stoppedShipment';
         $data = [
             'vendorId' => $account->code,
             'receiptId' => $receiptId,
