@@ -104,6 +104,13 @@ class CoupangReturnController extends Controller
             'createdAt' => $returnData['createdAt']
         ];
     }
+    public function isCancelOrder($account, $receiptId)
+    {
+        $contentType = 'application/json;charset=UTF-8';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests/' . $receiptId;
+        $ac = new ApiController();
+        return $ac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
+    }
     public function confirmReturnReceipt($account, $receiptId)
     {
         $accessKey = $account->access_key;

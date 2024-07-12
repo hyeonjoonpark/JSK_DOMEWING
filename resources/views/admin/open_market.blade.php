@@ -106,11 +106,11 @@
                                 value="RETURN_REQUEST">
                             <label class="form-check-label" for="returnProcess">반품요청</label>
                         </div>
-                        {{-- <div class="form-check form-check-inline">
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="orderStatus" id="returnComplete"
                                 value="RETURN_PROCESS">
                             <label class="form-check-label" for="returnComplete">반품대기중</label>
-                        </div> --}}
+                        </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="orderStatus" id="exchangeRequest"
                                 value="RETURN_COMPLETE">

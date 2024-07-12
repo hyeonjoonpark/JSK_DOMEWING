@@ -252,6 +252,10 @@ class OpenMarketOrderController extends Controller
             $exchangeController = new OpenMarketExchangeController();
             return $exchangeController->cancelExchange($request);
         }
+        if ($targetStatus == 'awaiting-shipment' && $orderType == 'REFUND') {
+            $setAwaitingController = new OpenMarketRefundController();
+            return $setAwaitingController->setAwaitingShipmentStatus($request->productOrderNumber);
+        }
         if ($targetStatus == 'shipment-complete' && $orderType == 'REFUND') {
             $exchangeController = new OpenMarketRefundController();
             return $exchangeController->saveRefundShipment($request);
@@ -540,11 +544,13 @@ class OpenMarketOrderController extends Controller
                     ->where('o.requested', 'N')
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
-                // case 'RETURN_PROCESS':
-                //     $query->where('o.delivery_status', 'PENDING')
-                //         ->where('o.type', 'REFUND')
-                //         ->where('o.requested', 'Y');
-                //     break;
+            case 'RETURN_PROCESS':
+                $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'PENDING')
+                    ->where('o.type', 'REFUND')
+                    ->where('o.requested', 'Y')
+                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                break;
             case 'RETURN_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
                     ->where('wt.status', 'APPROVED')
