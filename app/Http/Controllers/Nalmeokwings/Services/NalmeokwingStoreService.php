@@ -57,22 +57,29 @@ class NalmeokwingStoreService extends Controller
         $products = array_slice($sheetData, 2);
         $errors = [];
         foreach ($products as $i => $product) {
-            $product = $this->processOwnerclan($product);
-            $productValidatorResult = $this->productValidator($product);
-            if (!$productValidatorResult['status']) {
-                $errors[] = [
-                    'index' => $i + 1,
-                    'message' => $productValidatorResult['error']
-                ];
-                continue;
-            }
-            $storeResult = $this->store($product);
-            if (!$storeResult['status']) {
-                $errors[] = [
-                    'index' => $i + 1,
-                    'message' => $storeResult['message'],
-                    'error' => $storeResult['error']
-                ];
+            $productOptions = $this->processProductOptions($product[17], $product[18], $product[19], $product[20]);
+            if ($productOptions) {
+                $isCollected = false;
+                foreach ($productOptions as $productOption) {
+                    $processedProduct = $this->processOwnerclan($product, $productOption);
+                    $storeResult = $this->store($processedProduct);
+                    if (!$storeResult['status'] && !$isCollected) {
+                        $errors[] = [
+                            'index' => $i + 1,
+                            'message' => $storeResult['message']
+                        ];
+                        $isCollected = true;
+                    }
+                }
+            } else {
+                $processedProduct = $this->processOwnerclan($product);
+                $storeResult = $this->store($processedProduct);
+                if (!$storeResult['status']) {
+                    $errors[] = [
+                        'index' => $i + 1,
+                        'message' => $storeResult['message']
+                    ];
+                }
             }
         }
         return [
@@ -81,7 +88,36 @@ class NalmeokwingStoreService extends Controller
             'error' => $errors
         ];
     }
-    protected function processOwnerclan(array $product)
+    protected function processProductOptions(string $option1Name = null, string $option1Values = null, string $option2Name = null, string $option2Values = null)
+    {
+        $option1Values = $option1Values ? explode(',', $option1Values) : [];
+        $option2Values = $option2Values ? explode(',', $option2Values) : [];
+        $productOptions = [];
+        if ($option1Values) {
+            $index = 1;
+            foreach ($option1Values as $option1Value) {
+                $baseOption = '옵션: ' . $option1Name . ' - ' . $option1Value;
+                if ($option2Values) {
+                    foreach ($option2Values as $option2Value) {
+                        $fullOption = $baseOption . ' / ' . $option2Name . ' - ' . $option2Value;
+                        $productOptions[] = [
+                            'index' => $index,
+                            'productOption' => $fullOption
+                        ];
+                        $index++;
+                    }
+                } else {
+                    $productOptions[] = [
+                        'index' => $index,
+                        'productOption' => $baseOption
+                    ];
+                    $index++;
+                }
+            }
+        }
+        return $productOptions;
+    }
+    protected function processOwnerclan(array $product, array $productOption = [])
     {
         $sellerID = 5;
         $userID = 15;
@@ -91,25 +127,18 @@ class NalmeokwingStoreService extends Controller
             ->value('id');
         $originProductCode = $product[2];
         $productCode = $this->getProductCode('minewing_products', 8);
-        $productName = $product[7];
+        $productName = $productOption ? $product[7] . ' 옵션' . $productOption['index'] : $product[7];
         $productKeywords = $this->processProductKeywords($product[35]);
         $productPrice = $product[8];
         $shippingFee = $product[11];
         $bundleQuantity = $product[14];
         $productImage = $product[28];
-        $productOptions = [
-            'option1' => [
-                'name' => $product[17],
-                'value' => $product[18]
-            ],
-            'option2' => [
-                'name' => $product[19],
-                'value' => $product[20]
-            ]
-        ];
-        $productDetail = $this->processProductDetail($product[39], $productOptions);
+        if (!$productOption) {
+            $productOption['productOption'] = null;
+        }
+        $productDetail = $this->processProductDetail($product[39], $productOption['productOption']);
         $productHref = 'https://ownerclan.com/V2/product/view.php?selfcode=' . $originProductCode;
-        $hasOption = $productOptions['option1']['value'] ? 'Y' : 'N';
+        $hasOption = $productOption ? 'Y' : 'N';
         return [
             'sellerID' => $sellerID,
             'userID' => $userID,
@@ -133,32 +162,23 @@ class NalmeokwingStoreService extends Controller
         $productKeywords = array_slice($productKeywordArr, 0, 10);
         return implode(',', $productKeywords);
     }
-    protected function processProductDetail(string $productDetail, array $productOptions)
+    protected function processProductDetail(string $productDetail, string $productOption = null)
     {
-        $nalmeokwingHeader = asset('images/CDN/nalmeokwing_header.jpg');
-        $productOption = $this->processProductOptions($productOptions);
-        $html = '
+        $nalmeokwingHeader = asset('images/CDN/nalmeokwing_header.png');
+        $html = '';
+        if ($productOption) {
+            $html .= '
+                <h1 style="color:red !important; font-weight:bold !important; font-size:4rem !important;">
+                    ' . $productOption . '
+                </h1>
+            ';
+        }
+        $html .= '
             <center>
-                ' . $productOption . '
                 <img src="' . $nalmeokwingHeader . '" style="width: 100%;">
             </center>
         ';
         return $html . $productDetail;
-    }
-    protected function processProductOptions(array $productOptions)
-    {
-        $html = '';
-        if ($productOptions['option1']['value']) {
-            $html = '
-                <h1 style="color:red !important; font-weight:bold !important; font-size:4rem !important;">
-                    옵션: ' . $productOptions['option1']['name'] . ' - ' . $productOptions['option1']['value'] . '
-            ';
-            if ($productOptions['option2']['value']) {
-                $html .= ' / ' . $productOptions['option2']['name'] . ' - ' . $productOptions['option2']['value'];
-            }
-            $html .= '</h1><br><br><br>';
-        }
-        return $html;
     }
     protected function productValidator(array $product)
     {
