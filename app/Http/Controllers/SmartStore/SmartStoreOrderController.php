@@ -50,13 +50,8 @@ class SmartStoreOrderController extends Controller
             $formattedDate = $this->convertDateFormat($date->format('Y-m-d'));
             $data = ['lastChangedFrom' => $formattedDate];
             $response = $this->ssac->builder($account, $contentType, $method, $url, $data);
-            if ($response['status'] && isset($response['data']['data']['lastChangeStatuses'])) {
-                foreach ($response['data']['data']['lastChangeStatuses'] as $status) {
-                    if ($status['productOrderStatus'] === 'PAYED') {
-                        $returnOrders[] = $status;
-                    }
-                }
-            }
+            if (!$response || isset($response['error']) || !is_array($response)) continue;
+            $responses[$formattedDate] = $response;
         }
         return $responses;
     }
@@ -73,11 +68,17 @@ class SmartStoreOrderController extends Controller
         $date = new DateTime($inputDate, new DateTimeZone('Asia/Seoul'));
         return $date->format('Y-m-d\TH:i:s.vP');
     }
-    private function getOrderIds($orderList)
+    private function getOrderIds($response)
     {
         $orderIds = [];
-        foreach ($orderList as $order) {
-            $orderIds[] = $order['productOrderId'];
+        foreach ($response as $dateKey => $dateData) {
+            if (isset($dateData['data']['data']['lastChangeStatuses'])) {
+                foreach ($dateData['data']['data']['lastChangeStatuses'] as $status) {
+                    if (isset($status['productOrderId'])) {
+                        $orderIds[] = $status['productOrderId'];
+                    }
+                }
+            }
         }
         return $orderIds;
     }
