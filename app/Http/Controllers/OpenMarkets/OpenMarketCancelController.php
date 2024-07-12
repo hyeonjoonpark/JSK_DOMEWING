@@ -17,7 +17,7 @@ class OpenMarketCancelController extends Controller
             'message' => '취소사유는 필수입니다.',
         ];
         $order = DB::table('orders as o')
-            ->join('wing_transactions as wt', 'o.id', '=', 'wt.order_id')
+            ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
             ->where('o.product_order_number', $productOrderNumber)
             ->where('o.delivery_status', 'PENDING')
             ->where('o.type', '!=', 'CANCELLED')
@@ -84,7 +84,7 @@ class OpenMarketCancelController extends Controller
             'message' => '취소사유는 필수입니다.',
         ];
         $order = DB::table('orders as o')
-            ->join('wing_transactions as wt', 'o.id', '=', 'wt.order_id')
+            ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
             ->where('o.product_order_number', $productOrderNumber)
             ->where('o.delivery_status', 'PENDING')
             ->where('o.type', '!=', 'CANCELLED')
