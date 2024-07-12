@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\OpenMarkets\Coupang;
 
 use App\Http\Controllers\Controller;
+use DateTime;
 use Illuminate\Support\Facades\DB;
 
 class CoupangCancelController extends Controller
@@ -28,10 +29,25 @@ class CoupangCancelController extends Controller
             ->first();
         $singleOrder = $this->getSingleOrder($account, $partnerOrder->product_order_number); //발주서 단건 조회
         if (!$singleOrder['status']) {
-            return [ //즉 이미 쿠팡에서는 취소 또는 반품이 되어 있음으로 true를 진행하여 domewing에도 반영
+            return [
                 'status' => true,
                 'message' => '쿠팡 주문의 상태가 변경되었습니다.',
                 'error' => $singleOrder
+            ];
+        }
+        $receiptDetails = $this->fetchReceiptDetails($account, $partnerOrder->order_number, $partnerOrder->product_order_number);
+        if ($receiptDetails['status']) {
+            $response = $this->acceptCancel($account, $receiptDetails['receiptId'], $receiptDetails['cancelCount']); //취소 승인 api
+            if (!$response['status']) return [
+                'status' => false,
+                'message' => '쿠팡 취소 주문이어서 취소 처리중 취소 승인에 실패하였습니다.',
+                'data' => $response
+            ];
+            return [
+                'status' => true,
+                'message' => '쿠팡에서 취소요청인 주문이어서 취소요청 승인하였습니다.',
+                'data' => $response,
+                'cancelled' => true
             ];
         }
         $vendorItemId = $singleOrder['data']['data']['orderItems'][0]['vendorItemId'];
@@ -75,5 +91,56 @@ class CoupangCancelController extends Controller
         $contentType = 'application/json;charset=UTF-8';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/ordersheets' . '/' .  $productOrderNumber;
         return $this->ssac->getBuilder($account->access_key, $account->secret_key, $contentType, $path);
+    }
+    private function fetchReceiptDetails($account, $orderId, $shipmentBoxId)
+    {
+        $contentType = 'application/json';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests';
+        $startDate = (new DateTime('now - 4 days'))->format('Y-m-d');
+        $endDate = (new DateTime('now'))->format('Y-m-d');
+        $baseQuery = [
+            'createdAtFrom' => $startDate,
+            'createdAtTo' => $endDate,
+            'orderId' => $orderId
+        ];
+        $queryString = http_build_query($baseQuery);
+        $controller = new ApiController();
+        $response =  $controller->getBuilder($account->access_key, $account->secret_key, $contentType, $path, $queryString); //발주서 단건조회
+        $receiptId = 0;
+        $cancelCount = 0;
+        $purchaseCount = 0;
+        if (!isset($response['data']['data'])) return [
+            'status' => false,
+            'message' => '쿠팡 주문 조회가 되지 않습니다.'
+        ];
+        foreach ($response['data']['data'] as $orderItem) {
+            if ($orderItem['returnItems'][0]['shipmentBoxId'] == $shipmentBoxId) {
+                $receiptId = $orderItem['receiptId'];
+                $cancelCount = $orderItem['returnItems'][0]['cancelCount'];
+                $purchaseCount = $orderItem['returnItems'][0]['purchaseCount'];
+                break;
+            }
+        }
+        if ($cancelCount === 0) return [
+            'status' => false,
+            'message' => '주문 취소 건이 아닙니다.'
+        ];
+        return [
+            'status' => true,
+            'receiptId' => $receiptId,
+            'cancelCount' => $cancelCount,
+            'purchaseCount' => $purchaseCount
+        ];
+    }
+    private function acceptCancel($account, $receiptId, $cancelCount)
+    {
+        $contentType = 'application/json;charset=UTF-8';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/{vendorId}/returnRequests/{receiptId}/stoppedShipment';
+        $data = [
+            'vendorId' => $account->code,
+            'receiptId' => $receiptId,
+            'cancelCount' => $cancelCount
+        ];
+        return $this->ssac->putBuilder($account->access_key, $account->secret_key, $contentType, $path, $data);
     }
 }
