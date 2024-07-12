@@ -10,6 +10,49 @@ use Illuminate\Support\Facades\Validator;
 
 class OpenMarketRefundController extends Controller
 {
+    public function setAwaitingShipmentStatus($productOrderNumber)
+    {
+        $order = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->where('requested', 'N')
+            ->where('delivery_status', 'PENDING')
+            ->where('type', 'REFUND')
+            ->first();
+        if (!$order) {
+            return [
+                'status' => false,
+                'message' => '배송 대기 중으로 변경 가능한 주문이 아닙니다.',
+            ];
+        }
+        $openMarket = DB::table('orders as o')
+            ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
+            ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
+            ->where('o.product_order_number', $productOrderNumber)
+            ->where('v.is_active', 'ACTIVE')
+            ->select('v.*')
+            ->first(['v.name_eng', 'v.name']);
+        if ($openMarket && $openMarket->name_eng == 'coupang') { //일단은 쿠팡만 적용
+            $method = 'call' . ucfirst($openMarket->name_eng) . 'CheckApi';
+            $updateApiResult = $this->$method($productOrderNumber);
+            if (!$updateApiResult['status']) {
+                return $updateApiResult;
+            }
+        }
+        $updated = DB::table('orders')
+            ->where('product_order_number', $productOrderNumber)
+            ->update(['requested' => 'Y']);
+        if ($updated) {
+            return response()->json([
+                'status' => true,
+                'message' => '주문 상태가 배송 대기 중으로 변경되었습니다.',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => '주문 상태 변경에 실패했습니다.',
+            ]);
+        }
+    }
     public function saveRefundShipment(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -44,20 +87,6 @@ class OpenMarketRefundController extends Controller
         }
         $deliveryCompanyId = $request->deliveryCompanyId;
         $trackingNumber = $request->trackingNumber;
-        $openMarket = DB::table('orders as o')
-            ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
-            ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
-            ->where('o.product_order_number', $productOrderNumber)
-            ->where('v.is_active', 'ACTIVE')
-            ->select('v.*')
-            ->first(['v.name_eng', 'v.name']);
-        if ($openMarket && $openMarket->name_eng == 'coupang') { //일단은 쿠팡만 적용
-            $method = 'call' . ucfirst($openMarket->name_eng) . 'ReturnShipmentApi';
-            $updateApiResult = $this->$method($request);
-            if (!$updateApiResult['status']) {
-                return $updateApiResult;
-            }
-        }
         if ($trackingNumber && $deliveryCompanyId) {
             return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
         } else {
@@ -170,12 +199,31 @@ class OpenMarketRefundController extends Controller
             ];
         }
     }
-    private function callCoupangReturnShipmentApi($request)
+    private function callCoupangCheckApi($productOrderNumber)
     {
-        $order = DB::table('orders')->where('product_order_number', $request->productOrderNumber)->first();
+        $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
         $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new CoupangReturnController();
-        return $controller->confirmReturnReceipt($account, $partnerOrder->product_order_number);
+        $apiResult =  $controller->isCancelOrder($account, $partnerOrder->product_order_number);
+        if (!$apiResult['status']) {
+            DB::table('wing_transactions')->where('id', $order->wing_transaction_id)->update(['status' => 'REJECTED']);
+            return [
+                'status' => false,
+                'message' => '고객이 반품접수를 취소하여 반품주문 취소처리하였습니다.',
+                'data' => $apiResult
+            ];
+        }
+        $confirmApiResult = $controller->confirmReturnReceipt($account, $partnerOrder->product_order_number);
+        if (!$confirmApiResult['status']) {
+            return [
+                'status' => false,
+                'message' => '쿠팡 반품 주문 입고 요청에 실패하였습니다. 관리자에게 문의해주세요.',
+                'data' => $confirmApiResult
+            ];
+        }
+        return [
+            'status' => true
+        ];
     }
 }
