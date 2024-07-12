@@ -42,6 +42,15 @@
                 </div>
             </div>
         </div>
+        <div class="col-12">
+            <div class="card card-bordered">
+                <div class="card-inner">
+                    <h6 class="title">업로드 결과</h6>
+                    <p>오류가 발생한 상품의 열 번호와 원인이 표시됩니다.</p>
+                    <p id="uploadResult"></p>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 @section('scripts')
@@ -61,7 +70,35 @@
                 processData: false,
                 contentType: false,
                 data: formData,
-                success: ajaxSuccessHandling,
+                success: function(response) {
+                    console.log(response);
+                    Swal.close();
+                    $('.modal').modal("hide");
+                    $('.btn').prop('disabled', false);
+                    const status = response.status;
+                    const message = response.message;
+                    const error = response.error;
+                    if (!status) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "진행 실패",
+                            text: message
+                        });
+                    } else {
+                        let html = '';
+                        for (const e of error) {
+                            html += `
+                                열 ${e.index} 오류: ${e.message}<br>
+                            `;
+                        }
+                        $('#uploadResult').html(html);
+                        Swal.fire({
+                            icon: "success",
+                            title: "진행 성공",
+                            text: message
+                        });
+                    }
+                },
                 error: AjaxErrorHandling
             });
         }

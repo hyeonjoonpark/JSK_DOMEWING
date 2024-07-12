@@ -62,6 +62,15 @@ class NalmeokwingStoreService extends Controller
                 $isCollected = false;
                 foreach ($productOptions as $productOption) {
                     $processedProduct = $this->processOwnerclan($product, $productOption);
+                    $productValidatorResult = $this->productValidator($processedProduct);
+                    if (!$productValidatorResult['status']) {
+                        $errors[] = [
+                            'index' => $i + 1,
+                            'message' => $productValidatorResult['message'],
+                            'product' => $processedProduct
+                        ];
+                        continue;
+                    }
                     $storeResult = $this->store($processedProduct);
                     if (!$storeResult['status'] && !$isCollected) {
                         $errors[] = [
@@ -73,6 +82,15 @@ class NalmeokwingStoreService extends Controller
                 }
             } else {
                 $processedProduct = $this->processOwnerclan($product);
+                $productValidatorResult = $this->productValidator($processedProduct);
+                if (!$productValidatorResult['status']) {
+                    $errors[] = [
+                        'index' => $i + 1,
+                        'message' => $productValidatorResult['message'],
+                        'product' => $processedProduct
+                    ];
+                    continue;
+                }
                 $storeResult = $this->store($processedProduct);
                 if (!$storeResult['status']) {
                     $errors[] = [
@@ -236,7 +254,7 @@ class NalmeokwingStoreService extends Controller
         if ($validator->fails()) {
             return [
                 'status' => false,
-                'error' => $validator->errors()->first()
+                'message' => $validator->errors()->first()
             ];
         }
         return [
