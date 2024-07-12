@@ -44,6 +44,10 @@ const { goToAttempts, signIn } = require('./trackwing-common');
 async function validateProduct(page) {
     try {
         return await page.evaluate(() => {
+            const txtDescElement = document.querySelector('div.total.price.clearbox > span.button.bgred');
+            if (txtDescElement && txtDescElement.textContent.trim().includes('품절')) {
+                return false;
+            }
 
             return true;
         });
