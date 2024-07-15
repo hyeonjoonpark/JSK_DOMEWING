@@ -71,7 +71,7 @@ class NalmeokwingStoreService extends Controller
                         ];
                         continue;
                     }
-                    $storeResult = $this->store($processedProduct);
+                    $storeResult = $this->store($processedProduct, 'ownerclan');
                     if (!$storeResult['status'] && !$isCollected) {
                         $errors[] = [
                             'index' => $i + 1,
@@ -91,7 +91,7 @@ class NalmeokwingStoreService extends Controller
                     ];
                     continue;
                 }
-                $storeResult = $this->store($processedProduct);
+                $storeResult = $this->store($processedProduct, 'ownerclan');
                 if (!$storeResult['status']) {
                     $errors[] = [
                         'index' => $i + 1,
@@ -156,7 +156,7 @@ class NalmeokwingStoreService extends Controller
         }
         $productDetail = $this->processProductDetail($product[39], $productOption['productOption']);
         $productHref = 'https://ownerclan.com/V2/product/view.php?selfcode=' . $originProductCode;
-        $hasOption = $productOption ? 'Y' : 'N';
+        $hasOption = $productOption['productOption'] ? 'Y' : 'N';
         return [
             'sellerID' => $sellerID,
             'userID' => $userID,
@@ -261,15 +261,28 @@ class NalmeokwingStoreService extends Controller
             'status' => true
         ];
     }
-    protected function store(array $product)
+    protected function store(array $product, string $vendorEngName)
     {
+        DB::beginTransaction();
         try {
+            $isExistingCategoryMapping = DB::table('category_mapping AS cm')
+                ->join($vendorEngName . '_category AS c', 'c.id', '=', 'cm.' . $vendorEngName)
+                ->where('cm.' . $vendorEngName, $product['categoryID'])
+                ->exists();
+            if (!$isExistingCategoryMapping) {
+                DB::table('category_mapping')
+                    ->insert([
+                        $vendorEngName => $product['categoryID']
+                    ]);
+            }
             DB::table('minewing_products')
                 ->insert($product);
+            DB::commit();
             return [
                 'status' => true
             ];
         } catch (\Exception $e) {
+            DB::rollBack();
             return [
                 'status' => false,
                 'message' => '상품을 저장하는 과정에서 오류가 발생했습니다.',

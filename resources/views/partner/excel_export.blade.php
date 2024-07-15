@@ -40,7 +40,7 @@
                                             value="{{ $seller->vendor_id }}" class="custom-control-input"
                                             {{ $seller->vendor_id === 61 ? 'checked' : '' }}>
                                         <label class="custom-control-label"
-                                            for="seller{{ $seller->vendor_id }}">{{ $seller->nickname }}</label>
+                                            for="seller{{ $seller->vendor_id }}">{{ $seller->name }}</label>
                                     </div>
                                 </div>
                             @endforeach

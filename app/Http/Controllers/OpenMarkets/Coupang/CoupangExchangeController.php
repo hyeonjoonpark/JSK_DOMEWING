@@ -21,18 +21,14 @@ class CoupangExchangeController extends Controller
             $apiResults[] = $this->getExchangeResult($account); //모든 신청내역 불러오기
         }
         return $apiResults;
-
-
-
         foreach ($apiResults as $apiResult) {
             $exchangeId = $apiResult['data']['exchangeAddressDtoV1']['exchangeId'];
         }
     }
     private function getExchangeResult($account) //교환신청 내역 불러오기 - 테스트 완료
     {
-        $startDate = (new DateTime('now - 4 days'))->format('YmdHi');
-        $endDate = (new DateTime('now'))->format('YmdHi');
-
+        $startDate = (new DateTime('now - 4 days'))->format('Y-m-d\TH:i:s');
+        $endDate = (new DateTime('now'))->format('Y-m-d\TH:i:s');
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests';
         $baseQuery = [

@@ -118,8 +118,8 @@ class SmartstoreProductUpload extends Controller
                         ]
                     ],
                     'claimDeliveryInfo' => [
-                        'returnDeliveryFee' => (int)$product->shipping_fee,
-                        'exchangeDeliveryFee' => (int)$product->shipping_fee * 2
+                        'returnDeliveryFee' => (int)$product->shipping_fee === 0 ? 3000 : (int)$product->shipping_fee,
+                        'exchangeDeliveryFee' => (int)$product->shipping_fee === 0 ? 6000 : (int)$product->shipping_fee * 2
                     ],
                     'installationFee' => false,
                 ],

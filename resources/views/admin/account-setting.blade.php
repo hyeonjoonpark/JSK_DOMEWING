@@ -64,8 +64,8 @@
                 <div class="col-12">
                     <div class="card card-bordered">
                         <div class="card-inner">
-                            <h6 class="title">파트너스 엑셀윙 마진률</h6>
-                            <p>파트너스 엑셀 주문 마진률을 책정합니다.</p>
+                            <h6 class="title">파트너스 마진률</h6>
+                            <p>파트너스 각 서비스별 마진률을 책정합니다.</p>
                             <div class="form-group">
                                 <label for="" class="form-label">파트너스 엑셀윙 마진률</label>
                                 <div class="d-flex text-nowrap">
@@ -81,6 +81,21 @@
                                     </div>
                                     <button class="btn btn-primary" id="{{ $partnersExcelwingMargin->id }}CommissionBtn"
                                         onclick="updateExcelCommission('{{ $partnersExcelwingMargin->title }}');">변경</button>
+                                </div>
+                                <label for="" class="form-label">날먹윙 마진률</label>
+                                <div class="d-flex text-nowrap">
+                                    <div class="form-control-wrap w-100">
+                                        <div class="form-text-hint">
+                                            <span class="overline-title">%</span>
+                                        </div>
+                                        <input type="text" class="form-control"
+                                            id="{{ $nalmeokwing_margin->title }}NalmeokCommission"
+                                            value="{{ $nalmeokwing_margin->value }}" placeholder="수수료(%)를 기입해주세요."
+                                            onkeydown="handleEnter(event, '{{ $nalmeokwing_margin->id }}CommissionBtn')"
+                                            oninput="numberFormatter(this, 2, 1);">
+                                    </div>
+                                    <button class="btn btn-primary" id="{{ $nalmeokwing_margin->id }}CommissionBtn"
+                                        onclick="updateNalmeokCommission('{{ $nalmeokwing_margin->title }}');">변경</button>
                                 </div>
                             </div>
                         </div>
@@ -146,6 +161,22 @@
             const commission = parseFloat($('#' + title + 'ExcelCommission').val());
             $.ajax({
                 url: '/api/account-setting/update-excel-commission',
+                type: 'PUT',
+                dataType: 'JSON',
+                data: {
+                    rememberToken,
+                    title,
+                    commission
+                },
+                success: ajaxSuccessHandling,
+                error: AjaxErrorHandling
+            });
+        }
+
+        function updateNalmeokCommission(title) {
+            const commission = parseFloat($('#' + title + 'NalmeokCommission').val());
+            $.ajax({
+                url: '/api/account-setting/nalmeok-commission',
                 type: 'PUT',
                 dataType: 'JSON',
                 data: {

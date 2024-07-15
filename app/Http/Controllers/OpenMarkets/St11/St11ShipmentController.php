@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\OpenMarkets\Coupang;
+namespace App\Http\Controllers\OpenMarkets\St11;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\St11\ApiController;
@@ -110,7 +110,8 @@ class St11ShipmentController extends Controller
     {
         $method = 'GET';
         $nowDate = new DateTime('now');
-        $url = 'http://api.11st.co.kr/rest/claimservice/cancelreqreject/' . $partnerOrder->order_number . '/' . $ordPrdSeq . '/' . $ordPrdCnSeq . '/01/' . $nowDate . '/' . $$deliveryCompanyCode . '/' . $invoiceNumber;
+        $formattedDate = $nowDate->format('Ymd');
+        $url = 'http://api.11st.co.kr/rest/claimservice/cancelreqreject/' . $partnerOrder->order_number . '/' . $ordPrdSeq . '/' . $ordPrdCnSeq . '/01/' . $formattedDate . '/' . $deliveryCompanyCode . '/' . $invoiceNumber;
         return $this->ssac->builder($account->access_key, $method, $url);
     }
 
@@ -118,7 +119,8 @@ class St11ShipmentController extends Controller
     {
         $method = 'GET';
         $nowDate = new DateTime('now');
-        $url = 'https://api.11st.co.kr/rest/ordservices/reqdelivery/' . $nowDate . '/01/' . $deliveryCompanyCode . '/' . $invoiceNumber . '/' . $dlvNo;
+        $formattedDate = $nowDate->format('YmdHi');
+        $url = 'https://api.11st.co.kr/rest/ordservices/reqdelivery/' . $formattedDate . '/01/' . $deliveryCompanyCode . '/' . $invoiceNumber . '/' . $dlvNo;
         return $this->ssac->builder($account->access_key, $method, $url);
     }
 
@@ -144,7 +146,7 @@ class St11ShipmentController extends Controller
 
     private function getAccount($accountId)
     {
-        return DB::table('coupang_accounts')
+        return DB::table('st11_accounts')
             ->where('id', $accountId)
             ->where('is_active', 'ACTIVE')
             ->first();
