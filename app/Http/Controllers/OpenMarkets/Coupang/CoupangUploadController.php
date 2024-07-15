@@ -169,6 +169,7 @@ class CoupangUploadController extends Controller
             $deliveryChargeType = "FREE";
         }
         $deliveryCharge = $shippingFee;
+        $deliveryChargeOnReturn = $product->shipping_fee === 0 ? 3000 : $product->shipping_fee;
         return [
             'displayCategoryCode' => $product->code,
             'sellerProductName' => $product->productName,
@@ -183,7 +184,7 @@ class CoupangUploadController extends Controller
             'deliveryChargeType' => $deliveryChargeType,
             'deliveryCharge' => $deliveryCharge,
             'freeShipOverAmount' => 0,
-            'deliveryChargeOnReturn' => $product->shipping_fee,
+            'deliveryChargeOnReturn' => $deliveryChargeOnReturn,
             'remoteAreaDeliverable' => 'Y',
             'unionDeliveryType' => 'NOT_UNION_DELIVERY',
             'returnCenterCode' => $returnCenter['returnCenterCode'],
@@ -192,7 +193,7 @@ class CoupangUploadController extends Controller
             'returnZipCode' => $returnCenter['placeAddresses'][0]['returnZipCode'],
             'returnAddress' => $returnCenter['placeAddresses'][0]['returnAddress'],
             'returnAddressDetail' => $returnCenter['placeAddresses'][0]['returnAddressDetail'],
-            'returnCharge' => $product->shipping_fee,
+            'returnCharge' => $deliveryChargeOnReturn,
             'outboundShippingPlaceCode' => $outboundCode,
             'vendorUserId' => $account->username,
             'requested' => true,

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Str;
 
 class NalmeokwingExtractService extends Controller
 {
@@ -78,13 +79,16 @@ class NalmeokwingExtractService extends Controller
             $sheet->setCellValue('D' . $rowNumber, $order->receiver_name);
             $sheet->setCellValue('E' . $rowNumber, $order->receiver_phone);
             $sheet->setCellValue('F' . $rowNumber, $order->receiver_phone);
-            $sheet->setCellValue('G' . $rowNumber, '');
+            $sheet->setCellValue('G' . $rowNumber, '00000');
             $sheet->setCellValue('H' . $rowNumber, $order->receiver_address);
             $sheet->setCellValue('I' . $rowNumber, $option1Value);
             $sheet->setCellValue('J' . $rowNumber, $option2Value);
             $sheet->setCellValue('K' . $rowNumber, $order->receiver_remark);
             $rowNumber++;
         }
+        $newFilename = public_path('assets/excel/nalmeokwings/formed/' . Str::uuid() . '.xlsx');
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($newFilename);
     }
     protected function processProductOptions(string $productDetail)
     {
