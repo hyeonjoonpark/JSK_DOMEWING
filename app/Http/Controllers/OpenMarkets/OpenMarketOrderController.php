@@ -472,6 +472,10 @@ class OpenMarketOrderController extends Controller
                 $join->on('ssa.id', '=', 'po.account_id')
                     ->where('po.vendor_id', 51);
             })
+            ->leftJoin('st11_accounts as sa', function ($join) {
+                $join->on('sa.id', '=', 'po.account_id')
+                    ->where('po.vendor_id', 54);
+            })
             ->whereIn('mp.sellerID', $vendors)
             // ->whereNot('v.type', 'B2B') // 일단은 포함시키기로
             ->select(
@@ -505,7 +509,7 @@ class OpenMarketOrderController extends Controller
                 'o.admin_remark as adminRemark',
                 'o.bundle_quantity_then as bundleQuantity',
                 'o.delivery_status as deliveryStatus',
-                DB::raw('COALESCE(ca.username, ssa.username) as username')
+                DB::raw('COALESCE(ca.username, ssa.username, sa.username) as username')
             );
         switch ($orderStatus) {
             case 'PAID_REQUEST':
