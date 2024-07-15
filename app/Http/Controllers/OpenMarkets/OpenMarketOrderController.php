@@ -459,11 +459,11 @@ class OpenMarketOrderController extends Controller
         $query = DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
             ->leftJoin('delivery_companies as dc', 'o.delivery_company_id', '=', 'dc.id')
+            ->leftJoin('vendors as v', 'v.id', '=', 'po.vendor_id')
             ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
             ->join('members as m', 'm.id', '=', 'wt.member_id')
             ->join('carts as c', 'c.id', '=', 'o.cart_id')
             ->join('minewing_products as mp', 'mp.id', '=', 'c.product_id')
-            ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->leftJoin('coupang_accounts as ca', function ($join) {
                 $join->on('ca.id', '=', 'po.account_id')
                     ->where('po.vendor_id', 40);
@@ -473,7 +473,7 @@ class OpenMarketOrderController extends Controller
                     ->where('po.vendor_id', 51);
             })
             ->whereIn('mp.sellerID', $vendors)
-            ->whereNot('v.type', 'B2B')
+            // ->whereNot('v.type', 'B2B') // 일단은 포함시키기로
             ->select(
                 'm.username as member_username',
                 'c.quantity as quantity',
