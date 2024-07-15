@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Nalmeokwings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Nalmeokwings\Services\NalmeokwingCreateService;
+use App\Http\Controllers\Nalmeokwings\Services\NalmeokwingExtractService;
+use App\Http\Controllers\Nalmeokwings\Services\NalmeokwingOrderService;
 use App\Http\Controllers\Nalmeokwings\Services\NalmeokwingStoreService;
 use Illuminate\Http\Request;
 
@@ -21,5 +23,18 @@ class NalmeokwingController extends Controller
     {
         $nss = new NalmeokwingStoreService();
         return $nss->main($request);
+    }
+    public function order()
+    {
+        $nos = new NalmeokwingOrderService();
+        $data = $nos->main();
+        return view('admin.nalmeokwing_order', [
+            'data' => $data
+        ]);
+    }
+    public function extract(Request $request)
+    {
+        $nes = new NalmeokwingExtractService();
+        return $nes->main($request);
     }
 }

@@ -101,6 +101,11 @@
                                         <span class="nk-menu-text">상품 생성</span>
                                     </a>
                                 </li>
+                                <li class="nk-menu-item">
+                                    <a href="/admin/nalmeokwing/order" class="nk-menu-link">
+                                        <span class="nk-menu-text">주문서 추출</span>
+                                    </a>
+                                </li>
                             </ul><!-- .nk-menu-sub -->
                         </li><!-- .nk-menu-item -->
                         <li class="nk-menu-item has-sub">

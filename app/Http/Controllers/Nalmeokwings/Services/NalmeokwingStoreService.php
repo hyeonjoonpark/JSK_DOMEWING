@@ -156,7 +156,7 @@ class NalmeokwingStoreService extends Controller
         }
         $productDetail = $this->processProductDetail($product[39], $productOption['productOption']);
         $productHref = 'https://ownerclan.com/V2/product/view.php?selfcode=' . $originProductCode;
-        $hasOption = $productOption ? 'Y' : 'N';
+        $hasOption = $productOption['productOption'] ? 'Y' : 'N';
         return [
             'sellerID' => $sellerID,
             'userID' => $userID,
