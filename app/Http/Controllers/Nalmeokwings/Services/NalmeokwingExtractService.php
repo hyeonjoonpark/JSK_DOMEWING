@@ -65,6 +65,13 @@ class NalmeokwingExtractService extends Controller
         $sheet = $spreadsheet->getSheet(0);
         $rowNumber = 3;
         foreach ($orders as $order) {
+            $option1Value = '';
+            $option2Value = '';
+            if ($order->hasOption === 'Y') {
+                $productOptions = $this->processProductOptions($order->productDetail);
+                $option1Value = $productOptions['option1Value'];
+                $option2Value = $productOptions['option2Value'];
+            }
             $sheet->setCellValue('A' . $rowNumber, $order->origin_product_code);
             $sheet->setCellValue('B' . $rowNumber, $order->quantity);
             $sheet->setCellValue('C' . $rowNumber, '선불');
@@ -73,13 +80,29 @@ class NalmeokwingExtractService extends Controller
             $sheet->setCellValue('F' . $rowNumber, $order->receiver_phone);
             $sheet->setCellValue('G' . $rowNumber, '');
             $sheet->setCellValue('H' . $rowNumber, $order->receiver_address);
-            $sheet->setCellValue('I' . $rowNumber, $order->receiver_address);
-            $sheet->setCellValue('J' . $rowNumber, $order->receiver_address);
+            $sheet->setCellValue('I' . $rowNumber, $option1Value);
+            $sheet->setCellValue('J' . $rowNumber, $option2Value);
             $sheet->setCellValue('K' . $rowNumber, $order->receiver_remark);
             $rowNumber++;
         }
     }
-    protected function processProductOption(string $productDetail)
+    protected function processProductOptions(string $productDetail)
     {
+        $doc = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $doc->loadHTML($productDetail);
+        libxml_clear_errors();
+        $xpath = new \DOMXPath($doc);
+        $h1Nodes = $xpath->query('//h1');
+        $text = $h1Nodes[0]->textContent;
+        preg_match_all('/옵션: (.+?) - (.+?)(?: \/ (.+?) - (.+?))?/', $text, $matches, PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            $option1Value = $match[2] ?? '';
+            $option2Value = $match[4] ?? '';
+        }
+        return [
+            'option1Value' => $option1Value,
+            'option2Value' => $option2Value
+        ];
     }
 }
