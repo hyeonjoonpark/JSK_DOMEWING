@@ -110,8 +110,8 @@ class St11ShipmentController extends Controller
     {
         $method = 'GET';
         $nowDate = new DateTime('now');
-        $formattedDate = $nowDate->format('YmdHi');
-        $url = 'http://api.11st.co.kr/rest/claimservice/cancelreqreject/' . $partnerOrder->order_number . '/' . $ordPrdSeq . '/' . $ordPrdCnSeq . '/01/' . $formattedDate . '/' . $$deliveryCompanyCode . '/' . $invoiceNumber;
+        $formattedDate = $nowDate->format('Ymd');
+        $url = 'http://api.11st.co.kr/rest/claimservice/cancelreqreject/' . $partnerOrder->order_number . '/' . $ordPrdSeq . '/' . $ordPrdCnSeq . '/01/' . $formattedDate . '/' . $deliveryCompanyCode . '/' . $invoiceNumber;
         return $this->ssac->builder($account->access_key, $method, $url);
     }
 
