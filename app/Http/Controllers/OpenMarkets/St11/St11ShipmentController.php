@@ -146,7 +146,7 @@ class St11ShipmentController extends Controller
 
     private function getAccount($accountId)
     {
-        return DB::table('coupang_accounts')
+        return DB::table('st11_accounts')
             ->where('id', $accountId)
             ->where('is_active', 'ACTIVE')
             ->first();
