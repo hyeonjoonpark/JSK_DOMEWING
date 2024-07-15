@@ -473,7 +473,7 @@ class OpenMarketOrderController extends Controller
                     ->where('po.vendor_id', 51);
             })
             ->whereIn('mp.sellerID', $vendors)
-            // ->whereNot('v.type', 'B2B') // 다시 거를예정 임시방편
+            // ->whereNot('v.type', 'B2B') // 일단은 포함시키기로
             ->select(
                 'm.username as member_username',
                 'c.quantity as quantity',
