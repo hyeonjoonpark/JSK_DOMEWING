@@ -85,36 +85,36 @@
                     </div>
                     <div class="form-group">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeProcess"
+                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeRequest"
                                 value="EXCHANGE_REQUEST">
-                            <label class="form-check-label" for="exchangeProcess">교환요청</label>
+                            <label class="form-check-label" for="exchangeRequest">교환요청</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeProcess"
+                                value="EXCHANGE_PROCESS">
+                            <label class="form-check-label" for="exchangeProcess">교환대기중</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="orderStatus" id="exchangeComplete"
-                                value="EXCHANGE_PROCESS">
-                            <label class="form-check-label" for="exchangeComplete">교환대기중</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="returnRequest"
                                 value="EXCHANGE_COMPLETE">
-                            <label class="form-check-label" for="returnRequest">교환완료</label>
+                            <label class="form-check-label" for="exchangeComplete">교환완료</label>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="returnProcess"
+                            <input class="form-check-input" type="radio" name="orderStatus" id="returnRequest"
                                 value="RETURN_REQUEST">
-                            <label class="form-check-label" for="returnProcess">반품요청</label>
+                            <label class="form-check-label" for="returnRequest">반품요청</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="returnProcess"
+                                value="RETURN_PROCESS">
+                            <label class="form-check-label" for="returnProcess">반품대기중</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="orderStatus" id="returnComplete"
-                                value="RETURN_PROCESS">
-                            <label class="form-check-label" for="returnComplete">반품대기중</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="orderStatus" id="exchangeRequest"
                                 value="RETURN_COMPLETE">
-                            <label class="form-check-label" for="exchangeRequest">반품완료</label>
+                            <label class="form-check-label" for="returnComplete">반품완료</label>
                         </div>
                     </div>
                     <div class="form-group">
