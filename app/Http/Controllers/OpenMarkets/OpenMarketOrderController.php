@@ -70,7 +70,7 @@ class OpenMarketOrderController extends Controller
                             $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
                             $cartId = $cart['data']['cartId'];
                             $cartCode = $this->getCartCode($cartId);
-                            $totalPrice += $this->getCartAmount($cartCode); // wing_transaction amount구하기
+                            $totalPrice += $this->getCartAmount($cartCode, $product->sellerID); // wing_transaction amount구하기
                             $cartIds[] = $cartId;  //cartId 리스트로 보관
                         }
                         if ($totalPrice === 0) continue;
@@ -79,7 +79,7 @@ class OpenMarketOrderController extends Controller
                         foreach ($orders as $index => $order) {
                             $product = $this->getProduct($order['productCode']);
                             if (!$product) continue;
-                            $priceThen = $this->getSalePrice($product->id);
+                            $priceThen = $this->getSalePrice($product->id, $product->sellerID);
                             $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity, $order['orderDate']);
                             $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
                             $uploadedProduct = call_user_func([$this, $uploadedProductMethod], $product->id); // 해당 오픈마켓 업로드테이블에서 업로드된 상품인지 확인하고 id값 가져옴
@@ -180,7 +180,6 @@ class OpenMarketOrderController extends Controller
                 'data' => []
             ];
         }
-        $wc = new WingController();
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
         $results = [];
@@ -419,19 +418,19 @@ class OpenMarketOrderController extends Controller
     }
 
     // 카트 금액 계산
-    private function getCartAmount($cartCode)
+    private function getCartAmount($cartCode, $sellerID)
     {
         $cart = DB::table('carts AS c')
             ->join('minewing_products AS mp', 'mp.id', '=', 'c.product_id')
             ->where('c.code', $cartCode)
             ->first();
 
-        $salePrice = $this->getSalePrice($cart->product_id);
+        $salePrice = $this->getSalePrice($cart->product_id, $sellerID);
         $shippingRate = $cart->bundle_quantity === 0 ? 1 : ceil($cart->quantity / $cart->bundle_quantity);
         return $salePrice * $cart->quantity + $cart->shipping_fee * $shippingRate;
     }
     // 판매 가격 계산
-    private function getSalePrice($productId)
+    private function getSalePrice($productId, $sellerID)
     {
         $originProductPrice = DB::table('minewing_products')
             ->where('id', $productId)
@@ -447,6 +446,7 @@ class OpenMarketOrderController extends Controller
             ->value('pp.product_price');
         $productPrice = $promotion ?? $originProductPrice;
         $margin = DB::table('sellwing_config')->where('id', 1)->value('value');
+        if ($sellerID == 5) $margin = DB::table('sellwing_config')->where('id', 3)->value('value');
         $marginRate = ($margin / 100) + 1;
         return ceil($productPrice * $marginRate);
     }
