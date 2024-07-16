@@ -408,7 +408,7 @@ class UploadedController extends Controller
                     'deliveryBundleGroupUsable' => false,
                     'deliveryFee' => [
                         'deliveryFeeType' => $deliveryFeeType,
-                        'baseFee' => $product->shipping_fee,
+                        'baseFee' => $shippingFee,
                         'repeatQuantity' => $bundleQuantity,
                         'deliveryFeePayType' => 'PREPAID',
                         'deliveryFeeByArea' => [
