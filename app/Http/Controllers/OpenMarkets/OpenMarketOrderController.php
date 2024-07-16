@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangExchangeController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
@@ -786,8 +787,10 @@ class OpenMarketOrderController extends Controller
     private function getSmart_StoreExchangeOrder()
     {
     }
-    private function getCoupangExchangeOrder()
+    private function getCoupangExchangeOrder($partnerId)
     {
+        $controller = new CoupangExchangeController();
+        return $controller->index($partnerId);
     }
     private function getSmart_storeUploadedProductId($productId)
     {
