@@ -149,7 +149,7 @@ class UploadController extends Controller
         // 각 큐의 현재 대기열 길이 확인
         $queueLengths = [];
         for ($i = 1; $i < 11; $i++) {
-            $queueName = 'queue' . $i;
+            $queueName = 'uploads' . $i;
             $queueLengths[$queueName] = DB::table('jobs')->where('queue', $queueName)->count();
         }
         // 가장 대기열이 짧은 큐 선택
