@@ -243,6 +243,10 @@ class OpenMarketOrderController extends Controller
             ->value('type');
         $targetStatus = $request->targetStatus;
         $remark = $request->remark;
+        if ($targetStatus == 'awaiting-shipment' && $orderType == 'EXCHANGE') {
+            $setAwaitingController = new OpenMarketExchangeController();
+            return $setAwaitingController->setAwaitingShipmentStatus($request->productOrderNumber);
+        }
         if ($targetStatus == 'shipment-complete' && $orderType == 'EXCHANGE') {
             $exchangeController = new OpenMarketExchangeController();
             return $exchangeController->saveExchangeShipment($request);

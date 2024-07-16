@@ -199,7 +199,7 @@ class OpenMarketRefundController extends Controller
             ];
         }
     }
-    private function callCoupangCheckApi($productOrderNumber)
+    private function callCoupangCheckApi($productOrderNumber) //입고요청처리
     {
         $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
