@@ -143,6 +143,9 @@ class AdminController extends Controller
         $partnersExcelwingMargin = DB::table('sellwing_config')
             ->where('title', 'partners_excelwing_margin')
             ->first();
+        $nalmeokwing_margin = DB::table('sellwing_config')
+            ->where('title', 'nalmeokwing_margin')
+            ->first();
         $vendors = DB::table('product_search AS ps')
             ->join('vendors AS v', 'ps.vendor_id', '=', 'v.id')
             ->where('v.is_active', 'ACTIVE')
@@ -156,7 +159,8 @@ class AdminController extends Controller
             'b2Bs' => $b2Bs,
             'vendors' => $vendors,
             'vendorCommissions' => $vendorCommissions,
-            'partnersExcelwingMargin' => $partnersExcelwingMargin
+            'partnersExcelwingMargin' => $partnersExcelwingMargin,
+            'nalmeokwing_margin' => $nalmeokwing_margin
         ]);
     }
 
@@ -489,10 +493,13 @@ class AdminController extends Controller
             ->join('carts as c', 'c.product_id', '=', 'mp.id')
             ->join('orders as o', 'o.cart_id', '=', 'c.id')
             ->whereNotIn('o.type', ['CANCELLED'])
-            // ->where('v.is_active', 'ACTIVE')
-            ->where('v.type', 'SELLER')
+            ->where(function ($query) {
+                $query->where('v.type', 'SELLER')
+                    ->orWhere('v.id', 5);
+            })
             ->select('v.id', 'v.name', 'v.is_active', 'v.type')
             ->groupBy('v.id', 'v.name', 'v.is_active', 'v.type')
+            ->orderBy('v.type', 'asc')
             ->get();
         $columns = Schema::getColumnListing('delivery_companies');
         $query = DB::table('delivery_companies');

@@ -115,4 +115,27 @@ class AccountSettingController extends Controller
             'data' => $updated
         ];
     }
+    public function updateNalmeokCommission(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'commission' => 'required|numeric'
+        ]);
+        if ($validator->fails()) {
+            return [
+                'status' => false,
+                'message' => $validator->errors()->first(),
+            ];
+        }
+        $title = $request->title;
+        $commission = $request->commission;
+        $updated = DB::table('sellwing_config')
+            ->where('title', $title)
+            ->update(['value' => $commission]);
+        return [
+            'status' => true,
+            'message' => '날먹윙 마진률을 성공적으로 업데이트했습니다.',
+            'data' => $updated
+        ];
+    }
 }

@@ -143,6 +143,7 @@ Route::middleware(['auth.custom'])->group(function () {
         Route::post('shipping-fee', [ShippingFeeController::class, 'index']);
         Route::put('update-commission', [AccountSettingController::class, 'updateVendorCommission']);
         Route::put('update-excel-commission', [AccountSettingController::class, 'updateExcelCommission']);
+        Route::put('nalmeok-commission', [AccountSettingController::class, 'updateNalmeokCommission']);
     });
     // minewing
     Route::post('/minewing/unique-product-hrefs', [UniqueProductHrefsController::class, 'index']);
