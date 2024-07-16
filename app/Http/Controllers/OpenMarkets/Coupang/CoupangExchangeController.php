@@ -99,23 +99,29 @@ class CoupangExchangeController extends Controller
     public function exchangeShipment($account, $partnerOrder, $goodsDeliveryCode, $invoiceNumber) //교환상품 송장업로드 처리
     {
         $exchangeOrder = $this->getNewShipmentBoxId($account, $partnerOrder->order_number);
-        if (isset($exchangeOrder['data']['data'][0]['deliveryInvoiceGroupDtos']) && is_array($exchangeOrder['data']['data'][0]['deliveryInvoiceGroupDtos'])) {
-            $deliveryInvoiceGroupDtos = $exchangeOrder['data']['data'][0]['deliveryInvoiceGroupDtos'];
-            if (!empty($deliveryInvoiceGroupDtos)) {
-                $shipmentBoxId = $deliveryInvoiceGroupDtos[0]['shipmentBoxId'];
-            } else {
-                return [
-                    'status' => false,
-                    'message' => '아직 입고 요청이 진행중입니다.'
-                ];
-            }
+        if (
+            isset($exchangeOrder['data']['data'][0]) &&
+            isset($exchangeOrder['data']['data'][0]['deliveryInvoiceGroupDtos']) &&
+            is_array($exchangeOrder['data']['data'][0]['deliveryInvoiceGroupDtos']) &&
+            !empty($exchangeOrder['data']['data'][0]['deliveryInvoiceGroupDtos']) &&
+            isset($exchangeOrder['data']['data'][0]['exchangeId'])
+        ) {
+            $exchangeData = $exchangeOrder['data']['data'][0];
+            $deliveryInvoiceGroupDtos = $exchangeData['deliveryInvoiceGroupDtos'];
+            $exchangeId = $exchangeData['exchangeId'];
+            $shipmentBoxId = $deliveryInvoiceGroupDtos[0]['shipmentBoxId'];
+        } else {
+            return [
+                'status' => false,
+                'message' => '교환건 조회에 실패하였습니다. 관리자에게 문의해주세요.'
+            ];
         }
         $method = 'POST';
-        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests/' . $partnerOrder->product_order_number . '/invoices';
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests/' . $exchangeId . '/invoices';
         $contentType = 'application/json;charset=UTF-8';
         $data = [
             [
-                'exchangeId' => $partnerOrder->product_order_number,
+                'exchangeId' => $exchangeId,
                 'vendorId' => $account->code,
                 'shipmentBoxId' => $shipmentBoxId,
                 'goodsDeliveryCode' => $goodsDeliveryCode,

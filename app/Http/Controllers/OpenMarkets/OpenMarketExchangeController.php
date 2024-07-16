@@ -102,7 +102,6 @@ class OpenMarketExchangeController extends Controller
             // if ($openMarket) {
             $method = 'call' . ucfirst($openMarket->name_eng) . 'ShipmentApi';
             $updateApiResult = $this->$method($productOrderNumber, $deliveryCompanyCode, $trackingNumber);
-            return $updateApiResult;
             if ($updateApiResult['status'] === false) {
                 return $updateApiResult;
             }
@@ -221,8 +220,7 @@ class OpenMarketExchangeController extends Controller
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
         $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new CoupangExchangeController();
-        $confirmApiResult = $controller->exchangeShipment($account, $partnerOrder, $goodsDeliveryCode->st11, $invoiceNumber);
-        return $confirmApiResult;
+        $confirmApiResult = $controller->exchangeShipment($account, $partnerOrder, $goodsDeliveryCode->coupang, $invoiceNumber);
         if (!$confirmApiResult['status']) {
             return [
                 'status' => false,
