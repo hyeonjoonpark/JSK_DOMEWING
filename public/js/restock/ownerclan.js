@@ -39,16 +39,15 @@ const fs = require('fs'); // 파일 시스템 모듈을 불러옵니다.
     }
 })();
 async function validateProducts(product) {
-    const productStatus = await product.evaluate(() => {
-        const productStatus = document.querySelector('td:nth-child(9) > span').textContent.trim();
+    const productStatusElement = await product.$('td:nth-child(10) > span');
+    if (productStatusElement) {
+        const productStatus = await productStatusElement.evaluate(el => el.textContent.trim());
         if (productStatus.includes('품절')) {
-            return true;
+            const productCheckbox = await product.$('input[type=checkbox]');
+            if (productCheckbox) {
+                await productCheckbox.click();
+            }
         }
-        return false;
-    });
-    if (productStatus === true) {
-        const productCheckbox = await product.$('input[type=checkbox]');
-        await productCheckbox.click();
     }
 }
 async function login(page, username, password) {
@@ -73,7 +72,7 @@ async function processPageList(page, searchStr) {
     await page.click('#idx_saletype1');
     await page.type('input[name="search"]', searchStr);
     await page.select('select[name="display_count"]', '500');
-    await new Promise((page) => setTimeout(page, 5000));
+    await page.waitForNavigation({ waitUntil: 'networkidle0' });
     const products = await page.$$('tr[height="40"]');
     if (products.length < 1) {
         return false;
