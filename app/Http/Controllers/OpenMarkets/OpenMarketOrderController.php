@@ -105,14 +105,13 @@ class OpenMarketOrderController extends Controller
                     'message' => $returnResult['message'],
                     'data' => $returnResult
                 ];
-                // 아직 교환 자동수집 안됌
-                // $exchangeMethod = 'get'  . ucfirst($openMarketEngName) . 'ExchangeOrder';
-                // $exchangeResult = call_user_func([$this, $exchangeMethod], $partner->id);
-                // if (!$exchangeResult['status']) return [
-                //     'status' => false,
-                //     'message' => $exchangeResult['message'],
-                //     'data' => $exchangeResult
-                // ];
+                $exchangeMethod = 'get'  . ucfirst($openMarketEngName) . 'ExchangeOrder';
+                $exchangeResult = call_user_func([$this, $exchangeMethod], $partner->id);
+                if (!$exchangeResult['status']) return [
+                    'status' => false,
+                    'message' => $exchangeResult['message'],
+                    'data' => $exchangeResult
+                ];
             }
         }
         return [
