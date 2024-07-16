@@ -85,7 +85,7 @@ class CoupangExchangeController extends Controller
         ];
         return $this->ssac->putBuilder($account->access_key, $account->secret_key, $contentType, $path, $data);
     }
-    private function rejectExchangeRequest($account, $exchangeId) //교환신청 거부(품절 또는 고객요청)
+    public function rejectExchangeRequest($account, $exchangeId) //교환신청 거부(품절 또는 고객요청)
     {
         $contentType = 'application/json';
         $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/exchangeRequests/' . $exchangeId . '/rejection';

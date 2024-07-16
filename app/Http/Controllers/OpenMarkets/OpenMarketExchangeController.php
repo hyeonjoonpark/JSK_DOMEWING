@@ -138,6 +138,21 @@ class OpenMarketExchangeController extends Controller
                 'message' => '취소되었거나, 이미 처리된 주문입니다.'
             ];
         }
+        $openMarket = DB::table('orders as o')
+            ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
+            ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
+            ->where('o.product_order_number', $productOrderNumber)
+            ->where('v.is_active', 'ACTIVE')
+            ->select('v.*')
+            ->first(['v.name_eng', 'v.name']);
+        if ($openMarket && $openMarket->name_eng == 'coupang') { //일단은 쿠팡만 적용
+            // if ($openMarket) {
+            $method = 'call' . ucfirst($openMarket->name_eng) . 'CancelApi';
+            $updateApiResult = $this->$method($productOrderNumber);
+            if ($updateApiResult['status'] === false) {
+                return $updateApiResult;
+            }
+        }
         DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
             ->update([
@@ -226,6 +241,24 @@ class OpenMarketExchangeController extends Controller
                 'status' => false,
                 'message' => '쿠팡 교환 주문 송장번호 입력에 실패하였습니다. 관리자에게 문의해주세요.',
                 'data' => $confirmApiResult
+            ];
+        }
+        return [
+            'status' => true
+        ];
+    }
+    private function callCoupangCancelApi($productOrderNumber)
+    {
+        $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
+        $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
+        $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
+        $controller = new CoupangExchangeController();
+        $rejectedExchange = $controller->rejectExchangeRequest($account, $partnerOrder->product_order_number);
+        if (!$rejectedExchange['status']) {
+            return [
+                'status' => false,
+                'message' => '쿠팡 교환 주문 취소에 실패하였습니다. 관리자에게 문의해주세요.',
+                'data' => $rejectedExchange
             ];
         }
         return [
