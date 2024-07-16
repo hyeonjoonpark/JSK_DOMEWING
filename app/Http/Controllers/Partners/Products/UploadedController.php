@@ -321,9 +321,10 @@ class UploadedController extends Controller
             return $coupangGetProductResult;
         }
         $productInfo = $coupangGetProductResult['data']['data'];
-        $deliveryChargeOnReturn = (int)$shippingFee === 0 ? $product->shipping_fee : 0;
-        $returnCharge = (int)$shippingFee === 0 ? $product->shipping_fee : 0;
-        $deliveryChargeType = (int)$shippingFee === 0 ? 'FREE' : 'NOT_FREE';
+        $deliveryChargeType = (int)$price >= 5000 ? 'FREE' : 'NOT_FREE';
+        $deliveryChargeOnReturn = (int)$product->shipping_fee === 0 ? 3000 : $product->shipping_fee;
+        $returnCharge = (int)$product->shipping_fee === 0 ? 3000 : $product->shipping_fee;
+        $price = (int)$price >= 5000 ? (int)$price + (int)$shippingFee : $price;
         $productInfo['items'][0]['originalPrice'] = $price;
         $productInfo['items'][0]['salePrice'] = $price;
         $productInfo['displayProductName'] = $productName;
