@@ -321,8 +321,8 @@ class UploadedController extends Controller
             return $coupangGetProductResult;
         }
         $productInfo = $coupangGetProductResult['data']['data'];
-        $deliveryChargeOnReturn = (int)$shippingFee === 0 ? $product->shipping_fee : 0;
-        $returnCharge = (int)$shippingFee === 0 ? $product->shipping_fee : 0;
+        $deliveryChargeOnReturn = (int)$shippingFee === 0 ? $product->shipping_fee : 3000;
+        $returnCharge = (int)$shippingFee === 0 ? $product->shipping_fee : 3000;
         $deliveryChargeType = (int)$shippingFee === 0 ? 'FREE' : 'NOT_FREE';
         $productInfo['items'][0]['originalPrice'] = $price;
         $productInfo['items'][0]['salePrice'] = $price;
@@ -408,7 +408,7 @@ class UploadedController extends Controller
                     'deliveryBundleGroupUsable' => false,
                     'deliveryFee' => [
                         'deliveryFeeType' => $deliveryFeeType,
-                        'baseFee' => $product->shipping_fee,
+                        'baseFee' => $shippingFee,
                         'repeatQuantity' => $bundleQuantity,
                         'deliveryFeePayType' => 'PREPAID',
                         'deliveryFeeByArea' => [

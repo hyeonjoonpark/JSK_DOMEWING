@@ -17,6 +17,7 @@ class ExcelwingController
         $b2BID = $request->b2BID;
         $sellerID = $request->sellerID;
         $marginRate = $request->marginRate;
+        $marginRate = ($marginRate / 100) + 1;
         $shippingFee = $this->getShippingFee($sellerID);
         $products = $this->getProducts($sellerID);
         $numChunks = $this->getNumChunks($b2BID);

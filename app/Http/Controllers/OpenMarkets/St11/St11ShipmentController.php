@@ -19,7 +19,6 @@ class St11ShipmentController extends Controller
     public function index(Request $request)
     {
         try {
-            // 데이터 유효성 검증은 이미 수행되었으므로 생략
             $trackingNumber = $request->trackingNumber;
             $deliveryCompanyId = $request->deliveryCompanyId;
             $productOrderNumber = $request->productOrderNumber;
@@ -28,7 +27,6 @@ class St11ShipmentController extends Controller
             $partnerOrder = $this->getPartnerOrder($order->id);
             $account = $this->getAccount($partnerOrder->account_id);
             list($ordPrdSeq, $dlvNo) = explode('/', $partnerOrder->product_order_number);
-            // 취소 요청 체크 및 강제출고
             $cancelCheckResult = $this->checkCancelOrder($order, $account);
             if ($cancelCheckResult['status']) {
                 $shipResponse = $this->forceShipOrder($account, $deliveryCompany->st11, $trackingNumber, $partnerOrder, $ordPrdSeq, $cancelCheckResult['data']);

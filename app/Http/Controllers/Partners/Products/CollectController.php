@@ -35,13 +35,15 @@ class CollectController extends Controller
         $searchKeyword = $request->input('searchKeyword', '');
         $controller = new Controller();
         $marginValue = $controller->getMarginValue();
-
+        $nalmeokwingMargin = DB::table('sellwing_config')
+            ->where('id', 3)
+            ->value(DB::raw("value / 100 + 1"));
         $query = DB::table('minewing_products AS mp')
             ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->where('mp.isActive', 'Y')
             ->whereNot('categoryID', null)
-            ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * {$marginValue} AS productPrice"), 'mp.shipping_fee', 'oc.name');
+            ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * CASE WHEN v.type = 'B2B' THEN {$nalmeokwingMargin} ELSE {$marginValue} END AS productPrice"), 'mp.shipping_fee', 'oc.name');
         $isGodwing = Auth::guard('partner')->user()->partner_class_id === 4 ? [0, 1] : [0];
         $query = $query->whereIn('v.is_godwing', $isGodwing);
         if ($searchKeyword) {

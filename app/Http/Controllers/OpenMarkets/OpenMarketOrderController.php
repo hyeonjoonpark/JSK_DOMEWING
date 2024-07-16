@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OpenMarkets\Coupang\CoupangExchangeController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
@@ -105,14 +106,13 @@ class OpenMarketOrderController extends Controller
                     'message' => $returnResult['message'],
                     'data' => $returnResult
                 ];
-                // 아직 교환 자동수집 안됌
-                // $exchangeMethod = 'get'  . ucfirst($openMarketEngName) . 'ExchangeOrder';
-                // $exchangeResult = call_user_func([$this, $exchangeMethod], $partner->id);
-                // if (!$exchangeResult['status']) return [
-                //     'status' => false,
-                //     'message' => $exchangeResult['message'],
-                //     'data' => $exchangeResult
-                // ];
+                $exchangeMethod = 'get'  . ucfirst($openMarketEngName) . 'ExchangeOrder';
+                $exchangeResult = call_user_func([$this, $exchangeMethod], $partner->id);
+                if (!$exchangeResult['status']) return [
+                    'status' => false,
+                    'message' => $exchangeResult['message'],
+                    'data' => $exchangeResult
+                ];
             }
         }
         return [
@@ -243,6 +243,10 @@ class OpenMarketOrderController extends Controller
             ->value('type');
         $targetStatus = $request->targetStatus;
         $remark = $request->remark;
+        if ($targetStatus == 'awaiting-shipment' && $orderType == 'EXCHANGE') {
+            $setAwaitingController = new OpenMarketExchangeController();
+            return $setAwaitingController->setAwaitingShipmentStatus($request->productOrderNumber);
+        }
         if ($targetStatus == 'shipment-complete' && $orderType == 'EXCHANGE') {
             $exchangeController = new OpenMarketExchangeController();
             return $exchangeController->saveExchangeShipment($request);
@@ -783,8 +787,10 @@ class OpenMarketOrderController extends Controller
     private function getSmart_StoreExchangeOrder()
     {
     }
-    private function getCoupangExchangeOrder()
+    private function getCoupangExchangeOrder($partnerId)
     {
+        $controller = new CoupangExchangeController();
+        return $controller->index($partnerId);
     }
     private function getSmart_storeUploadedProductId($productId)
     {
