@@ -448,7 +448,7 @@
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
             let deliveryCompany = order.deliveryCompany ? `<p>택배사 : ${order.deliveryCompany}</p>` : '';
             let trackingNumber = order.trackingNumber ? `<p>송장 번호 : ${order.trackingNumber}</p>` : '';
-            let orderTypeHtml = order.orderType === '교환' || order.orderType === '환불' ?
+            let orderTypeHtml = order.orderType === '교환' || order.orderType === '반품' ?
                 `<h6 class="title">
                     <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
                         ${order.orderType}신청
