@@ -698,18 +698,14 @@ class UploadedController extends Controller
                 // 조회된 업로드된 제품 목록을 순회
                 foreach ($uploadedProducts as $uploadedProduct) {
                     if ($openMarket->id === 40) {
-                        $oldShippingFee = $oldProduct->shipping_fee;
-                        $oldProductPrice = $oldProduct->productPrice;
-                        $uploadedProductPrice = $uploadedProduct->price;
-                        $marginRate = $uploadedProductPrice / $oldProductPrice;
-                        if ($uploadedProductPrice - $oldShippingFee >= 5000) {
-                            $adjustedPrice = $uploadedProductPrice - $oldShippingFee;
-                            $marginRate = $adjustedPrice / $oldProductPrice;
-                        }
-                        $newPrice = round($product['productPrice'] * $marginRate, -1);
-                        $shippingFee = $product['shipping_fee'];
-                        if ($uploadedProductPrice - $oldShippingFee >= 5000) {
-                            $newPrice += $product['shipping_fee'];
+                        $vendorCommission = DB::table('vendor_commissions')
+                            ->where('vendor_id', 40)
+                            ->value("commission / 100 + 1");
+                        $marginRate = 1.15;
+                        $newPrice = round($product['productPrice'] * $marginRate * $vendorCommission);
+                        $shippingFee = $product['shippingFee'];
+                        if ($newPrice >= 5000) {
+                            $newPrice = $newPrice + $product['shipping_fee'];
                             $shippingFee = 0;
                         }
                     } else {
