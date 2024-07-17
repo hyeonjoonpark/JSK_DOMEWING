@@ -703,7 +703,7 @@ class UploadedController extends Controller
                             ->value(DB::raw('(commission / 100) + 1'));
                         $marginRate = 1.15;
                         $newPrice = round($product['productPrice'] * $marginRate * $vendorCommission);
-                        $shippingFee = $product['shippingFee'];
+                        $shippingFee = $product['shipping_fee'];
                         if ($newPrice >= 5000) {
                             $newPrice = $newPrice + $product['shipping_fee'];
                             $shippingFee = 0;
