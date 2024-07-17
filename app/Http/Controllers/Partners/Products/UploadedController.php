@@ -701,7 +701,7 @@ class UploadedController extends Controller
                         $vendorCommission = DB::table('vendor_commissions')
                             ->where('vendor_id', 40)
                             ->value(DB::raw('(commission / 100) + 1'));
-                        $marginRate = 1.15;
+                        $marginRate = 1.1;
                         $newPrice = round($product['productPrice'] * $marginRate * $vendorCommission, -1);
                         $shippingFee = $product['shipping_fee'];
                         if ($newPrice >= 5000) {
