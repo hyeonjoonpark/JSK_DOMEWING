@@ -7,7 +7,6 @@ const { goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName
     const page = await browser.newPage();
 
     await page.setDefaultNavigationTimeout(0);
-
     const [tempFilePath, username, password] = process.argv.slice(2);
     const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
 
@@ -114,8 +113,15 @@ async function getProductImage(page) {
 }
 
 async function getProductDetail(page) {
+    const excludedImages = [
+        '/web/upload/appfiles/ZaReJam3QiELznoZeGGkMG/8836a516b11011dfaa89b7f275346c17.jpg',
+        '/web/upload/appfiles/ZaReJam3QiELznoZeGGkMG/fef00cf9f94d66d92af2f03258995a87.jpg',
+        '/web/upload/appfiles/ZaReJam3QiELznoZeGGkMG/b29663de1cc7231b2585990b714bbd9e.jpg',
+        '/web/upload/appfiles/ZaReJam3QiELznoZeGGkMG/93e626af738f3dbba04ed4e800fac278.jpg'
+    ];
+
     const imageUrls = await page.evaluate(() => {
-        const productDetailElements = document.querySelectorAll('#prdDetail > div.cont > div > p > img');
+        const productDetailElements = document.querySelectorAll('#prdDetail img');
         const productDetail = [];
         productDetailElements.forEach(element => {
             if (element.src) {
@@ -127,9 +133,12 @@ async function getProductDetail(page) {
 
     const validImageUrls = [];
     for (const url of imageUrls) {
-        const isValid = await checkImageUrl(url);
-        if (isValid) {
-            validImageUrls.push(url);
+        const isExcluded = excludedImages.some(excludedUrl => url.includes(excludedUrl));
+        if (!isExcluded) {
+            const isValid = await checkImageUrl(url);
+            if (isValid) {
+                validImageUrls.push(url);
+            }
         }
     }
 
@@ -159,7 +168,7 @@ async function getProductOptions(page) {
 
             for (const option of options) {
                 await selects[currentDepth].select(option.value);
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1000));  // 충분한 대기 시간을 둠
 
                 const newSelectedOptions = [...selectedOptions, { text: option.text, value: option.value }];
                 if (currentDepth + 1 < selects.length) {
