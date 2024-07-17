@@ -700,7 +700,7 @@ class UploadedController extends Controller
                     if ($openMarket->id === 40) {
                         $vendorCommission = DB::table('vendor_commissions')
                             ->where('vendor_id', 40)
-                            ->value("commission / 100 + 1");
+                            ->value(DB::raw('(commission / 100) + 1'));
                         $marginRate = 1.15;
                         $newPrice = round($product['productPrice'] * $marginRate * $vendorCommission);
                         $shippingFee = $product['shippingFee'];
