@@ -707,15 +707,15 @@ class UploadedController extends Controller
                             $marginRate = $adjustedPrice / $oldProductPrice;
                         }
                         $newPrice = round($product['productPrice'] * $marginRate, -1);
-                        $shippingFee = $product['shippingFee'];
+                        $shippingFee = $product['shipping_fee'];
                         if ($uploadedProductPrice - $oldShippingFee >= 5000) {
-                            $newPrice += $product['shippingFee'];
+                            $newPrice += $product['shipping_fee'];
                             $shippingFee = 0;
                         }
                     } else {
                         $marginRate = $uploadedProduct->price / $oldProduct->productPrice;
                         $newPrice = round($product['productPrice'] * $marginRate, -1);
-                        $shippingFee = $product['shippingFee'];
+                        $shippingFee = $product['shipping_fee'];
                     }
                     // 제품 수정 요청을 위한 데이터 생성
                     $editRequest = new Request([
