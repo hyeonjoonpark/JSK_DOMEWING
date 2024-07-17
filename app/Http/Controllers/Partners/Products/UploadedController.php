@@ -320,16 +320,20 @@ class UploadedController extends Controller
             return $coupangGetProductResult;
         }
         $productInfo = $coupangGetProductResult['data']['data'];
-        $deliveryChargeType = $price - $shippingFee >= 5000 ? 'FREE' : 'NOT_FREE';
-        $deliveryCharge = $deliveryChargeType === 'FREE' ? 0 : $shippingFee;
+        $deliveryChargeType = $shippingFee > 0 ? 'NOT_FREE' : 'FREE';
+        $returnCharge = ($shippingFee > 0)
+            ? $shippingFee
+            : (($product->shipping_fee > 0)
+                ? $product->shipping_fee
+                : 3000);
         $productInfo['items'][0]['originalPrice'] = $price;
         $productInfo['items'][0]['salePrice'] = $price;
         $productInfo['displayProductName'] = $productName;
         $productInfo['generalProductName'] = $productName;
         $productInfo['deliveryChargeType'] = $deliveryChargeType;
-        $productInfo['deliveryCharge'] = $deliveryCharge;
-        $productInfo['deliveryChargeOnReturn'] = $shippingFee;
-        $productInfo['returnCharge'] = $shippingFee;
+        $productInfo['deliveryCharge'] = $shippingFee;
+        $productInfo['deliveryChargeOnReturn'] = $returnCharge;
+        $productInfo['returnCharge'] = $returnCharge;
         $productInfo['sellerProductName'] = $productName;
         $ac = new ApiController();
         $apiResult = $ac->putBuilder($accessKey, $secretKey, $contentType, $path, $productInfo);
@@ -703,19 +707,22 @@ class UploadedController extends Controller
                             $marginRate = $adjustedPrice / $oldProductPrice;
                         }
                         $newPrice = round($product['productPrice'] * $marginRate, -1);
+                        $shippingFee = $product['shippingFee'];
                         if ($uploadedProductPrice - $oldShippingFee >= 5000) {
                             $newPrice += $product['shippingFee'];
+                            $shippingFee = 0;
                         }
                     } else {
                         $marginRate = $uploadedProduct->price / $oldProduct->productPrice;
                         $newPrice = round($product['productPrice'] * $marginRate, -1);
+                        $shippingFee = $product['shippingFee'];
                     }
                     // 제품 수정 요청을 위한 데이터 생성
                     $editRequest = new Request([
                         'originProductNo' => $uploadedProduct->origin_product_no,
                         'productName' => $product['productName'],
                         'price' => $newPrice,
-                        'shippingFee' => $product['shippingFee'],
+                        'shippingFee' => $shippingFee,
                         'vendorId' => $openMarket->id,
                         'apiToken' => $uploadedProduct->api_token,
                         'bundleQuantity' => $product['bundle_quantity']

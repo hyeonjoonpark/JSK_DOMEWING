@@ -31,57 +31,11 @@ class Godwing extends Command
     {
         set_time_limit(0);
         ini_set('memory_allow', '-1');
-        $partnerId = 10;
+        $partnerId = 3;
         $vendorIds = [
-            1,
-            2,
-            3,
-            13,
-            14,
-            16,
-            19,
-            20,
-            21,
-            22,
-            23,
-            24,
-            25,
-            26,
-            27,
-            28,
-            29,
-            30,
-            32,
-            36,
-            37,
-            39,
-            41,
-            42,
-            43,
-            47,
-            48,
-            49,
-            50,
-            52,
-            53,
-            55,
-            56,
-            58,
-            59,
-            60,
-            61,
-            62,
             63,
-            64,
-            68,
             69,
-            70,
-            71,
-            72,
-            74,
-            75,
-            76,
-            78
+            61
         ];
         $ptc = new PartnerTableController();
         $mc = new ManageController();
