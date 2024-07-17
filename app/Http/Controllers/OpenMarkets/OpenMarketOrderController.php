@@ -97,7 +97,7 @@ class OpenMarketOrderController extends Controller
                         'error' => $e->getMessage(),
                     ];
                 }
-                // 현재 쿠팡만 환불 자동수집중
+                // 현재 쿠팡만 교환, 환불 자동수집중
                 if ($openMarketEngName !== 'coupang') continue;
                 $returnMethod = 'get'  . ucfirst($openMarketEngName) . 'ReturnOrder';
                 $returnResult = call_user_func([$this, $returnMethod], $partner->id);
