@@ -684,7 +684,7 @@ class UploadedController extends Controller
             // 입력받은 제품의 제품 코드를 기준으로 기존 제품 정보 조회
             $oldProduct = DB::table('minewing_products')
                 ->where('productCode', $product['productCode'])
-                ->first(['id', 'productPrice']);
+                ->first(['id', 'productPrice', 'shipping_fee']);
 
             // 모든 오픈 마켓 벤더를 순회
             foreach ($openMarkets as $openMarket) {
