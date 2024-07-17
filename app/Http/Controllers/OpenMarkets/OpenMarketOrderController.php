@@ -606,7 +606,7 @@ class OpenMarketOrderController extends Controller
         $orderType = '신규주문';
         switch ($order->type) {
             case 'REFUND':
-                $orderType = '환불';
+                $orderType = '반품';
                 break;
             case 'EXCHANGE':
                 $orderType = '교환';

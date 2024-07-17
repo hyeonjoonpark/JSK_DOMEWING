@@ -448,7 +448,7 @@
             let isActive = order.isActive === "N" ? '<span class="text-danger"> (품절)</span>' : '';
             let deliveryCompany = order.deliveryCompany ? `<p>택배사 : ${order.deliveryCompany}</p>` : '';
             let trackingNumber = order.trackingNumber ? `<p>송장 번호 : ${order.trackingNumber}</p>` : '';
-            let orderTypeHtml = order.orderType === '교환' || order.orderType === '환불' ?
+            let orderTypeHtml = order.orderType === '교환' || order.orderType === '반품' ?
                 `<h6 class="title">
                     <a class="text-danger" href="javascript:showOrderInfoModal('${order.productOrderNumber}');">
                         ${order.orderType}신청
@@ -611,7 +611,7 @@
                 },
                 success: function(data) {
                     let imageContent = data.image ?
-                        `<img src="${data.image}" class="w-100" />` :
+                        `<a href="${data.image}" target="_blank"><img src="${data.image}" class="w-100" /></a>` :
                         '이미지가 없습니다.';
                     $('#modalContent').html(`
                         <p><b>성함:</b> ${data.name}</p>
