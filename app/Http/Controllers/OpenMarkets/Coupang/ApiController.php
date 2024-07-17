@@ -66,6 +66,7 @@ class ApiController extends Controller
         } else {
             return [
                 'status' => false,
+                'message' => '쿠팡윙에서 반품지 주소를 올바르게 설정해주세요.<br>혹은 쿠팡 API 에 43.200.252.11 IP 주소를 기입해주세요.',
                 'error' => $response->body()
             ];
         }
@@ -137,6 +138,7 @@ class ApiController extends Controller
         } else {
             return [
                 'status' => false,
+                'message' => '쿠팡윙에서 반품지 주소를 올바르게 설정해주세요.<br>혹은 쿠팡 API 에 43.200.252.11 IP 주소를 기입해주세요.',
                 'error' => $response->body()
             ];
         }

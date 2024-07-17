@@ -207,8 +207,7 @@ class UploadedController extends Controller
             'productName' => 'required|string',
             'price' => 'required|integer',
             'shippingFee' => 'required|integer',
-            'vendorId' => 'required|integer|exists:vendors,id',
-            'bundleQuantity' => 'required|min:0|max:9999'
+            'vendorId' => 'required|integer|exists:vendors,id'
         ], [
             'originProductNo' => '유효한 상품이 아닙니다.',
             'productName' => '상품명을 입력해주세요.',
@@ -335,7 +334,7 @@ class UploadedController extends Controller
         $ac = new ApiController();
         $apiResult = $ac->putBuilder($accessKey, $secretKey, $contentType, $path, $productInfo);
         if ($apiResult['status'] === false || $apiResult['data']['code'] !== 'SUCCESS') {
-            return $coupangGetProductResult;
+            return $apiResult;
         }
         return [
             'status' => true,
