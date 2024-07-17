@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { goToAttempts, signIn } = require('./trackwing-common');
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
@@ -46,6 +46,10 @@ async function validateProduct(page) {
         return await page.evaluate(() => {
             const txtDescElement = document.querySelector('p.txtDesc');
             if (txtDescElement && txtDescElement.textContent.trim().includes('사라졌거나')) {
+                return false;
+            }
+            const nameElement = document.querySelector('h2.item_name');
+            if (nameElement && nameElement.textContent.trim().includes('임박')) {
                 return false;
             }
             const soldOutImage = document.querySelector('div.infoArea img[src="//img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif"]');
