@@ -415,6 +415,7 @@ class AdminController extends Controller
             ->join('vendors AS v', 'pr.vendor_id', '=', 'v.id')
             ->where('pr.is_active', 'Y')
             ->where('v.is_active', 'ACTIVE')
+            ->whereIn('v.id', [5, 40, 51, 54, 65, 66, 67, 73])
             ->get();
         $unmappedCategories = DB::table('category_mapping')
             ->join('ownerclan_category', 'category_mapping.ownerclan', '=', 'ownerclan_category.id')
