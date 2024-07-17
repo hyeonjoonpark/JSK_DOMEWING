@@ -611,7 +611,7 @@
                 },
                 success: function(data) {
                     let imageContent = data.image ?
-                        `<img src="${data.image}" class="w-100" />` :
+                        `<a href="${data.image}" target="_blank"><img src="${data.image}" class="w-100" /></a>` :
                         '이미지가 없습니다.';
                     $('#modalContent').html(`
                         <p><b>성함:</b> ${data.name}</p>
