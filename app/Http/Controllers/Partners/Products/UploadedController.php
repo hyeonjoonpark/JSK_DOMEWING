@@ -321,18 +321,16 @@ class UploadedController extends Controller
             return $coupangGetProductResult;
         }
         $productInfo = $coupangGetProductResult['data']['data'];
-        $deliveryChargeType = (int)$price >= 5000 ? 'FREE' : 'NOT_FREE';
-        $deliveryChargeOnReturn = (int)$product->shipping_fee === 0 ? 3000 : $product->shipping_fee;
-        $returnCharge = (int)$product->shipping_fee === 0 ? 3000 : $product->shipping_fee;
-        $price = (int)$price >= 5000 ? (int)$price + (int)$shippingFee : $price;
+        $deliveryChargeType = $price - $shippingFee >= 5000 ? 'FREE' : 'NOT_FREE';
+        $deliveryCharge = $deliveryChargeType === 'FREE' ? 0 : $shippingFee;
         $productInfo['items'][0]['originalPrice'] = $price;
         $productInfo['items'][0]['salePrice'] = $price;
         $productInfo['displayProductName'] = $productName;
         $productInfo['generalProductName'] = $productName;
         $productInfo['deliveryChargeType'] = $deliveryChargeType;
-        $productInfo['deliveryCharge'] = $shippingFee;
-        $productInfo['deliveryChargeOnReturn'] = $deliveryChargeOnReturn;
-        $productInfo['returnCharge'] = $returnCharge;
+        $productInfo['deliveryCharge'] = $deliveryCharge;
+        $productInfo['deliveryChargeOnReturn'] = $shippingFee;
+        $productInfo['returnCharge'] = $shippingFee;
         $productInfo['sellerProductName'] = $productName;
         $ac = new ApiController();
         $apiResult = $ac->putBuilder($accessKey, $secretKey, $contentType, $path, $productInfo);
@@ -696,22 +694,29 @@ class UploadedController extends Controller
 
                 // 조회된 업로드된 제품 목록을 순회
                 foreach ($uploadedProducts as $uploadedProduct) {
-                    // 마진율 계산
-                    $marginRate = $uploadedProduct->price / $oldProduct->productPrice;
-                    // 새로운 가격 계산
-                    $newPrice = round($product['productPrice'] * $marginRate, -1);
-                    // 쿠팡인 경우, 5,000원 이상인 상품들은 배송비를 0원 -> 상품가에 덤핑.
-                    $shippingFee = $product['shipping_fee'];
-                    if ($openMarket->id === 40 && $newPrice >= 5000) {
-                        $newPrice += $product['shipping_fee'];
-                        $shippingFee = 0;
+                    if ($openMarket->id === 40) {
+                        $oldShippingFee = $oldProduct->shipping_fee;
+                        $oldProductPrice = $oldProduct->productPrice;
+                        $uploadedProductPrice = $uploadedProduct->price;
+                        $marginRate = $uploadedProductPrice / $oldProductPrice;
+                        if ($uploadedProductPrice - $oldShippingFee >= 5000) {
+                            $adjustedPrice = $uploadedProductPrice - $oldShippingFee;
+                            $marginRate = $adjustedPrice / $oldProductPrice;
+                        }
+                        $newPrice = round($product['productPrice'] * $marginRate, -1);
+                        if ($uploadedProductPrice - $oldShippingFee >= 5000) {
+                            $newPrice += $product['shippingFee'];
+                        }
+                    } else {
+                        $marginRate = $uploadedProduct->price / $oldProduct->productPrice;
+                        $newPrice = round($product['productPrice'] * $marginRate, -1);
                     }
                     // 제품 수정 요청을 위한 데이터 생성
                     $editRequest = new Request([
                         'originProductNo' => $uploadedProduct->origin_product_no,
                         'productName' => $product['productName'],
                         'price' => $newPrice,
-                        'shippingFee' => $shippingFee,
+                        'shippingFee' => $product['shippingFee'],
                         'vendorId' => $openMarket->id,
                         'apiToken' => $uploadedProduct->api_token,
                         'bundleQuantity' => $product['bundle_quantity']
