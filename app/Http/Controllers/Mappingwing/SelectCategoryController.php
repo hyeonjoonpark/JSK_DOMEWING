@@ -48,7 +48,7 @@ class SelectCategoryController extends Controller
                 $categoryName = DB::table($categoryTable)
                     ->where('id', $categoryID)
                     ->select(DB::raw("CONCAT(
-                                        IFNULL(lg, ''), '>', 
+                                        IFNULL(lg, ''), '>',
                                         IFNULL(md, ''), '>',
                                         IFNULL(sm, ''), '>',
                                         IFNULL(xs, '')
@@ -93,6 +93,7 @@ class SelectCategoryController extends Controller
                 ->join('vendors AS v', 'pr.vendor_id', '=', 'v.id')
                 ->where('pr.is_active', 'Y')
                 ->where('v.is_active', 'ACTIVE')
+                ->where('v.type', 'OPEN_MARKET')
                 ->get();
             $row = DB::table('category_mapping')
                 ->where('category_mapping.ownerclan', $ownerclanCategoryID)
