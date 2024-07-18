@@ -188,7 +188,7 @@ class NalmeokwingStoreService extends Controller
             $html .= '
                 <h1 style="color:red !important; font-weight:bold !important; font-size:4rem !important;">
                     ' . $productOption . '
-                </h1>
+                </h1><br><br><br>
             ';
         }
         $html .= '

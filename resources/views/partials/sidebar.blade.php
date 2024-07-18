@@ -102,6 +102,11 @@
                                     </a>
                                 </li>
                                 <li class="nk-menu-item">
+                                    <a href="/admin/nalmeokwing/index" class="nk-menu-link">
+                                        <span class="nk-menu-text">상품 조회</span>
+                                    </a>
+                                </li>
+                                <li class="nk-menu-item">
                                     <a href="/admin/nalmeokwing/order" class="nk-menu-link">
                                         <span class="nk-menu-text">주문서 추출</span>
                                     </a>

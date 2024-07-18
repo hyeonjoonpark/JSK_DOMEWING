@@ -43,9 +43,8 @@ class CollectController extends Controller
             ->join('vendors AS v', 'v.id', '=', 'mp.sellerID')
             ->where('mp.isActive', 'Y')
             ->whereNot('categoryID', null)
+            ->where('v.is_godwing', 0)
             ->select('mp.productCode', 'mp.productImage', 'mp.productName', DB::raw("mp.productPrice * CASE WHEN v.type = 'B2B' THEN {$nalmeokwingMargin} ELSE {$marginValue} END AS productPrice"), 'mp.shipping_fee', 'oc.name');
-        $isGodwing = Auth::guard('partner')->user()->partner_class_id === 4 ? [0, 1] : [0];
-        $query = $query->whereIn('v.is_godwing', $isGodwing);
         if ($searchKeyword) {
             $query->where(function ($query) use ($searchKeyword) {
                 $query->where('mp.productName', 'like', "%$searchKeyword%")
