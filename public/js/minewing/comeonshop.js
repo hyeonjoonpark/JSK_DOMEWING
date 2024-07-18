@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const { goToAttempts, signIn, checkImageUrl, checkProductName, trimProductCodes } = require('./common.js');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     await page.setViewport({ width: 1500, height: 1000 });
     const [listUrl, username, password] = process.argv.slice(2);
