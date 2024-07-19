@@ -31,7 +31,7 @@ class PartnerTableController extends Controller
             ->id;
         return $this->add($partnerId, $productTableName);
     }
-    private function add($partnerId, $productTableName)
+    public function add($partnerId, $productTableName)
     {
         $exists = DB::table('partner_tables')
             ->where('partner_id', $partnerId)

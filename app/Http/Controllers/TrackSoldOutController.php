@@ -70,7 +70,7 @@ class TrackSoldOutController extends Controller
         $dqcStoreResult = $dqc->store($soldOutProducts);
         $errors = [];
         if (!$dqcStoreResult['status']) {
-            $errors = $dqcStoreResult;
+            $errors[] = $dqcStoreResult;
         }
         return [
             'status' => true,

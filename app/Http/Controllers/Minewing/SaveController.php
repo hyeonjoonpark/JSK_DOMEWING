@@ -87,6 +87,7 @@ class SaveController extends Controller
                 $numberOfDigits = strlen((string)$numberOfOptions);
                 $productNameBytes = 50 - (6 + $numberOfDigits);
                 $productName = $nameController->index($productName, $productNameBytes);
+                // 옵션 찢는 반복문. -> 뭐... 옵션 테이블에 저장하는 서비스 메소드 하나 생성해서 반복문으로 돌리기.
                 foreach ($productOptions as $productOption) {
                     $newProductName = $productName . ' 옵션 ' . $type;
                     $newProductDetail = '<h1 style="color:red !important; font-weight:bold !important; font-size:4rem !important;">옵션명 : ' . $productOption['optionName'] . '</h1><br><br>' . $productDetail;

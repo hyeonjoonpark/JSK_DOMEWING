@@ -55,25 +55,47 @@ class NamewingController extends Controller
             'totalDuplicateGroups' => $totalDuplicateGroups // 중복 그룹의 총 개수 전달
         ]);
     }
-    public function power()
+    public function power($vendorId = null)
     {
         try {
-            DB::statement("
-                UPDATE minewing_products
-                SET isActive = 'N'
-                WHERE id IN (
-                    SELECT id
-                    FROM (
-                        SELECT
-                            id,
-                            productName,
-                            ROW_NUMBER() OVER(PARTITION BY productName ORDER BY productPrice ASC) AS rn
-                        FROM minewing_products
-                        WHERE isActive = 'Y'
-                    ) AS ranked_products
-                    WHERE rn > 1
-                );
-            ");
+            DB::transaction(function () use ($vendorId) {
+                if ($vendorId === null) {
+                    DB::update("
+                        UPDATE minewing_products
+                        SET isActive = 'N'
+                        WHERE id IN (
+                            SELECT id
+                            FROM (
+                                SELECT
+                                    id,
+                                    productName,
+                                    ROW_NUMBER() OVER(PARTITION BY productName ORDER BY productPrice ASC) AS rn
+                                FROM minewing_products
+                                WHERE isActive = 'Y'
+                            ) AS ranked_products
+                            WHERE rn > 1
+                    );
+                ");
+                } else {
+                    DB::update("
+                        UPDATE minewing_products
+                        SET isActive = 'N'
+                        WHERE id IN (
+                            SELECT id
+                            FROM (
+                                SELECT
+                                    id,
+                                    productName,
+                                    ROW_NUMBER() OVER(PARTITION BY productName ORDER BY productPrice ASC) AS rn
+                                FROM minewing_products
+                                WHERE isActive = 'Y' AND sellerID = ?
+                            ) AS ranked_products
+                            WHERE rn > 1
+                    );
+                ", [$vendorId]);
+                }
+            });
+
             return [
                 'status' => true,
                 'message' => "파워 네임윙을 성공적으로 처리했습니다. 반드시 상품군들을 확인해주세요."
