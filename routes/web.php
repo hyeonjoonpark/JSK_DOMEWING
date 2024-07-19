@@ -113,6 +113,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
         Route::get('create', [NalmeokwingController::class, 'create']);
         Route::get('order', [NalmeokwingController::class, 'order']);
         Route::get('index', [NalmeokwingController::class, 'index'])->name('admin.nalmeokwing_index');
+        Route::post('index', [NalmeokwingController::class, 'index']);
+        Route::get('match', [NalmeokwingController::class, 'match']);
     });
     // 갓윙
     Route::prefix('godwing')->group(function () {
