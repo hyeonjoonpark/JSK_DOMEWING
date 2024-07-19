@@ -89,8 +89,8 @@ const signIn = async (page, username, password, url, usernameSelector, passwordS
 };
 const scrollDown = async (page) => {
     await page.evaluate(async () => {
-        const distance = 45;
-        const scrollInterval = 50;
+        const distance = 80;
+        const scrollInterval = 25;
         while (true) {
             const scrollTop = window.scrollY;
             const prdDetailElement = document.getElementById('prdDetail');

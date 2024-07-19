@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const { scrollDown, goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName, trimProductCodes } = require('../common.js');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     await page.setDefaultNavigationTimeout(0);
@@ -32,6 +32,7 @@ const { scrollDown, goToAttempts, signIn, checkImageUrl, checkProductName, forma
         await browser.close();
     }
 })();
+
 async function buildProduct(page, productHref) {
 
     const productName = await getProductName(page);
@@ -86,8 +87,14 @@ async function getProductName(page) {
     if (!validProductName) {
         return false;
     }
-    return await formatProductName(productName);
+
+    let formattedName = await formatProductName(productName);
+    formattedName = formattedName.replace(/[a-zA-Z]\d{3}/g, ''); // 영어 1개 숫자 3개 패턴 제거
+    formattedName += " 패션 데일리 캐쥬얼 여성가방";
+
+    return formattedName;
 }
+
 async function getproductPrice(page) {
     return await page.evaluate(() => {
 
@@ -99,6 +106,7 @@ async function getproductPrice(page) {
         return salePriceElement.textContent.replace(/[^0-9]/g, '').trim();
     });
 }
+
 async function getproductImage(page) {
     const imageUrl = await page.evaluate(() => {
         const productImageElement = document.querySelector('#add_slider div > li > img');
@@ -112,6 +120,7 @@ async function getproductImage(page) {
     const isValid = await checkImageUrl(imageUrl);
     return isValid ? imageUrl : false;
 }
+
 async function getproductDetail(page) {
     await scrollDown(page);
 

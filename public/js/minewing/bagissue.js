@@ -1,32 +1,13 @@
+const getForbiddenWords = require('../forbidden_words');
 const puppeteer = require('puppeteer');
-const { goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName, trimProductCodes } = require('./common.js');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.setViewport({ width: 1500, height: 1000 });
-    const [listUrl, username, password] = process.argv.slice(2);
-    await page.setDefaultNavigationTimeout(0);
-
+    const [listURL, username, password] = process.argv.slice(2);
     try {
-        await signIn(page, username, password, 'https://bagissue.kr/member/login.html', '#member_id', '#member_passwd', 'span.login_btn');
-        await goToAttempts(page, listUrl, 'domcontentloaded');
-        const lastPageNumber = await getLastPageNumber(page);
-        const products = [];
-        for (let i = lastPageNumber; i > 0; i--) {
-            await goToAttempts(page, listUrl + '&page=' + i, 'domcontentloaded');
-            const listProducts = await getListProducts(page);
-            for (const product of listProducts) {
-                const isValidImage = await checkImageUrl(product.image);
-                const isValidProduct = await checkProductName(product.name);
-                if (isValidImage && isValidProduct) {
-                    product.name = await formatProductName(product.name);
-                    products.push(product);
-                }
-            }
-        }
-
-        console.log(JSON.stringify(products));
+        await signIn(page, username, password);
+        await scrapeAllPages(page, listURL);
     } catch (error) {
         console.error(error);
     } finally {
@@ -34,57 +15,71 @@ const { goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName
     }
 })();
 
-async function getLastPageNumber(page) {
-    const lastPageNumber = await page.evaluate(() => {
-        const lastPageUrl = document.querySelector('ol > li.xans-record-:last-child > a').getAttribute('href');
-        const urlParams = new URLSearchParams(lastPageUrl);
-        const pageValue = urlParams.get('page');
-        return pageValue;
-    });
-    return lastPageNumber ? parseInt(lastPageNumber) : 1;
+async function signIn(page, username, password) {
+    await page.goto('https://bagissue.kr/member/login.html', { waitUntil: 'networkidle0' });
+    await page.type('#member_id', username);
+    await page.type('#member_passwd', password);
+    await page.click('div > div > div > div.login > fieldset > span.login_btn');
+    await page.waitForNavigation({ waitUntil: 'load' });
 }
 
-async function getListProducts(page) {
-    const products = await page.evaluate(() => {
-        const productElements = document.querySelectorAll('li.item.xans-record-');
+async function scrapeAllPages(page, listURL) {
+    const forbiddenWords = getForbiddenWords();
+    let products = [];
+    for (let pageNum = 20; pageNum > 0; pageNum--) {
+        await moveToPage(page, listURL, pageNum);
+        const pageProducts = await scrapeProducts(page, forbiddenWords);
+        products = products.concat(pageProducts);
+    }
+    console.log(JSON.stringify(products));
+}
+
+async function moveToPage(page, listURL, pageNum) {
+    const url = `${listURL}&page=${pageNum}`;
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+}
+
+async function scrapeProducts(page, forbiddenWords) {
+    const products = await page.evaluate((forbiddenWords) => {
+        const productElements = document.querySelectorAll('ul.prdList.column_3 > li');
         const products = [];
-        for (const pe of productElements) {
-            const product = buildProduct(pe);
-            if (product) {
-                products.push(product);
+        for (const productElement of productElements) {
+            const product = scrapeProduct(productElement, forbiddenWords);
+            if (product === false) {
+                continue;
             }
-        }
-        function buildProduct(pe) {
-            const nameElement = pe.querySelector('div.prdImg_box > div.item_name.left > a > span');
-            if (!nameElement) {
-                return false;
-            }
-            const priceElements = pe.querySelectorAll('div.prdImg_box li > span:nth-child(2)')
-            let priceText = '';
-            for (const priceElement of priceElements) {
-                priceText += priceElement.textContent.trim();
-            }
-            const price = parseInt(priceText.replace(/[^0-9]/g, '').trim());
-            if (!price) {
-                return false;
-            }
-            const imageElement = pe.querySelector('.prdImg_image > a > img')
-            if (!imageElement) {
-                return false;
-            }
-
-            const hrefElement = pe.querySelector('.prdImg_image > a');
-            if (!hrefElement) {
-                return false;
-            }
-
-            const name = nameElement.textContent.trim();
-            const image = imageElement.src;
-            let href = 'https://bagissue.kr/' + hrefElement.getAttribute('href');
-            const platform = '벡이슈';
-            return { name, price, image, href, platform };
+            products.push(product);
         }
         return products;
-    });
+
+        function scrapeProduct(productElement, forbiddenWords) {
+            try {
+                const soldOutImageElement = productElement.querySelector('img[src="/shop/data/skin/everybag/img/icon/good_icon_soldout.gif"]');
+                if (soldOutImageElement) {
+                    return false;
+                }
+                let name = productElement.querySelector('div > span > div.prdImg_box > div.item_name.left > a > span').textContent.trim();
+                for (const forbiddenWord of forbiddenWords) {
+                    if (name.includes(forbiddenWord)) {
+                        return false;
+                    }
+                }
+                name = name.replace(/[a-zA-Z]\d{3}/g, ''); // 영어 1개 숫자 3개 패턴 제거
+                name = name + " 패션 데일리 캐쥬얼 여성가방"; // 문자열 추가
+
+                const price = parseInt(productElement.querySelector('div.prdImg_box > ul > li > span:nth-child(2)').textContent.trim().replace(/[^\d]/g, ''));
+                if (price < 1) {
+                    return false;
+                }
+                const image = productElement.querySelector('div.prdImg_box > div.prdImg_image > a > img').src;
+                const href = productElement.querySelector('div.prdImg_box > div.prdImg_image > a').href;
+                const platform = "벡이슈";
+                const product = { name, price, image, href, platform };
+                return product;
+            } catch (error) {
+                return false;
+            }
+        }
+    }, forbiddenWords);
     return products;
 }

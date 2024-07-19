@@ -21,6 +21,8 @@ class WingController extends Controller
             ->sum('wt.amount');
         $paidAmount = DB::table('orders AS o')
             ->join('carts AS c', 'c.id', '=', 'o.cart_id')
+            ->join('wing_transactions AS wt', 'wt.id', '=', 'o.wing_transaction_id')
+            ->whereNot('wt.status', 'REJECTED')
             ->where('o.type', 'PAID')
             ->where('c.member_id', $memberId)
             ->selectRaw('

@@ -8,15 +8,12 @@ use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
-use App\Http\Controllers\SmartStore\SmartStoreReturnController;
 use App\Http\Controllers\WingController;
 use DateTime;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class OpenMarketOrderController extends Controller
 {
@@ -32,71 +29,15 @@ class OpenMarketOrderController extends Controller
                 $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
                 if (!$isExistOpenMarketAccount) continue;
                 $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi'; //오픈마켓별 주문내역조회 api 쏠려고 영어이름을 메소드명으로 지정
-                $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';  // 오픈마켓별 업로드된 상품인지 조회하려고 메소드명 지정
                 $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null); //api 결과 저장
                 if ($apiResults === false) continue; //api의 결과값이 비어있으면 continue 곧 아무런 결과값이 없는거지
-                // orderId를 기준으로 그룹화
-                $groupedResults = []; // wing_transaction에 주문의 총합으로 넣으려고 그룹화
-                foreach ($apiResults as $apiResult) {
-                    if (!$apiResult || !is_array($apiResult) || !isset($apiResult['orderId'])) {
-                        continue;
-                    }
-                    if ($apiResult['productOrderStatus'] !== '결제완료' && $apiResult['productOrderStatus'] !== '상품준비중') {
-                        continue; // 결제완료, 상품준비중 db에 저장하려고 검증
-                    } //일부러 결제완료, 상품준비중을 먼저 검증 왜냐 db조회보다 간단한 배열 조회가 더빠르기 때문에 성능 최적화
-                    //주문이 이미 있는지 검증
-                    $isExist = DB::table('partner_orders as po')
-                        ->join('orders as o', 'o.id', '=', 'po.order_id')
-                        ->where('po.order_number', $apiResult['orderId'])
-                        ->where('po.product_order_number', $apiResult['productOrderId'])
-                        ->whereIn('o.type', ['PAID', 'CANCELLED'])
-                        ->exists();
-                    if ($isExist) {
-                        continue; // 저장 로직 건너뛰기
-                    }
-                    $orderId = $apiResult['orderId'];
-                    if (!isset($groupedResults[$orderId])) {
-                        $groupedResults[$orderId] = [];
-                    }
-                    $groupedResults[$orderId][] = $apiResult;
-                }
-                try {
-                    DB::beginTransaction(); // 트랜잭션 시작
-                    foreach ($groupedResults as $orderId => $orders) { //orderId기준 반복문 진행
-                        $totalPrice = 0;
-                        $cartIds = [];
-                        foreach ($orders as $order) {
-                            $product = $this->getProduct($order['productCode']);
-                            if (!$product) continue; //셀러가 우리 제품 말고 다른걸 올릴 수 있음
-                            $cart = $this->storeCart($memberId, $product->id, $order['quantity']);
-                            $cartId = $cart['data']['cartId'];
-                            $cartCode = $this->getCartCode($cartId);
-                            $totalPrice += $this->getCartAmount($cartCode, $product->sellerID); // wing_transaction amount구하기
-                            $cartIds[] = $cartId;  //cartId 리스트로 보관
-                        }
-                        if ($totalPrice === 0) continue;
-                        $wingTransaction =  $this->storeWingTransaction($memberId, 'PAYMENT', $totalPrice, $remark = ''); //윙 트랜잭션 테이블 insert
-                        $wingTransactionId = $wingTransaction['data']['wingTransactionId']; //저장한 데이터의 id값
-                        foreach ($orders as $index => $order) {
-                            $product = $this->getProduct($order['productCode']);
-                            if (!$product) continue;
-                            $priceThen = $this->getSalePrice($product->id, $product->sellerID);
-                            $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity, $order['orderDate']);
-                            $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
-                            $uploadedProduct = call_user_func([$this, $uploadedProductMethod], $product->id); // 해당 오픈마켓 업로드테이블에서 업로드된 상품인지 확인하고 id값 가져옴
-                            $uploadedProductId = $uploadedProduct->id;
-                            $this->storePartnerOrder($orderId, $openMarket->id, $order['accountId'], $uploadedProductId, $priceThen, $product->shipping_fee, $order['orderId'], $order['productOrderId'], $order['accountId']); //partner_orders 테이블 insert
-                        }
-                    }
-                    DB::commit(); // 트랜잭션 커밋
-                } catch (\Exception $e) {
-                    DB::rollBack(); // 트랜잭션 롤백
-                    return [
-                        'status' => false,
-                        'message' => '새로운 주문 저장과정에서 오류가 발생하였습니다.',
-                        'error' => $e->getMessage(),
-                    ];
-                }
+                $openMarketCreateOrder = new OpenMarketCreateOrder();
+                $resultCreateOrder = $openMarketCreateOrder->createOrder($apiResults, $memberId, $openMarket->id, $openMarketEngName);
+                if (!$resultCreateOrder['status']) return [
+                    'status' => false,
+                    'message' => $resultCreateOrder['message'],
+                    'data' => $resultCreateOrder
+                ];
                 // 현재 쿠팡만 교환, 환불 자동수집중
                 if ($openMarketEngName !== 'coupang') continue;
                 $returnMethod = 'get'  . ucfirst($openMarketEngName) . 'ReturnOrder';
@@ -144,7 +85,6 @@ class OpenMarketOrderController extends Controller
             }
             $startOn = $request->input('startOn');
             $endOn = $request->input('endOn');
-
             $vendors = $request->input('vendors');
             $orderStatus = $request->input('orderStatus');
             $orders = $this->getOrders($vendors, $orderStatus, $startOn, $endOn);
@@ -183,8 +123,6 @@ class OpenMarketOrderController extends Controller
         $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
         $results = [];
-        $saveResults = [];
-        $totalAmountRequired = 0;
         $partner = $this->getPartner($domewingAndPartner->partner_id);
         $domewingUser = $this->getDomewingUser($domewingAndPartner->domewing_account_id);
         foreach ($orderwingEngNameLists as $orderwingEngNameList) {
@@ -194,8 +132,6 @@ class OpenMarketOrderController extends Controller
                 if (isset($apiResult) && is_array($apiResult)) {
                     foreach ($apiResult as $order) {
                         if ($order['productOrderStatus'] == "결제완료") {
-                            $totalAmountRequired += $order['totalPaymentAmount'] + $order['deliveryFeeAmount'];
-                            $saveResults[] = $order;
                         }
                     }
                 }
@@ -229,7 +165,6 @@ class OpenMarketOrderController extends Controller
             'trackingNumber.string' => '송장 번호는 문자열이어야 합니다.',
             'remark.string' => '사유는 문자열이어야 합니다.',
         ]);
-
         if ($validator->fails()) {
             return [
                 'status' => false,
@@ -351,109 +286,6 @@ class OpenMarketOrderController extends Controller
         }
         return $lowBalanceAccounts;
     }
-    private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen, $orderDate = null)
-    {
-        try {
-            $orderData = [
-                'wing_transaction_id' => $wingTransactionId,
-                'cart_id' => $cartId,
-                'product_order_number' => (string) Str::uuid(),
-                'receiver_name' => $receiverName,
-                'receiver_phone' => $receiverPhone,
-                'receiver_address' => $receiverAddress,
-                'receiver_remark' => $receiverRemark,
-                'delivery_status' => 'PENDING',
-                'type' => 'PAID',
-                'price_then' => $priceThen,
-                'shipping_fee_then' => $shippingFeeThen,
-                'bundle_quantity_then' => $bundleQuantityThen,
-            ];
-            if ($orderDate !== null) {
-                $orderData['created_at'] = $orderDate;
-            }
-            $orderId = DB::table('orders')->insertGetId($orderData);
-            return [
-                'status' => true,
-                'data' => [
-                    'orderId' => $orderId
-                ]
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'message' => '주문 내역을 저장하는 과정에서 오류가 발생했습니다.',
-                'error' => $e->getMessage()
-            ];
-        }
-    }
-
-
-
-    private function storePartnerOrder($orderId, $vendorId, $accountId, $uploadedProductId, $price, $shippingFee, $orderNumber, $productOrderNumber)
-    {
-        try {
-            DB::table('partner_orders')
-                ->insertGetId([
-                    'order_id' => $orderId,
-                    'vendor_id' => $vendorId,
-                    'account_id' => $accountId,
-                    'uploaded_product_id' => $uploadedProductId,
-                    'price_then' => $price,
-                    'shipping_fee_then' => $shippingFee,
-                    'order_number' => $orderNumber,
-                    'product_order_number' => $productOrderNumber,
-                ]);
-            return [
-                'status' => true
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'message' => '주문 내역을 저장하는 과정에서 오류가 발생했습니다.',
-                'error' => $e->getMessage()
-            ];
-        }
-    }
-    private function getCartCode($cartId)
-    {
-        return DB::table('carts')
-            ->where('id', $cartId)
-            ->value('code');
-    }
-
-    // 카트 금액 계산
-    private function getCartAmount($cartCode, $sellerID)
-    {
-        $cart = DB::table('carts AS c')
-            ->join('minewing_products AS mp', 'mp.id', '=', 'c.product_id')
-            ->where('c.code', $cartCode)
-            ->first();
-
-        $salePrice = $this->getSalePrice($cart->product_id, $sellerID);
-        $shippingRate = $cart->bundle_quantity === 0 ? 1 : ceil($cart->quantity / $cart->bundle_quantity);
-        return $salePrice * $cart->quantity + $cart->shipping_fee * $shippingRate;
-    }
-    // 판매 가격 계산
-    private function getSalePrice($productId, $sellerID)
-    {
-        $originProductPrice = DB::table('minewing_products')
-            ->where('id', $productId)
-            ->value('productPrice');
-        $promotion = DB::table('promotion_products AS pp')
-            ->join('promotion AS p', 'p.id', '=', 'pp.promotion_id')
-            ->where('product_id', $productId)
-            ->where('p.end_at', '>', now())
-            ->where('p.is_active', 'Y')
-            ->where('pp.is_active', 'Y')
-            ->where('p.band_promotion', 'N')
-            ->where('pp.band_product', 'N')
-            ->value('pp.product_price');
-        $productPrice = $promotion ?? $originProductPrice;
-        $margin = DB::table('sellwing_config')->where('id', 1)->value('value');
-        if ($sellerID == 5) $margin = DB::table('sellwing_config')->where('id', 3)->value('value');
-        $marginRate = ($margin / 100) + 1;
-        return ceil($productPrice * $marginRate);
-    }
     private function getOrders($vendors, $orderStatus, $startOn, $endOn)
     {
         // $endOn에 1일을 추가
@@ -545,7 +377,6 @@ class OpenMarketOrderController extends Controller
                         });
                 })->whereBetween('o.updated_at', [$startOn, $endOn]);
                 break;
-
             case 'RETURN_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('wt.status', 'PENDING')
@@ -595,9 +426,6 @@ class OpenMarketOrderController extends Controller
         });
         return $orders;
     }
-
-
-
     private function transformOrderDetails($order)
     {
         $product  = DB::table('minewing_products as mp')
@@ -677,7 +505,7 @@ class OpenMarketOrderController extends Controller
 
         return $result->pluck('name_eng')->toArray();
     }
-    private function getDomewingAndPartners($partnerId = null) //그리고 어떤 도매윙 아이디의 오픈마켓 정보들인가를 가져와
+    private function getDomewingAndPartners($partnerId = null)
     {
         $query = DB::table('partner_domewing_accounts as da')
             ->where('is_active', 'Y')
@@ -687,7 +515,6 @@ class OpenMarketOrderController extends Controller
         }
         return $query->get();
     }
-
     private function getPartner($id)
     {
         return DB::table('partners')
@@ -700,67 +527,6 @@ class OpenMarketOrderController extends Controller
             ->where('id', $id)
             ->first();
     }
-    // 카트 테이블 저장
-    private function storeCart($memberId, $productId, $quantity)
-    {
-        try {
-            $cartId = DB::table('carts')
-                ->insertGetId([
-                    'member_id' => $memberId,
-                    'product_id' => $productId,
-                    'quantity' => $quantity,
-                    'code' => (string) Str::uuid(),
-                    'status' => 'PAID'
-                ]);
-
-            return [
-                'status' => true,
-                'data' => [
-                    'cartId' => $cartId
-                ]
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'message' => '신규 주문을 저장하는 과정에서 오류가 발생했습니다.',
-                'error' => $e->getMessage()
-            ];
-        }
-    }
-    // Wing 거래 저장
-    private function storeWingTransaction($memberId, $type, $amount, $remark = null)
-    {
-        try {
-            $wingTransactionId = DB::table('wing_transactions')
-                ->insertGetId([
-                    'member_id' => $memberId,
-                    'order_number' => (string) Str::uuid(),
-                    'type' => $type,
-                    'amount' => $amount,
-                    'remark' => $remark
-                ]);
-
-            return [
-                'status' => true,
-                'data' => [
-                    'wingTransactionId' => $wingTransactionId
-                ]
-            ];
-        } catch (\Exception $e) {
-            return [
-                'status' => false,
-                'message' => '주문 내역을 저장하는 과정에서 오류가 발생했습니다.',
-                'error' => $e->getMessage()
-            ];
-        }
-    }
-    private function getProduct($productCode)
-    {
-        return DB::table('minewing_products')
-            ->where('productCode', $productCode)
-            ->first();
-    }
-
     private function callSmart_storeOrderApi($id)
     {
         $controller = new SmartStoreOrderController();
@@ -791,27 +557,6 @@ class OpenMarketOrderController extends Controller
     {
         $controller = new CoupangExchangeController();
         return $controller->index($partnerId);
-    }
-    private function getSmart_storeUploadedProductId($productId)
-    {
-        return DB::table('smart_store_uploaded_products')
-            ->where('product_id', $productId)
-            ->select('id')
-            ->first();
-    }
-    private function getCoupangUploadedProductId($productId)
-    {
-        return DB::table('coupang_uploaded_products')
-            ->where('product_id', $productId)
-            ->select('id')
-            ->first();
-    }
-    private function getSt11UploadedProductId($productId)
-    {
-        return DB::table('st11_uploaded_products')
-            ->where('product_id', $productId)
-            ->select('id')
-            ->first();
     }
     private function isExistSmart_storeAccount($partnerId)
     {
