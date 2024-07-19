@@ -1,14 +1,14 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     try {
-        // const [tempFilePath, username, password] = process.argv.slice(2);
-        // const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        const urls = ['https://www.soggupnoli.com/goods/goods_view.php?goodsNo=1000001979'];
-        const username = "jskorea2023";
-        const password = "tjddlf88!@";
+        const [tempFilePath, username, password] = process.argv.slice(2);
+        const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+        // const urls = ['https://www.soggupnoli.com/goods/goods_view.php?goodsNo=1000001979'];
+        // const username = "jskorea2023";
+        // const password = "tjddlf88!@";
 
         await signIn(page, username, password);
         const products = [];
