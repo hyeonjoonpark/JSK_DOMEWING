@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\OpenMarkets\LotteOn;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
@@ -20,14 +21,17 @@ class LotteOnUploadController extends Controller
     public function main()
     {
         set_time_limit(0);
+        $filterDuplicatesResult = $this->filterDuplicates();
         $processProductsResult = $this->processProducts();
         if (!$processProductsResult['status']) {
             return $processProductsResult;
         }
         $data = $processProductsResult['data'];
-        $error = $processProductsResult['error'];
         $uploadResult = $this->upload($data);
-        return $uploadResult;
+        if (!$uploadResult['status']) {
+            return $uploadResult;
+        }
+        return $this->processStore($uploadResult['data']);
     }
     protected function processProducts()
     {
@@ -50,6 +54,10 @@ class LotteOnUploadController extends Controller
         $errors = [];
         $data = [];
         foreach ($this->products as $product) {
+            $isExisting = $this->isExisting($product);
+            if ($isExisting) {
+                continue;
+            }
             $generateDataResult = $this->generateData($product, $warehouseAndReturnInfo, $dvCstPolNo);
             if (!$generateDataResult['status']) {
                 $errors[] = [
@@ -66,6 +74,15 @@ class LotteOnUploadController extends Controller
             'data' => $data,
             'error' => $errors
         ];
+    }
+    protected function isExisting(Collection $product)
+    {
+        return DB::table('lotte_on_uploaded_products AS up')
+            ->join('minewing_products AS mp', 'mp.id', '=', 'up.product_id')
+            ->join('lotte_on_accounts AS a', 'a.id', '=', 'up.lotte_on_account_id')
+            ->where('mp.id', $product->id)
+            ->where('a.partner_id', $this->partner->id)
+            ->exists();
     }
     protected function generateData(stdClass $product, array $warehouseAndReturnInfo, array $dvCstPolNo)
     {
@@ -274,6 +291,51 @@ class LotteOnUploadController extends Controller
         $method = 'post';
         $url = 'https://openapi.lotteon.com/v1/openapi/product/v1/product/registration/request';
         $loac = new LotteOnApiController();
-        return $loac->builder($method, $this->account->access_key, $url, $data);
+        $response = $loac->builder($method, $this->account->access_key, $url, $data);
+        if (!$response['status']) {
+            return $response;
+        }
+        $productCodes = $response['data']['data'];
+        return [
+            'status' => true,
+            'data' => $productCodes
+        ];
+    }
+    protected function processStore(array $productCodes)
+    {
+        $success = 0;
+        foreach ($productCodes as $productCode) {
+            if ($productCode['resultCode'] !== 0000) {
+                continue;
+            }
+            $sellwingProductCode = $productCode['epdNo'];
+            $lotteonProductCode = $productCode['spdNo'];
+            $storeResult = $this->store($sellwingProductCode, $lotteonProductCode);
+            if ($storeResult) {
+                $success++;
+            }
+        }
+        return [
+            'status' => true,
+            'message' => "총 " . number_format(count($this->products)) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다."
+        ];
+    }
+    protected function store(string $sellwingProductCode, string $lotteonProductCode)
+    {
+        $product = $this->products->firstWhere('productCode', $sellwingProductCode);
+        try {
+            DB::table('lotte_on_uploaded_products')
+                ->insert([
+                    'lotte_on_account_id' => $this->account->id,
+                    'product_id' => $product->id,
+                    'product_name' => $product->productName,
+                    'price' => $product->productPrice,
+                    'shipping_fee' => $product->shipping_fee,
+                    'origin_product_no' => $lotteonProductCode
+                ]);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
