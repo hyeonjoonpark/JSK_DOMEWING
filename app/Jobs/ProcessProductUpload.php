@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
+use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnUploadController;
 use App\Http\Controllers\OpenMarkets\St11\UploadController as St11UploadController;
 use App\Http\Controllers\SmartStore\SmartstoreProductUpload;
 use Illuminate\Bus\Queueable;
@@ -51,6 +52,8 @@ class ProcessProductUpload implements ShouldQueue
             case 'st11':
                 $uploader = new St11UploadController();
                 break;
+            case 'lotte_on':
+                $uploader = new LotteOnUploadController($this->products, $this->partner, $this->account);
             default:
                 throw new \Exception("Unknown vendor: {$this->vendor->name_eng}");
         }

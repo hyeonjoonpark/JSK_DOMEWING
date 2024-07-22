@@ -47,6 +47,7 @@ class NalmeokwingStoreService extends Controller
     {
         $spreadsheet = IOFactory::load($file->getPathname());
         $sheetData = $spreadsheet->getActiveSheet()->toArray();
+        return $sheetData;
         $vendorEngName = DB::table('vendors')
             ->where('id', $vendorId)
             ->value('name_eng');
@@ -204,7 +205,7 @@ class NalmeokwingStoreService extends Controller
             'sellerID' => ['required', 'integer', 'exists:vendors,id'],
             'userID' => ['required', 'integer', 'exists:users,id'],
             'categoryID' => ['required', 'integer', 'exists:ownerclan_category,id'],
-            'origin_product_code' => ['required', 'string'],
+            'origin_product_code' => ['required', 'string', 'unique:minewing_products,origin_product_code'],
             'productCode' => ['required', 'string', 'unique:minewing_products,productCode'],
             'productName' => ['required', 'string', 'unique:minewing_products,productName'],
             'productKeywords' => ['required', 'string'],

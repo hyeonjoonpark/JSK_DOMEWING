@@ -3,10 +3,32 @@
 namespace App\Http\Controllers\OpenMarkets\LotteOn;
 
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\Http;
 
 class LotteOnApiController extends Controller
 {
+    public function builder(string $method, string $accessKey, string $url, array $data = [])
+    {
+        ini_set('max_execution_time', 120);
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessKey,
+                'Accept' => "application/json",
+                'Accept-Language' => 'ko',
+                'X-Timezone' => "GMT+09:00",
+                "Content-Type" => "application/json"
+            ])->$method($url, $data);
+            return [
+                'status' => true,
+                'data' => $response->json()
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
     public function getBuilder($accessKey, $url)
     {
         // cURL 세션 초기화
