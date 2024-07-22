@@ -47,6 +47,7 @@ async function validateProduct(page) {
     try {
         return await page.evaluate(() => {
             const txtDescElements = document.querySelectorAll('body > div.container.goods_detail_skin > div.g_skin_head.mt-lg-3.mb-3.mb-md-4.row.px-2.px-lg-0 > div.goods_info.col-12.col-lg.pl-lg-3 > div.d-flex.flex-wrap.justify-content-between.mb-3.pb-2.border-bottom > div.col-auto.d-flex > p span');
+
             for (const txtDescElement of txtDescElements) {
                 const textContent = txtDescElement.textContent.trim();
                 if (
@@ -61,17 +62,19 @@ async function validateProduct(page) {
                     return false;
                 }
             }
-            const OrderLimit = document.querySelector('div:nth-child(2) > span.text-danger.ml-3');
-            if (OrderLimit) {
-                const orderLimitText = OrderLimit.textContent.trim();
+            const orderLimit = document.querySelector('div:nth-child(2) > span.text-danger.ml-3');
+            if (orderLimit) {
+                const orderLimitText = orderLimit.textContent.trim();
                 const match = orderLimitText.match(/\d+/);
                 if (match && parseInt(match[0]) > 1) {
                     return false;
                 }
             }
+
             return true;
         });
     } catch (error) {
         return false;
     }
 }
+
