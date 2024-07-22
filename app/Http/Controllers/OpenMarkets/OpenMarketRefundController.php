@@ -124,7 +124,6 @@ class OpenMarketRefundController extends Controller
         DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
             ->update([
-                'type' => 'CANCELLED',
                 'remark' => $remark,
                 'requested' => 'N'
             ]);
