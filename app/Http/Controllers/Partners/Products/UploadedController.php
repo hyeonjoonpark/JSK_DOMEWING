@@ -130,13 +130,16 @@ class UploadedController extends Controller
     public function delete(Request $request)
     {
         set_time_limit(0);
+
+        // Request validation
         $validator = Validator::make($request->all(), [
             'originProductsNo' => 'required|array|min:1',
             'vendorId' => 'required|integer|exists:vendors,id'
         ], [
-            'originProductNo' => '유효한 상품이 아닙니다.',
-            'vendorId' => '유효한 오픈 마켓을 선택해주세요.'
+            'originProductsNo.required' => '유효한 상품이 아닙니다.',
+            'vendorId.required' => '유효한 오픈 마켓을 선택해주세요.'
         ]);
+
         if ($validator->fails()) {
             return [
                 'status' => false,
@@ -144,29 +147,35 @@ class UploadedController extends Controller
                 'error' => $validator->errors()
             ];
         }
+
         $vendorId = $request->vendorId;
         $vendorEngName = DB::table('vendors')
             ->where('id', $vendorId)
             ->value('name_eng');
-        $originProductsNo = DB::table($vendorEngName . '_uploaded_products')
+
+        $originProductsNo = DB::table("{$vendorEngName}_uploaded_products")
             ->whereIn('origin_product_no', $request->originProductsNo)
             ->pluck('origin_product_no');
+
         $errors = [];
         $successedOriginProductsNo = [];
+
         foreach ($originProductsNo as $originProductNo) {
-            $functionName = $vendorEngName . 'DeleteRequest';
+            $functionName = "{$vendorEngName}DeleteRequest";
             $result = $this->$functionName($originProductNo, $vendorEngName);
+
             if ($result['status'] === false) {
-                $error = $result['error'];
-                $errors = [
+                $errors[] = [
                     'originProductNo' => $originProductNo,
-                    'error' => $error
+                    'error' => $result['error'] ?? 'Unknown error'
                 ];
             } else {
                 $successedOriginProductsNo[] = $originProductNo;
             }
         }
+
         $dupResult = $this->destroyUploadedProducts($originProductsNo, $vendorEngName);
+
         return [
             'status' => true,
             'message' => '총 ' . count($originProductsNo) . '개의 상품 중 ' . count($successedOriginProductsNo) . '개의 상품을 성공적으로 삭제했습니다.<br>주문 및 클레임 진행 중인 상품들은 삭제할 수 없습니다. 해당 상품들은 주문 및 클레임이 완료된 후, 판매자 센터에서 수동으로 삭제해주시기 바랍니다.',
