@@ -190,6 +190,10 @@ class OpenMarketOrderController extends Controller
             $exchangeController = new OpenMarketExchangeController();
             return $exchangeController->cancelExchange($request);
         }
+        if ($targetStatus == 'accept-cancel' && $orderType == 'EXCHANGE') {
+            $cancelOrderController = new OpenMarketExchangeController();
+            return $cancelOrderController->acceptCancel($productOrderNumber, $remark);
+        }
         if ($targetStatus == 'awaiting-shipment' && $orderType == 'REFUND') {
             $setAwaitingController = new OpenMarketRefundController();
             return $setAwaitingController->setAwaitingShipmentStatus($request->productOrderNumber);
@@ -201,6 +205,10 @@ class OpenMarketOrderController extends Controller
         if ($targetStatus == 'order-cancel' && $orderType == 'REFUND') {
             $exchangeController = new OpenMarketRefundController();
             return $exchangeController->cancelRefund($request);
+        }
+        if ($targetStatus == 'accept-cancel' && $orderType == 'REFUND') {
+            $cancelOrderController = new OpenMarketRefundController();
+            return $cancelOrderController->acceptCancel($productOrderNumber, $remark);
         }
         if ($targetStatus == 'awaiting-shipment') {
             $setAwaitingController = new OpenMarketSetAwaitingController();

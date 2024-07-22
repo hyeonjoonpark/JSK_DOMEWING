@@ -83,7 +83,8 @@ class CoupangReturnController extends Controller
         $baseQuery = [
             'createdAtFrom' => $startDate,
             'createdAtTo' => $endDate,
-            'status' => 'UC'
+            'status' => 'UC',
+            'cancelType' => 'RETURN'
         ];
         $query = 'searchType=timeFrame&' . http_build_query($baseQuery);
         $ac = new ApiController();

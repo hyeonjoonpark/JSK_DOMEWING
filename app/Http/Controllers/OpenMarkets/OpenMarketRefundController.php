@@ -124,7 +124,6 @@ class OpenMarketRefundController extends Controller
         DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
             ->update([
-                'type' => 'CANCELLED',
                 'remark' => $remark,
                 'requested' => 'N'
             ]);
@@ -138,6 +137,55 @@ class OpenMarketRefundController extends Controller
             'status' => true,
             'message' => '환불 요청이 취소되었습니다.'
         ];
+    }
+    public function acceptCancel($productOrderNumber, $remark)
+    {
+        if (!$remark) return [
+            'status' => false,
+            'message' => '취소사유는 필수입니다.',
+        ];
+        $order = DB::table('orders as o')
+            ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
+            ->where('o.product_order_number', $productOrderNumber)
+            ->where('o.delivery_status', 'PENDING')
+            ->where('o.type', 'EXCHANGE')
+            ->where('wt.status', 'PENDING')
+            ->select('o.*')
+            ->first();
+        if (!$order) return [
+            'status' => false,
+            'message' => '이미 취소되었거나 유효한 주문이 아닙니다.',
+        ];
+        DB::beginTransaction();
+        try {
+            // orders 테이블 업데이트
+            DB::table('orders')
+                ->where('product_order_number', $productOrderNumber)
+                ->where('delivery_status', 'PENDING')
+                ->update([
+                    'remark' => $remark,
+                    'requested' => 'N'
+                ]);
+            DB::table('wing_transactions')
+                ->where('id', $order->wing_transaction_id)
+                ->update([
+                    'status' => 'REJECTED'
+                ]);
+            // 트랜잭션 커밋
+            DB::commit();
+            return [
+                'status' => true,
+                'message' => '주문이 성공적으로 취소되었습니다.',
+            ];
+        } catch (\Exception $e) {
+            // 트랜잭션 롤백
+            DB::rollBack();
+            return [
+                'status' => false,
+                'message' => '주문 취소 중 오류가 발생했습니다.',
+                'error' => $e->getMessage(),
+            ];
+        }
     }
     private function update($orderId, $deliveryCompanyId, $trackingNumber)
     {

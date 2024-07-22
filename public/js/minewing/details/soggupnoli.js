@@ -6,9 +6,6 @@ const puppeteer = require('puppeteer');
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const urls = ['https://www.soggupnoli.com/goods/goods_view.php?goodsNo=1000001979'];
-        // const username = "jskorea2023";
-        // const password = "tjddlf88!@";
 
         await signIn(page, username, password);
         const products = [];
@@ -43,14 +40,14 @@ async function scrapeProduct(page, url) {
             const productName = document.querySelector('div.item_detail_tit > h3').textContent.trim();
             const productPrice = document.querySelector('dl.item_price > dd > strong > strong').textContent.trim().replace(/[^\d]/g, '');
             const productImage = document.querySelector('#mainImage > img').src;
-            const productDetailElements = document.querySelectorAll('#detail > div.detail_cont > div > div.txt-manual > div img');
+            const productDetailElements = document.querySelectorAll('#detail > div.detail_cont > div > div.txt-manual img');
             if (productDetailElements.length < 1) {
                 return false;
             }
             const productDetail = [];
             for (const productDetailElement of productDetailElements) {
                 const tempProductDetailSrc = productDetailElement.src;
-                if (tempProductDetailSrc === 'http://buzz71.godohosting.com/start/common/open_end.jpg' || tempProductDetailSrc === 'http://buzz71.godohosting.com/start/common/open_notice.jpg') {
+                if (tempProductDetailSrc === 'http://cutebox.godohosting.com/soggunoli%20order.jpg' || tempProductDetailSrc === 'http://buzz71.godohosting.com/start/common/open_notice.jpg') {
                     continue;
                 }
                 productDetail.push(productDetailElement.src);
