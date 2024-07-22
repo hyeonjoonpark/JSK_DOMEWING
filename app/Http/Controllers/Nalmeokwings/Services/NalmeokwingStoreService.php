@@ -205,7 +205,7 @@ class NalmeokwingStoreService extends Controller
             'sellerID' => ['required', 'integer', 'exists:vendors,id'],
             'userID' => ['required', 'integer', 'exists:users,id'],
             'categoryID' => ['required', 'integer', 'exists:ownerclan_category,id'],
-            'origin_product_code' => ['required', 'string', 'unique:minewing_products,origin_product_code'],
+            'origin_product_code' => ['required', 'string'],
             'productCode' => ['required', 'string', 'unique:minewing_products,productCode'],
             'productName' => ['required', 'string', 'unique:minewing_products,productName'],
             'productKeywords' => ['required', 'string'],
