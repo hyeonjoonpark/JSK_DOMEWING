@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
-use function PHPUnit\Framework\isEmpty;
-
 class LotteOnUploadController extends Controller
 {
     private $products, $partner, $account;
@@ -317,7 +315,8 @@ class LotteOnUploadController extends Controller
         }
         return [
             'status' => true,
-            'message' => "총 " . number_format(count($this->products)) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다."
+            'message' => "총 " . number_format(count($this->products)) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.",
+            'error' => '?'
         ];
     }
     protected function store(string $sellwingProductCode, string $lotteonProductCode)
