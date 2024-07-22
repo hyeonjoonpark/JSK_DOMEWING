@@ -107,6 +107,11 @@
                                     </a>
                                 </li>
                                 <li class="nk-menu-item">
+                                    <a href="/admin/nalmeokwing/match" class="nk-menu-link">
+                                        <span class="nk-menu-text">상품 매칭</span>
+                                    </a>
+                                </li>
+                                <li class="nk-menu-item">
                                     <a href="/admin/nalmeokwing/order" class="nk-menu-link">
                                         <span class="nk-menu-text">주문서 추출</span>
                                     </a>

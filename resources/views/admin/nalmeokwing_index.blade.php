@@ -94,7 +94,33 @@
                 <div class="card-inner">
                     <h6 class="title">검색 필터</h6>
                     <p>아래 옵션들을 활용해 특정 조건의 상품들을 조회할 수 있습니다.</p>
-                    <p>업데이트 중입니다.</p>
+                    <form class="row g-gs" method="GET">
+                        <div class="col-12 col-md-6">
+                            <div class="row g-gs">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="form-label">키워드</label>
+                                        <div class="form-control-wrap">
+                                            <input type="text" class="form-control" name="searchKeyword"
+                                                value="{{ $data['searchKeyword'] }}"
+                                                placeholder="상품명, 원청사, 소유주 등의 키워드를 입력해보세요." />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-primary">검색하기</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">상품 코드</label>
+                                <div class="form-control-wrap">
+                                    <textarea class="form-control" name="productCodes" placeholder=",(쉼표)로 구분하여 여러 상품 코드를 동시 검색 가능합니다.">{{ $data['productCodes'] }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -132,6 +158,7 @@
                                     <th scope="col">코드</th>
                                     <th scope="col">가격</th>
                                     <th scope="col">원청사</th>
+                                    <th scope="col">소유주</th>
                                     <th scope="col">수집일자</th>
                                 </tr>
                             </thead>
@@ -163,8 +190,11 @@
                                         </td>
                                         <td>
                                             <a href="{{ $product->productHref }}" target="_blank">
-                                                {{ $product->name }}
+                                                {{ $product->v_name }}
                                             </a>
+                                        </td>
+                                        <td>
+                                            {{ $product->p_name }}
                                         </td>
                                         <td class="text-center">
                                             {{ date('Y-m-d', strtotime($product->createdAt)) }}<br>

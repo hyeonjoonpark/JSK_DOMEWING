@@ -227,6 +227,7 @@ Route::middleware(['auth.custom'])->group(function () {
     });
     Route::prefix('nalmeokwing')->group(function () {
         Route::post('store', [NalmeokwingController::class, 'store']);
+        Route::put('combine', [NalmeokwingController::class, 'combine']);
     });
 });
 

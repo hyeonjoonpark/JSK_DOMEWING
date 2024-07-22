@@ -59,17 +59,25 @@ class ExcelUploadController extends Controller
     {
         try {
             $spreadsheet = IOFactory::load($ordersExcelFile->getRealPath());
-            $sheet = $spreadsheet->getSheet(0);
+            $sheet = $spreadsheet->getSheet(0)->toArray();
+            $highestRow = 0;
+            foreach ($sheet as $row) {
+                $filteredRow = array_filter($row, function ($cell) {
+                    return $cell !== null && $cell !== '';
+                });
+                if (!empty($filteredRow)) {
+                    $highestRow++;
+                }
+            }
             $errors = [];
             $datas = [];
-            $highestRow = $sheet->getHighestRow();
             if ($highestRow >= 501) {
                 return [
                     'status' => false,
                     'message' => '데이터는 헤더를 제외하고 2번째부터 501번째 행까지, 총 500개의 행 이하이어야 합니다.'
                 ];
             }
-            for ($i = 2; $i <= $highestRow; $i++) {
+            for ($i = 1; $i < $highestRow; $i++) {
                 $rowData = $this->getRowData($sheet, $i);
                 $validateColumnsResult = $this->validateColumns($rowData);
                 if ($validateColumnsResult['status'] === false) {
@@ -117,15 +125,15 @@ class ExcelUploadController extends Controller
             'status' => true
         ];
     }
-    private function getRowData($sheet, $row)
+    private function getRowData($sheet, $i)
     {
         return [
-            'productCode' => $sheet->getCell('A' . $row)->getValue(),
-            'quantity' => $sheet->getCell('B' . $row)->getValue(),
-            'receiverName' => $sheet->getCell('C' . $row)->getValue(),
-            'receiverPhone' => $sheet->getCell('D' . $row)->getValue(),
-            'receiverAddress' => $sheet->getCell('E' . $row)->getValue(),
-            'receiverRemark' => $sheet->getCell('F' . $row)->getValue()
+            'productCode' => $sheet[$i][0],
+            'quantity' => $sheet[$i][1],
+            'receiverName' => $sheet[$i][2],
+            'receiverPhone' => $sheet[$i][3],
+            'receiverAddress' => $sheet[$i][4],
+            'receiverRemark' => $sheet[$i][5]
         ];
     }
     private function createOrder($orderData, $memberId)
