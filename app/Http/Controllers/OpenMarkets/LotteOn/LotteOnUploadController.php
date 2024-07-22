@@ -19,12 +19,15 @@ class LotteOnUploadController extends Controller
     }
     public function main()
     {
+        set_time_limit(0);
         $processProductsResult = $this->processProducts();
         if (!$processProductsResult['status']) {
             return $processProductsResult;
         }
         $data = $processProductsResult['data'];
         $error = $processProductsResult['error'];
+        $uploadResult = $this->upload($data);
+        return $uploadResult;
     }
     protected function processProducts()
     {
@@ -44,21 +47,19 @@ class LotteOnUploadController extends Controller
             ];
         }
         $dvCstPolNo = $requestDvCstPolNoResult['data'];
-        return [
-            'warehouseAndReturnInfo' => $warehouseAndReturnInfo,
-            'dvCstPolNo' => $dvCstPolNo
-        ];
         $errors = [];
+        $data = [];
         foreach ($this->products as $product) {
             $generateDataResult = $this->generateData($product, $warehouseAndReturnInfo, $dvCstPolNo);
-            if (!$generateDataResult) {
+            if (!$generateDataResult['status']) {
                 $errors[] = [
                     'productCode' => $product->productCode,
                     'message' => $generateDataResult['message'],
                     'error' => $generateDataResult['error']
                 ];
+                continue;
             }
-            $data['spdLst'][] = $generateDataResult;
+            $data['spdLst'][] = $generateDataResult['data'];
         }
         return [
             'status' => true,
@@ -68,98 +69,107 @@ class LotteOnUploadController extends Controller
     }
     protected function generateData(stdClass $product, array $warehouseAndReturnInfo, array $dvCstPolNo)
     {
-        $scatNo = $this->getCategoryCode($product->categoryID);
-        $requestDcatLstResult = $this->requestDcatLst($scatNo);
+        $lotteonCategoryCode = $this->getCategoryCode($product->categoryID);
+        $requestDcatLstResult = $this->requestDcatLst($lotteonCategoryCode);
         if (!$requestDcatLstResult['status']) {
             return $requestDcatLstResult;
         }
         $lfDcatNo = $requestDcatLstResult['data'];
         $prdByMaxPurPsbQtyYn = $product->bundle_quantity > 0 ? 'Y' : 'N';
         return [
-            'scatNo' => $scatNo,
-            'dcatLst' => [
-                [
-                    'mallCd' => 'LTON',
-                    'lfDcatNo' => $lfDcatNo
-                ]
-            ],
-            'prdByMaxPurPsbQtyYn' => $prdByMaxPurPsbQtyYn,
-            'slTypCd' => 'GNRL',
-            'pdTypCd' => 'GNRL_GNRL',
-            'spdNm' => $product->productName,
-            'oplcCd' => "상품상세 참조",
-            'tdfDvsCd' => '01',
-            'slStrtDttm' => date('YmdHis', time()),
-            'slEndDttm' => '20990801100000',
-            'pdItmsInfo' => [
-                'pdItmsCd' => 38,
-                'pdItmsArtlLst' => [
+            'status' => true,
+            'data' => [
+                'trGrpCd' => 'SR',
+                'trNo' => $this->account->partner_code,
+                'scatNo' => $lotteonCategoryCode,
+                'dcatLst' => [
                     [
-                        'pdArtlCd' => '0210',
-                        'pdArtlCnts' => '상품상세 참조'
-                    ],
-                    [
-                        'pdArtlCd' => '1400',
-                        'pdArtlCnts' => '상품상세 참조'
-                    ],
-                    [
-                        'pdArtlCd' => '1420',
-                        'pdArtlCnts' => '상품상세 참조'
-                    ],
-                    [
-                        'pdArtlCd' => '0070',
-                        'pdArtlCnts' => '상품상세 참조'
-                    ],
-                    [
-                        'pdArtlCd' => '1440',
-                        'pdArtlCnts' => '상품상세 참조'
-                    ],
-                ]
-            ],
-            'purPsbQtyInfo' => [
-                'itmByMinPurYn' => 'N',
-                'itmByMaxPurPsbQtyYn' => $prdByMaxPurPsbQtyYn,
-                'maxPurQty' => $product->bundle_quantity,
-                'maxPurLmtTypCd' => 'ONCE'
-            ],
-            'ageLmtCd' => '0',
-            'pdStatCd' => 'NEW',
-            'epnLst' => [
-                [
-                    'pdEpnTypCd' => 'DSCRP',
-                    'cnts' => $product->productDetail
-                ]
-            ],
-            'dvProcTypCd' => 'LO_ENTP',
-            'dvPdTypCd' => 'GNRL',
-            'dvRgsprGrpCd' => 'DV_RGSPR_GRP_CD',
-            'dvMnsCd' => 'DPCL',
-            'owhpNo' => $warehouseAndReturnInfo['owhpNo'],
-            'hdcCd' => '0001',
-            'dvCstPolNo' => $dvCstPolNo[0],
-            'adtnDvCstPolNo' => $dvCstPolNo[1],
-            'cmbnDvPsbYn' => 'N',
-            'dvCstStdQty' => $product->bundle_quantity,
-            'rtrpNo' => $warehouseAndReturnInfo['rtrpNo'],
-            'itmLst' => [
-                [
-                    'eitmNo' => $product->productCode,
-                    'dpYn' => 'Y',
-                    'itmImgLst' => [
+                        'mallCd' => 'LTON',
+                        'lfDcatNo' => $lfDcatNo
+                    ]
+                ],
+                'epdNo' => $product->productCode,
+                'slTypCd' => 'GNRL',
+                'pdTypCd' => 'GNRL_GNRL',
+                'spdNm' => $product->productName,
+                'oplcCd' => '상품상세 참조',
+                'tdfDvsCd' => '01',
+                'slStrtDttm' => date('YmdHis'),
+                'slEndDttm' => '20991231235959',
+                'pdItmsInfo' => [
+                    'pdItmsCd' => 38,
+                    'pdItmsArtlLst' => [
                         [
-                            'epsrTypCd' => 'IMG',
-                            'epsrTypDtlCd' => 'IMG_SQRE',
-                            'origImgFileNm' => $product->productImage,
-                            'rprtImgYn' => 'Y'
-                        ]
-                    ],
-                    'clrchipLst' => [
+                            'pdArtlCd' => '0210',
+                            'pdArtlCnts' => '상품상세 참조'
+                        ],
                         [
-                            'origImgFileNm' => $product->productImage
-                        ]
+                            'pdArtlCd' => '1400',
+                            'pdArtlCnts' => '상품상세 참조'
+                        ],
+                        [
+                            'pdArtlCd' => '1420',
+                            'pdArtlCnts' => '상품상세 참조'
+                        ],
+                        [
+                            'pdArtlCd' => '0070',
+                            'pdArtlCnts' => '상품상세 참조'
+                        ],
+                        [
+                            'pdArtlCd' => '1440',
+                            'pdArtlCnts' => '상품상세 참조'
+                        ],
+                    ]
+                ],
+                'purPsbQtyInfo' => [
+                    'itmByMinPurYn' => 'N',
+                    'itmByMaxPurPsbQtyYn' => $prdByMaxPurPsbQtyYn,
+                    'maxPurQty' => $product->bundle_quantity,
+                    'maxPurLmtTypCd' => 'ONCE'
+                ],
+                'ageLmtCd' => '0',
+                'prstPckPsbYn' => 'N',
+                'prstMsgPsbYn' => 'N',
+                'pdStatCd' => 'NEW',
+                'scKwdLst' => explode(',', $product->productKeywords),
+                'epnLst' => [
+                    [
+                        'pdEpnTypCd' => 'DSCRP',
+                        'cnts' => $product->productDetail
+                    ]
+                ],
+                'dvProcTypCd' => 'LO_ENTP',
+                'dvPdTypCd' => 'GNRL',
+                'dvRgsprGrpCd' => 'GN101',
+                'dvMnsCd' => 'DPCL',
+                'owhpNo' => $warehouseAndReturnInfo['owhpNo'],
+                'dvCstPolNo' => $dvCstPolNo[1],
+                'adtnDvCstPolNo' => $dvCstPolNo[0],
+                'rtrpNo' => $warehouseAndReturnInfo['rtrpNo'],
+                'stkMgtYn' => 'N',
+                'sitmYn' => 'Y',
+                'itmLst' => [
+                    [
+                        'eitmNo' => $product->productCode,
+                        'dpYn' => 'Y',
+                        "sortSeq" => 1,
+                        'itmOptLst' => [
+                            [
+                                'optNm' => '단일 상품',
+                                'optVal' => '단일 상품'
+                            ]
+                        ],
+                        'itmImgLst' => [
+                            [
+                                'epsrTypCd' => 'IMG',
+                                'epsrTypDtlCd' => 'IMG_SQRE',
+                                'origImgFileNm' => $product->productImage,
+                                'rprtImgYn' => 'Y'
+                            ]
+                        ],
+                        'slPrc' => round($product->productPrice, -1)
                     ],
-                    'slPrc' => $product->productPrice
-                ]
+                ],
             ]
         ];
     }
@@ -206,17 +216,17 @@ class LotteOnUploadController extends Controller
         return DB::table('lotte_on_category AS loc')
             ->join('category_mapping AS cm', 'cm.lotte_on', '=', 'loc.id')
             ->where('cm.ownerclan', $categoryId)
-            ->value('cm.lotte_on');
+            ->value('loc.code');
     }
-    public function requestDcatLst(string $scatNo)
+    public function requestDcatLst(string $lotteonCategoryCode)
     {
         $method = 'get';
-        $url = 'https://onpick-api.lotteon.com/cheetah/econCheetah.ecn?job=cheetahDisplayCategory';
-        $loac = new LotteOnApiController();
+        $url = 'https://onpick-api.lotteon.com/cheetah/econCheetah.ecn';
         $data = [
-            'job' => 'cheetahStandardCategory',
-            'filter_1' => $scatNo
+            'filter_1' => $lotteonCategoryCode,
+            'job' => 'cheetahStandardCategory'
         ];
+        $loac = new LotteOnApiController();
         $builderResult = $loac->builder($method, $this->account->access_key, $url, $data);
         if (!isset($builderResult['data']['itemList'][0]['data']['disp_list'][0]['disp_cat_id'])) {
             return [
@@ -258,5 +268,12 @@ class LotteOnUploadController extends Controller
             'status' => true,
             'data' => $arrayDvCstPolNo
         ];
+    }
+    protected function upload(array $data)
+    {
+        $method = 'post';
+        $url = 'https://openapi.lotteon.com/v1/openapi/product/v1/product/registration/request';
+        $loac = new LotteOnApiController();
+        return $loac->builder($method, $this->account->access_key, $url, $data);
     }
 }

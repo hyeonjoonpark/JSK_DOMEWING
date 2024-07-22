@@ -28,9 +28,12 @@ class LotteonBuilderTest extends Command
      */
     public function handle()
     {
-        $products = DB::table('minewing_products')
-            ->where('isActive', 'Y')
-            ->limit(2)
+        $products = DB::table('minewing_products AS mp')
+            ->join('category_mapping AS cm', 'cm.ownerclan', '=', 'mp.categoryID')
+            ->whereNot('cm.lotte_on', null)
+            ->where('mp.isActive', 'Y')
+            ->inRandomOrder()
+            ->limit(3)
             ->get();
         $partner = DB::table('partners')
             ->where('id', 13)

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class LotteOnApiController extends Controller
 {
-    public function builder(string $method, string $accessKey, string $url, array $data = [])
+    public function builder(string $method, string $accessKey, string $url, array $data = null)
     {
         ini_set('max_execution_time', 120);
         try {
