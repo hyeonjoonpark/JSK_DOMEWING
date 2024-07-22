@@ -3,12 +3,8 @@
 namespace App\Http\Controllers\OpenMarkets\LotteOn;
 
 use App\Http\Controllers\Controller;
-use DateTime;
-use DOMDocument;
-use DOMXPath;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -24,21 +20,37 @@ class LotteOnUploadController extends Controller
     public function main()
     {
         $processProductsResult = $this->processProducts();
+        if (!$processProductsResult['status']) {
+            return $processProductsResult;
+        }
+        $data = $processProductsResult['data'];
+        $error = $processProductsResult['error'];
     }
     protected function processProducts()
     {
-        $requestOwhpNoResult = $this->requestOwhpNo();
-        $requestDvCstPolNoResult = $this->requestDvCstPolNo();
-        if (!$requestOwhpNoResult['status']) {
+        $getWarehouseAndReturnInfoResult = $this->getWarehouseAndReturnInfo();
+        if (!$getWarehouseAndReturnInfoResult['status']) {
             return [
                 'status' => false,
-                'message' => '해당 판매자 계정의 출고지 조회에 실패했습니다.'
+                'message' => '해당 판매자 계정의 출고지|반품지 조회에 실패했습니다.'
             ];
         }
-        $OwhpNo = $requestOwhpNoResult['data'];
+        $warehouseAndReturnInfo = $getWarehouseAndReturnInfoResult['data'];
+        $requestDvCstPolNoResult = $this->requestDvCstPolNo();
+        if (!$requestDvCstPolNoResult['status']) {
+            return [
+                'status' => false,
+                'message' => '해당 판매자 계정의 배송 정책 조회에 실패했습니다.'
+            ];
+        }
+        $dvCstPolNo = $requestDvCstPolNoResult['data'];
+        return [
+            'warehouseAndReturnInfo' => $warehouseAndReturnInfo,
+            'dvCstPolNo' => $dvCstPolNo
+        ];
         $errors = [];
         foreach ($this->products as $product) {
-            $generateDataResult = $this->generateData($product, $OwhpNo);
+            $generateDataResult = $this->generateData($product, $warehouseAndReturnInfo, $dvCstPolNo);
             if (!$generateDataResult) {
                 $errors[] = [
                     'productCode' => $product->productCode,
@@ -48,9 +60,13 @@ class LotteOnUploadController extends Controller
             }
             $data['spdLst'][] = $generateDataResult;
         }
-        return $data;
+        return [
+            'status' => true,
+            'data' => $data,
+            'error' => $errors
+        ];
     }
-    protected function generateData(Collection $product, string $OwhpNo)
+    protected function generateData(stdClass $product, array $warehouseAndReturnInfo, array $dvCstPolNo)
     {
         $scatNo = $this->getCategoryCode($product->categoryID);
         $requestDcatLstResult = $this->requestDcatLst($scatNo);
@@ -118,11 +134,36 @@ class LotteOnUploadController extends Controller
             'dvPdTypCd' => 'GNRL',
             'dvRgsprGrpCd' => 'DV_RGSPR_GRP_CD',
             'dvMnsCd' => 'DPCL',
-            'owhpNo' => $OwhpNo,
-            'hdcCd' => '0001'
+            'owhpNo' => $warehouseAndReturnInfo['owhpNo'],
+            'hdcCd' => '0001',
+            'dvCstPolNo' => $dvCstPolNo[0],
+            'adtnDvCstPolNo' => $dvCstPolNo[1],
+            'cmbnDvPsbYn' => 'N',
+            'dvCstStdQty' => $product->bundle_quantity,
+            'rtrpNo' => $warehouseAndReturnInfo['rtrpNo'],
+            'itmLst' => [
+                [
+                    'eitmNo' => $product->productCode,
+                    'dpYn' => 'Y',
+                    'itmImgLst' => [
+                        [
+                            'epsrTypCd' => 'IMG',
+                            'epsrTypDtlCd' => 'IMG_SQRE',
+                            'origImgFileNm' => $product->productImage,
+                            'rprtImgYn' => 'Y'
+                        ]
+                    ],
+                    'clrchipLst' => [
+                        [
+                            'origImgFileNm' => $product->productImage
+                        ]
+                    ],
+                    'slPrc' => $product->productPrice
+                ]
+            ]
         ];
     }
-    public function requestOwhpNo()
+    public function getWarehouseAndReturnInfo()
     {
         $method = 'post';
         $url = 'https://openapi.lotteon.com/v1/openapi/contract/v1/dvp/getDvpListSr';
@@ -133,21 +174,31 @@ class LotteOnUploadController extends Controller
         $builderResult = $loac->builder($method, $this->account->access_key, $url, $data);
         if (!isset($builderResult['data']['data'])) {
             return [
-                'status' => false
+                'status' => false,
+                'message' => '데이터를 가져오는 데 실패했습니다.'
             ];
         }
-        $filteredResult = array_filter($builderResult['data']['data'], function ($item) {
-            return $item['dvpTypCd'] === '02';
-        });
-        if (empty($filteredResult)) {
+        $owhpNo = null;
+        $rtrpNo = null;
+        foreach ($builderResult['data']['data'] as $br) {
+            if ($br['dvpTypCd'] === '02') {
+                $owhpNo = $br['dvpNo'];
+            } elseif ($br['dvpTypCd'] === '01') {
+                $rtrpNo = $br['dvpNo'];
+            }
+        }
+        if (is_null($owhpNo) || is_null($rtrpNo)) {
             return [
-                'status' => false
+                'status' => false,
+                'message' => '해당 판매자 계정의 출고지 또는 반품지 정보를 확인해주세요.'
             ];
         }
-        $filteredResult = array_values($filteredResult);
         return [
             'status' => true,
-            'data' => $filteredResult[0]['dvpNo']
+            'data' => [
+                'owhpNo' => $owhpNo,
+                'rtrpNo' => $rtrpNo
+            ]
         ];
     }
     protected function getCategoryCode($categoryId)
@@ -188,24 +239,24 @@ class LotteOnUploadController extends Controller
             'afflTrCd' => $this->account->partner_code
         ];
         $builderResult = $loac->builder($method, $this->account->access_key, $url, $data);
-        return $builderResult;
         if (!isset($builderResult['data']['data'])) {
             return [
                 'status' => false
             ];
         }
-        $filteredResult = array_filter($builderResult['data']['data'], function ($item) {
-            return $item['dvpTypCd'] === '02';
-        });
-        if (empty($filteredResult)) {
+        $resultData = $builderResult['data']['data'];
+        if (empty($resultData)) {
             return [
                 'status' => false
             ];
         }
-        $filteredResult = array_values($filteredResult);
+        $arrayDvCstPolNo = [];
+        foreach ($resultData as $rd) {
+            $arrayDvCstPolNo[] = $rd['dvCstPolNo'];
+        }
         return [
             'status' => true,
-            'data' => $filteredResult[0]['dvCstPolNo']
+            'data' => $arrayDvCstPolNo
         ];
     }
 }

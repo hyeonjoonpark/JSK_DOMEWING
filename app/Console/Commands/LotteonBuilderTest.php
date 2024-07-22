@@ -39,6 +39,6 @@ class LotteonBuilderTest extends Command
             ->where('id', 1)
             ->first();
         $louc = new LotteOnUploadController($products, $partner, $account);
-        print_r($louc->requestDvCstPolNo());
+        print_r($louc->main());
     }
 }
