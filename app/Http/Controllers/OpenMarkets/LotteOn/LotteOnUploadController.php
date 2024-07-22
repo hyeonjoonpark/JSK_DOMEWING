@@ -73,7 +73,7 @@ class LotteOnUploadController extends Controller
             'error' => $errors
         ];
     }
-    protected function isExisting(Collection $product)
+    protected function isExisting(stdClass $product)
     {
         return DB::table('lotte_on_uploaded_products AS up')
             ->join('minewing_products AS mp', 'mp.id', '=', 'up.product_id')
