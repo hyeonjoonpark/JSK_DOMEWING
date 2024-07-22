@@ -164,24 +164,4 @@ class UploadController extends Controller
                 '현재 ' . $numJobs . '개의 작업이 대기열에 있습니다.'
         ];
     }
-    private function smart_store($products, $partner, $account)
-    {
-        $spu = new SmartstoreProductUpload($products, $partner, $account);
-        return $spu->main();
-    }
-    private function coupang($products, $partner, $account)
-    {
-        $cuc = new CoupangUploadController($products, $partner, $account);
-        return $cuc->main();
-    }
-    private function st11($products, $partner, $account)
-    {
-        $st11UploadController = new St11UploadController();
-        return $st11UploadController->main($products, $partner, $account);
-    }
-    private function lotte_on($products, $partner, $account)
-    {
-        $lotteOnUploadController = new LotteOnUploadController($products, $partner, $account);
-        return $lotteOnUploadController->main();
-    }
 }
