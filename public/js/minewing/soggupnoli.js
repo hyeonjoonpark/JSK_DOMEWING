@@ -1,25 +1,14 @@
+const getForbiddenWords = require('../forbidden_words');
 const puppeteer = require('puppeteer');
-const { signIn, checkImageUrl, checkProductName, formatProductName } = require('./common.js');
 (async () => {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     const [listURL, username, password] = process.argv.slice(2);
-
-    await page.setDefaultNavigationTimeout(0);
-
     try {
-        await signIn(page, username, password, 'https://soggupnoli.com/member/login.php', '#loginId', '#loginPwd', '#formLogin > div.member_login_box > div.login_input_sec > button');
+        await signIn(page, username, password);
         await moveToPage(page, listURL);
-        const products = [];
-        const listProducts = await getListProducts(page);
-        for (const product of listProducts) {
-            const isValidImage = await checkImageUrl(product.image);
-            const isValidProduct = await checkProductName(product.name);
-            if (isValidImage && isValidProduct) {
-                product.name = await formatProductName(product.name);
-                products.push(product);
-            }
-        }
+        const forbiddenWords = getForbiddenWords();
+        const products = await scrapeProducts(page, forbiddenWords);
         console.log(JSON.stringify(products));
     } catch (error) {
         console.error(error);
@@ -27,6 +16,15 @@ const { signIn, checkImageUrl, checkProductName, formatProductName } = require('
         await browser.close();
     }
 })();
+
+async function signIn(page, username, password) {
+    await page.goto('https://soggupnoli.com/member/login.php', { waitUntil: 'networkidle0' });
+    await page.type('#loginId', username);
+    await page.type('#loginPwd', password);
+    await page.click('#formLogin > div.member_login_box > div.login_input_sec > button');
+    await page.waitForNavigation({ waitUntil: 'load' });
+}
+
 async function moveToPage(page, listURL) {
     await page.goto(listURL, { waitUntil: 'load' });
     const url = await page.evaluate((listURL) => {
@@ -36,54 +34,48 @@ async function moveToPage(page, listURL) {
     }, listURL);
     await page.goto(url, { waitUntil: 'domcontentloaded' });
 }
-async function getListProducts(page) {
-    const products = await page.evaluate(() => {
+
+async function scrapeProducts(page, forbiddenWords) {
+    const products = await page.evaluate((forbiddenWords) => {
         const productElements = document.querySelectorAll('div.item_cont');
         const products = [];
-        for (const pe of productElements) {
-            const product = buildProduct(pe);
+        productElements.forEach((productElement) => {
+            const product = scrapeProduct(productElement, forbiddenWords);
             if (product) {
                 products.push(product);
             }
-        }
-        function buildProduct(pe) {
-            const isSoldOut = Array.from(pe.querySelectorAll('div > div.item_info_cont > div.item_icon_box > img')).some(img => img.src === 'https://cdn-pro-web-250-118.cdn-nhncommerce.com/sogguptr0066_godomall_com/data/icon/goods_icon/icon_soldout.gif');
-            if (isSoldOut) {
-                return false;
-            }
-
-            const nameElement = pe.querySelector('strong.item_name');
-            if (!nameElement) {
-                return false;
-            }
-
-            const priceElements = pe.querySelectorAll('strong.item_price > span');
-            let priceText = '';
-            for (const priceElement of priceElements) {
-                priceText += priceElement.textContent.trim();
-            }
-
-            const price = parseInt(priceText.replace(/[^0-9]/g, '').trim());
-            if (!price) {
-                return false;
-            }
-
-            const imageElement = pe.querySelector('div > div.item_photo_box > a > img')
-            if (!imageElement) {
-                return false;
-            }
-            const hrefElement = pe.querySelector('div > div.item_photo_box > a');
-            if (!hrefElement) {
-                return false;
-            }
-            const name = nameElement.textContent.trim();
-            const image = imageElement.src;
-            // const href = productElement.querySelector('div:nth-child(1) > a').href;
-            const href = 'https://www.soggupnoli.com/' + hrefElement.getAttribute('href');
-            const platform = '소꿉노리';
-            return { name, price, image, href, platform };
-        }
+        });
         return products;
-    });
+
+        function scrapeProduct(productElement, forbiddenWords) {
+            try {
+                const soldOutImageElement = productElement.querySelector('img[src="https://cdn-pro-web-250-118.cdn-nhncommerce.com/sogguptr0066_godomall_com/data/icon/goods_icon/icon_soldout.gif"]');
+                if (soldOutImageElement) {
+                    return false;
+                }
+                const name = productElement.querySelector('strong.item_name').textContent.trim();
+                for (const forbiddenWord of forbiddenWords) {
+                    if (name.includes(forbiddenWord)) {
+                        return false;
+                    }
+                }
+                const priceElement = productElement.querySelector('strong.item_price > span');
+                let priceText = '';
+                priceElement.childNodes.forEach((node) => {
+                    priceText += node.textContent.trim();
+                });
+                const price = parseInt(priceText.replace(/[^\d]/g, ''));
+                if (price < 1) {
+                    return false;
+                }
+                const image = productElement.querySelector('div > div.item_photo_box > a > img').src;
+                const href = productElement.querySelector('div > div.item_photo_box > a').href;
+                const platform = "소꿉노리";
+                return { name, price, image, href, platform };
+            } catch (error) {
+                return false;
+            }
+        }
+    }, forbiddenWords);
     return products;
 }

@@ -6,10 +6,6 @@ const puppeteer = require('puppeteer');
     try {
         const [tempFilePath, username, password] = process.argv.slice(2);
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        // const urls = ['https://www.soggupnoli.com/goods/goods_view.php?goodsNo=1000001979'];
-        // const username = "jskorea2023";
-        // const password = "tjddlf88!@";
-
         await signIn(page, username, password);
         const products = [];
         for (const url of urls) {

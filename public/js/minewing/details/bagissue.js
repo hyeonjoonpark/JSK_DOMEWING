@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const { scrollDown, goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName, trimProductCodes } = require('../common.js');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     await page.setDefaultNavigationTimeout(0);
