@@ -19,7 +19,6 @@ class LotteOnUploadController extends Controller
     public function main()
     {
         set_time_limit(0);
-        $filterDuplicatesResult = $this->filterDuplicates();
         $processProductsResult = $this->processProducts();
         if (!$processProductsResult['status']) {
             return $processProductsResult;
