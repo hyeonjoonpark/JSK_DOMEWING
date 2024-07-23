@@ -3,19 +3,20 @@
 namespace App\Http\Controllers\OpenMarkets\LotteOn;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
 class LotteOnUploadController extends Controller
 {
     private $products, $partner, $account;
+
     public function __construct($products, $partner, $account)
     {
         $this->products = $products;
         $this->partner = $partner;
         $this->account = $account;
     }
+
     public function main()
     {
         set_time_limit(0);
@@ -30,6 +31,7 @@ class LotteOnUploadController extends Controller
         }
         return $this->processStore($uploadResult['data']);
     }
+
     protected function processProducts()
     {
         $getWarehouseAndReturnInfoResult = $this->getWarehouseAndReturnInfo();
@@ -72,6 +74,7 @@ class LotteOnUploadController extends Controller
             'error' => $errors
         ];
     }
+
     protected function isExisting(stdClass $product)
     {
         return DB::table('lotte_on_uploaded_products AS up')
@@ -81,6 +84,7 @@ class LotteOnUploadController extends Controller
             ->where('a.partner_id', $this->partner->id)
             ->exists();
     }
+
     protected function generateData(stdClass $product, array $warehouseAndReturnInfo, array $dvCstPolNo)
     {
         $lotteonCategoryCode = $this->getCategoryCode($product->categoryID);
@@ -187,6 +191,7 @@ class LotteOnUploadController extends Controller
             ]
         ];
     }
+
     public function getWarehouseAndReturnInfo()
     {
         $method = 'post';
@@ -225,6 +230,7 @@ class LotteOnUploadController extends Controller
             ]
         ];
     }
+
     protected function getCategoryCode($categoryId)
     {
         return DB::table('lotte_on_category AS loc')
@@ -232,6 +238,7 @@ class LotteOnUploadController extends Controller
             ->where('cm.ownerclan', $categoryId)
             ->value('loc.code');
     }
+
     public function requestDcatLst(string $lotteonCategoryCode)
     {
         $method = 'get';
@@ -254,6 +261,7 @@ class LotteOnUploadController extends Controller
             'data' => $builderResult['data']['itemList'][0]['data']['disp_list'][0]['disp_cat_id']
         ];
     }
+
     public function requestDvCstPolNo()
     {
         $method = 'post';
@@ -283,6 +291,7 @@ class LotteOnUploadController extends Controller
             'data' => $arrayDvCstPolNo
         ];
     }
+
     protected function upload(array $data)
     {
         $method = 'post';
@@ -298,11 +307,12 @@ class LotteOnUploadController extends Controller
             'data' => $productCodes
         ];
     }
+
     protected function processStore(array $productCodes)
     {
         $success = 0;
         foreach ($productCodes as $productCode) {
-            if ($productCode['resultCode'] !== 0000) {
+            if ($productCode['resultCode'] !== '0000') {
                 continue;
             }
             $sellwingProductCode = $productCode['epdNo'];
@@ -318,6 +328,7 @@ class LotteOnUploadController extends Controller
             'error' => '?'
         ];
     }
+
     protected function store(string $sellwingProductCode, string $lotteonProductCode)
     {
         $product = $this->products->firstWhere('productCode', $sellwingProductCode);

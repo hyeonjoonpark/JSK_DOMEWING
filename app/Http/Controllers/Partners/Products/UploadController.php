@@ -85,7 +85,7 @@ class UploadController extends Controller
         $vendor = DB::table('vendors')
             ->where('id', $vendorId)
             ->where('is_active', 'ACTIVE')
-            ->first(['name_eng', 'name']);
+            ->first();
 
         if ($vendor === null) {
             return [

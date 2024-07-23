@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
 use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnUploadController;
 use App\Http\Controllers\OpenMarkets\St11\UploadController as St11UploadController;
@@ -13,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProcessProductUpload implements ShouldQueue
 {
@@ -35,13 +35,14 @@ class ProcessProductUpload implements ShouldQueue
 
     public function handle()
     {
-        $uploadResult = $this->uploadProducts();
-        if (isset($uploadResult['error'])) {
-            $error = $uploadResult['error'];
-        } else {
-            $error = '?';
+        try {
+            $uploadResult = $this->uploadProducts();
+            $error = $uploadResult['error'] ?? null;
+            $this->storeNotification($this->partner->id, $uploadResult['status'], $uploadResult['message'], $this->vendor->name, $error);
+        } catch (\Exception $e) {
+            Log::error("Error in ProcessProductUpload handle method: " . $e->getMessage());
+            $this->storeNotification($this->partner->id, false, 'Upload failed due to an exception.', $this->vendor->name, $e->getMessage());
         }
-        $this->storeNotification($this->partner->id, $uploadResult['status'], $uploadResult['message'], $this->vendor->name, $error);
     }
 
     protected function uploadProducts()
@@ -58,11 +59,13 @@ class ProcessProductUpload implements ShouldQueue
                 break;
             case 'lotte_on':
                 $uploader = new LotteOnUploadController($this->products, $this->partner, $this->account);
+                break;
             default:
                 throw new \Exception("Unknown vendor: {$this->vendor->name_eng}");
         }
 
-        return $uploader->main($this->products, $this->partner, $this->account);
+        Log::info("Starting upload for vendor: {$this->vendor->name_eng}");
+        return $uploader->main();
     }
 
     protected function storeNotification($partnerId, $status, $data, $vendorName, $error = null)
