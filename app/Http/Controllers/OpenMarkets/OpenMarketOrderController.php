@@ -8,6 +8,7 @@ use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
+use App\Http\Controllers\SmartStore\SmartStoreReturnController;
 use App\Http\Controllers\WingController;
 use DateTime;
 use Illuminate\Http\Request;
@@ -19,47 +20,62 @@ class OpenMarketOrderController extends Controller
 {
     public function index()
     {
-        $allPartners = $this->getAllPartners(); //모든 파트너 조회
-        $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화중인 오픈마켓 조회
-        foreach ($allPartners as $partner) { //모든 파트너 반복문
-            $memberId = $partner->domewing_account_id;
-            foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
-                $openMarketEngName = $openMarket->name_eng; //해당 오픈마켓 영어이름 구하기
-                $isExistAccount = 'isExist'  . ucfirst($openMarketEngName) . 'Account';
-                $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); //해당 파트너가 해당 오픈마켓 아이디가 있는지 없으면 패스
-                if (!$isExistOpenMarketAccount) continue;
-                $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi'; //오픈마켓별 주문내역조회 api 쏠려고 영어이름을 메소드명으로 지정
-                $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null); //api 결과 저장
-                if ($apiResults === false) continue; //api의 결과값이 비어있으면 continue 곧 아무런 결과값이 없는거지
-                $openMarketCreateOrder = new OpenMarketCreateOrder();
-                $resultCreateOrder = $openMarketCreateOrder->createOrder($apiResults, $memberId, $openMarket->id, $openMarketEngName);
-                if (!$resultCreateOrder['status']) return [
-                    'status' => false,
-                    'message' => $resultCreateOrder['message'],
-                    'data' => $resultCreateOrder
-                ];
-                // 현재 쿠팡만 교환, 환불 자동수집중
-                if ($openMarketEngName !== 'coupang') continue;
-                $returnMethod = 'get'  . ucfirst($openMarketEngName) . 'ReturnOrder';
-                $returnResult = call_user_func([$this, $returnMethod], $partner->id);
-                if (!$returnResult['status']) return [
-                    'status' => false,
-                    'message' => $returnResult['message'],
-                    'data' => $returnResult
-                ];
-                $exchangeMethod = 'get'  . ucfirst($openMarketEngName) . 'ExchangeOrder';
-                $exchangeResult = call_user_func([$this, $exchangeMethod], $partner->id);
-                if (!$exchangeResult['status']) return [
-                    'status' => false,
-                    'message' => $exchangeResult['message'],
-                    'data' => $exchangeResult
-                ];
+        try {
+            $allPartners = $this->getAllPartners(); // 모든 파트너 조회
+            $allOpenMarkets = $this->getAllOpenMarkets(); // 활성화 중인 오픈마켓 조회
+            foreach ($allPartners as $partner) { // 모든 파트너 반복문
+                $memberId = $partner->domewing_account_id;
+                foreach ($allOpenMarkets as $openMarket) { // 오픈마켓 반복문
+                    $openMarketEngName = $openMarket->name_eng; // 해당 오픈마켓 영어이름 구하기
+                    $isExistAccount = 'isExist' . ucfirst($openMarketEngName) . 'Account';
+                    $isExistOpenMarketAccount = call_user_func([$this, $isExistAccount], $partner->id); // 해당 파트너가 해당 오픈마켓 아이디가 있는지 확인
+                    if (!$isExistOpenMarketAccount) continue;
+                    $methodName = 'call' . ucfirst($openMarketEngName) . 'OrderApi'; // 오픈마켓별 주문내역조회 API 호출 메소드명 지정
+                    $apiResults = call_user_func([$this, $methodName], $partner->id, $startDate = null, $endDate = null); // API 결과 저장
+                    if ($apiResults === false) continue; // API 결과값이 비어있으면 continue
+                    $openMarketCreateOrder = new OpenMarketCreateOrder();
+                    $resultCreateOrder = $openMarketCreateOrder->createOrder($apiResults, $memberId, $openMarket->id, $openMarketEngName);
+                    if (!$resultCreateOrder['status']) {
+                        return [
+                            'status' => false,
+                            'message' => $resultCreateOrder['message'],
+                            'data' => $resultCreateOrder
+                        ];
+                    }
+                    if ($openMarketEngName === 'coupang' || $openMarketEngName === 'smart_store') {
+                        $returnMethod = 'get' . ucfirst($openMarketEngName) . 'ReturnOrder';
+                        $returnResult = call_user_func([$this, $returnMethod], $partner->id);
+                        if (!$returnResult['status']) {
+                            return [
+                                'status' => false,
+                                'message' => $returnResult['message'],
+                                'data' => $returnResult
+                            ];
+                        }
+                    }
+                    if ($openMarketEngName === 'coupang') {
+                        $exchangeMethod = 'get' . ucfirst($openMarketEngName) . 'ExchangeOrder';
+                        $exchangeResult = call_user_func([$this, $exchangeMethod], $partner->id);
+                        if (!$exchangeResult['status']) {
+                            return [
+                                'status' => false,
+                                'message' => $exchangeResult['message'],
+                                'data' => $exchangeResult
+                            ];
+                        }
+                    }
+                }
             }
+            return [
+                'status' => true,
+                'message' => '새로운 주문 저장이 완료되었습니다.'
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '처리 중 오류가 발생하였습니다: ' . $e->getMessage()
+            ];
         }
-        return [
-            'status' => true,
-            'message' => '새로운 주문 저장이 완료되었습니다.'
-        ];
     }
     public function showData(Request $request)
     {
@@ -390,6 +406,7 @@ class OpenMarketOrderController extends Controller
                     ->where('wt.status', 'PENDING')
                     ->where('o.type', 'REFUND')
                     ->where('o.requested', 'N')
+                    ->whereNot('po.vendor_id', 40)
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'RETURN_PROCESS':
@@ -424,6 +441,22 @@ class OpenMarketOrderController extends Controller
                     ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'EXCHANGE')
                     ->whereBetween('o.updated_at', [$startOn, $endOn]);
+                break;
+            case 'COUPANG_EXCHANGE':
+                $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'PENDING')
+                    ->where('o.type', 'EXCHANGE')
+                    ->where('o.requested', 'N')
+                    ->where('po.vendor_id', 40)
+                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                break;
+            case 'COUPANG_RETURN':
+                $query->where('o.delivery_status', 'PENDING')
+                    ->where('wt.status', 'PENDING')
+                    ->where('o.type', 'RETURN')
+                    ->where('o.requested', 'N')
+                    ->where('po.vendor_id', 40)
+                    ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
         }
         $orders = [];
@@ -550,15 +583,17 @@ class OpenMarketOrderController extends Controller
         $controller = new St11OrderController();
         return $controller->index($id);
     }
-    private function getSmart_StoreReturnOrder()
+    private function getSmart_storeReturnOrder($partnerId)
     {
+        $controller = new SmartStoreReturnController();
+        return $controller->index($partnerId);
     }
     private function getCoupangReturnOrder($partnerId)
     {
         $controller = new CoupangReturnController();
         return $controller->index($partnerId);
     }
-    private function getSmart_StoreExchangeOrder()
+    private function getSmart_storeExchangeOrder()
     {
     }
     private function getCoupangExchangeOrder($partnerId)

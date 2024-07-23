@@ -4,6 +4,7 @@ namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
+use App\Http\Controllers\SmartStore\SmartStoreReturnController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,31 +13,22 @@ class OpenMarketRefundController extends Controller
 {
     public function setAwaitingShipmentStatus($productOrderNumber)
     {
-        $order = DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->where('requested', 'N')
-            ->where('delivery_status', 'PENDING')
-            ->where('type', 'REFUND')
+        $order = DB::table('orders as o')
+            ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
+            ->where([
+                ['o.product_order_number', '=', $productOrderNumber],
+                ['o.requested', '=', 'N'],
+                ['o.delivery_status', '=', 'PENDING'],
+                ['o.type', '=', 'REFUND'],
+                ['w.status', '=', 'PENDING'],
+            ])
+            ->select('o.*')
             ->first();
         if (!$order) {
             return [
                 'status' => false,
                 'message' => '배송 대기 중으로 변경 가능한 주문이 아닙니다.',
             ];
-        }
-        $openMarket = DB::table('orders as o')
-            ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
-            ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
-            ->where('o.product_order_number', $productOrderNumber)
-            ->where('v.is_active', 'ACTIVE')
-            ->select('v.*')
-            ->first(['v.name_eng', 'v.name']);
-        if ($openMarket && $openMarket->name_eng == 'coupang') { //일단은 쿠팡만 적용
-            $method = 'call' . ucfirst($openMarket->name_eng) . 'CheckApi';
-            $updateApiResult = $this->$method($productOrderNumber);
-            if (!$updateApiResult['status']) {
-                return $updateApiResult;
-            }
         }
         $updated = DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
@@ -74,10 +66,16 @@ class OpenMarketRefundController extends Controller
             ];
         }
         $productOrderNumber = $request->productOrderNumber;
-        $order = DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->where('delivery_status', 'PENDING')
-            ->where('type', 'REFUND')
+        $order = DB::table('orders as o')
+            ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
+            ->where([
+                ['o.product_order_number', '=', $productOrderNumber],
+                ['o.requested', '=', 'N'],
+                ['o.delivery_status', '=', 'PENDING'],
+                ['o.type', '=', 'REFUND'],
+                ['w.status', '=', 'PENDING'],
+            ])
+            ->select('o.*')
             ->first();
         if ($order === null) {
             return [
@@ -87,6 +85,20 @@ class OpenMarketRefundController extends Controller
         }
         $deliveryCompanyId = $request->deliveryCompanyId;
         $trackingNumber = $request->trackingNumber;
+        $openMarket = DB::table('orders as o')
+            ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
+            ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
+            ->where('o.product_order_number', $productOrderNumber)
+            ->where('v.is_active', 'ACTIVE')
+            ->select('v.*')
+            ->first(['v.name_eng', 'v.name']);
+        if ($openMarket) {
+            $method = 'call' . ucfirst($openMarket->name_eng) . 'ShipmentApi';
+            $updateApiResult = $this->$method($productOrderNumber);
+            if (!$updateApiResult['status']) {
+                return $updateApiResult;
+            }
+        }
         if ($trackingNumber && $deliveryCompanyId) {
             return $this->update($order->id, $deliveryCompanyId, $trackingNumber);
         } else {
@@ -110,16 +122,36 @@ class OpenMarketRefundController extends Controller
         }
         $remark = $request->remark;
         $productOrderNumber = $request->productOrderNumber;
-        $order = DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->where('delivery_status', 'PENDING')
-            ->where('type', 'REFUND')
+        $order = DB::table('orders as o')
+            ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
+            ->where([
+                ['o.product_order_number', '=', $productOrderNumber],
+                ['o.requested', '=', 'N'],
+                ['o.delivery_status', '=', 'PENDING'],
+                ['o.type', '=', 'REFUND'],
+                ['w.status', '=', 'PENDING'],
+            ])
+            ->select('o.*')
             ->first();
         if ($order === null) {
             return [
                 'status' => false,
                 'message' => '취소되었거나, 이미 처리된 주문입니다.'
             ];
+        }
+        $openMarket = DB::table('orders as o')
+            ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
+            ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
+            ->where('o.product_order_number', $productOrderNumber)
+            ->where('v.is_active', 'ACTIVE')
+            ->select('v.*')
+            ->first(['v.name_eng', 'v.name']);
+        if ($openMarket && $openMarket->name_eng === 'smart_store') { //스마트스토어만 반품철회가있음
+            $method = 'call' . ucfirst($openMarket->name_eng) . 'RejectApi';
+            $updateApiResult = $this->$method($productOrderNumber, $remark);
+            if (!$updateApiResult['status']) {
+                return $updateApiResult;
+            }
         }
         DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
@@ -145,11 +177,14 @@ class OpenMarketRefundController extends Controller
             'message' => '취소사유는 필수입니다.',
         ];
         $order = DB::table('orders as o')
-            ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
-            ->where('o.product_order_number', $productOrderNumber)
-            ->where('o.delivery_status', 'PENDING')
-            ->where('o.type', 'EXCHANGE')
-            ->where('wt.status', 'PENDING')
+            ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
+            ->where([
+                ['o.product_order_number', '=', $productOrderNumber],
+                ['o.requested', '=', 'N'],
+                ['o.delivery_status', '=', 'PENDING'],
+                ['o.type', '=', 'REFUND'],
+                ['w.status', '=', 'PENDING'],
+            ])
             ->select('o.*')
             ->first();
         if (!$order) return [
@@ -234,7 +269,6 @@ class OpenMarketRefundController extends Controller
                 ->update([
                     'status' => 'APPROVED'
                 ]);
-
             return [
                 'status' => true,
                 'message' => '송장번호, 택배사 없이 성공하였습니다'
@@ -247,7 +281,7 @@ class OpenMarketRefundController extends Controller
             ];
         }
     }
-    private function callCoupangCheckApi($productOrderNumber) //입고요청처리
+    private function callCoupangShipmentApi($productOrderNumber) //입고요청처리
     {
         $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
@@ -268,6 +302,42 @@ class OpenMarketRefundController extends Controller
                 'status' => false,
                 'message' => '쿠팡 반품 주문 입고 요청에 실패하였습니다. 관리자에게 문의해주세요.',
                 'data' => $confirmApiResult
+            ];
+        }
+        return [
+            'status' => true
+        ];
+    }
+    private function callSmart_storeShipmentApi($productOrderNumber) //반품승인처리
+    {
+        $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
+        $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
+        $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
+        $controller = new SmartStoreReturnController();
+        $confirmApiResult = $controller->approveReturnRequest($account, $partnerOrder->product_order_number);
+        if (!$confirmApiResult['status']) {
+            return [
+                'status' => false,
+                'message' => '스마트스토어 반품 주문 승인 요청에 실패하였습니다. 관리자에게 문의해주세요.',
+                'data' => $confirmApiResult
+            ];
+        }
+        return [
+            'status' => true
+        ];
+    }
+    private function callSmart_storeRejectApi($productOrderNumber, $reason) //반품거절처리
+    {
+        $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
+        $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
+        $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
+        $controller = new SmartStoreReturnController();
+        $rejectApiResult = $controller->rejectReturnRequest($account, $partnerOrder->product_order_number, $reason);
+        if (!$rejectApiResult['status']) {
+            return [
+                'status' => false,
+                'message' => '스마트스토어 반품 주문 승인 요청에 실패하였습니다. 관리자에게 문의해주세요.',
+                'data' => $rejectApiResult
             ];
         }
         return [
