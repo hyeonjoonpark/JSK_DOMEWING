@@ -114,7 +114,6 @@ class UploadController extends Controller
             ->where('mp.isActive', 'Y')
             ->whereNotNull('mp.categoryID')
             ->select([
-                'mp.id AS product_id',
                 DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"),
                 'mp.productCode',
                 'pp.product_name AS productName',
