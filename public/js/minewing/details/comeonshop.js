@@ -1,25 +1,25 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
+const { scrollDown, goToAttempts, signIn, checkImageUrl, checkProductName, formatProductName, trimProductCodes } = require('../common.js');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    let cookies = null;
-    let localStorageData = null;
+
+    await page.setDefaultNavigationTimeout(0);
+    await page.setViewport({ 'width': 1500, 'height': 1000 });
+    const [tempFilePath, username, password] = process.argv.slice(2);
+    const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
     try {
-        const urls = ['https://comeonshop.co.kr/product/detail.html?product_no=1742&cate_no=47&display_group=1'];
-        const username = "jskorea2023";
-        const password = "tjddlf88!@";
-
-        // 로그인 후 쿠키와 로컬 스토리지 저장
-        await signIn(page, username, password);
-        cookies = await page.cookies();
-        localStorageData = await page.evaluate(() => JSON.stringify(localStorage));
-
+        await signIn(page, username, password, 'https://comeonshop.co.kr/member/login.html', '#member_id', '#member_passwd', '.user-login fieldset > a');
         const products = [];
         for (const url of urls) {
-            const product = await scrapeProduct(page, url, cookies, localStorageData);
-            if (product === false) {
+            const goToAttemptsResult = await goToAttempts(page, url, 'domcontentloaded');
+            if (!goToAttemptsResult) {
+                continue;
+            }
+            const product = await buildProduct(page, url);
+            if (!product) {
                 continue;
             }
             products.push(product);
@@ -31,161 +31,137 @@ const puppeteer = require('puppeteer');
         await browser.close();
     }
 })();
+async function buildProduct(page, productHref) {
 
-async function signIn(page, username, password) {
-    await page.goto('https://nanuli2022.cafe24.com/member/login.html', { waitUntil: 'networkidle0' });
-    await page.type('#member_id', username);
-    await page.type('#member_passwd', password);
-    await page.click('div > div > fieldset > a');
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
-    // 로그인 후 쿠키와 로컬 스토리지 저장
-    const cookies = await page.cookies();
-    const localStorageData = await page.evaluate(() => JSON.stringify(localStorage));
-    return { cookies, localStorageData };
-}
-
-async function scrapeProduct(page, url, cookies, localStorageData) {
-    try {
-        // 쿠키와 로컬 스토리지를 설정하여 세션 유지
-        await page.setCookie(...cookies);
-        await page.evaluate((data) => {
-            const localStorage = JSON.parse(data);
-            for (let key in localStorage) {
-                window.localStorage.setItem(key, localStorage[key]);
-            }
-        }, localStorageData);
-
-        await page.goto(url, { waitUntil: 'networkidle0' });
-        await scrollDown(page);
-
-        const productOptionData = await getProductOptions(page);
-        const hasOption = productOptionData.hasOption;
-        const productOptions = productOptionData.productOptions;
-
-        const productData = await page.evaluate(() => {
-            const productName = document.querySelector('div.detailArea div.buy-scroll-box > h2').textContent.trim();
-            const productPrice = document.querySelector('#contents > div.xans-element-.xans-product.xans-product-detail > div.detailArea > div.buy-wrapper > div.buy-scroll-box > div.infoArea.DB_rate > div.xans-element-.xans-product.xans-product-detaildesign > table > tbody > tr.price.xans-record- > td > span > strong').textContent.trim().replace(/[^\d]/g, '');
-            const productImage = document.querySelector('#big_img_box > div.lslide.active > img').src;
-            const productDetailElements = document.querySelectorAll('#prdDetail > div.cont img');
-            if (productDetailElements.length < 1) {
-                return false;
-            }
-            const productDetail = [];
-            for (const productDetailElement of productDetailElements) {
-                const tempProductDetailSrc = productDetailElement.src;
-                if (tempProductDetailSrc === 'http://buzz71.godohosting.com/start/common/open_end.jpg' || tempProductDetailSrc === 'http://buzz71.godohosting.com/start/common/open_notice.jpg') {
-                    continue;
-                }
-                productDetail.push(tempProductDetailSrc);
-            }
-            return {
-                productName,
-                productPrice,
-                productImage,
-                productDetail
-            };
-        });
-
-        const { productName, productPrice, productImage, productDetail } = productData;
-        const product = {
-            productName,
-            productPrice,
-            productImage,
-            productDetail,
-            hasOption,
-            productOptions,
-            productHref: url,
-            sellerID: 80
-        };
-        return product;
-    } catch (error) {
-        console.error(error);
+    const productName = await getProductName(page);
+    if (!productName) {
         return false;
     }
-}
+    const productPrice = await getproductPrice(page);
+    if (!productPrice) {
+        return false;
+    }
+    const productImage = await getproductImage(page);
+    if (!productImage) {
+        return false;
+    }
+    const productDetail = await getproductDetail(page);
+    if (!productDetail) {
+        return false;
+    }
+    const productOptions = await getproductOptions(page);
+    if (productOptions === false) {
+        return false;
+    }
+    const hasOption = productOptions.length > 0;
 
-async function getProductOptions(page) {
-    async function reloadSelects() {
-        return await page.$$('table select');
-    }
-    async function reselectOptions(selects, selectedOptions) {
-        for (let i = 0; i < selectedOptions.length; i++) {
-            await selects[i].select(selectedOptions[i].value);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            if (i < selectedOptions.length - 1) {
-                selects = await reloadSelects();
-            }
-        }
-    }
-    async function processSelectOptions(selects, currentDepth = 0, selectedOptions = [], productOptions = []) {
-        if (currentDepth < selects.length) {
-            const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
-                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value !== '' && opt.value !== '-1')
-            );
-            for (const option of options) {
-                await selects[currentDepth].select(option.value);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                const newSelectedOptions = [...selectedOptions, { text: option.text, value: option.value }];
-                if (currentDepth + 1 < selects.length) {
-                    const newSelects = await reloadSelects();
-                    await processSelectOptions(newSelects, currentDepth + 1, newSelectedOptions, productOptions);
-                } else {
-                    let optionName = "";
-                    newSelectedOptions.forEach(opt => {
-                        let optText = opt.text;
-                        optionName = optionName.length > 0 ? `${optionName} / ${optText}` : optText;
-                    });
-                    const optionPriceMatch = optionName.match(/\(([\d,]+)원\)/);
-                    const optionPrice = parseInt(optionPriceMatch ? optionPriceMatch[1].replace(/,/g, '') : "0");
-                    optionName = optionName.replace(/\(([\d,]+)원\)/, '').trim();
-                    const productOption = { optionName, optionPrice };
-                    productOptions.push(productOption);
-                }
-                selects = await reloadSelects();
-                if (currentDepth > 0) {
-                    await reselectOptions(selects, selectedOptions);
-                    selects = await reloadSelects();
-                }
-            }
-        }
-        return productOptions;
-    }
-    let selects = await reloadSelects();
-    if (selects.length < 1) {
-        return {
-            hasOption: false,
-            productOptions: []
-        };
-    }
-    const productOptions = await processSelectOptions(selects);
     return {
-        hasOption: true,
-        productOptions: productOptions
+        productName,
+        productPrice,
+        productImage,
+        productDetail,
+        hasOption,
+        productOptions,
+        productHref,
+        sellerID: 80
     };
 }
 
-const scrollDown = async (page) => {
-    await page.evaluate(async () => {
-        const distance = 20;
-        const scrollInterval = 100;
-        while (true) {
-            const scrollTop = window.scrollY;
-            const prdDetailElement = document.getElementById('prdDetail');
-            const prdInfoElement = document.getElementById('prdInfo');
-            if (prdDetailElement) {
-                const targetScrollBottom = prdDetailElement.getBoundingClientRect().bottom + window.scrollY;
-                if (scrollTop < targetScrollBottom) {
-                    window.scrollBy(0, distance);
-                } else {
-                    break;
-                }
-            } else if (prdInfoElement) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                break;
-            } else {
-                window.scrollBy(0, distance);
-            }
-            await new Promise(resolve => setTimeout(resolve, scrollInterval));
+async function getProductName(page) {
+    const productName = await page.evaluate(() => {
+        const productNameElement = document.querySelector('div.detailArea div.buy-scroll-box > h2');
+        if (!productNameElement) {
+            return false;
         }
+        return productNameElement.textContent.trim();
+    });
+
+    if (!productName) {
+        return false;
+    }
+
+    const validProductName = await checkProductName(productName);
+    if (!validProductName) {
+        return false;
+    }
+    return await formatProductName(productName);
+}
+async function getproductPrice(page) {
+    return await page.evaluate(() => {
+
+        const salePriceElement = document.querySelector('#span_product_price_text');
+        if (!salePriceElement) {
+            return false;
+        }
+
+        return salePriceElement.textContent.replace(/[^0-9]/g, '').trim();
+    });
+}
+async function getproductImage(page) {
+    const imageUrl = await page.evaluate(() => {
+        const productImageElement = document.querySelector('#big_img_box > div.lslide.active > img');
+        return productImageElement ? productImageElement.src : null;
+    });
+
+    if (!imageUrl) {
+        return false;
+    }
+
+    const isValid = await checkImageUrl(imageUrl);
+    return isValid ? imageUrl : false; j
+}
+async function getproductDetail(page) {
+    await scrollDown(page);
+
+    const imageUrls = await page.evaluate(() => {
+        let productDetailElements = document.querySelectorAll('#prdDetail > div.cont img');
+
+        const productDetail = [];
+        productDetailElements.forEach(element => {
+            if (element.src) {
+                productDetail.push(element.src);
+            }
+        });
+        return productDetail;
+    });
+
+    const validImageUrls = [];
+    for (const url of imageUrls) {
+        const isValid = await checkImageUrl(url);
+        if (isValid) {
+            validImageUrls.push(url);
+        }
+    }
+
+    return validImageUrls.length > 0 ? validImageUrls : false;
+}
+
+
+async function getproductOptions(page) {
+    return await page.evaluate(() => {
+        const productOptionElements = document.querySelectorAll('div.detailArea select option');
+        if (productOptionElements.length === 0) {
+            return [];
+        }
+        const productOptions = Array.from(productOptionElements)
+            .filter(poe => {
+                const optionText = poe.textContent.trim();
+                return !optionText.includes('품절') && !optionText.includes('-------------------') && !optionText.includes('- [필수] 옵션을 선택해 주세요 -');
+                // Filter out sold-out optionsText  // Placeholder EMPTY optionText
+            })
+            .map(poe => {
+                const optionText = poe.textContent.trim();
+                const [optionName, optionPrice] = optionText.split(':');
+                return {
+                    optionName: optionName.trim(),
+                    optionPrice: optionPrice ? optionPrice.replace(/[^0-9]/g, '').trim() : 0
+                };
+            })
+            .filter(option => option.optionName) // ensure optionName and optionPrice properties
+
+        if (productOptionElements.length > 0 && productOptions.length < 1) {
+            return false;
+        }
+        return productOptions;
     });
 }
