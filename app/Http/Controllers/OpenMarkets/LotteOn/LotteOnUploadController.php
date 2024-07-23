@@ -351,7 +351,7 @@ class LotteOnUploadController extends Controller
         } catch (\Exception $e) {
             return [
                 'status' => false,
-                '업로드 상품 정보를 데이터베이스에 저장하는 과정에서 오류가 발생했습니다.',
+                'message' => '업로드 상품 정보를 데이터베이스에 저장하는 과정에서 오류가 발생했습니다.',
                 'error' => $e->getMessage()
             ];
         }
