@@ -2,7 +2,7 @@ const getForbiddenWords = require('../forbidden_words');
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     const [listURL, username, password] = process.argv.slice(2);
     try {
