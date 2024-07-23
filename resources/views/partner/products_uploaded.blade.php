@@ -55,8 +55,7 @@
                                         <input type="radio" id="openMarket{{ $openMarket->id }}"
                                             name="selectedOpenMarketId" value="{{ $openMarket->id }}"
                                             class="custom-control-input"
-                                            {{ $selectedOpenMarketId == $openMarket->id ? 'checked' : '' }}
-                                            {{ in_array($openMarket->id, [40, 51, 54]) ? '' : 'disabled' }}>
+                                            {{ $selectedOpenMarketId == $openMarket->id ? 'checked' : '' }}>
                                         <label class="custom-control-label"
                                             for="openMarket{{ $openMarket->id }}">{{ $openMarket->name }}</label>
                                     </div>
