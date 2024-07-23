@@ -11,13 +11,15 @@ class LotteOnApiController extends Controller
     {
         ini_set('max_execution_time', 120);
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $accessKey,
-                'Accept' => "application/json",
-                'Accept-Language' => 'ko',
-                'X-Timezone' => "GMT+09:00",
-                "Content-Type" => "application/json"
-            ])->$method($url, $data);
+            $response = Http::timeout(120)
+                ->withHeaders([
+                    'Authorization' => 'Bearer ' . $accessKey,
+                    'Accept' => "application/json",
+                    'Accept-Language' => 'ko',
+                    'X-Timezone' => "GMT+09:00",
+                    "Content-Type" => "application/json"
+                ])
+                ->$method($url, $data);
             return [
                 'status' => true,
                 'data' => $response->json()
