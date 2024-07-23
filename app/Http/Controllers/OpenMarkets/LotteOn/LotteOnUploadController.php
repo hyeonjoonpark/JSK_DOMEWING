@@ -61,7 +61,7 @@ class LotteOnUploadController extends Controller
             if (!$generateDataResult['status']) {
                 $errors[] = [
                     'productCode' => $product->productCode,
-                    // 'message' => $generateDataResult['message'],
+                    'message' => $generateDataResult['message'],
                     'error' => $generateDataResult['error']
                 ];
                 continue;
@@ -311,6 +311,7 @@ class LotteOnUploadController extends Controller
     protected function processStore(array $productCodes)
     {
         $success = 0;
+        $error = null;
         foreach ($productCodes as $productCode) {
             if ($productCode['resultCode'] !== '0000') {
                 continue;
@@ -320,12 +321,14 @@ class LotteOnUploadController extends Controller
             $storeResult = $this->store($sellwingProductCode, $lotteonProductCode);
             if ($storeResult) {
                 $success++;
+            } else {
+                $error = $storeResult['error'];
             }
         }
         return [
             'status' => true,
             'message' => "총 " . number_format(count($this->products)) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.",
-            'error' => '?'
+            'error' => $error
         ];
     }
 
@@ -342,9 +345,14 @@ class LotteOnUploadController extends Controller
                     'shipping_fee' => $product->shipping_fee,
                     'origin_product_no' => $lotteonProductCode
                 ]);
-            return true;
+            return [
+                'status' => true
+            ];
         } catch (\Exception $e) {
-            return false;
+            return [
+                'status' => false,
+                'error' => $e->getMessage()
+            ];
         }
     }
 }
