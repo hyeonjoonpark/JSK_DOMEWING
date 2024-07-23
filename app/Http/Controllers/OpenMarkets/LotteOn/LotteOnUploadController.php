@@ -339,7 +339,7 @@ class LotteOnUploadController extends Controller
             DB::table('lotte_on_uploaded_products')
                 ->insert([
                     'lotte_on_account_id' => $this->account->id,
-                    'product_id' => $product->id,
+                    'product_id' => $product->product_id,
                     'product_name' => $product->productName,
                     'price' => $product->productPrice,
                     'shipping_fee' => $product->shipping_fee,
