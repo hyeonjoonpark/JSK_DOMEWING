@@ -36,8 +36,12 @@ class ProcessProductUpload implements ShouldQueue
     public function handle()
     {
         $uploadResult = $this->uploadProducts();
-
-        $this->storeNotification($this->partner->id, $uploadResult['status'], $uploadResult['message'], $this->vendor->name, $uploadResult['error']);
+        if (isset($uploadResult['error'])) {
+            $error = $uploadResult['error'];
+        } else {
+            $error = '?';
+        }
+        $this->storeNotification($this->partner->id, $uploadResult['status'], $uploadResult['message'], $this->vendor->name, $error);
     }
 
     protected function uploadProducts()
