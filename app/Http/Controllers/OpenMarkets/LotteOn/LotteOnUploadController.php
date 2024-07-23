@@ -61,7 +61,7 @@ class LotteOnUploadController extends Controller
             if (!$generateDataResult['status']) {
                 $errors[] = [
                     'productCode' => $product->productCode,
-                    'message' => $generateDataResult['message'],
+                    // 'message' => $generateDataResult['message'],
                     'error' => $generateDataResult['error']
                 ];
                 continue;
