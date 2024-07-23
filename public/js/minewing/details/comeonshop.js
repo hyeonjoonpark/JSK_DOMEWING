@@ -80,13 +80,14 @@ async function getProductName(page) {
     if (!productName) {
         return false;
     }
-
-    const validProductName = await checkProductName(productName);
+    const sanitizedProductName = productName.replace(/\(.*?\)/g, '').trim();
+    const validProductName = await checkProductName(sanitizedProductName);
     if (!validProductName) {
         return false;
     }
-    return await formatProductName(productName);
+    return await formatProductName(sanitizedProductName);
 }
+
 async function getproductPrice(page) {
     return await page.evaluate(() => {
 
