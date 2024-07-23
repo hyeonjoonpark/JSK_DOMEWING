@@ -12,11 +12,16 @@ class OpenMarketExchangeController extends Controller
 {
     public function setAwaitingShipmentStatus($productOrderNumber)
     {
-        $order = DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->where('requested', 'N')
-            ->where('delivery_status', 'PENDING')
-            ->where('type', 'EXCHANGE')
+        $order = DB::table('orders as o')
+            ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
+            ->where([
+                ['o.product_order_number', '=', $productOrderNumber],
+                ['o.requested', '=', 'N'],
+                ['o.delivery_status', '=', 'PENDING'],
+                ['o.type', '=', 'EXCHANGE'],
+                ['w.status', '=', 'PENDING'],
+            ])
+            ->select('o.*')
             ->first();
         if (!$order) {
             return [
@@ -77,10 +82,16 @@ class OpenMarketExchangeController extends Controller
         $trackingNumber = $request->trackingNumber;
         $deliveryCompanyId = $request->deliveryCompanyId;
         $productOrderNumber = $request->productOrderNumber;
-        $order = DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->where('delivery_status', 'PENDING')
-            ->where('type', 'EXCHANGE')
+        $order = DB::table('orders as o')
+            ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
+            ->where([
+                ['o.product_order_number', '=', $productOrderNumber],
+                ['o.requested', '=', 'N'],
+                ['o.delivery_status', '=', 'PENDING'],
+                ['o.type', '=', 'EXCHANGE'],
+                ['w.status', '=', 'PENDING'],
+            ])
+            ->select('o.*')
             ->first();
         $deliveryCompanyCode = DB::table('delivery_companies as dc')
             ->where('dc.id', $deliveryCompanyId)
@@ -99,7 +110,6 @@ class OpenMarketExchangeController extends Controller
             ->select('v.*')
             ->first(['v.name_eng', 'v.name']);
         if ($openMarket && $openMarket->name_eng == 'coupang') { //일단은 쿠팡만 적용
-            // if ($openMarket) {
             $method = 'call' . ucfirst($openMarket->name_eng) . 'ShipmentApi';
             $updateApiResult = $this->$method($productOrderNumber, $deliveryCompanyCode, $trackingNumber);
             if ($updateApiResult['status'] === false) {
@@ -127,10 +137,16 @@ class OpenMarketExchangeController extends Controller
         }
         $remark = $request->remark;
         $productOrderNumber = $request->productOrderNumber;
-        $order = DB::table('orders')
-            ->where('product_order_number', $productOrderNumber)
-            ->where('delivery_status', 'PENDING')
-            ->where('type', 'EXCHANGE')
+        $order = DB::table('orders as o')
+            ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
+            ->where([
+                ['o.product_order_number', '=', $productOrderNumber],
+                ['o.requested', '=', 'N'],
+                ['o.delivery_status', '=', 'PENDING'],
+                ['o.type', '=', 'EXCHANGE'],
+                ['w.status', '=', 'PENDING'],
+            ])
+            ->select('o.*')
             ->first();
         if ($order === null) {
             return [
@@ -177,11 +193,14 @@ class OpenMarketExchangeController extends Controller
             'message' => '취소사유는 필수입니다.',
         ];
         $order = DB::table('orders as o')
-            ->join('wing_transactions as wt', 'wt.id', '=', 'o.wing_transaction_id')
-            ->where('o.product_order_number', $productOrderNumber)
-            ->where('o.delivery_status', 'PENDING')
-            ->where('o.type', 'EXCHANGE')
-            ->where('wt.status', 'PENDING')
+            ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
+            ->where([
+                ['o.product_order_number', '=', $productOrderNumber],
+                ['o.requested', '=', 'N'],
+                ['o.delivery_status', '=', 'PENDING'],
+                ['o.type', '=', 'EXCHANGE'],
+                ['w.status', '=', 'PENDING'],
+            ])
             ->select('o.*')
             ->first();
         if (!$order) return [

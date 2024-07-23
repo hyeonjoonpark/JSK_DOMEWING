@@ -85,7 +85,7 @@ class UploadController extends Controller
         $vendor = DB::table('vendors')
             ->where('id', $vendorId)
             ->where('is_active', 'ACTIVE')
-            ->first(['name_eng', 'name']);
+            ->first();
 
         if ($vendor === null) {
             return [
@@ -114,7 +114,6 @@ class UploadController extends Controller
             ->where('mp.isActive', 'Y')
             ->whereNotNull('mp.categoryID')
             ->select([
-                'mp.id',
                 DB::raw("CEIL((mp.productPrice * $marginRate * $partnerMarginRate * $commissionRate) / 10) * 10 AS productPrice"),
                 'mp.productCode',
                 'pp.product_name AS productName',
@@ -126,7 +125,8 @@ class UploadController extends Controller
                 'mp.id',
                 'mp.productKeywords',
                 'mp.hasOption',
-                'mp.bundle_quantity'
+                'mp.bundle_quantity',
+                'mp.categoryID'
             ])
             ->get();
 
