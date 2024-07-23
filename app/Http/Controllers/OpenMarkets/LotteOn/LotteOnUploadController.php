@@ -29,12 +29,7 @@ class LotteOnUploadController extends Controller
         if (!$uploadResult['status']) {
             return $uploadResult;
         }
-        return [
-            'status' => false,
-            'message' => '테스트',
-            'error' => $uploadResult['data']
-        ];
-        // return $this->processStore($uploadResult['data']);
+        return $this->processStore($uploadResult['data']);
     }
 
     protected function processProducts()

@@ -40,8 +40,7 @@ class ProcessProductUpload implements ShouldQueue
             $error = $uploadResult['error'] ?? null;
             $this->storeNotification($this->partner->id, $uploadResult['status'], $uploadResult['message'], $this->vendor->name, $error);
         } catch (\Exception $e) {
-            Log::error("Error in ProcessProductUpload handle method: " . $e->getMessage());
-            $this->storeNotification($this->partner->id, false, 'Upload failed due to an exception.', $this->vendor->name, $e->getMessage());
+            $this->storeNotification($this->partner->id, false, '상품 업로드 과정에서 예기치 못한 에러가 발생했습니다.', $this->vendor->name, $e->getMessage());
         }
     }
 
