@@ -126,7 +126,8 @@ class UploadController extends Controller
                 'mp.id',
                 'mp.productKeywords',
                 'mp.hasOption',
-                'mp.bundle_quantity'
+                'mp.bundle_quantity',
+                'mp.categoryID'
             ])
             ->get();
 
