@@ -25,6 +25,7 @@ class LotteOnApiController extends Controller
         } catch (\Exception $e) {
             return [
                 'status' => false,
+                'message' => 'API 요청에서 오류가 발생했습니다.',
                 'error' => $e->getMessage()
             ];
         }
