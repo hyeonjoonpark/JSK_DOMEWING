@@ -25,6 +25,8 @@ class SmartStoreCancelController extends Controller
         $account = DB::table('smart_store_accounts')
             ->where('id', $partnerOrder->account_id)
             ->first();
+        $isCancelOrder = $this->checkIsCancel($order);
+        if ($isCancelOrder['status']) return $isCancelOrder;
         return $this->cancelOrder($account, $partnerOrder->product_order_number);
     }
     public function cancelOrder($account, $productOrderId)
@@ -53,5 +55,35 @@ class SmartStoreCancelController extends Controller
             'message' => '주문취소에 성공하였습니다.',
             'data' => $response
         ];
+    }
+    private function checkIsCancel($order)
+    {
+        $partnerOrder = DB::table('partner_orders')
+            ->where('order_id', $order->id)
+            ->first();
+        $account = DB::table('smart_store_accounts as ssa')
+            ->where('ssa.id', $partnerOrder->account_id)
+            ->first();
+        $contentType = 'application/json';
+        $method = 'POST';
+        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query';
+        $data = ['productOrderIds' => [$partnerOrder->product_order_number]];
+        $controller = new SmartStoreApiController();
+        $builderResponse =  $controller->builder($account, $contentType, $method, $url, $data); //조회해서 상태확인
+        if (isset($builderResponse['data']['data'][0]['cancel'])) { //취소상태이면 취소 승인 진행
+            return $this->acceptCancel($controller, $account, $contentType, $method, $partnerOrder->product_order_number); //취소 승인 api
+        }
+        return [
+            'status' => false,
+            'message' => '취소 요청 주문이 아닙니다.'
+        ];
+    }
+    private function acceptCancel($controller, $account, $contentType, $method, $productOrderNumber)
+    {
+        $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/' . $productOrderNumber . '/claim/cancel/approve';
+        $data = [
+            'productOrderId' => $productOrderNumber
+        ];
+        return $controller->builder($account, $contentType, $method, $url, $data);
     }
 }
