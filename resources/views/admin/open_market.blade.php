@@ -123,6 +123,16 @@
                                 value="CANCEL_COMPLETE">
                             <label class="form-check-label" for="orderCancelled">취소완료</label>
                         </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="coupangExchange"
+                                value="COUPANG_EXCHANGE">
+                            <label class="form-check-label" for="coupangExchange">쿠팡교환</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="orderStatus" id="coupangReturn"
+                                value="COUPANG_RETURN">
+                            <label class="form-check-label" for="coupangReturn">쿠팡반품</label>
+                        </div>
                     </div>
 
                     <button class="btn btn-primary mb-5" onclick="showData();">조회하기</button>

@@ -124,6 +124,15 @@ class CoupangReturnController extends Controller
             'receiptId' => $receiptId
         ];
         $ac = new ApiController();
+        $returnStockConfirmation = $ac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
+        if (!$returnStockConfirmation['status']) return [
+            'status' => false,
+            'message' => '상품 입고처리에 문제가 발생하였습니다.'
+        ];
+
+        sleep(2);
+
+        $path = '/v2/providers/openapi/apis/api/v4/vendors/' . $account->code . '/returnRequests/' . $receiptId . '/approval';
         return $ac->putBuilder($accessKey, $secretKey, $contentType, $path, $data);
     }
 }
