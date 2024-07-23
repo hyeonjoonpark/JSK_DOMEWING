@@ -24,11 +24,12 @@ class CoupangReturnController extends Controller
                     $results[] = $this->transformReturnData($returnData, $reasonType);
                 }
             }
-            $openMarketExchangeRefundController = new OpenMarketExchangeRefundController();
             $createResult = [];
             foreach ($results as $result) {
-                if (!$this->isExistReturnOrder($result['newProductOrderNumber']))
+                if (!$this->isExistReturnOrder($result['newProductOrderNumber'])) {
+                    $openMarketExchangeRefundController = new OpenMarketExchangeRefundController();
                     $createResult[] = $openMarketExchangeRefundController->createExchangeRefund($result);
+                }
             }
             return ['status' => true, 'message' => '쿠팡환불요청수집에 성공하였습니다', 'data' => $createResult];
         } catch (\Exception $e) {
