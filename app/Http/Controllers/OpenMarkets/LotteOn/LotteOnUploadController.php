@@ -311,7 +311,7 @@ class LotteOnUploadController extends Controller
     protected function processStore(array $productCodes)
     {
         $success = 0;
-        $error = null;
+        $error = '';
         foreach ($productCodes as $productCode) {
             if ($productCode['resultCode'] !== '0000') {
                 continue;
@@ -339,7 +339,7 @@ class LotteOnUploadController extends Controller
             DB::table('lotte_on_uploaded_products')
                 ->insert([
                     'lotte_on_account_id' => $this->account->id,
-                    'product_id' => $product->id,
+                    'product_id' => $product->product_id,
                     'product_name' => $product->productName,
                     'price' => $product->productPrice,
                     'shipping_fee' => $product->shipping_fee,
@@ -351,6 +351,7 @@ class LotteOnUploadController extends Controller
         } catch (\Exception $e) {
             return [
                 'status' => false,
+                '업로드 상품 정보를 데이터베이스에 저장하는 과정에서 오류가 발생했습니다.',
                 'error' => $e->getMessage()
             ];
         }
