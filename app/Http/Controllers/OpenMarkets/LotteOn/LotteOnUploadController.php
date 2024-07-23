@@ -339,8 +339,8 @@ class LotteOnUploadController extends Controller
 
     protected function store(string $sellwingProductCode, string $lotteonProductCode)
     {
-        $product = $this->products->firstWhere('productCode', $sellwingProductCode);
         try {
+            $product = $this->products->firstWhere('productCode', $sellwingProductCode);
             DB::table('lotte_on_uploaded_products')
                 ->insert([
                     'lotte_on_account_id' => $this->account->id,
