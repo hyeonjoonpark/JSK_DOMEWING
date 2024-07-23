@@ -10,6 +10,7 @@ const { scrollDown, goToAttempts, signIn, checkImageUrl, checkProductName, forma
     await page.setViewport({ 'width': 1500, 'height': 1000 });
     const [tempFilePath, username, password] = process.argv.slice(2);
     const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
+
     try {
         await signIn(page, username, password, 'https://comeonshop.co.kr/member/login.html', '#member_id', '#member_passwd', '.user-login fieldset > a');
         const products = [];
@@ -99,7 +100,7 @@ async function getproductPrice(page) {
 }
 async function getproductImage(page) {
     const imageUrl = await page.evaluate(() => {
-        const productImageElement = document.querySelector('#big_img_box > div.lslide.active > img');
+        const productImageElement = document.querySelector('#big_img_box > div > img');
         return productImageElement ? productImageElement.src : null;
     });
 
