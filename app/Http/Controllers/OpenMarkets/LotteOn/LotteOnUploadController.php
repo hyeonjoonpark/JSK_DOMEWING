@@ -202,7 +202,7 @@ class LotteOnUploadController extends Controller
             return $builderResult;
         }
         $builderData = $builderResult['data'];
-        if ((int)$builderData['returnCode'] !== 0000) {
+        if (isset($builderData['returnCode']) || (int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
                 'message' => $builderData['message'],
@@ -253,7 +253,7 @@ class LotteOnUploadController extends Controller
         $loac = new LotteOnApiController();
         $builderResult = $loac->builder($method, $this->account->access_key, $url, $data);
         $builderData = $builderResult['data'];
-        if ((int)$builderData['returnCode'] !== 0000) {
+        if (isset($builderData['returnCode']) || (int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
                 'message' => $builderData['message'],
@@ -313,7 +313,7 @@ class LotteOnUploadController extends Controller
             return $response;
         }
         $builderData = $response['data'];
-        if ((int)$builderData['returnCode'] !== 0000) {
+        if (isset($builderData['returnCode']) || (int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
                 'message' => $builderData['message'],
