@@ -7,6 +7,7 @@ use App\Http\Controllers\OpenMarkets\Coupang\CoupangExchangeController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
+use App\Http\Controllers\SmartStore\SmartStoreExchangeController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\SmartStore\SmartStoreReturnController;
 use App\Http\Controllers\WingController;
@@ -53,7 +54,7 @@ class OpenMarketOrderController extends Controller
                             ];
                         }
                     }
-                    if ($openMarketEngName === 'coupang') {
+                    if ($openMarketEngName === 'coupang' || $openMarketEngName === 'smart_store') {
                         $exchangeMethod = 'get' . ucfirst($openMarketEngName) . 'ExchangeOrder';
                         $exchangeResult = call_user_func([$this, $exchangeMethod], $partner->id);
                         if (!$exchangeResult['status']) {
@@ -406,7 +407,10 @@ class OpenMarketOrderController extends Controller
                     ->where('wt.status', 'PENDING')
                     ->where('o.type', 'REFUND')
                     ->where('o.requested', 'N')
-                    ->whereNot('po.vendor_id', 40)
+                    ->where(function ($query) {
+                        $query->where('po.vendor_id', '!=', 40)
+                            ->orWhereNull('po.vendor_id');
+                    })
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'RETURN_PROCESS':
@@ -427,6 +431,10 @@ class OpenMarketOrderController extends Controller
                     ->where('wt.status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
                     ->where('o.requested', 'N')
+                    ->where(function ($query) {
+                        $query->where('po.vendor_id', '!=', 40)
+                            ->orWhereNull('po.vendor_id');
+                    })
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_PROCESS':
@@ -593,8 +601,10 @@ class OpenMarketOrderController extends Controller
         $controller = new CoupangReturnController();
         return $controller->index($partnerId);
     }
-    private function getSmart_storeExchangeOrder()
+    private function getSmart_storeExchangeOrder($partnerId)
     {
+        $controller = new SmartStoreExchangeController();
+        return $controller->index($partnerId);
     }
     private function getCoupangExchangeOrder($partnerId)
     {

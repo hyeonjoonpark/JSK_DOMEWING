@@ -297,7 +297,7 @@ class OpenMarketRefundController extends Controller
         if (!$confirmApiResult['status']) {
             return [
                 'status' => false,
-                'message' => '쿠팡 반품 주문 입고 요청에 실패하였습니다. 관리자에게 문의해주세요.',
+                'message' => '쿠팡 반품 주문 입고 요청 및 반품 승인에 실패하였습니다. 관리자에게 문의해주세요.',
                 'data' => $confirmApiResult
             ];
         }
@@ -309,7 +309,7 @@ class OpenMarketRefundController extends Controller
     {
         $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
-        $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
+        $account = DB::table('smart_store_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new SmartStoreReturnController();
         $confirmApiResult = $controller->approveReturnRequest($account, $partnerOrder->product_order_number);
         if (!$confirmApiResult['status']) {
@@ -327,13 +327,13 @@ class OpenMarketRefundController extends Controller
     {
         $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
-        $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
+        $account = DB::table('smart_store_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new SmartStoreReturnController();
         $rejectApiResult = $controller->rejectReturnRequest($account, $partnerOrder->product_order_number, $reason);
         if (!$rejectApiResult['status']) {
             return [
                 'status' => false,
-                'message' => '스마트스토어 반품 주문 승인 요청에 실패하였습니다. 관리자에게 문의해주세요.',
+                'message' => '스마트스토어 반품 주문 거절 요청에 실패하였습니다. 관리자에게 문의해주세요.',
                 'data' => $rejectApiResult
             ];
         }
