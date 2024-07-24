@@ -16,21 +16,19 @@ class SmartStoreExchangeController extends Controller
     {
         $this->ssac = new SmartStoreApiController();
     }
-    public function index() //$id값주기
+    public function index($partnerId)
     {
-        $accounts = $this->getAccounts(); //$id값주기
-        if (!$accounts) {
-            return false;
-        }
-        $allOrderDetails = [];
+        $accounts = $this->getAccounts($partnerId);
+        $createResult = [];
         foreach ($accounts as $account) {
-            $returnOrderList = $this->getExchangeOrderList($account);
-            $orderIds = $this->getOrderIds($returnOrderList);
+            $exchangeOrderList = $this->getExchangeOrderList($account);
+            if (empty($exchangeOrderList)) continue;
+            $orderIds = $this->getOrderIds($exchangeOrderList);
             $exchangeDatas = $this->getOrderDetails($account, $orderIds);
             if (!$exchangeDatas) continue;
             $results =  $this->transformExchangeData($exchangeDatas);
             foreach ($results as $result) {
-                if (!$this->isExistReturnOrder($result['newProductOrderNumber'])) {
+                if (!$this->isExistExchangeOrder($result['newProductOrderNumber'])) {
                     $openMarketExchangeRefundController = new OpenMarketExchangeRefundController();
                     $createResult[] = $openMarketExchangeRefundController->createExchangeRefund($result);
                 }
@@ -45,7 +43,7 @@ class SmartStoreExchangeController extends Controller
         $url = 'https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses';
         $startDate = new DateTime('now - 7 days');
         $endDate = new DateTime('now');
-        $returnOrders = [];
+        $exchangeOrders = [];
         for ($date = $startDate; $date <= $endDate; $date->modify('+1 day')) {
             $formattedDate = $this->convertDateFormat($date->format('Y-m-d'));
             $data = ['lastChangedFrom' => $formattedDate];
@@ -53,23 +51,23 @@ class SmartStoreExchangeController extends Controller
             if ($response['status'] && isset($response['data']['data']['lastChangeStatuses'])) {
                 foreach ($response['data']['data']['lastChangeStatuses'] as $status) {
                     if (isset($status['claimStatus']) && $status['claimStatus'] === 'EXCHANGE_REQUEST') {
-                        $returnOrders[] = $status;
+                        $exchangeOrders[] = $status;
                     }
                 }
             }
         }
-        return $returnOrders;
+        return $exchangeOrders;
     }
     private function convertDateFormat($inputDate)
     {
         $date = new DateTime($inputDate, new DateTimeZone('Asia/Seoul'));
         return $date->format('Y-m-d\TH:i:s.vP');
     }
-    private function getOrderIds($returnOrderList)
+    private function getOrderIds($exchangeOrderList)
     {
         $orderIds = [];
-        foreach ($returnOrderList as $returnOrder) {
-            $orderIds[] = $returnOrder['productOrderId'];
+        foreach ($exchangeOrderList as $exchangeOrder) {
+            $orderIds[] = $exchangeOrder['productOrderId'];
         }
         return $orderIds;
     }
@@ -84,7 +82,7 @@ class SmartStoreExchangeController extends Controller
             return false;
         }
         foreach ($response['data']['data'] as $item) {
-            if (isset($item['return']) && $item['return']['claimStatus'] == 'EXCHANGE_REQUEST' && isset($item['return']['returnDetailedReason'])) {
+            if (isset($item['exchange']) && $item['exchange']['claimStatus'] == 'EXCHANGE_REQUEST' && isset($item['exchange']['exchangeDetailedReason'])) {
                 return $response;
             }
         }
@@ -109,8 +107,8 @@ class SmartStoreExchangeController extends Controller
             'ETC'
         ];
         foreach ($exchangeDatas as $data) {
-            $returnReason = $data['return']['returnReason'];
-            $reasonType = in_array($returnReason, $simpleChangeReasons) ? '상품정보와 상이' : '단순변심';
+            $exchangeReason = $data['exchange']['exchangeReason'];
+            $reasonType = in_array($exchangeReason, $simpleChangeReasons) ? '상품정보와 상이' : '단순변심';
             $receiverPhone = $data['productOrder']['shippingAddress']['tel1']
                 ?? $data['productOrder']['shippingAddress']['tel2']
                 ?? '01000000000';
@@ -150,12 +148,12 @@ class SmartStoreExchangeController extends Controller
                 'ASYNC_FAIL_PAYMENT' => '결제 승인 실패',
                 'ASYNC_LONG_WAIT_PAYMENT' => '결제 승인 실패'
             ];
-            $translatedReason = $reasonMapping[$returnReason] ?? $returnReason;
-            $reason = $translatedReason . '. ' . $data['return']['returnDetailedReason'];
-            $claimRequestDate = new DateTime($data['return']['claimRequestDate']);
+            $translatedReason = $reasonMapping[$exchangeReason] ?? $exchangeReason;
+            $reason = $translatedReason . '. ' . $data['exchange']['exchangeDetailedReason'];
+            $claimRequestDate = new DateTime($data['exchange']['claimRequestDate']);
             $formattedClaimRequestDate = $claimRequestDate->format('Y-m-d H:i:s');
             $result[] = [
-                'requestType' => 'REFUND',
+                'requestType' => 'EXCHANGE',
                 'reasonType' => $reasonType,
                 'reason' => $reason,
                 'productOrderNumber' => $data['productOrder']['productOrderId'],
@@ -164,20 +162,20 @@ class SmartStoreExchangeController extends Controller
                 'receiverName' => $data['productOrder']['shippingAddress']['name'],
                 'receiverPhone' => $receiverPhone,
                 'receiverAddress' => $data['productOrder']['shippingAddress']['baseAddress'] . ' ' . $data['productOrder']['shippingAddress']['detailedAddress'],
+                'receiverRemark' => $data['productOrder']['shippingMemo'] ?? null,
                 'createdAt' => $formattedClaimRequestDate
             ];
         }
         return $result;
     }
-    private function getAccounts()
+    private function getAccounts($partnerId)
     {
         return DB::table('smart_store_accounts')
-            // ->where('partner_id', $id)
-            // ->where('partner_id', 3)
+            ->where('partner_id', $partnerId)
             ->where('is_active', 'ACTIVE')
             ->get();
     }
-    private function completeExchangePickup($account, $productOrderId) // 교환 수거 완료
+    public function completeExchangePickup($account, $productOrderId) // 교환 수거 완료
     {
         $contentType = 'application/json';
         $method = 'POST';
@@ -185,7 +183,7 @@ class SmartStoreExchangeController extends Controller
         $data = [];
         return $this->ssac->builder($account, $contentType, $method, $url, $data);
     }
-    private function reshipExchange($account, $productOrderId, $deliveryCompany, $deliveryTrackingNumber) // 교환 재배송 처리
+    public function reshipExchange($account, $productOrderId, $deliveryCompany, $deliveryTrackingNumber) // 교환 재배송 처리
     {
         $contentType = 'application/json';
         $method = 'POST';
@@ -197,7 +195,7 @@ class SmartStoreExchangeController extends Controller
         ];
         return $this->ssac->builder($account, $contentType, $method, $url, $data);
     }
-    private function rejectExchangeRequest($account, $productOrderId, $rejectExchangeReason) // 교환 거부(재배송) 처리
+    public function rejectExchangeRequest($account, $productOrderId, $rejectExchangeReason) // 교환 거부(재배송) 처리
     {
         $contentType = 'application/json';
         $method = 'POST';
@@ -206,5 +204,11 @@ class SmartStoreExchangeController extends Controller
             'rejectExchangeReason' => $rejectExchangeReason
         ];
         return $this->ssac->builder($account, $contentType, $method, $url, $data);
+    }
+    private function isExistExchangeOrder($newProductOrderNumber)
+    {
+        return DB::table('partner_orders')
+            ->where('product_order_number', $newProductOrderNumber)
+            ->first();
     }
 }

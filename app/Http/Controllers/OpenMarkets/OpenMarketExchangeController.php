@@ -4,6 +4,7 @@ namespace App\Http\Controllers\OpenMarkets;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangExchangeController;
+use App\Http\Controllers\SmartStore\SmartStoreExchangeController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -28,20 +29,6 @@ class OpenMarketExchangeController extends Controller
                 'status' => false,
                 'message' => '배송 대기 중으로 변경 가능한 주문이 아닙니다.',
             ];
-        }
-        $openMarket = DB::table('orders as o')
-            ->join('partner_orders as po', 'o.id', '=', 'po.order_id')
-            ->join('vendors as v', 'po.vendor_id', '=', 'v.id')
-            ->where('o.product_order_number', $productOrderNumber)
-            ->where('v.is_active', 'ACTIVE')
-            ->select('v.*')
-            ->first(['v.name_eng', 'v.name']);
-        if ($openMarket && $openMarket->name_eng == 'coupang') { //일단은 쿠팡만 적용
-            $method = 'call' . ucfirst($openMarket->name_eng) . 'CheckApi';
-            $updateApiResult = $this->$method($productOrderNumber);
-            if (!$updateApiResult['status']) {
-                return $updateApiResult;
-            }
         }
         $updated = DB::table('orders')
             ->where('product_order_number', $productOrderNumber)
@@ -108,7 +95,7 @@ class OpenMarketExchangeController extends Controller
             ->where('v.is_active', 'ACTIVE')
             ->select('v.*')
             ->first(['v.name_eng', 'v.name']);
-        if ($openMarket && $openMarket->name_eng == 'coupang') { //일단은 쿠팡만 적용
+        if ($openMarket) {
             $method = 'call' . ucfirst($openMarket->name_eng) . 'ShipmentApi';
             $updateApiResult = $this->$method($productOrderNumber, $deliveryCompanyCode, $trackingNumber);
             if ($updateApiResult['status'] === false) {
@@ -159,10 +146,9 @@ class OpenMarketExchangeController extends Controller
             ->where('v.is_active', 'ACTIVE')
             ->select('v.*')
             ->first(['v.name_eng', 'v.name']);
-        if ($openMarket && $openMarket->name_eng == 'coupang') { //일단은 쿠팡만 적용
-            // if ($openMarket) {
+        if ($openMarket) {
             $method = 'call' . ucfirst($openMarket->name_eng) . 'CancelApi';
-            $updateApiResult = $this->$method($productOrderNumber);
+            $updateApiResult = $this->$method($productOrderNumber, $remark);
             if ($updateApiResult['status'] === false) {
                 return $updateApiResult;
             }
@@ -206,7 +192,6 @@ class OpenMarketExchangeController extends Controller
         ];
         DB::beginTransaction();
         try {
-            // orders 테이블 업데이트
             DB::table('orders')
                 ->where('product_order_number', $productOrderNumber)
                 ->where('delivery_status', 'PENDING')
@@ -219,14 +204,12 @@ class OpenMarketExchangeController extends Controller
                 ->update([
                     'status' => 'REJECTED'
                 ]);
-            // 트랜잭션 커밋
             DB::commit();
             return [
                 'status' => true,
                 'message' => '주문이 성공적으로 취소되었습니다.',
             ];
         } catch (\Exception $e) {
-            // 트랜잭션 롤백
             DB::rollBack();
             return [
                 'status' => false,
@@ -266,7 +249,7 @@ class OpenMarketExchangeController extends Controller
             ];
         }
     }
-    private function callCoupangCheckApi($productOrderNumber) //입고요청처리
+    private function callCoupangShipmentApi($productOrderNumber, $goodsDeliveryCode, $invoiceNumber)
     {
         $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
@@ -289,16 +272,6 @@ class OpenMarketExchangeController extends Controller
                 'data' => $confirmApiResult
             ];
         }
-        return [
-            'status' => true
-        ];
-    }
-    private function callCoupangShipmentApi($productOrderNumber, $goodsDeliveryCode, $invoiceNumber)
-    {
-        $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
-        $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
-        $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
-        $controller = new CoupangExchangeController();
         $confirmApiResult = $controller->exchangeShipment($account, $partnerOrder, $goodsDeliveryCode->coupang, $invoiceNumber);
         if (!$confirmApiResult['status']) {
             return [
@@ -311,13 +284,57 @@ class OpenMarketExchangeController extends Controller
             'status' => true
         ];
     }
-    private function callCoupangCancelApi($productOrderNumber)
+    private function callSmart_storeShipmentApi($productOrderNumber, $goodsDeliveryCode, $invoiceNumber)
+    {
+        $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
+        $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
+        $account = DB::table('smart_store_accounts')->where('id', $partnerOrder->account_id)->first();
+        $controller = new SmartStoreExchangeController();
+        $confirmApiResult = $controller->completeExchangePickup($account, $partnerOrder->product_order_number);
+        if (!$confirmApiResult['status']) {
+            return [
+                'status' => false,
+                'message' => '스마트스토어 교환승인에 실패하였습니다. 관리자에게 문의해주세요.',
+                'data' => $confirmApiResult
+            ];
+        }
+        $confirmApiResult = $controller->reshipExchange($account, $partnerOrder, $goodsDeliveryCode->smart_store, $invoiceNumber);
+        if (!$confirmApiResult['status']) {
+            return [
+                'status' => false,
+                'message' => '스마트스토어 교환 주문 송장번호 입력에 실패하였습니다. 관리자에게 문의해주세요.',
+                'data' => $confirmApiResult
+            ];
+        }
+        return [
+            'status' => true
+        ];
+    }
+    private function callCoupangCancelApi($productOrderNumber, $remark)
     {
         $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
         $account = DB::table('coupang_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new CoupangExchangeController();
         $rejectedExchange = $controller->rejectExchangeRequest($account, $partnerOrder->product_order_number);
+        if (!$rejectedExchange['status']) {
+            return [
+                'status' => false,
+                'message' => '쿠팡 교환 주문 취소에 실패하였습니다. 관리자에게 문의해주세요.',
+                'data' => $rejectedExchange
+            ];
+        }
+        return [
+            'status' => true
+        ];
+    }
+    private function callSmart_storeCancelApi($productOrderNumber, $remark)
+    {
+        $order = DB::table('orders')->where('product_order_number', $productOrderNumber)->first();
+        $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
+        $account = DB::table('smart_store_accounts')->where('id', $partnerOrder->account_id)->first();
+        $controller = new SmartStoreExchangeController();
+        $rejectedExchange = $controller->rejectExchangeRequest($account, $partnerOrder->product_order_number, $remark);
         if (!$rejectedExchange['status']) {
             return [
                 'status' => false,
