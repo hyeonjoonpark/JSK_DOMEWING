@@ -313,7 +313,6 @@ class OpenMarketOrderController extends Controller
     }
     private function getOrders($vendors, $orderStatus, $startOn, $endOn)
     {
-        // $endOn에 1일을 추가
         $endOnDate = new DateTime($endOn);
         $endOnDate->modify('+1 day');
         $endOn = $endOnDate->format('Y-m-d');
@@ -338,7 +337,6 @@ class OpenMarketOrderController extends Controller
                     ->where('po.vendor_id', 54);
             })
             ->whereIn('mp.sellerID', $vendors)
-            // ->whereNot('v.type', 'B2B') // 일단은 포함시키기로
             ->select(
                 'm.username as member_username',
                 'c.quantity as quantity',
