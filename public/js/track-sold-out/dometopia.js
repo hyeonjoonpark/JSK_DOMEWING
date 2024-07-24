@@ -59,6 +59,15 @@ async function validateProduct(page) {
                     return false;
                 }
             }
+            const stockSelector = '#select_option_lay > div.quantity_box > table > tbody > tr:nth-child(2) > td';
+            const availableStockElement = document.querySelector(stockSelector);
+            // 요소의 존재 여부를 검사
+            if (availableStockElement) {
+                const availableStockElement = parseInt(availableStockElement.textContent.trim().replace(/[^\d]/g, ''));
+                if (availableStockElement < 5) {
+                    return false;
+                }
+            }
             const stockElement = document.querySelector('#info > div.goods_info.clearbox > form > div.container > table > tbody > tr:nth-child(4) > td');
             if (stockElement) {
                 const stock = parseInt(stockElement.textContent.trim().replace(/[^\d]/g, ''));
