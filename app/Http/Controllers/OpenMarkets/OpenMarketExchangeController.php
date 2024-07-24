@@ -86,7 +86,6 @@ class OpenMarketExchangeController extends Controller
             ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
             ->where([
                 ['o.product_order_number', '=', $productOrderNumber],
-                ['o.requested', '=', 'N'],
                 ['o.delivery_status', '=', 'PENDING'],
                 ['o.type', '=', 'EXCHANGE'],
                 ['w.status', '=', 'PENDING'],
@@ -141,7 +140,6 @@ class OpenMarketExchangeController extends Controller
             ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
             ->where([
                 ['o.product_order_number', '=', $productOrderNumber],
-                ['o.requested', '=', 'N'],
                 ['o.delivery_status', '=', 'PENDING'],
                 ['o.type', '=', 'EXCHANGE'],
                 ['w.status', '=', 'PENDING'],
@@ -196,7 +194,6 @@ class OpenMarketExchangeController extends Controller
             ->join('wing_transactions as w', 'w.id', '=', 'o.wing_transaction_id')
             ->where([
                 ['o.product_order_number', '=', $productOrderNumber],
-                ['o.requested', '=', 'N'],
                 ['o.delivery_status', '=', 'PENDING'],
                 ['o.type', '=', 'EXCHANGE'],
                 ['w.status', '=', 'PENDING'],
