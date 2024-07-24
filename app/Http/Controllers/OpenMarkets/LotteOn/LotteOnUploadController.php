@@ -253,7 +253,7 @@ class LotteOnUploadController extends Controller
         $loac = new LotteOnApiController();
         $builderResult = $loac->builder($method, $this->account->access_key, $url, $data);
         $builderData = $builderResult['data'];
-        if ((int)$builderData !== 0000) {
+        if ((int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
                 'message' => 'API 요청 과정에서 오류가 발생했습니다.',
