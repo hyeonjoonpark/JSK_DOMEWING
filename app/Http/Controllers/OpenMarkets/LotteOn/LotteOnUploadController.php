@@ -205,7 +205,7 @@ class LotteOnUploadController extends Controller
         if ((int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
-                'message' => $builderData['message'],
+                'message' => 'API 요청 과정에서 오류가 발생했습니다.',
                 'error' => $builderData
             ];
         }
@@ -256,7 +256,7 @@ class LotteOnUploadController extends Controller
         if ((int)$builderData !== 0000) {
             return [
                 'status' => false,
-                'message' => $builderData['message'],
+                'message' => 'API 요청 과정에서 오류가 발생했습니다.',
                 'error' => $builderData
             ];
         }
@@ -316,7 +316,7 @@ class LotteOnUploadController extends Controller
         if ((int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
-                'message' => $builderData['message'],
+                'message' => 'API 요청 과정에서 오류가 발생했습니다.',
                 'error' => $builderData
             ];
         }
