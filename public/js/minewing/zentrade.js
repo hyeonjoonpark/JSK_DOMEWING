@@ -62,7 +62,7 @@ async function scrapeProducts(page, forbiddenWords) {
                 }
                 const image = productElement.querySelector('body > table > tbody > tr > td > table > tbody > tr > td > div.indiv > form:nth-child(1) > table > tbody > tr > td > table > tbody > tr > td > div:nth-child(1) > a > img').src;
                 const href = productElement.querySelector('body > table > tbody > tr > td > table > tbody > tr > td > div.indiv > form:nth-child(1) > table > tbody > tr > td > table > tbody > tr > td > div:nth-child(1) > a').href;
-                const platform = "블랙라이거";
+                const platform = "젠트레이드";
                 const product = { name, price, image, href, platform };
                 return product;
             } catch (error) {
