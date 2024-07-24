@@ -134,7 +134,10 @@
                             <label class="form-check-label" for="coupangReturn">쿠팡반품</label>
                         </div>
                     </div>
-
+                    <div class="form-group">
+                        <label for="searchInput" class="form-label">검색</label>
+                        <input type="text" id="searchInput" class="form-control" placeholder="검색어를 입력하세요">
+                    </div>
                     <button class="btn btn-primary mb-5" onclick="showData();">조회하기</button>
                     <button class="btn btn-danger mb-5" style="margin-left: 633px;" onclick="initIndex();">업데이트</button>
                     <div class="form-group">
@@ -301,6 +304,14 @@
                 } else {
                     $('#remoteAreaOption').hide();
                 }
+            });
+            // 검색창에 입력 이벤트 핸들러 추가
+            $('#searchInput').on('input', function() {
+                const searchTerm = $(this).val().toLowerCase();
+                $('#orderwingResult tr').each(function() {
+                    const rowText = $(this).text().toLowerCase();
+                    $(this).toggle(rowText.includes(searchTerm));
+                });
             });
         });
 
