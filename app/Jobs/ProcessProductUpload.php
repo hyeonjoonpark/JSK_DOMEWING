@@ -59,7 +59,7 @@ class ProcessProductUpload implements ShouldQueue
         }
 
         Log::info("Starting upload for vendor: {$this->vendor->name_eng}");
-        return $uploader->main();
+        return $uploader->main($this->products, $this->partner, $this->account);
     }
 
     protected function storeNotification($partnerId, $status, $data, $vendorName, $error = null)
