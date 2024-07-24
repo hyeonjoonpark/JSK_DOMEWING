@@ -205,7 +205,7 @@ class LotteOnUploadController extends Controller
         if ((int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
-                'message' => 'API 요청 과정에서 오류가 발생했습니다.',
+                'message' => $builderData['message'],
                 'error' => $builderData
             ];
         }
@@ -256,7 +256,7 @@ class LotteOnUploadController extends Controller
         if ((int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
-                'message' => 'API 요청 과정에서 오류가 발생했습니다.',
+                'message' => $builderData['message'],
                 'error' => $builderData
             ];
         }
@@ -316,7 +316,7 @@ class LotteOnUploadController extends Controller
         if ((int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
-                'message' => 'API 요청 과정에서 오류가 발생했습니다.',
+                'message' => $builderData['message'],
                 'error' => $builderData
             ];
         }
@@ -330,10 +330,10 @@ class LotteOnUploadController extends Controller
     protected function processStore(array $productCodes)
     {
         $success = 0;
-        $error = 'Success!';
+        $errors = [];
         foreach ($productCodes as $productCode) {
             if ((int)$productCode['resultCode'] !== 0000) {
-                continue;
+                $errors[] = $productCode['message'];
             }
             $sellwingProductCode = $productCode['epdNo'];
             $lotteonProductCode = $productCode['spdNo'];
@@ -341,14 +341,14 @@ class LotteOnUploadController extends Controller
             if ($storeResult) {
                 $success++;
             } else {
-                $error = $storeResult['error'];
+                $errors[] = $storeResult['error'];
             }
         }
         $status = $success > 0 ? true : false;
         return [
             'status' => $status,
             'message' => "총 " . number_format(count($this->products)) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.",
-            'error' => $error
+            'error' => $errors
         ];
     }
 
