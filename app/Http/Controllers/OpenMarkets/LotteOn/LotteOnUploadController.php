@@ -318,7 +318,7 @@ class LotteOnUploadController extends Controller
         $success = 0;
         $error = 'Success!';
         foreach ($productCodes as $productCode) {
-            if ($productCode['resultCode'] !== '0000') {
+            if ((int)$productCode['resultCode'] !== 0000) {
                 continue;
             }
             $sellwingProductCode = $productCode['epdNo'];
