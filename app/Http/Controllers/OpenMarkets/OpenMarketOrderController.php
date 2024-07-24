@@ -407,7 +407,10 @@ class OpenMarketOrderController extends Controller
                     ->where('wt.status', 'PENDING')
                     ->where('o.type', 'REFUND')
                     ->where('o.requested', 'N')
-                    ->whereNot('po.vendor_id', 40)
+                    ->where(function ($query) {
+                        $query->where('po.vendor_id', '!=', 40)
+                            ->orWhereNull('po.vendor_id');
+                    })
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'RETURN_PROCESS':
@@ -428,7 +431,10 @@ class OpenMarketOrderController extends Controller
                     ->where('wt.status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
                     ->where('o.requested', 'N')
-                    ->whereNot('po.vendor_id', 40)
+                    ->where(function ($query) {
+                        $query->where('po.vendor_id', '!=', 40)
+                            ->orWhereNull('po.vendor_id');
+                    })
                     ->whereBetween('o.created_at', [$startOn, $endOn]);
                 break;
             case 'EXCHANGE_PROCESS':
