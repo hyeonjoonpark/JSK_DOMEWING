@@ -252,11 +252,19 @@ class LotteOnUploadController extends Controller
         ];
         $loac = new LotteOnApiController();
         $builderResult = $loac->builder($method, $this->account->access_key, $url, $data);
+        $builderData = $builderResult['data'];
+        if ((int)$builderData !== 0000) {
+            return [
+                'status' => false,
+                'message' => $builderData['message'],
+                'error' => $builderData
+            ];
+        }
         if (!isset($builderResult['data']['itemList'][0]['data']['disp_list'][0]['disp_cat_id'])) {
             return [
                 'status' => false,
                 'message' => '전시 카테고리와 매칭이 실패된 상품입니다.',
-                'error' => $builderResult
+                'error' => $builderData
             ];
         }
         return [
