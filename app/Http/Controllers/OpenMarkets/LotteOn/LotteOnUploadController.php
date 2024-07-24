@@ -26,6 +26,11 @@ class LotteOnUploadController extends Controller
         }
         $data = $processProductsResult['data'];
         $uploadResult = $this->upload($data);
+        return [
+            'status' => false,
+            'message' => '테스트',
+            'error' => json_encode($uploadResult)
+        ];
         if (!$uploadResult['status']) {
             return $uploadResult;
         }
