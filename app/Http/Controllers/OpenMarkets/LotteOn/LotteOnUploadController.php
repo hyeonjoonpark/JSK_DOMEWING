@@ -26,11 +26,9 @@ class LotteOnUploadController extends Controller
         }
         $data = $processProductsResult['data'];
         $uploadResult = $this->upload($data);
-        return [
-            'status' => false,
-            'message' => '테스트',
-            'error' => json_encode($uploadResult)
-        ];
+        if (!$uploadResult['status']) {
+            return $uploadResult;
+        }
         if (!$uploadResult['status']) {
             return $uploadResult;
         }
@@ -306,10 +304,18 @@ class LotteOnUploadController extends Controller
         if (!$response['status']) {
             return $response;
         }
-        // $productCodes = $response['data']['data'];
+        $builderData = $response['data'];
+        if ((int)$builderData['returnCode'] !== 0000) {
+            return [
+                'status' => false,
+                'message' => $builderData['message'],
+                'error' => $builderData
+            ];
+        }
+        $productCodes = $builderData['data'];
         return [
             'status' => true,
-            'data' => $response
+            'data' => $productCodes
         ];
     }
 
