@@ -29,9 +29,6 @@ class LotteOnUploadController extends Controller
         if (!$uploadResult['status']) {
             return $uploadResult;
         }
-        if (!$uploadResult['status']) {
-            return $uploadResult;
-        }
         return $this->processStore($uploadResult['data']);
     }
 
@@ -39,10 +36,7 @@ class LotteOnUploadController extends Controller
     {
         $getWarehouseAndReturnInfoResult = $this->getWarehouseAndReturnInfo();
         if (!$getWarehouseAndReturnInfoResult['status']) {
-            return [
-                'status' => false,
-                'message' => '해당 판매자 계정의 출고지|반품지 조회에 실패했습니다.'
-            ];
+            return $getWarehouseAndReturnInfoResult;
         }
         $warehouseAndReturnInfo = $getWarehouseAndReturnInfoResult['data'];
         $requestDvCstPolNoResult = $this->requestDvCstPolNo();
@@ -204,26 +198,32 @@ class LotteOnUploadController extends Controller
             'afflTrCd' => $this->account->partner_code
         ];
         $builderResult = $loac->builder($method, $this->account->access_key, $url, $data);
-        if (!isset($builderResult['data']['data'])) {
+        if (!$builderResult['status']) {
+            return $builderResult;
+        }
+        $builderData = $builderResult['data'];
+        if ((int)$builderData['returnCode'] !== 0000) {
             return [
                 'status' => false,
-                'message' => '데이터를 가져오는 데 실패했습니다.'
+                'message' => $builderData['message'],
+                'error' => $builderData
             ];
         }
-        $owhpNo = null;
-        $rtrpNo = null;
-        foreach ($builderResult['data']['data'] as $br) {
-            if ($br['dvpTypCd'] === '02') {
-                $owhpNo = $br['dvpNo'];
-            } elseif ($br['dvpTypCd'] === '01') {
-                $rtrpNo = $br['dvpNo'];
+        foreach ($builderData['data'] as $data) {
+            switch ($data['dvpTypCd']) {
+                case '01':
+                    $rtrpNo = $data['dvpNo'];
+                    break;
+                case '02':
+                    $owhpNo = $data['dvpNo'];
+                    break;
+                default:
+                    return [
+                        'status' => false,
+                        'message' => '셀윙 이용 가이드를 참고하시어 출고지 및 반품지를 올바르게 설정해주세요.',
+                        'error' => $data
+                    ];
             }
-        }
-        if (is_null($owhpNo) || is_null($rtrpNo)) {
-            return [
-                'status' => false,
-                'message' => '해당 판매자 계정의 출고지 또는 반품지 정보를 확인해주세요.'
-            ];
         }
         return [
             'status' => true,
