@@ -306,10 +306,10 @@ class LotteOnUploadController extends Controller
         if (!$response['status']) {
             return $response;
         }
-        $productCodes = $response['data']['data'];
+        // $productCodes = $response['data']['data'];
         return [
             'status' => true,
-            'data' => $productCodes
+            'data' => $response
         ];
     }
 
