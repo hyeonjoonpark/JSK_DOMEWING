@@ -325,8 +325,9 @@ class LotteOnUploadController extends Controller
                 $error = $storeResult['error'];
             }
         }
+        $status = $success > 0 ? true : false;
         return [
-            'status' => true,
+            'status' => $status,
             'message' => "총 " . number_format(count($this->products)) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.",
             'error' => $error
         ];
