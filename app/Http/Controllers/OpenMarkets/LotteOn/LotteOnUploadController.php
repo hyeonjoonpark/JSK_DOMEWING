@@ -311,7 +311,7 @@ class LotteOnUploadController extends Controller
     protected function processStore(array $productCodes)
     {
         $success = 0;
-        $error = '';
+        $error = 'Success!';
         foreach ($productCodes as $productCode) {
             if ($productCode['resultCode'] !== '0000') {
                 continue;
