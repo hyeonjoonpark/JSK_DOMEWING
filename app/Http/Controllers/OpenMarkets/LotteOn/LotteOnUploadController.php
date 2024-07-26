@@ -58,7 +58,9 @@ class LotteOnUploadController extends Controller
         $success = 0;
 
         foreach ($this->products as $product) {
-            $productData['spdLst'][] = [];
+            $productData = [
+                'spdLst' => []
+            ];
             $processProductResult = $this->processProduct($product, $preData);
 
             if (!$processProductResult['status']) {
