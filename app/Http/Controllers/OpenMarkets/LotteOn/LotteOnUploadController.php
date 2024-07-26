@@ -194,7 +194,7 @@ class LotteOnUploadController extends Controller
             return $builderResult;
         }
 
-        if (!isset($builderResult['data'][0]['returnCode']) || (int)$builderResult['data'][0]['returnCode'] !== 0000) {
+        if (!isset($builderResult['data']['data'][0]['spdNo'])) {
             return [
                 'status' => false,
                 'error' => $builderResult
