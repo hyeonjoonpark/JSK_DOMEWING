@@ -46,7 +46,7 @@ class ExcelUploadController extends Controller
         if ($response) {
             return [
                 'status' => true,
-                'message' => '상품셋 정보를 성공적으로 업데이트했습니다.',
+                'message' => '성공적으로 주문하였습니다.',
                 'data' => $response
             ];
         }
@@ -142,7 +142,6 @@ class ExcelUploadController extends Controller
             foreach ($orderData as $data) {
                 $product = DB::table('minewing_products')
                     ->where('productCode', $data['productCode'])
-                    // ->where('isActive', 'Y') 이미 데이터 검증할 때 품절 검증함
                     ->first();
                 if (!$product) {
                     return [
@@ -235,6 +234,7 @@ class ExcelUploadController extends Controller
                 'price_then' => $priceThen,
                 'shipping_fee_then' => $shippingFeeThen,
                 'bundle_quantity_then' => $bundleQuantityThen,
+                'admin_remark' => '엑셀윙 주문'
             ];
             if ($orderDate !== null) {
                 $orderData['created_at'] = $orderDate;
