@@ -58,6 +58,7 @@ class LotteOnUploadController extends Controller
         $success = 0;
 
         foreach ($this->products as $product) {
+            $productData['spdLst'][] = [];
             $processProductResult = $this->processProduct($product, $preData);
 
             if (!$processProductResult['status']) {
@@ -137,10 +138,6 @@ class LotteOnUploadController extends Controller
         $method = 'post';
         $url = 'https://openapi.lotteon.com/v1/openapi/product/v1/product/registration/request';
         $builderResult = $this->loac->builder($method, $this->account->access_key, $url, $productsData);
-
-        if (!$builderResult['status']) {
-            return $builderResult;
-        }
 
         return $builderResult;
     }
