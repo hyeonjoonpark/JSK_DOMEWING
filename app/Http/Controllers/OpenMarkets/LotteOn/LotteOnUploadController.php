@@ -70,18 +70,64 @@ class LotteOnUploadController extends Controller
 
             $productData['spdLst'][] = $processProductResult['data'];
             $uploadResult = $this->upload($productData);
-            $errors[] = $uploadResult;
+
+            if (!$uploadResult['status']) {
+                $errors[] = $uploadResult;
+                continue;
+            }
+
+            $originProductNo = $uploadResult['data'];
+            $storeResult = $this->store($product, $originProductNo);
+
+            if (!$storeResult['status']) {
+                $errors[] = $storeResult;
+            }
+
+            $success++;
         }
 
         return [
             'status' => true,
-            'message' => '테스트',
+            'message' => "총 " . number_format(count($this->products)) . " 개의 상품들 중 <strong>$success</strong>개의 상품을 성공적으로 업로드했습니다.",
             'error' => $errors
         ];
     }
 
     /**
+     * 상품 업로드 정보를 데이터베이스에 반영합니다.
+     *
+     *
+     */
+    protected function store(stdClass $product, string $originProductNo)
+    {
+        try {
+            DB::table('lotte_on_uploaded_products')
+                ->insert([
+                    'lotte_on_account_id' => $this->account->id,
+                    'product_id' => $product->id,
+                    'product_name' => $product->productName,
+                    'price' => $product->productPrice,
+                    'shipping_fee' => $product->shipping_fee,
+                    'origin_product_no' => $originProductNo
+                ]);
+            return [
+                'status' => true
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => '업로드 상품 정보를 데이터베이스에 저장하는 과정에서 오류가 발생했습니다.',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
      * 상품 데이터를 전처리합니다.
+     *
+     * @param stdClass $product
+     * @param array $preData
+     * @return array
      */
     protected function processProduct(stdClass $product, array $preData)
     {
@@ -141,7 +187,23 @@ class LotteOnUploadController extends Controller
         $url = 'https://openapi.lotteon.com/v1/openapi/product/v1/product/registration/request';
         $builderResult = $this->loac->builder($method, $this->account->access_key, $url, $productsData);
 
-        return $builderResult;
+        if (!$builderResult['status']) {
+            return $builderResult;
+        }
+
+        if (!isset($builderResult['data']['returnCode']) || (int)$builderResult['data']['returnCode'] !== 0000) {
+            return [
+                'status' => false,
+                'error' => $builderResult
+            ];
+        }
+
+        $originProductNo = $builderResult['data']['data']['spdNo'];
+
+        return [
+            'status' => true,
+            'data' => $originProductNo
+        ];
     }
 
     /**
