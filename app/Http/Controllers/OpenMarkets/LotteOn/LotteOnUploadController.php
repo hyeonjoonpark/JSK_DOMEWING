@@ -81,6 +81,7 @@ class LotteOnUploadController extends Controller
 
             if (!$storeResult['status']) {
                 $errors[] = $storeResult;
+                continue;
             }
 
             $success++;
@@ -96,9 +97,11 @@ class LotteOnUploadController extends Controller
     /**
      * 상품 업로드 정보를 데이터베이스에 반영합니다.
      *
-     *
+     * @param stdClass $product
+     * @param string $originProductNo
+     * @return array
      */
-    protected function store(stdClass $product, string $originProductNo)
+    protected function store(stdClass $product, string $originProductNo): array
     {
         try {
             DB::table('lotte_on_uploaded_products')
