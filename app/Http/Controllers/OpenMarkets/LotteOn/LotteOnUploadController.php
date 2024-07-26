@@ -65,7 +65,7 @@ class LotteOnUploadController extends Controller
                 continue;
             }
 
-            $productData['spdLst'] = $processProductResult['data'];
+            $productData['spdLst'][] = $processProductResult['data'];
             $uploadResult = $this->upload($productData);
             $errors[] = $uploadResult;
         }
