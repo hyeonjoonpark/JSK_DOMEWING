@@ -293,7 +293,14 @@ class OpenMarketRefundController extends Controller
                 'data' => $apiResult
             ];
         }
+        if ($apiResult['status'] && $apiResult['data']['data']['receiptStatus'] == 'RETURNS_COMPLETED') {
+            return [
+                'status' => true,
+                'message' => '반품완료처리되었습니다.',
+            ];
+        }
         $confirmApiResult = $controller->confirmReturnReceipt($account, $partnerOrder->product_order_number);
+        return $confirmApiResult;
         if (!$confirmApiResult['status']) {
             return [
                 'status' => false,

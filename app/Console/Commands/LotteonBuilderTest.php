@@ -39,9 +39,10 @@ class LotteonBuilderTest extends Command
             ->where('id', 13)
             ->first();
         $account = DB::table('lotte_on_accounts')
-            ->where('id', 1)
+            ->where('id', 2)
             ->first();
         $louc = new LotteOnUploadController($products, $partner, $account);
+
         print_r($louc->main());
     }
 }
