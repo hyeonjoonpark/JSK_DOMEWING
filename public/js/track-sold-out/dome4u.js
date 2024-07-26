@@ -48,6 +48,10 @@ async function validateProduct(page) {
             if (txtDescElement && txtDescElement.textContent.trim().includes('불가능')) {
                 return false;
             }
+            const ownProductElement = document.querySelector('span.ownershop');
+            if (!ownProductElement || (ownProductElement && ownProductElement.textContent.includes('자사상품'))) {
+                return false;
+            }
             return true;
         });
     } catch (error) {
