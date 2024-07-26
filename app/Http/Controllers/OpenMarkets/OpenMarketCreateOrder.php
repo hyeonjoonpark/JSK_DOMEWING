@@ -54,7 +54,8 @@ class OpenMarketCreateOrder extends Controller
                     $product = $this->getProduct($order['productCode']);
                     if (!$product) continue;
                     $priceThen = $this->getSalePrice($product->id, $product->sellerID);
-                    $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity, $order['orderDate']);
+                    $displayedProductName = array_key_exists('displayedProductName', $order) ? $order['displayedProductName'] : null;
+                    $orderResult = $this->storeOrder($wingTransactionId, $cartIds[$index], $order['receiverName'], $order['receiverPhone'], $order['address'], $order['remark'], $priceThen, $product->shipping_fee, $product->bundle_quantity, $order['orderDate'], $displayedProductName);
                     $orderId = $orderResult['data']['orderId']; //order 테이블 insert하고 id값 챙기기
                     $uploadedProductMethod = 'get' . ucfirst($openMarketEngName) . 'UploadedProductId';  // 오픈마켓별 업로드된 상품인지 조회하려고 메소드명 지정
                     $uploadedProduct = call_user_func([$this, $uploadedProductMethod], $product->id); // 해당 오픈마켓 업로드테이블에서 업로드된 상품인지 확인하고 id값 가져옴
@@ -151,7 +152,7 @@ class OpenMarketCreateOrder extends Controller
             ];
         }
     }
-    private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen, $orderDate = null)
+    private function storeOrder($wingTransactionId, $cartId, $receiverName, $receiverPhone, $receiverAddress, $receiverRemark, $priceThen, $shippingFeeThen, $bundleQuantityThen, $orderDate = null, $displayedProductName = null)
     {
         try {
             $orderData = [
@@ -167,6 +168,7 @@ class OpenMarketCreateOrder extends Controller
                 'price_then' => $priceThen,
                 'shipping_fee_then' => $shippingFeeThen,
                 'bundle_quantity_then' => $bundleQuantityThen,
+                'admin_remark' => $displayedProductName
             ];
             if ($orderDate !== null) {
                 $orderData['created_at'] = $orderDate;

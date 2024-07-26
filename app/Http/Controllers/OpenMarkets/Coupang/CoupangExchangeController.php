@@ -177,6 +177,7 @@ class CoupangExchangeController extends Controller
             'receiverName' => $exchangeData['exchangeAddressDtoV1']['returnCustomerName'],
             'receiverPhone' => $exchangeData['exchangeAddressDtoV1']['returnMobile'] ?? $exchangeData['exchangeAddressDtoV1']['returnPhone'] ?? '01000000000',
             'receiverAddress' => $exchangeData['exchangeAddressDtoV1']['deliveryAddress'] . ' ' . $exchangeData['exchangeAddressDtoV1']['deliveryAddressDetail'],
+            'receiverRemark' => $exchangeData['exchangeAddressDtoV1']['deliveryMemo'] ?? null,
             'createdAt' => $exchangeData['createdAt']
         ];
     }

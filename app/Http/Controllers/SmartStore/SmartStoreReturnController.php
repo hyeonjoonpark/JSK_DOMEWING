@@ -17,7 +17,7 @@ class SmartStoreReturnController extends Controller
     {
         $this->ssac = new SmartStoreApiController();
     }
-    public function index($id) //$id값주기
+    public function index($id)
     {
         $accounts = $this->getAccounts($id);
         $createResult = [];

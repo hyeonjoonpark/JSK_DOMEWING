@@ -108,7 +108,8 @@ class CoupangOrderController extends Controller
                         'addressName' => '기본배송지',
                         'productCode' => $orderItem['externalVendorSkuCode'] ?? 'N/A',
                         'remark' => $item['parcelPrintMessage'] ?? 'N/A',
-                        'accountId' => $account->id
+                        'accountId' => $account->id,
+                        'displayedProductName' => $orderItem['vendorItemName'] ?? 'N/A'
                     ];
                 }
             }

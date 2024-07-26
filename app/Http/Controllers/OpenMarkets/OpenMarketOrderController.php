@@ -7,11 +7,13 @@ use App\Http\Controllers\OpenMarkets\Coupang\CoupangExchangeController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangOrderController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangReturnController;
 use App\Http\Controllers\OpenMarkets\St11\St11OrderController;
+use App\Http\Controllers\SmartStore\SmartStoreExchangeController;
 use App\Http\Controllers\SmartStore\SmartStoreOrderController;
 use App\Http\Controllers\SmartStore\SmartStoreReturnController;
 use App\Http\Controllers\WingController;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -53,7 +55,7 @@ class OpenMarketOrderController extends Controller
                             ];
                         }
                     }
-                    if ($openMarketEngName === 'coupang') {
+                    if ($openMarketEngName === 'coupang' || $openMarketEngName === 'smart_store') {
                         $exchangeMethod = 'get' . ucfirst($openMarketEngName) . 'ExchangeOrder';
                         $exchangeResult = call_user_func([$this, $exchangeMethod], $partner->id);
                         if (!$exchangeResult['status']) {
@@ -312,10 +314,8 @@ class OpenMarketOrderController extends Controller
     }
     private function getOrders($vendors, $orderStatus, $startOn, $endOn)
     {
-        // $endOn에 1일을 추가
-        $endOnDate = new DateTime($endOn);
-        $endOnDate->modify('+1 day');
-        $endOn = $endOnDate->format('Y-m-d');
+        $endOnDate = Carbon::createFromFormat('Y-m-d', $endOn)->endOfDay();
+        $startOnDate = Carbon::createFromFormat('Y-m-d', $startOn)->startOfDay();
         $query = DB::table('orders as o')
             ->leftJoin('partner_orders as po', 'o.id', '=', 'po.order_id')
             ->leftJoin('delivery_companies as dc', 'o.delivery_company_id', '=', 'dc.id')
@@ -337,7 +337,6 @@ class OpenMarketOrderController extends Controller
                     ->where('po.vendor_id', 54);
             })
             ->whereIn('mp.sellerID', $vendors)
-            // ->whereNot('v.type', 'B2B') // 일단은 포함시키기로
             ->select(
                 'm.username as member_username',
                 'c.quantity as quantity',
@@ -377,20 +376,20 @@ class OpenMarketOrderController extends Controller
                     ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'PAID')
                     ->where('o.requested', 'N')
-                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                    ->whereBetween('o.created_at', [$startOnDate, $endOnDate]);
                 break;
             case 'PAID_PROCESS':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'PAID')
                     ->where('o.requested', 'Y')
-                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                    ->whereBetween('o.created_at', [$startOnDate, $endOnDate]);
                 break;
             case 'PAID_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
                     ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'PAID')
-                    ->whereBetween('o.updated_at', [$startOn, $endOn]);
+                    ->whereBetween('o.updated_at', [$startOnDate, $endOnDate]);
                 break;
             case 'CANCEL_COMPLETE':
                 $query->where(function ($query) {
@@ -399,48 +398,55 @@ class OpenMarketOrderController extends Controller
                             $query->where('o.type', '!=', 'CANCELLED')
                                 ->where('wt.status', 'REJECTED');
                         });
-                })->whereBetween('o.updated_at', [$startOn, $endOn]);
+                })->whereBetween('o.updated_at', [$startOnDate, $endOnDate]);
                 break;
             case 'RETURN_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('wt.status', 'PENDING')
                     ->where('o.type', 'REFUND')
                     ->where('o.requested', 'N')
-                    ->whereNot('po.vendor_id', 40)
-                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                    ->where(function ($query) {
+                        $query->where('po.vendor_id', '!=', 40)
+                            ->orWhereNull('po.vendor_id');
+                    })
+                    ->whereBetween('o.created_at', [$startOnDate, $endOnDate]);
                 break;
             case 'RETURN_PROCESS':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('wt.status', 'PENDING')
                     ->where('o.type', 'REFUND')
                     ->where('o.requested', 'Y')
-                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                    ->whereBetween('o.created_at', [$startOnDate, $endOnDate]);
                 break;
             case 'RETURN_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
                     ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'REFUND')
-                    ->whereBetween('o.updated_at', [$startOn, $endOn]);
+                    ->whereBetween('o.updated_at', [$startOnDate, $endOnDate]);
                 break;
             case 'EXCHANGE_REQUEST':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('wt.status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
                     ->where('o.requested', 'N')
-                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                    ->where(function ($query) {
+                        $query->where('po.vendor_id', '!=', 40)
+                            ->orWhereNull('po.vendor_id');
+                    })
+                    ->whereBetween('o.created_at', [$startOnDate, $endOnDate]);
                 break;
             case 'EXCHANGE_PROCESS':
                 $query->where('o.delivery_status', 'PENDING')
                     ->where('wt.status', 'PENDING')
                     ->where('o.type', 'EXCHANGE')
                     ->where('o.requested', 'Y')
-                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                    ->whereBetween('o.created_at', [$startOnDate, $endOnDate]);
                 break;
             case 'EXCHANGE_COMPLETE':
                 $query->where('o.delivery_status', 'COMPLETE')
                     ->where('wt.status', 'APPROVED')
                     ->where('o.type', 'EXCHANGE')
-                    ->whereBetween('o.updated_at', [$startOn, $endOn]);
+                    ->whereBetween('o.updated_at', [$startOnDate, $endOnDate]);
                 break;
             case 'COUPANG_EXCHANGE':
                 $query->where('o.delivery_status', 'PENDING')
@@ -448,7 +454,7 @@ class OpenMarketOrderController extends Controller
                     ->where('o.type', 'EXCHANGE')
                     ->where('o.requested', 'N')
                     ->where('po.vendor_id', 40)
-                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                    ->whereBetween('o.created_at', [$startOnDate, $endOnDate]);
                 break;
             case 'COUPANG_RETURN':
                 $query->where('o.delivery_status', 'PENDING')
@@ -456,7 +462,7 @@ class OpenMarketOrderController extends Controller
                     ->where('o.type', 'RETURN')
                     ->where('o.requested', 'N')
                     ->where('po.vendor_id', 40)
-                    ->whereBetween('o.created_at', [$startOn, $endOn]);
+                    ->whereBetween('o.created_at', [$startOnDate, $endOnDate]);
                 break;
         }
         $orders = [];
@@ -593,8 +599,10 @@ class OpenMarketOrderController extends Controller
         $controller = new CoupangReturnController();
         return $controller->index($partnerId);
     }
-    private function getSmart_storeExchangeOrder()
+    private function getSmart_storeExchangeOrder($partnerId)
     {
+        $controller = new SmartStoreExchangeController();
+        return $controller->index($partnerId);
     }
     private function getCoupangExchangeOrder($partnerId)
     {
