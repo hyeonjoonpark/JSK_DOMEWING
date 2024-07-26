@@ -55,27 +55,26 @@ class LotteOnUploadController extends Controller
     public function processProducts(array $preData): array
     {
         $errors = [];
-        $productsData['spdLst'] = [];
+        $success = 0;
 
         foreach ($this->products as $product) {
             $processProductResult = $this->processProduct($product, $preData);
 
             if (!$processProductResult['status']) {
                 $errors[] = $processProductResult;
+                continue;
             }
 
-            $productsData['spdLst'][] = $processProductResult['data'];
+            $productData['spdLst'] = $processProductResult['data'];
+            $uploadResult = $this->upload($productData);
+            $errors[] = $uploadResult;
         }
 
-        if (empty($productsData['spdLst'])) {
-            return [
-                'status' => false,
-                'message' => '해당 테이블의 모든 상품들이 검열 과정에서 필터링 되었습니다.',
-                'error' => $errors
-            ];
-        }
-
-        return $this->upload($productsData);
+        return [
+            'status' => true,
+            'message' => '테스트',
+            'error' => $errors
+        ];
     }
 
     /**
@@ -143,11 +142,7 @@ class LotteOnUploadController extends Controller
             return $builderResult;
         }
 
-        return [
-            'status' => false,
-            'message' => '테스트',
-            'error' => $builderResult
-        ];
+        return $builderResult;
     }
 
     /**
