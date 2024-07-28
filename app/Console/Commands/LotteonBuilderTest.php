@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnApiController;
-use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnUploadController;
+use App\Http\Controllers\Partners\Products\UploadedController;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class LotteonBuilderTest extends Command
 {
@@ -28,21 +26,8 @@ class LotteonBuilderTest extends Command
      */
     public function handle()
     {
-        $products = DB::table('minewing_products AS mp')
-            ->join('category_mapping AS cm', 'cm.ownerclan', '=', 'mp.categoryID')
-            ->whereNot('cm.lotte_on', null)
-            ->where('mp.isActive', 'Y')
-            ->inRandomOrder()
-            ->limit(3)
-            ->get();
-        $partner = DB::table('partners')
-            ->where('id', 13)
-            ->first();
-        $account = DB::table('lotte_on_accounts')
-            ->where('id', 2)
-            ->first();
-        $louc = new LotteOnUploadController($products, $partner, $account);
-
-        print_r($louc->main());
+        $originProductNo = 'LO2343784258';
+        $uc = new UploadedController();
+        print_r($uc->lotte_onDeleteRequest($originProductNo));
     }
 }

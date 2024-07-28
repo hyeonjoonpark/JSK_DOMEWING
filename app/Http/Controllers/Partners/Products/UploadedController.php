@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Partners\Products;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OpenMarkets\Coupang\ApiController;
 use App\Http\Controllers\OpenMarkets\Coupang\CoupangUploadController;
+use App\Http\Controllers\OpenMarkets\LotteOn\LotteOnApiController;
 use App\Http\Controllers\OpenMarkets\St11\ApiController as St11ApiController;
 use App\Http\Controllers\OpenMarkets\St11\UploadController;
 use App\Http\Controllers\SmartStore\SmartStoreApiController;
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 use function PHPSTORM_META\map;
 
@@ -263,6 +265,7 @@ class UploadedController extends Controller
             ->join($vendorEngName . '_uploaded_products AS up', 'up.product_id', '=', 'mp.id')
             ->join('ownerclan_category AS oc', 'oc.id', '=', 'mp.categoryID')
             ->join('product_search AS ps', 'ps.vendor_id', '=', 'mp.sellerID')
+            ->join($vendorEngName . '_accounts AS a', 'a.id', '=', 'up.' . $vendorEngName . '_account_id')
             ->where('up.origin_product_no', $originProductNo)
             ->first();
         if (!$product) {
@@ -675,6 +678,169 @@ class UploadedController extends Controller
         }
         return $apiResult;
     }
+    /**
+     * 롯데온 상품을 삭제 요청합니다.
+     *
+     * @param string @originProductNo
+     * @return array
+     */
+    public function lotte_onDeleteRequest(string $originProductNo): array
+    {
+        $loac = new LotteOnApiController();
+        $account = DB::table('lotte_on_accounts AS a')
+            ->join('lotte_on_uploaded_products AS up', 'up.lotte_on_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.partner_code', 'a.access_key'])
+            ->first();
+        $method = 'post';
+        $url = "https://openapi.lotteon.com/v1/openapi/product/v1/product/status/change";
+        $data['spdLst'] = [
+            [
+                'trGrpCd' => 'SR',
+                'trNo' => $account->partner_code,
+                'spdNo' => $originProductNo,
+                'slStatCd' => 'END'
+            ]
+        ];
+        $apiResult = $loac->builder($method, $account->access_key, $url, $data);
+        if (!isset($apiResult['data']['data'][0]['resultCode']) || (int)$apiResult['data']['data'][0]['resultCode'] !== 0000) {
+            return [
+                'status' => false,
+                'apiResult' => $apiResult
+            ];
+        }
+        return [
+            'status' => true
+        ];
+    }
+
+    /**
+     * 롯데온에 업로드된 상품 정보를 수정합니다.
+     *
+     * @param string $originProductNo
+     * @param string $productName
+     * @param int $price
+     * @param int $shippingFee
+     * @param stdClass $partner
+     * @param stdClass $product
+     * @return array
+     */
+    public function lotte_onEditRequest(string $originProductNo, string $productName, int $price, int $shippingFee, stdClass $partner, stdClass $product, $bundleQuantity): array
+    {
+        $account = DB::table('lotte_on_accounts AS a')
+            ->join('lotte_on_uploaded_products AS up', 'up.lotte_on_account_id', '=', 'a.id')
+            ->where('up.origin_product_no', $originProductNo)
+            ->select(['a.partner_code', 'a.access_key'])
+            ->first();
+        $prdByMaxPurPsbQtyYn = $bundleQuantity > 0 ? 'Y' : 'N';
+        $loac = new LotteOnApiController();
+        $url = 'https://openapi.lotteon.com/v1/openapi/product/v1/product/detail';
+        $data = [
+            'trGrpCd' => 'SR',
+            'trNo' => $account->partner_code,
+            'spdNo' => $originProductNo
+        ];
+        $builderResult = $loac->builder('post', $account->access_key, $url, $data);
+        if (!$builderResult['status']) {
+            return $builderResult;
+        }
+        $builderData = $builderResult['data'];
+        if (!isset($builderData['data']['itmLst'][0]['sitmNo'])) {
+            return [
+                'status' => false,
+                'error' => $builderData
+            ];
+        }
+        $sitmNo = $builderData['data']['itmLst'][0]['sitmNo'];
+        $data['spdLst'][] = [
+            'trGrpCd' => 'SR',
+            'trNo' => $account->partner_code,
+            'epdNo' => $product->productCode,
+            'spdNo' => $product->origin_product_no,
+            'slTypCd' => 'GNRL',
+            'pdTypCd' => 'GNRL_GNRL',
+            'spdNm' => $productName,
+            'oplcCd' => '상품상세 참조',
+            'tdfDvsCd' => '01',
+            'pdItmsInfo' => [
+                'pdItmsCd' => 38,
+                'pdItmsArtlLst' => [
+                    [
+                        'pdArtlCd' => '0210',
+                        'pdArtlCnts' => '상품상세 참조'
+                    ],
+                    [
+                        'pdArtlCd' => '1400',
+                        'pdArtlCnts' => '상품상세 참조'
+                    ],
+                    [
+                        'pdArtlCd' => '1420',
+                        'pdArtlCnts' => '상품상세 참조'
+                    ],
+                    [
+                        'pdArtlCd' => '0070',
+                        'pdArtlCnts' => '상품상세 참조'
+                    ],
+                    [
+                        'pdArtlCd' => '1440',
+                        'pdArtlCnts' => '상품상세 참조'
+                    ],
+                ]
+            ],
+            'purPsbQtyInfo' => [
+                'itmByMinPurYn' => 'N',
+                'itmByMaxPurPsbQtyYn' => $prdByMaxPurPsbQtyYn,
+                'maxPurQty' => $bundleQuantity,
+                'maxPurLmtTypCd' => 'ONCE'
+            ],
+            'ageLmtCd' => '0',
+            'prstPckPsbYn' => 'N',
+            'prstMsgPsbYn' => 'N',
+            'pdStatCd' => 'NEW',
+            'epnLst' => [
+                [
+                    'pdEpnTypCd' => 'DSCRP',
+                    'cnts' => $product->productDetail
+                ]
+            ],
+            'dvProcTypCd' => 'LO_ENTP',
+            'dvPdTypCd' => 'GNRL',
+            'dvRgsprGrpCd' => 'GN101',
+            'dvMnsCd' => 'DPCL',
+            'stkMgtYn' => 'N',
+            'sitmYn' => 'Y',
+            'itmLst' => [
+                [
+                    'eitmNo' => $product->productCode,
+                    'sitmNo' => $sitmNo,
+                    'dpYn' => 'Y',
+                    "sortSeq" => 1,
+                    'itmImgLst' => [
+                        [
+                            'epsrTypCd' => 'IMG',
+                            'epsrTypDtlCd' => 'IMG_SQRE',
+                            'origImgFileNm' => $product->productImage,
+                            'rprtImgYn' => 'Y'
+                        ]
+                    ],
+                    'slPrc' => round($price, -1)
+                ],
+            ],
+        ];
+        $method = 'post';
+        $url = 'https://openapi.lotteon.com/v1/openapi/product/v1/product/modification/request';
+        $builderResult = $loac->builder($method, $account->access_key, $url, $data);
+        if (!isset($builderResult['data']['data'][0]['resultCode']) || (int)$builderResult['data']['data'][0]['resultCode'] !== 0000) {
+            return [
+                'status' => false,
+                'apiResult' => $builderResult
+            ];
+        }
+        return [
+            'status' => true
+        ];
+    }
+
     public function fetchEdittedProducts(array $products)
     {
         set_time_limit(0);
