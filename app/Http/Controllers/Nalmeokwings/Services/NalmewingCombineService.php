@@ -47,6 +47,9 @@ class NalmewingCombineService extends Controller
         $errors = [];
         foreach ($chunkedProductCodes as $productCodes) {
             $partnerId = $this->getPartnerId();
+            if (!$partnerId) {
+                $partnerId = 3;
+            }
             DB::beginTransaction();
             $combineResult = $this->combine($partnerId, $productCodes);
             if (!$combineResult['status']) {
@@ -94,11 +97,14 @@ class NalmewingCombineService extends Controller
     protected function getPartnerId()
     {
         return DB::table('partners AS p')
-            ->join('minewing_products AS mp', 'mp.partner_id', '=', 'p.id')
-            ->select('p.id', DB::raw('COUNT(*) as product_count'))
+            ->leftJoin('minewing_products AS mp', 'mp.partner_id', '=', 'p.id')
+            ->where('p.partner_class_id', 4)
+            ->where('p.is_active', 'ACTIVE')
+            ->select(['p.id', DB::raw('COUNT(*) AS product_count')])
             ->groupBy('p.id')
             ->orderBy('product_count')
-            ->value('p.id');
+            ->first()
+            ->id;
     }
     /**
      * @param int $partnerId
