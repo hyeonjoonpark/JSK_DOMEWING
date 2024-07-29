@@ -322,7 +322,7 @@ class OpenMarketRefundController extends Controller
         if (!$confirmApiResult['status']) {
             return [
                 'status' => false,
-                'message' => '스마트스토어 반품 주문 승인 요청에 실패하였습니다. 관리자에게 문의해주세요.',
+                'message' => '스마트스토어 반품 주문 승인 요청에 실패하였습니다. 주문 상태를 확인해주세요.',
                 'data' => $confirmApiResult
             ];
         }
