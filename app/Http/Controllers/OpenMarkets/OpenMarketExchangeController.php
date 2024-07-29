@@ -290,7 +290,7 @@ class OpenMarketExchangeController extends Controller
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
         $account = DB::table('smart_store_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new SmartStoreExchangeController();
-        $confirmApiResult = $controller->completeExchangePickup($account, $partnerOrder->product_order_number);
+        $confirmApiResult = $controller->completeExchangePickup($account, $partnerOrder->order_number);
         if (!$confirmApiResult['status']) {
             return [
                 'status' => false,
@@ -298,12 +298,12 @@ class OpenMarketExchangeController extends Controller
                 'data' => $confirmApiResult
             ];
         }
-        $confirmApiResult = $controller->reshipExchange($account, $partnerOrder, $goodsDeliveryCode->smart_store, $invoiceNumber);
-        if (!$confirmApiResult['status']) {
+        $reshipApiResult = $controller->reshipExchange($account, $partnerOrder->order_number, $goodsDeliveryCode->smart_store, $invoiceNumber);
+        if (!$reshipApiResult['status']) {
             return [
                 'status' => false,
-                'message' => '스마트스토어 교환 주문 송장번호 입력에 실패하였습니다. 관리자에게 문의해주세요.',
-                'data' => $confirmApiResult
+                'message' => '스마트스토어 교환 주문 송장번호 입력에 실패하였습니다. 주문 상태를 확인해주세요.',
+                'data' => $reshipApiResult
             ];
         }
         return [
@@ -334,7 +334,7 @@ class OpenMarketExchangeController extends Controller
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
         $account = DB::table('smart_store_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new SmartStoreExchangeController();
-        $rejectedExchange = $controller->rejectExchangeRequest($account, $partnerOrder->product_order_number, $remark);
+        $rejectedExchange = $controller->rejectExchangeRequest($account, $partnerOrder->order_number, $remark);
         if (!$rejectedExchange['status']) {
             return [
                 'status' => false,

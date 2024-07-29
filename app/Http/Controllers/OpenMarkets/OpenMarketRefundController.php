@@ -318,7 +318,7 @@ class OpenMarketRefundController extends Controller
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
         $account = DB::table('smart_store_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new SmartStoreReturnController();
-        $confirmApiResult = $controller->approveReturnRequest($account, $partnerOrder->product_order_number);
+        $confirmApiResult = $controller->approveReturnRequest($account, $partnerOrder->order_number);
         if (!$confirmApiResult['status']) {
             return [
                 'status' => false,
@@ -336,7 +336,7 @@ class OpenMarketRefundController extends Controller
         $partnerOrder = DB::table('partner_orders')->where('order_id', $order->id)->first();
         $account = DB::table('smart_store_accounts')->where('id', $partnerOrder->account_id)->first();
         $controller = new SmartStoreReturnController();
-        $rejectApiResult = $controller->rejectReturnRequest($account, $partnerOrder->product_order_number, $reason);
+        $rejectApiResult = $controller->rejectReturnRequest($account, $partnerOrder->order_number, $reason);
         if (!$rejectApiResult['status']) {
             return [
                 'status' => false,

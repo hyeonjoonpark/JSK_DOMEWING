@@ -107,7 +107,7 @@ class OpenMarketExchangeRefundController extends Controller
                     'uploaded_product_id' => $partnerOriginOrder->uploaded_product_id,
                     'price_then' => $partnerOriginOrder->price_then,
                     'shipping_fee_then' => $partnerOriginOrder->shipping_fee_then,
-                    'order_number' => $partnerOriginOrder->order_number,
+                    'order_number' => $partnerOriginOrder->product_order_number,
                     'product_order_number' => $data['newProductOrderNumber'],
                 ]);
             DB::table('order_details')
