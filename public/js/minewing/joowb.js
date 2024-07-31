@@ -1,100 +1,80 @@
 const puppeteer = require('puppeteer');
-
+const { goToAttempts, signIn } = require('./common.js');
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
-
+    const [listUrl, username, password] = process.argv.slice(2);
     try {
-        const [listURL, memberId, password] = process.argv.slice(2);
-        await signIn(page, memberId, password);
-
-        // 로그인 후 전체 카테고리 페이지로 이동
-        await moveToPage(page, `${listURL}`);
-
-        let pageNum = 1;
-        const allProducts = [];
-
-        while (true) {
-            const fullUrl = `${listURL}&page=${pageNum}`;
-            console.log(fullUrl);
-            await page.goto(fullUrl); // await 추가
-
-            const products = await scrapeProducts(page);
-            allProducts.push(...products); // 제품 추가
-
-            console.log(`Page ${pageNum}: ${products.length} products found`);
-            console.log(products);
-
-            const hasNextPage = await checkHasNextPage(page, pageNum);
-            if (!hasNextPage) {
-                break;
-            }
-
-            pageNum += 1;
+        await signIn(page, username, password, 'https://joowb.com/member/login.html', '#member_id', '#member_passwd', 'div > fieldset > a.btnSubmit.sizeL.df-lang-button-login');
+        await goToAttempts(page, listUrl, 'domcontentloaded');
+        const lastPageNumber = await getLastPageNumber(page);
+        const products = [];
+        for (let i = lastPageNumber; i > 0; i--) {
+            await goToAttempts(page, listUrl + '&page=' + i, 'domcontentloaded');
+            const listProducts = await getListProducts(page);
+            console.log(listProducts);
+            products.push(...listProducts);
+            console.log(products.length);
         }
-
-        // 전체 제품 목록 출력
-        console.log(`Total products: ${allProducts.length}`);
-        console.log(allProducts);
-
+        console.log(JSON.stringify(products));
     } catch (error) {
         console.error(error);
     } finally {
         await browser.close();
     }
 })();
-
-async function signIn(page, memberId, password) {
-    await page.goto('https://joowb.com/member/login.html', { waitUntil: 'load' });
-
-    // 로그인 폼이 로드될 때까지 기다림
-    await page.waitForSelector('#member_id');
-    await page.type('#member_id', memberId);
-
-    await page.waitForSelector('#member_passwd');
-    await page.type('#member_passwd', password);
-
-    // 로그인 버튼의 선택자가 올바른지 확인하고 클릭
-    const loginButtonSelector = '.btnSubmit.sizeL.df-lang-button-login';
-    await page.waitForSelector(loginButtonSelector);
-    await page.click(loginButtonSelector);
-
-    // 로그인 후 페이지 로드가 완료될 때까지 기다림
-    await page.waitForNavigation({ waitUntil: 'networkidle0' });
+async function getLastPageNumber(page) {
+    const lastPageNumber = await page.evaluate(() => {
+        const lastPageUrl = document.querySelector('a.last').getAttribute('href');
+        const urlParams = new URLSearchParams(lastPageUrl);
+        const pageValue = urlParams.get('page');
+        return pageValue;
+    });
+    return lastPageNumber ? parseInt(lastPageNumber) : 1;
 }
-
-async function moveToPage(page, url) {
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
-}
-
-async function scrapeProducts(page) {
+async function getListProducts(page) {
     const products = await page.evaluate(() => {
+        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div.xans-element-.xans-product.xans-product-listnormal.df-prl-wrap.df-prl-setup > ul > li');
         const products = [];
-        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div > ul > li');
-
-        productElements.forEach(productElement => {
-            const imageElement = productElement.querySelector('.thumb');
-            const nameElement = productElement.querySelector('div.df-prl-desc > div > a > span');
-            const priceElement = productElement.querySelector('div.df-prl-desc > div > ul > li.a-limited-price.df-prl-listitem-cell.summary_desc.xans-record- > span');
-
-            const image = imageElement ? imageElement.src.trim() : '';
-            const name = nameElement ? nameElement.textContent.trim() : '';
-            const price = priceElement ? priceElement.textContent.trim() : '';
-
-            if (name) {
-                products.push({ image, name, price });
+        for (const pe of productElements) {
+            const product = buildProduct(pe);
+            if (product) {
+                products.push(product);
             }
-        });
+        }
+        function buildProduct(pe) {
+            const isSoldOut = Array.from(pe.querySelectorAll('div.df-prl-icon > img')).some(img => img.src === 'https://img.echosting.cafe24.com/design/skin/admin/ko_KR/ico_product_soldout.gif');
+            if (isSoldOut) {
+                return false;
+            }
+            const nameElement = pe.querySelector('div > div.df-prl-desc > div > a > span');
+            if (!nameElement) {
+                return false;
+            }
+            const priceElements = pe.querySelectorAll('div > div.df-prl-desc > div > ul > li.a-limited-price.df-prl-listitem-cell.product_price.xans-record- > span:nth-child(2)');
+            let priceText = '';
+            for (const priceElement of priceElements) {
+                priceText += priceElement.textContent.trim();
+            }
+            const price = parseInt(priceText.replace(/[^0-9]/g, '').trim());
+            if (!price) {
+                return false;
+            }
+            const imageElement = pe.querySelector('div > div.df-prl-thumb > a > img')
+            if (!imageElement) {
+                return false;
+            }
+            const hrefElement = pe.querySelector('div > div.df-prl-thumb > a');
+            if (!hrefElement) {
+                return false;
+            }
+            const name = nameElement.textContent.trim();
+            const image = imageElement.src;
+            const href = 'https://joowb.com/' + hrefElement.getAttribute('href');
+            const platform = '엄마애손';
+            return { name, price, image, href, platform };
+        }
         return products;
     });
-
     return products;
-}
-
-async function checkHasNextPage(page, currentPageNum) {
-    return await page.evaluate((currentPageNum) => {
-        const paginationElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpaging.ec-base-paginate > ol > li > a');
-        const lastPageNum = parseInt(paginationElements[paginationElements.length - 1].textContent.trim(), 10);
-        return currentPageNum < lastPageNum;
-    }, currentPageNum);
 }
