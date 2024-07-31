@@ -1,9 +1,5 @@
 const puppeteer = require('puppeteer');
 
-/**
- * https://joowb.com/
- */
-
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -13,34 +9,33 @@ const puppeteer = require('puppeteer');
         await signIn(page, memberId, password);
 
         // 로그인 후 전체 카테고리 페이지로 이동
-        await moveToPage(page, `${listURL}/product/list.html`);
+        await moveToPage(page, `${listURL}`);
 
-        // 카테고리 페이지에서 카테고리 번호를 추출
-        const categories = await page.evaluate(allCategoriesNumber);
-        console.log(categories);
+        let pageNum = 1;
+        const allProducts = [];
 
-        let allProducts = [];
+        while (true) {
+            const fullUrl = `${listURL}&page=${pageNum}`;
+            console.log(fullUrl);
+            await page.goto(fullUrl); // await 추가
 
-        console.log(`categories.length = ${categories.length}`);
+            const products = await scrapeProducts(page);
+            allProducts.push(...products); // 제품 추가
 
-        for (const category of categories) {
-            let pageNum = 1;
-            while (true) {
-                await moveToPage(page, `${listURL}/product/list.html?cate_no=${category}&page=${pageNum}`);
-                const products = await scrapeProducts(page);
+            console.log(`Page ${pageNum}: ${products.length} products found`);
+            console.log(products);
 
-                if (products.length === 0) break;
-                console.log(`Category: ${category}, Page: ${pageNum}`);
-                console.log(`Products:`, products);
-                allProducts = allProducts.concat(products);
-                console.log(`products.length = ${products.length}`);
-
-                pageNum++;
+            const hasNextPage = await checkHasNextPage(page, pageNum);
+            if (!hasNextPage) {
+                break;
             }
+
+            pageNum += 1;
         }
 
-        console.log("All Products:", allProducts);
-        console.log(`all products.length = ${allProducts.length}`);
+        // 전체 제품 목록 출력
+        console.log(`Total products: ${allProducts.length}`);
+        console.log(allProducts);
 
     } catch (error) {
         console.error(error);
@@ -72,25 +67,22 @@ async function moveToPage(page, url) {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
 }
 
-async function allCategoriesNumber() {
-    const liElements = document.querySelectorAll('ul.xans-element- li[df-cate-no]');
-    const cateNos = Array.from(liElements).map(li => li.getAttribute('df-cate-no'));
-    return cateNos;
-}
-
 async function scrapeProducts(page) {
     const products = await page.evaluate(() => {
         const products = [];
-        const productElements = document.querySelectorAll('.df-prl-fadearea');
-        
+        const productElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpackage > div > ul > li');
+
         productElements.forEach(productElement => {
-            const imageElement = productElement.querySelector('#anchorBoxId_658 > div > div.df-prl-thumb');
-            
-            const name = productElement.querySelector('#anchorBoxId_660 > div > div.df-prl-desc > div > a > span')?.textContent.trim() || '';
-            const price = productElement.querySelector('ul > li.a-limited-price.df-prl-listitem-cell.product_price.xans-record- > span:nth-child(2)')?.textContent.trim() || '';
+            const imageElement = productElement.querySelector('.thumb');
+            const nameElement = productElement.querySelector('div.df-prl-desc > div > a > span');
+            const priceElement = productElement.querySelector('div.df-prl-desc > div > ul > li.a-limited-price.df-prl-listitem-cell.summary_desc.xans-record- > span');
+
+            const image = imageElement ? imageElement.src.trim() : '';
+            const name = nameElement ? nameElement.textContent.trim() : '';
+            const price = priceElement ? priceElement.textContent.trim() : '';
 
             if (name) {
-                products.push({ imageElement, name, price });
+                products.push({ image, name, price });
             }
         });
         return products;
@@ -99,3 +91,10 @@ async function scrapeProducts(page) {
     return products;
 }
 
+async function checkHasNextPage(page, currentPageNum) {
+    return await page.evaluate((currentPageNum) => {
+        const paginationElements = document.querySelectorAll('#contents > div.xans-element-.xans-product.xans-product-normalpaging.ec-base-paginate > ol > li > a');
+        const lastPageNum = parseInt(paginationElements[paginationElements.length - 1].textContent.trim(), 10);
+        return currentPageNum < lastPageNum;
+    }, currentPageNum);
+}
