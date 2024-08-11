@@ -1,4 +1,8 @@
-// joowb Details
+// crazylist Details
+/**
+ * id : jskorea2024
+ * password : tjddlf88!@
+ */
 
 const puppeteer = require('puppeteer');
 const { signIn } = require('../common');
@@ -8,24 +12,29 @@ const { signIn } = require('../common');
     const page = await browser.newPage();
 
     try {
-        const [tempFilePath, username, password] = process.argv.slice(2);
+        const [tempFilePath, id, password] = process.argv.slice(2);
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        await signIn(page, username, password, 'https://joowb.com/member/login.html', '#member_id', '#member_passwd', 'div > fieldset > a.btnSubmit.sizeL.df-lang-button-login');
+        await signIn(
+            page, id, password, 
+            "https://crazylist.co.kr/member/login.html", 
+            "#member_id", // 로그인 ID
+            "#member_passwd", // 로그인 PW
+            ".btnLogin" // 로그인 BUTTON
+        );
         const products = [];
         for (const url of urls) {
             const product = await scrapeProduct(page, url);
-            if (product === false) {
-                continue;
-            }
+            if(product === false) continue;
             products.push(product);
         }
         console.log(JSON.stringify(products));
-    } catch (error) {
-        console.error(error);
+    } catch (err) {
+        console.error(err);
     } finally {
         await browser.close();
     }
 })();
+
 
 async function scrapeProduct(page, url) {
     try {
@@ -35,13 +44,13 @@ async function scrapeProduct(page, url) {
         const productOptions = productOptionData.productOptions;
         const productData = await page.evaluate(() => {
             const productName = 
-                document.querySelector('#df-product-detail > div > div.infoArea-wrap > div > div > div.scroll-wrapper.df-detail-fixed-scroll.scrollbar-macosx > div.df-detail-fixed-scroll.scrollbar-macosx.scroll-content > div.headingArea > h2');
+                document.querySelector('.item_name > div.xans-element-.xans-product.xans-product-detaildesign > div > span');
             const productPrice =
-                document.querySelector('#totalPrice > span > strong > em');
+                document.querySelector('.delv_price_B > strong');
             const productImage = 
-                document.querySelector('#df-product-detail > div > div.imgArea-wrap > div > div > div.thumbnail > span > img');
+                document.querySelector('detailArea > div.xans-element-.xans-product.xans-product-image.imgArea > div > div > img');
             const productDetailElements =
-                document.querySelectorAll('#prdDetail > div.cont > div > img');
+                document.querySelectorAll('#prdDetail > div > div.edibot-product-detail > div > img');
             if(productDetailElements.length < 1) {
                 return false;
             }
@@ -49,8 +58,7 @@ async function scrapeProduct(page, url) {
             for(const productDetailElement of productDetailElements) {
                 const tempProductDetailSrc = productDetailElement.src;
                 if(
-                    tempProductDetailSrc === 'https://joowb.com/web/upload/NNEditor/20210415/f207c5667c8587a042f070648c942766.jpg' ||
-                    tempProductDetailSrc === 'https://joowb.com/web/upload/NNEditor/20210415/f207c5667c8587a042f070648c942766.jpg'
+                    tempProductDetailSrc === 'https://cafe24.poxo.com/ec01/rugdome/0jJurf5+JqL2mXn6P+LWO+PqV6bsdh7X3gfNNABC5wsxKXAqYH8SWKHjlm2alCb6EZedkkrbGiBgknm8firtAg==/_/web/upload/NNEditor/20240611/EAB080EAB2A9ECA480EC8898.jpg'
                 ) {
                     continue;
                 }
@@ -85,7 +93,7 @@ async function scrapeProduct(page, url) {
 
 async function getProductOptions(page) {
     async function reloadSelects() {
-        return await page.$$('table select');
+        return await page.$$('select');
     }
     async function reselectOptions(selects, selectedOptions) {
         for (let i = 0; i < selectedOptions.length; i++) {
@@ -100,7 +108,7 @@ async function getProductOptions(page) {
         if(currentDepth < selects.length) {
             //  옵션을 선택해주세요 문구와 -------------- 선 제외한 option만 가져온다
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
-                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value !== '*' && opt.value !== '**')
+                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value == "*" && opt.value == "**")
             );
 
             for(const option of options) {

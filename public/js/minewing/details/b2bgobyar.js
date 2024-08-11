@@ -1,16 +1,27 @@
-// joowb Details
+// B2B gobycar Details
+
+/**
+ * id : jskorea2024
+ * password : tjddlf88!@
+ */
 
 const puppeteer = require('puppeteer');
-const { signIn } = require('../common');
+const { signIn } = require('./common.js');
 
 (async () => {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     try {
-        const [tempFilePath, username, password] = process.argv.slice(2);
+        const [tempFilePath, id, password] = process.argv.slice(2);
         const urls = JSON.parse(fs.readFileSync(tempFilePath, 'utf8'));
-        await signIn(page, username, password, 'https://joowb.com/member/login.html', '#member_id', '#member_passwd', 'div > fieldset > a.btnSubmit.sizeL.df-lang-button-login');
+        await signIn(
+            page, id, password,
+            "http://b2bgobycar.co.kr/member/login.php",
+            "#loginId",
+            "#loginPwd",
+            ".skinbtn.point2.l-login"
+        );
         const products = [];
         for (const url of urls) {
             const product = await scrapeProduct(page, url);
@@ -20,12 +31,13 @@ const { signIn } = require('../common');
             products.push(product);
         }
         console.log(JSON.stringify(products));
-    } catch (error) {
-        console.error(error);
+    } catch (e) {
+        console.error(e);
     } finally {
         await browser.close();
     }
 })();
+
 
 async function scrapeProduct(page, url) {
     try {
@@ -35,13 +47,13 @@ async function scrapeProduct(page, url) {
         const productOptions = productOptionData.productOptions;
         const productData = await page.evaluate(() => {
             const productName = 
-                document.querySelector('#df-product-detail > div > div.infoArea-wrap > div > div > div.scroll-wrapper.df-detail-fixed-scroll.scrollbar-macosx > div.df-detail-fixed-scroll.scrollbar-macosx.scroll-content > div.headingArea > h2');
+                document.querySelector('#frmView > div > div.goods-header > div.top > div > h2');
             const productPrice =
-                document.querySelector('#totalPrice > span > strong > em');
+                document.querySelector('#frmView > div > div.item > ul > li.price > div > strong');
             const productImage = 
-                document.querySelector('#df-product-detail > div > div.imgArea-wrap > div > div > div.thumbnail > span > img');
+                document.querySelector('#mainImage > img');
             const productDetailElements =
-                document.querySelectorAll('#prdDetail > div.cont > div > img');
+                document.querySelectorAll('#detail > div.txt-manual > p > img');
             if(productDetailElements.length < 1) {
                 return false;
             }
@@ -49,8 +61,8 @@ async function scrapeProduct(page, url) {
             for(const productDetailElement of productDetailElements) {
                 const tempProductDetailSrc = productDetailElement.src;
                 if(
-                    tempProductDetailSrc === 'https://joowb.com/web/upload/NNEditor/20210415/f207c5667c8587a042f070648c942766.jpg' ||
-                    tempProductDetailSrc === 'https://joowb.com/web/upload/NNEditor/20210415/f207c5667c8587a042f070648c942766.jpg'
+                    tempProductDetailSrc === '' ||
+                    tempProductDetailSrc === ''
                 ) {
                     continue;
                 }
@@ -85,7 +97,7 @@ async function scrapeProduct(page, url) {
 
 async function getProductOptions(page) {
     async function reloadSelects() {
-        return await page.$$('table select');
+        return await page.$$('select');
     }
     async function reselectOptions(selects, selectedOptions) {
         for (let i = 0; i < selectedOptions.length; i++) {
@@ -100,7 +112,7 @@ async function getProductOptions(page) {
         if(currentDepth < selects.length) {
             //  옵션을 선택해주세요 문구와 -------------- 선 제외한 option만 가져온다
             const options = await selects[currentDepth].$$eval('option:not(:disabled)', opts =>
-                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value !== '*' && opt.value !== '**')
+                opts.map(opt => ({ value: opt.value, text: opt.text })).filter(opt => opt.value == '')
             );
 
             for(const option of options) {
